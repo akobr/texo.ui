@@ -1,0 +1,31 @@
+﻿using System.Collections.Immutable;
+
+namespace BeaverSoft.Texo.Core.Commands
+{
+    public partial class CommandContext
+    {
+        public class Builder
+        {
+            internal Builder(CommandContext context)
+            {
+                Key = context.Key;
+                IsValid = context.IsValid;
+                Options = context.options.ToBuilder();
+                Parameters = context.parameters.ToBuilder();
+            }
+
+            public string Key { get; set; }
+
+            public bool IsValid { get; set; }
+
+            public ImmutableDictionary<string, IOptionContext>.Builder Options { get; }
+
+            public ImmutableDictionary<string, IParameterContext>.Builder Parameters { get; }
+
+            public CommandContext ToImmutable()
+            {
+                return new CommandContext(this);
+            }
+        }
+    }
+}
