@@ -1,6 +1,8 @@
-﻿namespace BeaverSoft.Texo.Core.Runtime
+﻿using System;
+
+namespace BeaverSoft.Texo.Core.Runtime
 {
-    public interface IRuntimeCoordinatorService
+    public interface IRuntimeCoordinatorService : IDisposable
     {
         void Process(string input);
     }

@@ -2,7 +2,6 @@
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.InputTree;
 using BeaverSoft.Texo.Core.Model.Configuration;
-using BeaverSoft.Texo.Core.Services;
 using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Core.Input
@@ -11,7 +10,7 @@ namespace BeaverSoft.Texo.Core.Input
     {
         private readonly IInputParseService parser;
         private readonly IEnvironmentService environment;
-        private readonly ISettingsService settings;
+        private readonly ISettingService setting;
         private readonly ILogService logger;
 
         private ITextumConfiguration configuration;
@@ -20,18 +19,18 @@ namespace BeaverSoft.Texo.Core.Input
         public InputEvaluationService(
             IInputParseService parser,
             IEnvironmentService environment,
-            ISettingsService settings,
+            ISettingService setting,
             ILogService logger)
         {
             this.parser = parser;
             this.environment = environment;
-            this.settings = settings;
+            this.setting = setting;
             this.logger = logger;
         }
 
         public void Initialise()
         {
-            configuration = settings.Configuration;
+            configuration = setting.Configuration;
 
             IInputTreeBuilder treeBuilder = new InputTreeBuilder(logger);
             tree = treeBuilder.Build(configuration.Runtime.Commands, configuration.Runtime.DefaultCommand);

@@ -1,6 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Input;
-
-namespace BeaverSoft.Texo.Core.Services
+﻿namespace BeaverSoft.Texo.Core.Input
 {
     public interface IInputParseService
     {

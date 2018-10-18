@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using BeaverSoft.Texo.Core.Services;
 
 namespace BeaverSoft.Texo.Core.Input
 {

@@ -2,7 +2,7 @@
 
 namespace BeaverSoft.Texo.Core.Configuration
 {
-    public interface ISettingsService
+    public interface ISettingService
     {
         ITextumConfiguration Configuration { get; }
 

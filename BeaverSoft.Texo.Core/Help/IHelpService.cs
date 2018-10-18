@@ -2,10 +2,10 @@
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Model.View;
 
-namespace BeaverSoft.Texo.Core.Runtime
+namespace BeaverSoft.Texo.Core.Help
 {
     public interface IHelpService
     {
-        IImmutableList<IItem> Help(IParsedInput input);
+        IImmutableList<IItem> Help(IInput input);
     }
 }

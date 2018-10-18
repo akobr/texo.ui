@@ -92,6 +92,12 @@ namespace BeaverSoft.Texo.Core.InputTree
 
         private void EvaluateQueueBody(QueryNode query)
         {
+            if (query.DefaultQuery != null)
+            {
+                EvaluateDefaultQuery(query);
+                return;
+            }
+
             int queryInputIndex = 0;
 
             while (!wrongInput && tokenStack.Count > 0)
@@ -108,6 +114,7 @@ namespace BeaverSoft.Texo.Core.InputTree
                 }
                 else if (query.Queries.TryGetValue(token.NormalisedValue, out QueryNode subQuery))
                 {
+                    result.Context.QueryPath.Add(token.NormalisedValue);
                     EvaluateExplicitQueue(subQuery);
                 }
                 else if(queryInputIndex == 0)
@@ -120,6 +127,22 @@ namespace BeaverSoft.Texo.Core.InputTree
                 }
 
                 queryInputIndex++;
+            }
+        }
+
+        private void EvaluateDefaultQuery(QueryNode query)
+        {
+            AnalysedToken token = tokenStack.Peek();
+
+            if (token.CanBeQuery && query.Queries.TryGetValue(token.NormalisedValue, out QueryNode subQuery))
+            {
+                result.Context.QueryPath.Add(token.NormalisedValue);
+                EvaluateExplicitQueue(subQuery);
+            }
+            else
+            {
+                result.Context.QueryPath.Add(query.DefaultQuery.Query.Key);
+                EvaluateQueueBody(query);
             }
         }
 
@@ -150,6 +173,11 @@ namespace BeaverSoft.Texo.Core.InputTree
 
             foreach (char character in token.NormalisedValue)
             {
+                if (character == InputConstants.PARAMETER_INPUT_PREFIX)
+                {
+                    continue;
+                }
+
                 if (!query.OptionList.TryGetValue(character, out OptionNode option))
                 {
                     EvaluateParameters(query, result.Context.Parameters);

@@ -2,7 +2,6 @@
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.InputTree;
 using BeaverSoft.Texo.Core.Model.Configuration;
-using BeaverSoft.Texo.Core.Services;
 using StrongBeaver.Core.Services.Logging;
 using Xunit;
 

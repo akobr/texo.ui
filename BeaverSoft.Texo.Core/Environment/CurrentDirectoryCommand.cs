@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Extensions;
 using BeaverSoft.Texo.Core.Result;
-using BeaverSoft.Texo.Core.Services;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Core.Environment
 {
@@ -11,10 +12,12 @@ namespace BeaverSoft.Texo.Core.Environment
         private const string PARAMETER_PATH = "path";
 
         private readonly ICurrentDirectoryService service;
+        private readonly ILogService logger;
 
-        public CurrentDirectoryCommand(ICurrentDirectoryService service)
+        public CurrentDirectoryCommand(ICurrentDirectoryService service, ILogService logger)
         {
             this.service = service ?? throw new ArgumentNullException(nameof(service));
+            this.logger = logger;
         }
 
         public ICommandResult Execute(ICommandContext context)
@@ -39,7 +42,10 @@ namespace BeaverSoft.Texo.Core.Environment
                     string newPath = Path.Combine(currentPath, path);
                     currentPath = ChangePathIfExists(currentPath, newPath);
                 }
-                catch { /* no operation */ }
+                catch (Exception exception)
+                {
+                    logger.CommandError(CommandKeys.CURRENT_DIRECTORY, exception);
+                }
             }
 
             service.SetCurrentDirectory(currentPath);

@@ -1,10 +1,11 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Model.View;
 
 namespace BeaverSoft.Texo.Core.View
 {
-    public interface IViewService
+    public interface IViewService : IDisposable
     {
         void Render(IInput input);
 
@@ -12,7 +13,9 @@ namespace BeaverSoft.Texo.Core.View
 
         void RenderIntellisence(IImmutableList<IItem> items);
 
-        void RenderProgress();
+        void RenderProgress(IProgress progress);
+
+        void UpdateCurrentDirectory(string directoryPath);
 
         void Update(string key, IItem item);
     }

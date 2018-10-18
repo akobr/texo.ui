@@ -8,6 +8,8 @@ namespace BeaverSoft.Texo.Core.Commands
 
         bool IsValid { get; }
 
+        IImmutableList<string> QueryPath { get; }
+
         IImmutableDictionary<string, IOptionContext> Options { get; }
 
         IImmutableDictionary<string, IParameterContext> Parameters { get; }

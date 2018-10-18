@@ -26,11 +26,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Texo.Core.MarkDown", "BeaverSoft.Texo.Core.MarkDown\BeaverSoft.Texo.Core.MarkDown.csproj", "{9D99B9D9-ED3A-430C-8233-68CB05CB7CCA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Texo.Core.Markdown", "BeaverSoft.Texo.Core.MarkDown\BeaverSoft.Texo.Core.Markdown.csproj", "{9D99B9D9-ED3A-430C-8233-68CB05CB7CCA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeaverSoft.Texo.Test", "BeaverSoft.Texo.Test", "{B0C6C7C8-9839-40AD-A96F-C81E22EA87E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Texo.Test.Core", "BeaverSoft.Texo.Test.Core\BeaverSoft.Texo.Test.Core.csproj", "{4DF7DF69-5953-45B0-B6B0-CF2DC7CFED03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Texo.Test.Core", "BeaverSoft.Texo.Test.Core\BeaverSoft.Texo.Test.Core.csproj", "{4DF7DF69-5953-45B0-B6B0-CF2DC7CFED03}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Texo.View.Console.Markdown", "BeaverSoft.Texo.View.Console.Markdown\BeaverSoft.Texo.View.Console.Markdown.csproj", "{74FA3293-4FC3-4B60-BA41-3670657AD3D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Texo.View.WPF.Markdown", "BeaverSoft.Texo.View.WPF.Markdown\BeaverSoft.Texo.View.WPF.Markdown.csproj", "{1DC76826-BCBE-4E8D-BB0A-D3D47736C816}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,6 +78,14 @@ Global
 		{4DF7DF69-5953-45B0-B6B0-CF2DC7CFED03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DF7DF69-5953-45B0-B6B0-CF2DC7CFED03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DF7DF69-5953-45B0-B6B0-CF2DC7CFED03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74FA3293-4FC3-4B60-BA41-3670657AD3D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74FA3293-4FC3-4B60-BA41-3670657AD3D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74FA3293-4FC3-4B60-BA41-3670657AD3D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74FA3293-4FC3-4B60-BA41-3670657AD3D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DC76826-BCBE-4E8D-BB0A-D3D47736C816}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DC76826-BCBE-4E8D-BB0A-D3D47736C816}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DC76826-BCBE-4E8D-BB0A-D3D47736C816}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DC76826-BCBE-4E8D-BB0A-D3D47736C816}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +98,8 @@ Global
 		{BDF53369-758D-4954-BA18-9424EF294550} = {F5B87E3E-7729-46C9-8863-75ED2D5A2D51}
 		{51B05FED-D5D3-4B31-916A-D05F670F5108} = {534F00C1-22A4-4090-9566-6C6A8468ACC1}
 		{4DF7DF69-5953-45B0-B6B0-CF2DC7CFED03} = {B0C6C7C8-9839-40AD-A96F-C81E22EA87E1}
+		{74FA3293-4FC3-4B60-BA41-3670657AD3D3} = {534F00C1-22A4-4090-9566-6C6A8468ACC1}
+		{1DC76826-BCBE-4E8D-BB0A-D3D47736C816} = {534F00C1-22A4-4090-9566-6C6A8468ACC1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDFCCFD5-8669-4BBF-83FF-8DFCC3F39551}

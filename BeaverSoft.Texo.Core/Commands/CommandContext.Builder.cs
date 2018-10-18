@@ -10,6 +10,7 @@ namespace BeaverSoft.Texo.Core.Commands
             {
                 Key = context.Key;
                 IsValid = context.IsValid;
+                QueryPath = context.queryPath.ToBuilder();
                 Options = context.options.ToBuilder();
                 Parameters = context.parameters.ToBuilder();
             }
@@ -17,6 +18,8 @@ namespace BeaverSoft.Texo.Core.Commands
             public string Key { get; set; }
 
             public bool IsValid { get; set; }
+
+            public ImmutableList<string>.Builder QueryPath { get; }
 
             public ImmutableDictionary<string, IOptionContext>.Builder Options { get; }
 

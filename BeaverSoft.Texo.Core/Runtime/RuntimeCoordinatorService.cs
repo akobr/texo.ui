@@ -1,62 +1,64 @@
 ﻿using System;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Model.View;
-using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Runtime
 {
     public class RuntimeCoordinatorService : IRuntimeCoordinatorService
     {
-        private readonly IInputParseService parser;
-        private readonly ICommandContextBuildService contextBuilder;
+        private readonly IInputEvaluationService evaluator;
         private readonly ICommandManagementService commandManagement;
         private readonly IDidYouMeanService didYouMean;
         private readonly IResultProcessingService resultProcessing;
         private readonly IViewService view;
 
         public RuntimeCoordinatorService(
-            IInputParseService parser,
-            ICommandContextBuildService contextBuilder,
+            IInputEvaluationService evaluator,
             ICommandManagementService commandManagement,
-            IDidYouMeanService didYouMean,
             IResultProcessingService resultProcessing,
-            IViewService view)
+            IViewService view,
+            IDidYouMeanService didYouMean)
         {
-            this.parser = parser ?? throw new ArgumentNullException(nameof(parser));
-            this.contextBuilder = contextBuilder ?? throw new ArgumentNullException(nameof(contextBuilder));
+            this.evaluator = evaluator ?? throw new ArgumentNullException(nameof(evaluator));
             this.commandManagement = commandManagement ?? throw new ArgumentNullException(nameof(commandManagement));
-            this.didYouMean = didYouMean ?? throw new ArgumentNullException(nameof(didYouMean));
             this.resultProcessing = resultProcessing ?? throw new ArgumentNullException(nameof(resultProcessing));
             this.view = view ?? throw new ArgumentNullException(nameof(view));
+            this.didYouMean = didYouMean;
         }
 
         public void Process(string input)
         {
-            IParsedInput parsedInput = parser.Parse(input);
+            IInput inputModel = evaluator.Evaluate(input);
 
-            if (parsedInput.IsEmpty())
+            if (!inputModel.Context.IsValid)
             {
+                if (didYouMean == null)
+                {
+                    RenderError("Unknown input.");
+                    return;
+                }
+
+                Render(didYouMean.Help(inputModel));
                 return;
             }
 
-            ICommandContext context = contextBuilder.BuildContext(parsedInput);
-
-            if (context.IsValid)
+            if (!commandManagement.HasCommand(inputModel.Context.Key))
             {
-                Render(didYouMean.Help(parsedInput));
+                RenderError($"The command is not registered: {inputModel.Context.Key}.");
                 return;
             }
 
-            if (!commandManagement.HasCommand(context.Key))
-            {
-                RenderError("Invalid command!");
-                return;
-            }
+            ProcessContext(inputModel.Context);
+        }
 
-            ProcessContext(context);
+        public void Dispose()
+        {
+            view.Dispose();
+            commandManagement.Dispose();
         }
 
         private void ProcessContext(ICommandContext context)

@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.Services;
 
 namespace BeaverSoft.Texo.Core.InputTree
 {
@@ -39,6 +38,8 @@ namespace BeaverSoft.Texo.Core.InputTree
         public bool IsExplicitOption => isExplicitOption;
 
         public bool IsEndOfParameterList => isEndOfParameterList;
+
+        public bool CanBeQuery => !isParameter && !isExplicitOption && !isEndOfParameterList;
 
         private void Process()
         {

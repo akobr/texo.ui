@@ -4,6 +4,7 @@ namespace BeaverSoft.Texo.Core.Commands
 {
     public partial class CommandContext : ICommandContext
     {
+        private readonly ImmutableList<string> queryPath;
         private readonly ImmutableDictionary<string, IOptionContext> options;
         private readonly ImmutableDictionary<string, IParameterContext> parameters;
 
@@ -17,6 +18,7 @@ namespace BeaverSoft.Texo.Core.Commands
         {
             Key = toClone.Key;
             IsValid = toClone.IsValid;
+            queryPath = toClone.queryPath;
             options = toClone.options;
             parameters = toClone.parameters;
         }
@@ -25,6 +27,7 @@ namespace BeaverSoft.Texo.Core.Commands
         {
             Key = builder.Key;
             IsValid = builder.IsValid;
+            queryPath = builder.QueryPath.ToImmutable();
             options = builder.Options.ToImmutable();
             parameters = builder.Parameters.ToImmutable();
         }
@@ -32,6 +35,8 @@ namespace BeaverSoft.Texo.Core.Commands
         public string Key { get; }
 
         public bool IsValid { get; }
+
+        public IImmutableList<string> QueryPath { get; }
 
         public IImmutableDictionary<string, IOptionContext> Options => options;
 
