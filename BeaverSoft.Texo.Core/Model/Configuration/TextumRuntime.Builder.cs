@@ -6,13 +6,13 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
     {
         public sealed class Builder
         {
-            internal Builder(TextumRuntime configuration)
+            internal Builder(TextumRuntime immutable)
             {
-                Commands = configuration.commands;
-                DefaultCommand = configuration.defaultCommand;
+                Commands = immutable.commands.ToBuilder();
+                DefaultCommand = immutable.defaultCommand;
             }
 
-            public ImmutableList<IQuery> Commands { get; set; }
+            public ImmutableList<Query>.Builder Commands { get; }
 
             public string DefaultCommand { get; set; }
 

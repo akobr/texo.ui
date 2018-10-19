@@ -4,9 +4,9 @@ namespace BeaverSoft.Texo.Core.Configuration
 {
     public class SettingService : ISettingService
     {
-        public ITextumConfiguration Configuration { get; private set; }
+        public TextumConfiguration Configuration { get; private set; }
 
-        public void Configure(ITextumConfiguration configuration)
+        public void Configure(TextumConfiguration configuration)
         {
             Configuration = configuration;
         }

@@ -41,5 +41,10 @@ namespace BeaverSoft.Texo.View.WPF
         public void Dispose()
         {
         }
+
+        public void Initialise()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

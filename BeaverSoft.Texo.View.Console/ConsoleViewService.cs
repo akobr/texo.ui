@@ -62,5 +62,10 @@ namespace BeaverSoft.Texo.View.Console
         public void Dispose()
         {
         }
+
+        public void Initialise()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

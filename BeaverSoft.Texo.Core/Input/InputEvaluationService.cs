@@ -13,7 +13,7 @@ namespace BeaverSoft.Texo.Core.Input
         private readonly ISettingService setting;
         private readonly ILogService logger;
 
-        private ITextumConfiguration configuration;
+        private TextumConfiguration configuration;
         private InputTree.InputTree tree;
 
         public InputEvaluationService(

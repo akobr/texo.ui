@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BeaverSoft.Texo.Core.Model.Configuration
+﻿namespace BeaverSoft.Texo.Core.Model.Configuration
 {
     public partial class Parameter
     {

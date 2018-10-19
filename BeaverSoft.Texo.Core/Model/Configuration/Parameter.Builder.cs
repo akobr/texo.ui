@@ -9,7 +9,7 @@
                 IsOptional = parameter.isOptional;
                 IsRepeatable = parameter.isRepeatable;
                 ArgumentTemplate = parameter.argumentTemplate;
-                Documentation = parameter.documentation;
+                Documentation = parameter.documentation.ToBuilder();
             }
 
             public string Key { get; set; }
@@ -20,7 +20,7 @@
 
             public string ArgumentTemplate { get; set; }
 
-            public IDocumentation Documentation { get; set; }
+            public Documentation.Builder Documentation { get; set; }
 
             public Parameter ToImmutable()
             {

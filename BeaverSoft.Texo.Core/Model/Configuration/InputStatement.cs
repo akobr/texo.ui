@@ -2,17 +2,18 @@
 
 namespace BeaverSoft.Texo.Core.Model.Configuration
 {
-    public abstract partial class InputStatement : IInputStatement
+    public abstract partial class InputStatement
     {
         private string key;
         private ImmutableList<string> representations;
-        private ImmutableList<IParameter> parameters;
-        private IDocumentation documentation;
+        private ImmutableList<Parameter> parameters;
+        private Documentation documentation;
 
         protected InputStatement()
         {
             representations = ImmutableList<string>.Empty;
-            parameters = ImmutableList<IParameter>.Empty;
+            parameters = ImmutableList<Parameter>.Empty;
+            documentation = Documentation.Empty;
         }
 
         protected InputStatement(InputStatement toClone)
@@ -28,14 +29,14 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
             key = builder.Key;
             representations = builder.Representations.ToImmutable();
             parameters = builder.Parameters.ToImmutable();
-            documentation = builder.Documentation;
+            documentation = builder.Documentation.ToImmutable();
         }
 
         protected InputStatement(
             string key,
             ImmutableList<string> representations,
-            ImmutableList<IParameter> parameters,
-            IDocumentation documentation)
+            ImmutableList<Parameter> parameters,
+            Documentation documentation)
         {
             this.key = key;
             this.representations = representations;
@@ -45,11 +46,11 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
 
         public string Key => key;
 
-        public IImmutableList<string> Representations => representations;
+        public ImmutableList<string> Representations => representations;
 
-        public IImmutableList<IParameter> Parameters => parameters;
+        public ImmutableList<Parameter> Parameters => parameters;
 
-        public IDocumentation Documentation => documentation;
+        public Documentation Documentation => documentation;
 
         protected T SetKey<T>(T cloned, string value)
             where T : InputStatement
@@ -65,14 +66,14 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
             return cloned;
         }
 
-        protected T SetParameters<T>(T cloned, ImmutableList<IParameter> value)
+        protected T SetParameters<T>(T cloned, ImmutableList<Parameter> value)
             where T : InputStatement
         {
             cloned.parameters = value;
             return cloned;
         }
 
-        protected T SetDocumentation<T>(T cloned, IDocumentation value)
+        protected T SetDocumentation<T>(T cloned, Documentation value)
             where T : InputStatement
         {
             cloned.documentation = value;

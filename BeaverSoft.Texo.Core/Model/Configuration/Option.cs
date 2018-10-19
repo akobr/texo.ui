@@ -2,7 +2,7 @@
 
 namespace BeaverSoft.Texo.Core.Model.Configuration
 {
-    public sealed partial class Option : InputStatement, IOption
+    public sealed partial class Option : InputStatement
     {
         private Option()
             : base()
@@ -32,12 +32,12 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
             return SetRepresentations(new Option(this), value);
         }
 
-        public Option SetParameters(ImmutableList<IParameter> value)
+        public Option SetParameters(ImmutableList<Parameter> value)
         {
             return SetParameters(new Option(this), value);
         }
 
-        public Option SetDocumentation(IDocumentation value)
+        public Option SetDocumentation(Documentation value)
         {
             return SetDocumentation(new Option(this), value);
         }

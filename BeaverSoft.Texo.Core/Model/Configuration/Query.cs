@@ -2,16 +2,16 @@
 
 namespace BeaverSoft.Texo.Core.Model.Configuration
 {
-    public sealed partial class Query : InputStatement, IQuery
+    public sealed partial class Query : InputStatement
     {
-        private ImmutableList<IQuery> queries;
-        private ImmutableList<IOption> options;
+        private ImmutableList<Query> queries;
+        private ImmutableList<Option> options;
         private string defaultQueryKey;
 
         private Query()
         {
-            queries = ImmutableList<IQuery>.Empty;
-            options = ImmutableList<IOption>.Empty;
+            queries = ImmutableList<Query>.Empty;
+            options = ImmutableList<Option>.Empty;
         }
 
         private Query(Query toClone)
@@ -30,13 +30,13 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
             defaultQueryKey = builder.DefaultQueryKey;
         }
 
-        public IImmutableList<IQuery> Queries => queries;
+        public ImmutableList<Query> Queries => queries;
 
-        public IImmutableList<IOption> Options => options;
+        public ImmutableList<Option> Options => options;
 
         public string DefaultQueryKey => defaultQueryKey;
 
-        public Query SetQueries(ImmutableList<IQuery> value)
+        public Query SetQueries(ImmutableList<Query> value)
         {
             return new Query(this)
             {
@@ -44,7 +44,7 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
             };
         }
 
-        public Query SetOptions(ImmutableList<IOption> value)
+        public Query SetOptions(ImmutableList<Option> value)
         {
             return new Query(this)
             {
@@ -70,12 +70,12 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
             return SetRepresentations(new Query(this), value);
         }
 
-        public Query SetParameters(ImmutableList<IParameter> value)
+        public Query SetParameters(ImmutableList<Parameter> value)
         {
             return SetParameters(new Query(this), value);
         }
 
-        public Query SetDocumentation(IDocumentation value)
+        public Query SetDocumentation(Documentation value)
         {
             return SetDocumentation(new Query(this), value);
         }

@@ -4,12 +4,12 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
 {
     public static class InputStatementExtensions
     {
-        public static string GetMainRepresentation(this IInputStatement statement)
+        public static string GetMainRepresentation(this InputStatement statement)
         {
             return statement?.Representations?.FirstOrDefault() ?? string.Empty;
         }
 
-        public static bool HasParameters(this IInputStatement statement)
+        public static bool HasParameters(this InputStatement statement)
         {
             return statement?.Parameters?.Count > 0;
         }

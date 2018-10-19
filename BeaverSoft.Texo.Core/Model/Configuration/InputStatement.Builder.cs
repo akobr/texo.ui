@@ -11,16 +11,16 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
                 Key = configuration.key;
                 Representations = configuration.representations.ToBuilder();
                 Parameters = configuration.parameters.ToBuilder();
-                Documentation = configuration.documentation;
+                Documentation = configuration.documentation.ToBuilder();
             }
 
             public string Key { get; set; }
 
             public ImmutableList<string>.Builder Representations { get; set; }
 
-            public ImmutableList<IParameter>.Builder Parameters { get; set; }
+            public ImmutableList<Parameter>.Builder Parameters { get; set; }
 
-            public IDocumentation Documentation { get; set; }
+            public Documentation.Builder Documentation { get; set; }
         }
     }
 }

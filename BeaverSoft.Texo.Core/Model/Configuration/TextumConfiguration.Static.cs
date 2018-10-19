@@ -1,10 +1,10 @@
 ﻿namespace BeaverSoft.Texo.Core.Model.Configuration
 {
-    public partial class TextumEnvironment
+    public partial class TextumConfiguration
     {
-        public static TextumEnvironment Empty { get; } = new TextumEnvironment();
+        public static TextumConfiguration Empty { get; } = new TextumConfiguration();
 
-        public static TextumEnvironment CreateDefault()
+        public static TextumConfiguration CreateDefault()
         {
             Builder builder = CreateBuilder();
             SetDefault(builder);
@@ -18,7 +18,9 @@
 
         internal static void SetDefault(Builder builder)
         {
-            builder.WorkingPath = System.Environment.CurrentDirectory;
+            TextumRuntime.SetDefault(builder.Runtime);
+            TextumEnvironment.SetDefault(builder.Environment);
+            TextumUi.SetDefault(builder.Ui);
         }
     }
 }

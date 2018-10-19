@@ -4,9 +4,9 @@
     {
         public sealed class Builder
         {
-            internal Builder(TextumEnvironment configuration)
+            internal Builder(TextumEnvironment immutable)
             {
-                WorkingPath = configuration.workingPath;
+                WorkingPath = immutable.workingPath;
             }
 
             public string WorkingPath { get; set; }

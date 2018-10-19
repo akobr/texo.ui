@@ -18,9 +18,14 @@ namespace BeaverSoft.Texo.Core
             this.setting = setting ?? throw new ArgumentNullException(nameof(setting));
         }
 
-        public void Configure(ITextumConfiguration configuration)
+        public void Configure(TextumConfiguration configuration)
         {
             setting.Configure(configuration);
+        }
+
+        public void Start()
+        {
+            runtime.Initialise();
         }
 
         public void Process(string input)

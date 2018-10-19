@@ -8,7 +8,7 @@ namespace BeaverSoft.Texo.Core
 {
     public static class CommandsBuilder
     {
-        public static IQuery BuildCurrentDirectory()
+        public static Query BuildCurrentDirectory()
         {
             var command = Query.CreateBuilder();
 
@@ -17,22 +17,20 @@ namespace BeaverSoft.Texo.Core
             parameter.ArgumentTemplate = InputRegex.PATH;
             parameter.IsOptional = true;
             parameter.IsRepeatable = true;
-            parameter.Documentation = new Documentation(
-                "Directory path",
-                "Specify full or relative path(s) to working directory.");
+            parameter.Documentation.Title = "Directory path";
+            parameter.Documentation.Description = "Specify full or relative path(s) to working directory.";
 
             command.Key = CommandKeys.CURRENT_DIRECTORY;
             command.Representations.AddRange(
                 new[] { CommandKeys.CURRENT_DIRECTORY, "cd", "chdir", "cdir" });
             command.Parameters.Add(parameter.ToImmutable());
-            command.Documentation = new Documentation(
-                "Current directory",
-                "Gets or sets current working directory.");
+            command.Documentation.Title = "Current directory";
+            command.Documentation.Description = "Gets or sets current working directory.";
 
             return command.ToImmutable();
         }
 
-        public static IQuery BuildHelp()
+        public static Query BuildHelp()
         {
             var command = Query.CreateBuilder();
 
@@ -41,22 +39,20 @@ namespace BeaverSoft.Texo.Core
             parameter.ArgumentTemplate = InputRegex.QUERY_OR_OPTION;
             parameter.IsOptional = true;
             parameter.IsRepeatable = true;
-            parameter.Documentation = new Documentation(
-                "Query",
-                "Specify command / query / option or parameter name about which you want to know more.");
+            parameter.Documentation.Title = "Query";
+            parameter.Documentation.Description = "Specify command / query / option or parameter name about which you want to know more.";
 
             command.Key = CommandKeys.HELP;
             command.Representations.AddRange(
                 new[] { CommandKeys.HELP, "advice", "aid" });
             command.Parameters.Add(parameter.ToImmutable());
-            command.Documentation = new Documentation(
-                "Help",
-                "Shows more information and hint for requested query.");
+            command.Documentation.Title = "Help";
+            command.Documentation.Description = "Shows more information and hint for requested query.";
 
             return command.ToImmutable();
         }
 
-        public static IQuery BuildTexo()
+        public static Query BuildTexo()
         {
             var command = Query.CreateBuilder();
 
@@ -70,7 +66,7 @@ namespace BeaverSoft.Texo.Core
             return command.ToImmutable();
         }
 
-        private static IQuery CreateEnvironmentQuery()
+        private static Query CreateEnvironmentQuery()
         {
             var query = Query.CreateBuilder();
             query.Key = EnvironmentNames.QUERY_ENVIRONMENT;
@@ -81,15 +77,13 @@ namespace BeaverSoft.Texo.Core
             var parName = Parameter.CreateBuilder();
             parName.Key = ParameterKeys.NAME;
             parName.ArgumentTemplate = InputRegex.VARIABLE_NAME;
-            parName.Documentation = new Documentation(
-                "Variable name",
-                "Specify variable name.");
+            parName.Documentation.Title = "Variable name";
+            parName.Documentation.Description = "Specify variable name.";
 
             var parValue = Parameter.CreateBuilder();
             parValue.Key = ParameterKeys.VALUE;
-            parValue.Documentation = new Documentation(
-                "Variable value",
-                "Specify new value of variable.");
+            parValue.Documentation.Title = "Variable value";
+            parValue.Documentation.Description = "Specify new value of variable.";
 
             var queryList = Query.CreateBuilder();
             queryList.Key = EnvironmentNames.QUERY_LIST;
@@ -125,7 +119,7 @@ namespace BeaverSoft.Texo.Core
             return query.ToImmutable();
         }
 
-        private static IQuery CreateSettingQuery()
+        private static Query CreateSettingQuery()
         {
             var query = Query.CreateBuilder();
             query.Key = SettingNames.QUERY_SETTING;
@@ -135,21 +129,18 @@ namespace BeaverSoft.Texo.Core
             var parCategory = Parameter.CreateBuilder();
             parCategory.Key = SettingNames.PARAMETER_CATEGORY;
             parCategory.ArgumentTemplate = InputRegex.VARIABLE_NAME;
-            parCategory.Documentation = new Documentation(
-                "Category",
-                "Specify requested category from settings.");
+            parCategory.Documentation.Title = "Category";
+            parCategory.Documentation.Description = "Specify requested category from settings.";
 
             var parProperty = Parameter.CreateBuilder();
             parProperty.Key = SettingNames.PARAMETER_PROPERTY;
-            parProperty.Documentation = new Documentation(
-                "Property path",
-                "Specify path to property from settings.");
+            parProperty.Documentation.Title = "Property path";
+            parProperty.Documentation.Description = "Specify path to property from settings.";
 
             var parValue = Parameter.CreateBuilder();
             parValue.Key = ParameterKeys.VALUE;
-            parValue.Documentation = new Documentation(
-                "Property value",
-                "Specify new value of property.");
+            parValue.Documentation.Title = "Property value";
+            parValue.Documentation.Description = "Specify new value of property.";
 
             var queryList = Query.CreateBuilder();
             queryList.Key = SettingNames.QUERY_LIST;

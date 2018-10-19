@@ -1,6 +1,6 @@
 ﻿namespace BeaverSoft.Texo.Core.Model.Configuration
 {
-    public partial class TextumUi : ITextumUi
+    public partial class TextumUi
     {
         private string prompt;
         private bool showWorkingPathAsPrompt;
@@ -11,10 +11,10 @@
             showWorkingPathAsPrompt = false;
         }
 
-        private TextumUi(TextumUi configuration)
+        private TextumUi(TextumUi toClone)
         {
-            prompt = configuration.prompt;
-            showWorkingPathAsPrompt = configuration.showWorkingPathAsPrompt;
+            prompt = toClone.prompt;
+            showWorkingPathAsPrompt = toClone.showWorkingPathAsPrompt;
         }
 
         private TextumUi(Builder builder)

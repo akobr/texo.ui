@@ -2,14 +2,14 @@
 
 namespace BeaverSoft.Texo.Core.Model.Configuration
 {
-    public sealed partial class TextumRuntime : ITextumRuntime
+    public sealed partial class TextumRuntime
     {
-        private ImmutableList<IQuery> commands;
+        private ImmutableList<Query> commands;
         private string defaultCommand;
 
         private TextumRuntime()
         {
-            commands = ImmutableList<IQuery>.Empty;
+            commands = ImmutableList<Query>.Empty;
         }
 
         private TextumRuntime(TextumRuntime toClone)
@@ -20,15 +20,15 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
 
         private TextumRuntime(Builder builder)
         {
-            commands = builder.Commands;
+            commands = builder.Commands.ToImmutable();
             defaultCommand = builder.DefaultCommand;
         }
 
-        public IImmutableList<IQuery> Commands => commands;
+        public ImmutableList<Query> Commands => commands;
 
         public string DefaultCommand => defaultCommand;
 
-        public TextumRuntime SetCommands(ImmutableList<IQuery> value)
+        public TextumRuntime SetCommands(ImmutableList<Query> value)
         {
             return new TextumRuntime(this)
             {

@@ -1,12 +1,12 @@
 ﻿namespace BeaverSoft.Texo.Core.Model.Configuration
 {
-    public partial class Parameter : IParameter
+    public partial class Parameter
     {
         private string key;
         private bool isOptional;
         private bool isRepeatable;
         private string argumentTemplate;
-        private IDocumentation documentation;
+        private Documentation documentation;
 
         private Parameter()
         {
@@ -28,7 +28,7 @@
             isOptional = builder.IsOptional;
             isRepeatable = builder.IsRepeatable;
             argumentTemplate = builder.ArgumentTemplate;
-            documentation = builder.Documentation;
+            documentation = builder.Documentation.ToImmutable();
         }
 
         public string Key => key;
@@ -39,7 +39,7 @@
 
         public string ArgumentTemplate => argumentTemplate;
 
-        public IDocumentation Documentation => documentation;
+        public Documentation Documentation => documentation;
 
         public Parameter SetKey(string value)
         {
@@ -73,7 +73,7 @@
             };
         }
 
-        public Parameter SetDocumentation(IDocumentation value)
+        public Parameter SetDocumentation(Documentation value)
         {
             return new Parameter(this)
             {

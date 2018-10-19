@@ -5,7 +5,7 @@ namespace BeaverSoft.Texo.Core.InputTree
 {
     public class QueryNode : ParameteriseNode
     {
-        public QueryNode(IQuery query)
+        public QueryNode(Query query)
         {
             Query = query;
 
@@ -14,7 +14,7 @@ namespace BeaverSoft.Texo.Core.InputTree
             OptionList = new Dictionary<char, OptionNode>();
         }
 
-        public IQuery Query { get; }
+        public Query Query { get; }
 
         public override NodeTypeEnum Type => NodeTypeEnum.Query;
 

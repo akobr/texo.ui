@@ -2,10 +2,11 @@
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Model.View;
+using StrongBeaver.Core;
 
 namespace BeaverSoft.Texo.Core.View
 {
-    public interface IViewService : IDisposable
+    public interface IViewService : IInitialisable, IDisposable
     {
         void Render(IInput input);
 

@@ -14,9 +14,9 @@ namespace BeaverSoft.Texo.Core.Model.Configuration
                 DefaultQueryKey = configuration.defaultQueryKey;
             }
 
-            public ImmutableList<IQuery>.Builder Queries { get; set; }
+            public ImmutableList<Query>.Builder Queries { get; set; }
 
-            public ImmutableList<IOption>.Builder Options { get; set; }
+            public ImmutableList<Option>.Builder Options { get; set; }
 
             public string DefaultQueryKey { get; set; }
 

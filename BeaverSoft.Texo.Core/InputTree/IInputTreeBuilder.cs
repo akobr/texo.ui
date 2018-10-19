@@ -5,6 +5,6 @@ namespace BeaverSoft.Texo.Core.InputTree
 {
     public interface IInputTreeBuilder
     {
-        InputTree Build(IEnumerable<IQuery> commands, string defaultCommandKey);
+        InputTree Build(IEnumerable<Query> commands, string defaultCommandKey);
     }
 }

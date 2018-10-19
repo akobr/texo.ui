@@ -1,6 +1,6 @@
 ﻿namespace BeaverSoft.Texo.Core.Model.Configuration
 {
-    public partial class TextumEnvironment : ITextumEnvironment
+    public partial class TextumEnvironment
     {
         private string workingPath;
 
@@ -9,9 +9,9 @@
             workingPath = string.Empty;
         }
 
-        private TextumEnvironment(TextumEnvironment configuration)
+        private TextumEnvironment(TextumEnvironment toClone)
         {
-            workingPath = configuration.workingPath;
+            workingPath = toClone.workingPath;
         }
 
         private TextumEnvironment(Builder builder)

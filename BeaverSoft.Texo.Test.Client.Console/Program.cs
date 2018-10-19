@@ -1,6 +1,7 @@
 ﻿using System;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Texo.Core.Model.Configuration;
 using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.View.Console;
@@ -44,7 +45,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
                 .WithSettingService(container.GetInstance<ISettingService>())
                 .Build(container.GetInstance<IViewService>());
 
-            //engine.Configure();
+            engine.Configure(TextumConfiguration.CreateDefault());
         }
 
         private static void Shutdown()
@@ -54,7 +55,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
 
         private static void LongRun()
         {
-
+            engine.Start();
         }
 
         private static void Run(string[] args)

@@ -21,12 +21,14 @@ namespace BeaverSoft.Texo.Test.Core
             cdParamBuilder.ArgumentTemplate = "[^\\<\\>\\:\\\"\\|\\?\\*[:cntrl:]]+";
             cdParamBuilder.IsOptional = true;
             cdParamBuilder.IsRepeatable = true;
-            cdParamBuilder.Documentation = new Documentation("Directory path", "Specify full or relative path.");
+            cdParamBuilder.Documentation.Title = "Directory path";
+            cdParamBuilder.Documentation.Description = "Specify full or relative path.";
 
             cdBuilder.Key = "current-directory";
             cdBuilder.Representations.AddRange(new[] { "current-directory", "cd", "chdir", "cdir" });
             cdBuilder.Parameters.Add(cdParamBuilder.ToImmutable());
-            cdBuilder.Documentation = new Documentation("Current directory", "Gets or sets current working directory.");
+            cdBuilder.Documentation.Title = "Current directory";
+            cdBuilder.Documentation.Description = "Gets or sets current working directory.";
 
             InputTreeBuilder builder = new InputTreeBuilder(new EmptyLogService());
             InputTree tree = builder.Build(new[] { cdBuilder.ToImmutable() }, null);

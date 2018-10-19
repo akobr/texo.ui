@@ -4,12 +4,12 @@ namespace BeaverSoft.Texo.Core.InputTree
 {
     public class OptionNode : ParameteriseNode
     {
-        public OptionNode(IOption option)
+        public OptionNode(Option option)
         {
             Option = option;
         }
 
-        public IOption Option { get; set; }
+        public Option Option { get; set; }
 
         public override NodeTypeEnum Type => NodeTypeEnum.Option;
     }

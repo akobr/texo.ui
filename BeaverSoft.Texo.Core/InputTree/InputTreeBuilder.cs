@@ -17,14 +17,14 @@ namespace BeaverSoft.Texo.Core.InputTree
             this.logger = logger;
         }
 
-        public InputTree Build(IEnumerable<IQuery> commands, string defaultCommandKey)
+        public InputTree Build(IEnumerable<Query> commands, string defaultCommandKey)
         {
             InputTree tree = new InputTree();
             ProcessQueries(tree.Root, commands, defaultCommandKey);
             return tree;
         }
 
-        private QueryNode BuildQueryNode(IQuery query)
+        private QueryNode BuildQueryNode(Query query)
         {
             QueryNode node = new QueryNode(query);
             ProcessQueries(node, query.Queries, query.DefaultQueryKey);
@@ -33,14 +33,14 @@ namespace BeaverSoft.Texo.Core.InputTree
             return node;
         }
 
-        private OptionNode BuildOptionNode(IOption option)
+        private OptionNode BuildOptionNode(Option option)
         {
             OptionNode node = new OptionNode(option);
             ProcessParameters(node, option.Parameters);
             return node;
         }
 
-        private static ParameterNode BuildParameterNode(IParameter parameter)
+        private static ParameterNode BuildParameterNode(Parameter parameter)
         {
             return new ParameterNode(parameter);
         }
@@ -106,9 +106,9 @@ namespace BeaverSoft.Texo.Core.InputTree
             node.Parameters.Add(parameterNode);
         }
 
-        private void ProcessQueries(QueryNode parent, IEnumerable<IQuery> queries, string defaultQueryKey)
+        private void ProcessQueries(QueryNode parent, IEnumerable<Query> queries, string defaultQueryKey)
         {
-            foreach (IQuery query in queries)
+            foreach (Query query in queries)
             {
                 QueryNode node = BuildQueryNode(query);
                 AddQuery(node, parent);
@@ -120,18 +120,18 @@ namespace BeaverSoft.Texo.Core.InputTree
             }
         }
 
-        private void ProcessOptions(QueryNode parent, IEnumerable<IOption> options)
+        private void ProcessOptions(QueryNode parent, IEnumerable<Option> options)
         {
-            foreach (IOption option in options)
+            foreach (Option option in options)
             {
                 OptionNode optionNode = BuildOptionNode(option);
                 AddOption(optionNode, parent);
             }
         }
 
-        private void ProcessParameters(ParameteriseNode parent, IEnumerable<IParameter> parameters)
+        private void ProcessParameters(ParameteriseNode parent, IEnumerable<Parameter> parameters)
         {
-            foreach (IParameter parameter in parameters)
+            foreach (Parameter parameter in parameters)
             {
                 ParameterNode parameterNode = BuildParameterNode(parameter);
                 AddParameter(parameterNode, parent);
@@ -140,7 +140,7 @@ namespace BeaverSoft.Texo.Core.InputTree
 
         private bool CheckIfParameterIsValid(ParameterNode parameterNode, ParameteriseNode node)
         {
-            IParameter newParameter = parameterNode.Parameter;
+            Parameter newParameter = parameterNode.Parameter;
 
             if (NeedsTemplate(newParameter)
                 && !IsValidTemplate(newParameter.ArgumentTemplate))
@@ -154,7 +154,7 @@ namespace BeaverSoft.Texo.Core.InputTree
                 return true;
             }
 
-            IParameter lastParameter = node.Parameters[node.Parameters.Count - 1].Parameter;
+            Parameter lastParameter = node.Parameters[node.Parameters.Count - 1].Parameter;
 
             if (lastParameter.IsRepeatable)
             {
@@ -268,7 +268,7 @@ namespace BeaverSoft.Texo.Core.InputTree
             return string.Equals(firstKey, secondKey, StringComparison.InvariantCulture);
         }
 
-        private static bool NeedsTemplate(IParameter parameter)
+        private static bool NeedsTemplate(Parameter parameter)
         {
             return parameter.IsOptional || parameter.IsRepeatable;
         }

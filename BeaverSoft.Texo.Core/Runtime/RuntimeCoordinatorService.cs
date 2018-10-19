@@ -30,6 +30,12 @@ namespace BeaverSoft.Texo.Core.Runtime
             this.didYouMean = didYouMean;
         }
 
+        public void Initialise()
+        {
+            evaluator.Initialise();
+            view.Initialise();
+        }
+
         public void Process(string input)
         {
             IInput inputModel = evaluator.Evaluate(input);

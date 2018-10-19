@@ -4,9 +4,9 @@
     {
         public sealed class Builder
         {
-            internal Builder(TextumUi configuration)
+            internal Builder(TextumUi immutable)
             {
-                Prompt = configuration.prompt;
+                Prompt = immutable.prompt;
             }
 
             public string Prompt { get; set; }
