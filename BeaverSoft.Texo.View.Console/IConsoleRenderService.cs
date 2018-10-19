@@ -2,7 +2,7 @@
 
 namespace BeaverSoft.Texo.View.Console
 {
-    public interface IConsoleWriteItemService
+    public interface IConsoleRenderService
     {
         void Write(IItem item);
     }

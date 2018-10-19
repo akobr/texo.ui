@@ -9,11 +9,11 @@ using SysConsole = System.Console;
 
 namespace BeaverSoft.Texo.View.Console.Markdown
 {
-    public class ConsoleWriteMarkdownItemService : IConsoleWriteItemService
+    public class ConsoleMarkdownRenderService : IConsoleRenderService
     {
         private readonly IMarkdownService markdown;
 
-        public ConsoleWriteMarkdownItemService(IMarkdownService markdown)
+        public ConsoleMarkdownRenderService(IMarkdownService markdown)
         {
             this.markdown = markdown;
         }

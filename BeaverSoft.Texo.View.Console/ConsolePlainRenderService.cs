@@ -4,7 +4,7 @@ using SysConsole = System.Console;
 
 namespace BeaverSoft.Texo.View.Console
 {
-    public class ConsoleWritePlainItemService : IConsoleWriteItemService
+    public class ConsolePlainRenderService : IConsoleRenderService
     {
         public void Write(IItem item)
         {

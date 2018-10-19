@@ -10,11 +10,11 @@ namespace BeaverSoft.Texo.View.Console
 {
     public class ConsoleViewService : IViewService
     {
-        private readonly IConsoleWriteItemService writer;
+        private readonly IConsoleRenderService writer;
         private readonly ISettingService setting;
 
         public ConsoleViewService(
-            IConsoleWriteItemService writer,
+            IConsoleRenderService writer,
             ISettingService setting)
         {
             this.writer = writer;

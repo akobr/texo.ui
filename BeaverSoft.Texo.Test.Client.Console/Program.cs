@@ -38,7 +38,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
 
             container.Register<ISettingService, SettingService>();
             container.Register<IMarkdownService, MarkdownService>();
-            container.Register<IConsoleWriteItemService, ConsoleWriteMarkdownItemService>();
+            container.Register<IConsoleRenderService, ConsoleMarkdownRenderService>();
             container.Register<IViewService, ConsoleViewService>();
 
             engine = new TexoEngineBuilder()
