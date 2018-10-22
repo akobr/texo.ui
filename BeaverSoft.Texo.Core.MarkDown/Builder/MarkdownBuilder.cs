@@ -48,13 +48,13 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
 
         public IMarkdownBuilder Image(string path, string alternative)
         {
-            stringBuilder.AppendFormat("![{0}][{1}]", alternative, path);
+            stringBuilder.AppendFormat("![{0}]({1})", alternative, path);
             return this;
         }
 
         public IMarkdownBuilder Link(string title, string path)
         {
-            stringBuilder.AppendFormat("[{0}][{1}]", title, path);
+            stringBuilder.AppendFormat("[{0}]({1})", title, path);
             return this;
         }
 
@@ -67,6 +67,21 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
         public IMarkdownBuilder Bold(string text)
         {
             stringBuilder.AppendFormat("**{0}**", text);
+            return this;
+        }
+
+        public IMarkdownBuilder CodeBlock(string language, string code)
+        {
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($"```{language}");
+            stringBuilder.AppendLine(code);
+            stringBuilder.AppendLine("```");
+            return this;
+        }
+
+        public IMarkdownBuilder CodeInline(string code)
+        {
+            stringBuilder.AppendFormat("`{0}`", code);
             return this;
         }
 
