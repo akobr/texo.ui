@@ -14,7 +14,7 @@ namespace BeaverSoft.Texo.Core.Commands
 
             public string Key { get; set; }
 
-            public ImmutableDictionary<string, IParameterContext>.Builder Parameters { get; }
+            public ImmutableDictionary<string, ParameterContext>.Builder Parameters { get; }
 
             public OptionContext ToImmutable()
             {

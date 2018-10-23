@@ -1,6 +1,5 @@
 ﻿using System;
 using BeaverSoft.Texo.Core.Configuration;
-using BeaverSoft.Texo.Core.Model.Configuration;
 using BeaverSoft.Texo.Core.Runtime;
 
 namespace BeaverSoft.Texo.Core
@@ -23,9 +22,14 @@ namespace BeaverSoft.Texo.Core
             setting.Configure(configuration);
         }
 
-        public void Start()
+        public void Initialise()
         {
             runtime.Initialise();
+        }
+
+        public void Start()
+        {
+            runtime.Start();
         }
 
         public void Process(string input)

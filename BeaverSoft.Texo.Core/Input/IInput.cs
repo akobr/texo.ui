@@ -5,7 +5,7 @@ namespace BeaverSoft.Texo.Core.Input
 {
     public interface IInput
     {
-        ICommandContext Context { get; }
+        CommandContext Context { get; }
 
         IImmutableList<IToken> Tokens { get; }
 

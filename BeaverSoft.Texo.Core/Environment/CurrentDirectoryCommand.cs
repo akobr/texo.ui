@@ -20,9 +20,9 @@ namespace BeaverSoft.Texo.Core.Environment
             this.logger = logger;
         }
 
-        public ICommandResult Execute(ICommandContext context)
+        public ICommandResult Execute(CommandContext context)
         {
-            if (!context.Parameters.TryGetValue(PARAMETER_PATH, out IParameterContext parameter))
+            if (!context.Parameters.TryGetValue(PARAMETER_PATH, out ParameterContext parameter))
             {
                 return new TextResult(service.GetCurrentDirectory());
             }
@@ -33,6 +33,7 @@ namespace BeaverSoft.Texo.Core.Environment
             {
                 try
                 {
+                    // TODO: Even rooted path can be relative
                     if (Path.IsPathRooted(path))
                     {
                         currentPath = ChangePathIfExists(currentPath, path);

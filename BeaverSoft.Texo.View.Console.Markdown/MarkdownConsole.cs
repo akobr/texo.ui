@@ -9,44 +9,42 @@ namespace BeaverSoft.Texo.View.Console.Markdown
         public static void WriteHeader(string text, int level)
         {
             TexoConsole.WriteWithColor(text, GetHeaderColor(level));
-            SysConsole.WriteLine();
         }
 
         public static void WriteItalic(string text)
         {
-            TexoConsole.WriteWithColor(text, ConsoleColor.DarkMagenta);
+            TexoConsole.WriteWithColor(text, ConsoleColor.DarkGray);
         }
 
         public static void WriteBold(string text)
         {
-            TexoConsole.WriteWithColor(text, ConsoleColor.Magenta);
+            TexoConsole.WriteWithColor(text, ConsoleColor.DarkMagenta);
         }
 
         public static void WriteCode(string code)
         {
-            TexoConsole.WriteWithColor(code, ConsoleColor.Yellow, ConsoleColor.DarkGray);
+            TexoConsole.WriteWithColor(code, ConsoleColor.DarkGreen, ConsoleColor.White);
         }
 
         public static void WriteQuote(string quote)
         {
-            TexoConsole.WriteWithColor(quote, ConsoleColor.DarkYellow, ConsoleColor.DarkGray);
-            SysConsole.WriteLine();
+            TexoConsole.WriteWithColor(quote, ConsoleColor.Black, ConsoleColor.White);
         }
 
         public static void WriteLink(string url)
         {
-            TexoConsole.WriteWithColor(url, ConsoleColor.Blue, ConsoleColor.DarkGray);
+            TexoConsole.WriteWithColor(url, ConsoleColor.DarkBlue);
         }
 
         public static void WriteLink(string url, string title)
         {
             if (!string.IsNullOrWhiteSpace(title))
             {
-                TexoConsole.WriteWithColor(title, ConsoleColor.DarkBlue, ConsoleColor.DarkGray);
+                TexoConsole.WriteWithColor(title, ConsoleColor.DarkBlue);
                 SysConsole.Write(" / ");
             }
 
-            TexoConsole.WriteWithColor(url, ConsoleColor.Blue, ConsoleColor.DarkGray);
+            TexoConsole.WriteWithColor(url, ConsoleColor.DarkBlue);
         }
 
         public static void WriteListItemBullet(string bullet, int intentLevel)
@@ -66,14 +64,13 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         public static void WriteHtml(string html)
         {
-            TexoConsole.WriteWithColor(html, ConsoleColor.White, ConsoleColor.DarkCyan);
+            TexoConsole.WriteWithColor(html, ConsoleColor.DarkCyan, ConsoleColor.White);
         }
 
         public static void WriteHorizontalBreak()
         {
             SysConsole.WriteLine();
-            TexoConsole.WriteWithColor("---", ConsoleColor.DarkGray, ConsoleColor.DarkGray);
-            SysConsole.WriteLine();
+            TexoConsole.WriteWithColor(new string('-', 32), ConsoleColor.DarkGray, ConsoleColor.DarkGray);
             SysConsole.WriteLine();
         }
 

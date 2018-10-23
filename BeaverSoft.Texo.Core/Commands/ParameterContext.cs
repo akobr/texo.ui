@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace BeaverSoft.Texo.Core.Commands
 {
-    public partial class ParameterContext : IParameterContext
+    public partial class ParameterContext
     {
         private const int FIRST_INDEX = 0;
         private readonly ImmutableList<string> values;

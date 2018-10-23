@@ -1,9 +1,11 @@
-﻿using StrongBeaver.Core;
+﻿using BeaverSoft.Texo.Core.Configuration;
+using StrongBeaver.Core;
+using StrongBeaver.Core.Services;
 
 namespace BeaverSoft.Texo.Core.Input
 {
-    public interface IInputEvaluationService : IInitialisable
+    public interface IInputEvaluationService : IInitialisable, IMessageBusService<ISettingUpdatedMessage>
     {
-        IInput Evaluate(string input);
+        Input Evaluate(string input);
     }
 }

@@ -3,8 +3,8 @@ using StrongBeaver.Core;
 
 namespace BeaverSoft.Texo.Core.Runtime
 {
-    public interface IRuntimeCoordinatorService : IInitialisable, IDisposable
+    public interface IRuntimeCoordinatorService : IExecutor, IInitialisable, IDisposable
     {
-        void Process(string input);
+        void Start();
     }
 }

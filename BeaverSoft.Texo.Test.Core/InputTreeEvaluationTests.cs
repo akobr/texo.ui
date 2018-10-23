@@ -1,7 +1,7 @@
-﻿using BeaverSoft.Texo.Core.Environment;
+﻿using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.InputTree;
-using BeaverSoft.Texo.Core.Model.Configuration;
+using BeaverSoft.Texo.Core.Input.InputTree;
 using StrongBeaver.Core.Services.Logging;
 using Xunit;
 
@@ -33,12 +33,12 @@ namespace BeaverSoft.Texo.Test.Core
             InputTreeBuilder builder = new InputTreeBuilder(new EmptyLogService());
             InputTree tree = builder.Build(new[] { cdBuilder.ToImmutable() }, null);
 
-            IEnvironmentService environment = new EnvironmentService();
+            IEnvironmentService environment = new EnvironmentService(null);
             IInputParseService parser = new InputParseService();
             InputTreeEvaluationStrategy evaluation = new InputTreeEvaluationStrategy(tree, environment);
 
-            IParsedInput parsed = parser.Parse(input);
-            IInput evaluated = evaluation.Evaluate(parsed);
+            ParsedInput parsed = parser.Parse(input);
+            Input evaluated = evaluation.Evaluate(parsed);
 
             Assert.Equal(parsed, evaluated.ParsedInput);
             Assert.Equal(3, evaluated.Tokens.Count);

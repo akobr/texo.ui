@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Text;
-using BeaverSoft.Texo.Core.Model.View;
 using BeaverSoft.Texo.Core.Services;
+using BeaverSoft.Texo.Core.View;
+using Markdig.Helpers;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 
@@ -22,6 +23,7 @@ namespace BeaverSoft.Texo.View.Console.Markdown
         {
             MarkdownDocument doc = markdown.Parse(item.Text);
             WriteBlockContainer(doc);
+            SysConsole.WriteLine();
         }
 
         private static void WriteBlockContainer(ContainerBlock container)
@@ -127,7 +129,7 @@ namespace BeaverSoft.Texo.View.Console.Markdown
             switch (inline)
             {
                 case LiteralInline literal:
-                    SysConsole.Write(literal.Content.Text);
+                    SysConsole.Write(GetTextFromLiteral(literal));
                     return;
 
                 case LinkInline link:
@@ -173,7 +175,7 @@ namespace BeaverSoft.Texo.View.Console.Markdown
             switch (inline)
             {
                 case LiteralInline literal:
-                    return literal.Content.Text;
+                    return GetTextFromLiteral(literal);
 
                 case LinkInline link:
                     return GetTextFromLink(link);
@@ -199,6 +201,12 @@ namespace BeaverSoft.Texo.View.Console.Markdown
                 default:
                     return string.Empty;
             }
+        }
+
+        private static string GetTextFromLiteral(LiteralInline literal)
+        {
+            StringSlice slice = literal.Content;
+            return slice.Text.Substring(slice.Start, slice.Length);
         }
 
         private static string GetTextFromLink(LinkInline link)

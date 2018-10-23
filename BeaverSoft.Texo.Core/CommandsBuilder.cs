@@ -2,7 +2,6 @@
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.Model.Configuration;
 
 namespace BeaverSoft.Texo.Core
 {

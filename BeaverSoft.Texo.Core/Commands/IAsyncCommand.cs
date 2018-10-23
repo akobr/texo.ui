@@ -4,6 +4,6 @@ namespace BeaverSoft.Texo.Core.Commands
 {
     public interface IAsyncCommand : ICommand
     {
-        Task<ICommandResult> ExecuteAsync(ICommandContext context);
+        Task<ICommandResult> ExecuteAsync(CommandContext context);
     }
 }
