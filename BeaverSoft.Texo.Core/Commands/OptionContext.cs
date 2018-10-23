@@ -2,13 +2,13 @@
 
 namespace BeaverSoft.Texo.Core.Commands
 {
-    public partial class OptionContext : IOptionContext
+    public partial class OptionContext
     {
-        private readonly ImmutableDictionary<string, IParameterContext> parameters;
+        private readonly ImmutableDictionary<string, ParameterContext> parameters;
 
         private OptionContext()
         {
-            parameters = ImmutableDictionary<string, IParameterContext>.Empty;
+            parameters = ImmutableDictionary<string, ParameterContext>.Empty;
         }
 
         private OptionContext(OptionContext toClone)
@@ -25,7 +25,7 @@ namespace BeaverSoft.Texo.Core.Commands
 
         public string Key { get; }
 
-        public IImmutableDictionary<string, IParameterContext> Parameters => parameters;
+        public ImmutableDictionary<string, ParameterContext> Parameters => parameters;
 
         public static OptionContext Empty { get; } = new OptionContext();
 

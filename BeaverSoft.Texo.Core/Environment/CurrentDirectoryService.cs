@@ -7,12 +7,10 @@ namespace BeaverSoft.Texo.Core.Environment
     public class CurrentDirectoryService : ICurrentDirectoryService
     {
         private readonly IEnvironmentService environment;
-        private readonly IViewService view;
 
-        public CurrentDirectoryService(IEnvironmentService environment, IViewService view)
+        public CurrentDirectoryService(IEnvironmentService environment)
         {
             this.environment = environment ?? throw new ArgumentNullException(nameof(environment));
-            this.view = view ?? throw new ArgumentNullException(nameof(view));
         }
 
         public void SetCurrentDirectory(string directoryPath)
@@ -24,7 +22,6 @@ namespace BeaverSoft.Texo.Core.Environment
 
             string fullPath = Path.GetFullPath(directoryPath);
             environment.SetVariable(VariableNames.CURRENT_DIRECTORY, fullPath);
-            view.UpdateCurrentDirectory(fullPath);
         }
 
         public string GetCurrentDirectory()

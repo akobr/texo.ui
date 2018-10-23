@@ -14,7 +14,7 @@ namespace BeaverSoft.Texo.Core.Runtime
 
         public void Process(string input)
         {
-            IParsedInput parsedInput = parser.Parse(input);
+            ParsedInput parsedInput = parser.Parse(input);
         }
     }
 }

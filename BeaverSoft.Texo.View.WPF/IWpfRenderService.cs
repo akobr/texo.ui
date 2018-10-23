@@ -1,9 +1,10 @@
-﻿using BeaverSoft.Texo.Core.Model.View;
+﻿using System.Windows.Documents;
+using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.View.WPF
 {
     public interface IWpfRenderService
     {
-        void Render(IItem item);
+        Section Render(IItem item);
     }
 }

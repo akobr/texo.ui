@@ -1,5 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Model.View;
-
+﻿using BeaverSoft.Texo.Core.View;
 using SysConsole = System.Console;
 
 namespace BeaverSoft.Texo.View.Console

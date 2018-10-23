@@ -4,11 +4,11 @@ namespace BeaverSoft.Texo.Core.Input
 {
     public class InputParseService : IInputParseService
     {
-        public IParsedInput Parse(string input)
+        public ParsedInput Parse(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
-                return new EmptyParsedInput();
+                return ParsedInput.Empty;
             }
 
             Regex tokenExpression = new Regex("\\\"[^\\\"]*\\\"|\\'[^\\']*\\'|[\\S]+", RegexOptions.Compiled);

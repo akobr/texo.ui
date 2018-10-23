@@ -2,6 +2,6 @@
 {
     public interface IInputParseService
     {
-        IParsedInput Parse(string input);
+        ParsedInput Parse(string input);
     }
 }

@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Model.View;
+﻿using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.View.Console
 {

@@ -1,4 +1,6 @@
-﻿using BeaverSoft.Texo.Core.Commands;
+﻿using System;
+using System.Threading;
+using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
@@ -6,12 +8,15 @@ using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core;
+using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Core
 {
     public class TexoEngineBuilder : IFluentSyntax
     {
+        private readonly ServiceMessageBus messageBus;
+
         private ILogService logger;
         private ISettingService setting;
         private IEnvironmentService environment;
@@ -24,6 +29,17 @@ namespace BeaverSoft.Texo.Core
         private IResultProcessingService resultProcessing;
         private IViewService usedView;
         private IRuntimeCoordinatorService runtime;
+
+        public TexoEngineBuilder()
+            : this(new ServiceMessageBus())
+        {
+            // no member
+        }
+
+        public TexoEngineBuilder(ServiceMessageBus messageBus)
+        {
+            this.messageBus = messageBus;
+        }
 
         public TexoEngineBuilder WithLogService(ILogService service)
         {
@@ -39,7 +55,7 @@ namespace BeaverSoft.Texo.Core
 
         public TexoEngineBuilder WithEnvironmentService(IEnvironmentService service)
         {
-            environment = service;
+            SetEnvironmentService(service);
             return this;
         }
 
@@ -51,7 +67,7 @@ namespace BeaverSoft.Texo.Core
 
         public TexoEngineBuilder WithInputEvaluationService(IInputEvaluationService service)
         {
-            evaluator = service;
+            SetInputEvaluationService(service);
             return this;
         }
 
@@ -82,8 +98,8 @@ namespace BeaverSoft.Texo.Core
         public TexoEngine Build(IViewService view)
         {
             Initiliase();
-            usedView = view;
-            runtime = new RuntimeCoordinatorService(evaluator, commandManagement, resultProcessing, view, didYouMean);
+            SetViewService(view);
+            runtime = new RuntimeCoordinatorService(environment, evaluator, commandManagement, resultProcessing, usedView, didYouMean);
             return new TexoEngine(runtime, setting);
         }
 
@@ -95,12 +111,47 @@ namespace BeaverSoft.Texo.Core
             logger = logger ?? new EmptyLogService();
 #endif
 
-            setting = setting ?? new SettingService();
-            environment = environment ?? new EnvironmentService();
+            setting = setting ?? new SettingService(messageBus);
+            SetEnvironmentService(environment ?? new EnvironmentService(messageBus));
             parser = parser ?? new InputParseService();
-            evaluator = evaluator ?? new InputEvaluationService(parser, environment, setting, logger);
+            SetInputEvaluationService(evaluator ?? new InputEvaluationService(parser, environment, logger));
             commandManagement = commandManagement ?? new SingletonCommandManagementService(commandFactory);
+            resultProcessing = resultProcessing ?? new ResultProcessingService(logger);
             // didYouMean
+        }
+
+        private void SetEnvironmentService(IEnvironmentService service)
+        {
+            if (environment != null)
+            {
+                messageBus.Unregister(environment);
+            }
+
+            environment = service;
+            messageBus.Register<IEnvironmentService, ISettingUpdatedMessage>(environment);
+        }
+
+        private void SetInputEvaluationService(IInputEvaluationService service)
+        {
+            if (evaluator != null)
+            {
+                messageBus.Unregister(evaluator);
+            }
+
+            evaluator = service;
+            messageBus.Register<IInputEvaluationService, ISettingUpdatedMessage>(evaluator);
+        }
+
+        private void SetViewService(IViewService service)
+        {
+            if (usedView != null)
+            {
+                messageBus.Unregister(usedView);
+            }
+
+            usedView = service;
+            messageBus.Register<IViewService, ISettingUpdatedMessage>(usedView);
+            messageBus.Register<IViewService, IVariableUpdatedMessage>(usedView);
         }
     }
 }

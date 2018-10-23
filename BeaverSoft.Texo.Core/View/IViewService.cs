@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Immutable;
-using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.Model.View;
+using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Texo.Core.Environment;
+using BeaverSoft.Texo.Core.Runtime;
 using StrongBeaver.Core;
+using StrongBeaver.Core.Services;
 
 namespace BeaverSoft.Texo.Core.View
 {
-    public interface IViewService : IInitialisable, IDisposable
+    public interface IViewService :
+        IInitialisable<IExecutor>,
+        IDisposable,
+        IMessageBusService<ISettingUpdatedMessage>,
+        IMessageBusService<IVariableUpdatedMessage>
     {
-        void Render(IInput input);
+        void Render(Input.Input input);
 
         void Render(IImmutableList<IItem> items);
 
@@ -16,8 +22,8 @@ namespace BeaverSoft.Texo.Core.View
 
         void RenderProgress(IProgress progress);
 
-        void UpdateCurrentDirectory(string directoryPath);
-
         void Update(string key, IItem item);
+
+        void Start();
     }
 }
