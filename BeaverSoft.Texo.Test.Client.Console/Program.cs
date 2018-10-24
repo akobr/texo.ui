@@ -59,11 +59,13 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<ICurrentDirectoryService, CurrentDirectoryService>();
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
+            container.Register<ReferenceCheckCommand>();
 
             CommandFactory commandFactory = new CommandFactory();
             container.Register<ITexoFactory<ICommand, string>>(() => commandFactory);
             commandFactory.Register(CommandKeys.CURRENT_DIRECTORY, () => container.GetInstance<CurrentDirectoryCommand>());
             commandFactory.Register(CommandKeys.TEXO, () => container.GetInstance<TexoCommand>());
+            commandFactory.Register(ReferenceCheckConstants.REF_CHECK, () => container.GetInstance<ReferenceCheckCommand>());
 
             engine = new TexoEngineBuilder(container.GetInstance<ServiceMessageBus>())
                 .WithLogService(container.GetInstance<ILogService>())

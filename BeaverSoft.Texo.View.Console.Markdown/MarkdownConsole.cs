@@ -69,9 +69,7 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         public static void WriteHorizontalBreak()
         {
-            SysConsole.WriteLine();
             TexoConsole.WriteWithColor(new string('-', 32), ConsoleColor.DarkGray, ConsoleColor.DarkGray);
-            SysConsole.WriteLine();
         }
 
         private static ConsoleColor GetHeaderColor(int level)

@@ -34,24 +34,39 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
 
         public IMarkdownBuilder Header(string text, int level)
         {
+            if (!IsOnNewLine())
+            {
+                stringBuilder.AppendLine();
+            }
+
             stringBuilder.Append('#', Math.Max(level, 1));
             stringBuilder.Append(' ');
-            stringBuilder.Append(text);
+            stringBuilder.AppendLine(text);
             return this;
         }
 
         public IMarkdownBuilder Bullet(string text)
         {
+            if (!IsOnNewLine())
+            {
+                stringBuilder.AppendLine();
+            }
+
             stringBuilder.Append("* ");
-            stringBuilder.Append(text);
+            stringBuilder.AppendLine(text);
             return this;
         }
 
         public IMarkdownBuilder Bullet(string text, int intentLevel)
         {
+            if (!IsOnNewLine())
+            {
+                stringBuilder.AppendLine();
+            }
+
             stringBuilder.Append(' ', Math.Max(intentLevel, 0) * 3);
             stringBuilder.Append("* ");
-            stringBuilder.Append(text);
+            stringBuilder.AppendLine(text);
             return this;
         }
 
@@ -92,11 +107,9 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
                 stringBuilder.AppendLine();
             }
 
-            stringBuilder.AppendLine();
             stringBuilder.AppendLine($"```{language}");
             stringBuilder.AppendLine(code);
             stringBuilder.AppendLine("```");
-            stringBuilder.AppendLine();
             return this;
         }
 
@@ -112,16 +125,13 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
             {
                 stringBuilder.AppendLine();
             }
-            
-            stringBuilder.AppendLine();
 
             foreach (string line in GetLines(quotes))
             {
                 stringBuilder.AppendFormat("> {0}", line);
                 stringBuilder.AppendLine();
             }
-            
-            stringBuilder.AppendLine();
+
             return this;
         }
 
@@ -143,9 +153,14 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
             return this;
         }
 
+        public override string ToString()
+        {
+            return stringBuilder.ToString();
+        }
+
         private bool IsOnNewLine()
         {
-            return LastCharacter == NEWLINE;
+            return stringBuilder.Length < 1 || LastCharacter == NEWLINE;
         }
 
         private static IEnumerable<string> GetLines(string text)

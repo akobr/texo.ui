@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml.Linq;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Result;
@@ -14,13 +15,26 @@ namespace Commands.ReferenceCheck
 {
     public class ReferenceCheckCommand : ICommand
     {
+        private readonly ICurrentDirectoryService currentDirectory;
+
+        public ReferenceCheckCommand(ICurrentDirectoryService currentDirectory)
+        {
+            this.currentDirectory = currentDirectory;
+        }
+
         public ICommandResult Execute(CommandContext context)
         {
             var result = ImmutableList<Item>.Empty.ToBuilder();
+            var paths = context.GetParameterValues(ParameterKeys.PATH);
 
-            foreach (string path in context.Parameters[ParameterKeys.PATH].GetValues())
+            foreach (string path in paths)
             {
                 result.AddRange(ProcessFolder(path));
+            }
+
+            if (paths.Count < 1)
+            {
+                result.AddRange(ProcessFolder(currentDirectory.GetCurrentDirectory()));
             }
 
             return new ItemsResult(result.ToImmutable());
@@ -100,6 +114,7 @@ namespace Commands.ReferenceCheck
 
             XNamespace defaultNamespace = content.Root.GetDefaultNamespace();
             ISet<string> references = new HashSet<string>();
+            int problemCount = 0;
 
             foreach (XElement projectReferenceElement in content.Descendants(defaultNamespace + "ProjectReference"))
             {
@@ -126,10 +141,13 @@ namespace Commands.ReferenceCheck
                 if (references.Contains(projectId))
                 {
                     markdown.WriteLine(projectName);
+                    problemCount++;
                 }
 
                 references.Add(projectId);
             }
+
+            markdown.Italic($"{problemCount} problem(s) found in {references.Count} reference(s).");
         }
     }
 }
