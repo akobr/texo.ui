@@ -1,17 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Linq;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Markdown.Builder;
-using BeaverSoft.Texo.Core.Model.View;
 using BeaverSoft.Texo.Core.Result;
+using BeaverSoft.Texo.Core.View;
 
 namespace Commands.ReferenceCheck
 {
     public class ReferenceCheckCommand : ICommand
     {
-        public ICommandResult Execute(ICommandContext context)
+        public ICommandResult Execute(CommandContext context)
         {
             var result = ImmutableList<Item>.Empty.ToBuilder();
 
@@ -23,9 +26,31 @@ namespace Commands.ReferenceCheck
             return new ItemsResult(result.ToImmutable());
         }
 
-        private IEnumerable<Item> ProcessFolder(string folderPath)
+        public static Query BuildConfiguration()
         {
-            MarkdownBuilder markdown = new MarkdownBuilder();
+            var command = Query.CreateBuilder();
+
+            var parameter = Parameter.CreateBuilder();
+            parameter.Key = ParameterKeys.PATH;
+            parameter.ArgumentTemplate = InputRegex.PATH;
+            parameter.IsOptional = true;
+            parameter.IsRepeatable = true;
+            parameter.Documentation.Title = "Directory path";
+            parameter.Documentation.Description = "Specify full or relative path(s) to directory with csproj files.";
+
+            command.Key = ReferenceCheckConstants.REF_CHECK;
+            command.Representations.AddRange(
+                new[] { ReferenceCheckConstants.REF_CHECK, "rcheck", "projcheck" });
+            command.Parameters.Add(parameter.ToImmutable());
+            command.Documentation.Title = "Project reference check";
+            command.Documentation.Description = "Check C# project for duplicate references.";
+
+            return command.ToImmutable();
+        }
+
+        private static IEnumerable<Item> ProcessFolder(string folderPath)
+        {
+            IMarkdownBuilder markdown = new MarkdownBuilder();
 
             folderPath = Path.GetFullPath(folderPath);
             markdown.Header(folderPath);
@@ -34,13 +59,13 @@ namespace Commands.ReferenceCheck
             if (!directory.Exists)
             {
                 markdown.Italic("Directory doesn't exist.");
-                yield return new Item(markdown.ToString());
+                yield return Item.Markdown(markdown.ToString());
                 yield break;
             }
 
             FileInfo[] projectFiles = directory.GetFiles("*.csproj", SearchOption.AllDirectories);
             markdown.Italic($"{projectFiles.Length} project file(s).");
-            yield return new Item(markdown.ToString());
+            yield return Item.Markdown(markdown.ToString());
 
             foreach (FileInfo projectFile in projectFiles)
             {
@@ -50,10 +75,24 @@ namespace Commands.ReferenceCheck
 
         private static Item ProcessProjectFile(FileInfo projectFile)
         {
-            MarkdownBuilder markdown = new MarkdownBuilder();
+            IMarkdownBuilder markdown = new MarkdownBuilder();
             markdown.Header(projectFile.Name, 2);
-            XDocument content;
 
+            try
+            {
+                ProcessProjectContent(projectFile, markdown);
+            }
+            catch (Exception exception)
+            {
+                markdown.Blockquotes(exception.Message);
+            }
+
+            return Item.Markdown(markdown.ToString());
+        }
+
+        private static void ProcessProjectContent(FileInfo projectFile, IMarkdownBuilder markdown)
+        {
+            XDocument content;
             using (Stream fileContent = projectFile.OpenRead())
             {
                 content = XDocument.Load(fileContent);
@@ -91,8 +130,6 @@ namespace Commands.ReferenceCheck
 
                 references.Add(projectId);
             }
-
-            return new Item(markdown.ToString());
         }
     }
 }

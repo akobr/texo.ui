@@ -26,6 +26,8 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
 
         IMarkdownBuilder CodeInline(string code);
 
+        IMarkdownBuilder Blockquotes(string quotes);
+
         IMarkdownBuilder WriteLine();
 
         IMarkdownBuilder WriteLine(string text);

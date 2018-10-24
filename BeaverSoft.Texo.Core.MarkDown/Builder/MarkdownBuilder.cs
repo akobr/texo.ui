@@ -1,15 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace BeaverSoft.Texo.Core.Markdown.Builder
 {
     public class MarkdownBuilder : IMarkdownBuilder
     {
+        private const char NEWLINE = '\n';
         private readonly StringBuilder stringBuilder;
 
         public MarkdownBuilder()
         {
             stringBuilder = new StringBuilder();
+        }
+
+        private char LastCharacter
+        {
+            get
+            {
+                if (stringBuilder.Length < 1)
+                {
+                    return '\0';
+                }
+
+                return stringBuilder[stringBuilder.Length - 1];
+            }
         }
 
         public IMarkdownBuilder Header(string text)
@@ -72,16 +87,41 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
 
         public IMarkdownBuilder CodeBlock(string language, string code)
         {
+            if (!IsOnNewLine())
+            {
+                stringBuilder.AppendLine();
+            }
+
             stringBuilder.AppendLine();
             stringBuilder.AppendLine($"```{language}");
             stringBuilder.AppendLine(code);
             stringBuilder.AppendLine("```");
+            stringBuilder.AppendLine();
             return this;
         }
 
         public IMarkdownBuilder CodeInline(string code)
         {
             stringBuilder.AppendFormat("`{0}`", code);
+            return this;
+        }
+
+        public IMarkdownBuilder Blockquotes(string quotes)
+        {
+            if (!IsOnNewLine())
+            {
+                stringBuilder.AppendLine();
+            }
+            
+            stringBuilder.AppendLine();
+
+            foreach (string line in GetLines(quotes))
+            {
+                stringBuilder.AppendFormat("> {0}", line);
+                stringBuilder.AppendLine();
+            }
+            
+            stringBuilder.AppendLine();
             return this;
         }
 
@@ -101,6 +141,16 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
         {
             stringBuilder.Append(text);
             return this;
+        }
+
+        private bool IsOnNewLine()
+        {
+            return LastCharacter == NEWLINE;
+        }
+
+        private static IEnumerable<string> GetLines(string text)
+        {
+            return text.Split(new[] {System.Environment.NewLine}, StringSplitOptions.None);
         }
     }
 }

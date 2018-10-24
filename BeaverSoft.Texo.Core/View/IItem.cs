@@ -3,5 +3,7 @@
     public interface IItem
     {
         string Text { get; }
+
+        TextFormatEnum Format { get; }
     }
 }
