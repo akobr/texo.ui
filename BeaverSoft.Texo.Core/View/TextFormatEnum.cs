@@ -2,12 +2,12 @@
 {
     public enum TextFormatEnum
     {
+        Undefined = 0,
         Plain,
         Markdown,
         Html,
         Json,
         Xml,
-        Generated,
         Other
     }
 }

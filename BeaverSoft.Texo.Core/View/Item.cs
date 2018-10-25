@@ -9,13 +9,13 @@
         }
 
         public Item(string text)
-            : this(text, TextFormatEnum.Plain)
+            : this(text, TextFormatEnum.Undefined)
         {
             // no operation
         }
 
         protected Item()
-            : this(string.Empty, TextFormatEnum.Plain)
+            : this(string.Empty, TextFormatEnum.Undefined)
         {
             // no operation
         }
@@ -32,6 +32,11 @@
         public static explicit operator string(Item item)
         {
             return item.Text;
+        }
+
+        public static Item Plain(string text)
+        {
+            return new Item(text, TextFormatEnum.Plain);
         }
 
         public static Item Markdown(string text)
