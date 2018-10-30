@@ -2,6 +2,7 @@
 {
     public static class StageQueries
     {
+        public const string STAGE = "stage";
         public const string STATUS = "status";
         public const string LIST = "list";
         public const string ADD = "add";

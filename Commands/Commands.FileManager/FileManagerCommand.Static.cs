@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Model.Configuration;
+﻿using BeaverSoft.Texo.Core.Configuration;
 
 namespace BeaverSoft.Texo.Commands.FileManager
 {
@@ -6,7 +6,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
     {
         public static Query BuildCommand()
         {
-
+            return null;
         }
     }
 }

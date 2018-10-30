@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BeaverSoft.Texo.Core.Commands;
 
 namespace BeaverSoft.Texo.Commands.FileManager.Operations
 {
-    class CopyCommand
+    public class CopyCommand : ICommand
     {
+        public ICommandResult Execute(CommandContext context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

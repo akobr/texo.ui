@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Result;
 
-namespace BeaverSoft.Texo.Commands.FileManager
+namespace BeaverSoft.Texo.Core.Commands
 {
     public class FactoryIntersectionCommand : ICommand
     {
@@ -14,21 +13,21 @@ namespace BeaverSoft.Texo.Commands.FileManager
             subCommands = new Dictionary<string, Func<ICommand>>();
         }
 
-        public virtual ICommandResult Execute(ICommandContext context)
+        public virtual ICommandResult Execute(CommandContext context)
         {
-            if (!subCommands.TryGetValue(context.Key, out Func<ICommand> factory))
+            if (!subCommands.TryGetValue(context.FirstQuery, out Func<ICommand> factory))
             {
-                return new ErrorTextResult($"No command factory for {context.Key}.");
+                return new ErrorTextResult($"No command factory for {context.FirstQuery}.");
             }
 
             ICommand subCommand = factory();
 
             if(subCommand == null)
             {
-                return new ErrorTextResult($"Null command for {context.Key}.");
+                return new ErrorTextResult($"Null command for {context.FirstQuery}.");
             }
 
-            return factory()?.Execute(context); // TODO: shift
+            return factory()?.Execute(CommandContext.ShiftQuery(context));
         }
 
         protected void RegisterCommand(string key, Func<ICommand> factory)

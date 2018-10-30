@@ -7,7 +7,7 @@
         public const string PUSH = "push";
         public const string APPLY = "apply";
         public const string POP = "pop";
-        public const string PEAK = "peak";
+        public const string PEEK = "peek";
         public const string DROP = "drop";
         public const string CLEAR = "clear";
     }

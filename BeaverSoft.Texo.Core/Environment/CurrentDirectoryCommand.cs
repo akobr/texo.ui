@@ -34,13 +34,13 @@ namespace BeaverSoft.Texo.Core.Environment
                 try
                 {
                     // TODO: Even rooted path can be relative
-                    if (Path.IsPathRooted(path))
+                    if (System.IO.Path.IsPathRooted(path))
                     {
                         currentPath = ChangePathIfExists(currentPath, path);
                         continue;
                     }
 
-                    string newPath = Path.Combine(currentPath, path);
+                    string newPath = System.IO.Path.Combine(currentPath, path);
                     currentPath = ChangePathIfExists(currentPath, newPath);
                 }
                 catch (Exception exception)

@@ -5,7 +5,7 @@ using BeaverSoft.Texo.Core.Commands;
 
 namespace BeaverSoft.Texo.Commands.FileManager.Operations
 {
-    public class MoveCommand : ICommand
+    public class ContentReplaceCommand : ICommand
     {
         public ICommandResult Execute(CommandContext context)
         {

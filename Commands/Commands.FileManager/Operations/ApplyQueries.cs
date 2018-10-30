@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BeaverSoft.Texo.Commands.FileManager.Operations
+﻿namespace BeaverSoft.Texo.Commands.FileManager.Operations
 {
     public static class ApplyQueries
     {
+        public const string APPLY = "apply";
         public const string COPY = "copy";
         public const string MOVE = "move";
         public const string RENAME = "rename";

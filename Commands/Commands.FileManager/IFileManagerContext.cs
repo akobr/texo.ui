@@ -6,6 +6,6 @@ namespace BeaverSoft.Texo.Commands.FileManager
 {
     public interface IFileManagerContext
     {
-        ImmutableList<string> Paths
+        
     }
 }

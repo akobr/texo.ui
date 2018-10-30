@@ -20,7 +20,7 @@ namespace BeaverSoft.Texo.Core.Environment
                 return;
             }
 
-            string fullPath = Path.GetFullPath(directoryPath);
+            string fullPath = System.IO.Path.GetFullPath(directoryPath);
             System.Environment.CurrentDirectory = fullPath;
             environment.SetVariable(VariableNames.CURRENT_DIRECTORY, fullPath);
         }
