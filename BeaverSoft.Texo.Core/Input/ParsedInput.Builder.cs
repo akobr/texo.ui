@@ -9,7 +9,7 @@ namespace BeaverSoft.Texo.Core.Input
             internal Builder(ParsedInput input)
             {
                 RawInput = input.RawInput;
-                Tokens = input.tokens.ToBuilder();
+                Tokens = input.Tokens.ToBuilder();
             }
 
             public string RawInput { get; set; }

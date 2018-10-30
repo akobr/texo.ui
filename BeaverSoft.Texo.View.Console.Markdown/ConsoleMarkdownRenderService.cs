@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Text;
-using BeaverSoft.Texo.Core.Model.View;
 using BeaverSoft.Texo.Core.Services;
+using BeaverSoft.Texo.Core.View;
+using Markdig.Helpers;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 
@@ -20,8 +21,17 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         public void Write(IItem item)
         {
-            MarkdownDocument doc = markdown.Parse(item.Text);
-            WriteBlockContainer(doc);
+            if (item.Format == TextFormatEnum.Plain)
+            {
+                SysConsole.Write(item.Text);
+            }
+            else
+            {
+                MarkdownDocument doc = markdown.Parse(item.Text);
+                WriteBlockContainer(doc);
+            }
+
+            SysConsole.WriteLine();
         }
 
         private static void WriteBlockContainer(ContainerBlock container)
@@ -32,19 +42,22 @@ namespace BeaverSoft.Texo.View.Console.Markdown
                 {
                     case HeadingBlock heading:
                         MarkdownConsole.WriteHeader(GetTextFromInlineContainer(heading.Inline), heading.Level);
+                        SysConsole.WriteLine();
                         break;
 
                     case CodeBlock code:
-                        MarkdownConsole.WriteCode(GetTextFromInlineContainer(code.Inline));
-                        SysConsole.WriteLine();
+                        WriteCode(code);
                         break;
 
                     case QuoteBlock quote:
                         MarkdownConsole.WriteQuote(GetTextFromBlockContainer(quote));
+                        SysConsole.WriteLine();
                         break;
 
                     case ThematicBreakBlock horizontalLine:
+                        SysConsole.WriteLine();
                         MarkdownConsole.WriteHorizontalBreak();
+                        SysConsole.WriteLine();
                         break;
 
                     case ParagraphBlock paragraph:
@@ -60,6 +73,15 @@ namespace BeaverSoft.Texo.View.Console.Markdown
                         break;
                 }
             }
+        }
+
+        private static void WriteCode(CodeBlock code)
+        {
+            foreach (StringLine line in code.Lines)
+            {
+                MarkdownConsole.WriteCode(GetTextFromSlice(line.Slice));
+            }
+            SysConsole.WriteLine();
         }
 
         private static void WriteList(ListBlock list, int intentLevel = 1)
@@ -127,7 +149,7 @@ namespace BeaverSoft.Texo.View.Console.Markdown
             switch (inline)
             {
                 case LiteralInline literal:
-                    SysConsole.Write(literal.Content.Text);
+                    SysConsole.Write(GetTextFromLiteral(literal));
                     return;
 
                 case LinkInline link:
@@ -173,7 +195,7 @@ namespace BeaverSoft.Texo.View.Console.Markdown
             switch (inline)
             {
                 case LiteralInline literal:
-                    return literal.Content.Text;
+                    return GetTextFromLiteral(literal);
 
                 case LinkInline link:
                     return GetTextFromLink(link);
@@ -199,6 +221,21 @@ namespace BeaverSoft.Texo.View.Console.Markdown
                 default:
                     return string.Empty;
             }
+        }
+
+        private static string GetTextFromSlice(StringSlice slice)
+        {
+            if (slice.Text == null)
+            {
+                return string.Empty;
+            }
+
+            return slice.Text.Substring(slice.Start, slice.Length);
+        }
+
+        private static string GetTextFromLiteral(LiteralInline literal)
+        {
+            return GetTextFromSlice(literal.Content);
         }
 
         private static string GetTextFromLink(LinkInline link)

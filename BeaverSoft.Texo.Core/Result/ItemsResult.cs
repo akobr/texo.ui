@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Commands;
-using BeaverSoft.Texo.Core.Model.View;
+using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Result
 {
@@ -11,7 +11,7 @@ namespace BeaverSoft.Texo.Core.Result
         {
             // no operation
         }
-        public ItemsResult(ImmutableList<Item> content)
+        public ItemsResult(IImmutableList<Item> content)
             : this(ResultTypeEnum.Success, content)
         {
             // no operation

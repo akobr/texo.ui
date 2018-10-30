@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using BeaverSoft.Texo.Core.Commands;
-using BeaverSoft.Texo.Core.Model.View;
+using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Core.Runtime

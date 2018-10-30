@@ -4,7 +4,7 @@ namespace BeaverSoft.Texo.Core.Input
 {
     public static class InputRegex
     {
-        public const string PATH = "^[^\\<\\>\\:\\\"\\|\\?\\*[:cntrl:]]+$";
+        public const string PATH = "^[^\\<\\>\\\"\\|\\?\\*[:cntrl:]]+$";
         public const string QUERY = "^[A-Za-z_][A-Za-z0-9_-]*$";
         public const string QUERY_OR_OPTION = "^[A-Za-z_-][A-Za-z0-9_-]*$";
         public const string RESERVED = "[\\^\\$\\~\\@\\#\\&\\%\\!\\?\\:\\\"\\'\\\\\\/\\|\\(\\)\\[\\]\\{\\}\\<\\>]+";

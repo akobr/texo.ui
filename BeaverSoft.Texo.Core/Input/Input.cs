@@ -3,7 +3,7 @@ using BeaverSoft.Texo.Core.Commands;
 
 namespace BeaverSoft.Texo.Core.Input
 {
-    public class Input : IInput
+    public class Input
     {
         private readonly CommandContext context;
         private readonly ImmutableList<IToken> tokens;
@@ -26,18 +26,18 @@ namespace BeaverSoft.Texo.Core.Input
         {
             context = builder.Context.ToImmutable();
             tokens = builder.Tokens.ToImmutable();
-            ParsedInput = builder.ParsedInput;
+            ParsedInput = builder.ParsedInput.ToImmutable();
         }
 
-        public ICommandContext Context => context;
+        public CommandContext Context => context;
 
-        public IImmutableList<IToken> Tokens => tokens;
+        public ImmutableList<IToken> Tokens => tokens;
 
-        public IParsedInput ParsedInput { get; private set; }
+        public ParsedInput ParsedInput { get; private set; }
 
         public static Input Empty { get; } = new Input();
 
-        public Input SetParsedInput(IParsedInput value)
+        public Input SetParsedInput(ParsedInput value)
         {
             return new Input(this)
             {
@@ -50,7 +50,7 @@ namespace BeaverSoft.Texo.Core.Input
             return new Builder(this);
         }
 
-        public static Input BuildUnrecognised(IParsedInput parsedInput)
+        public static Input BuildUnrecognised(ParsedInput parsedInput)
         {
             return Empty.SetParsedInput(parsedInput);
         }
@@ -61,14 +61,14 @@ namespace BeaverSoft.Texo.Core.Input
             {
                 Context = input.context.ToBuilder();
                 Tokens = input.tokens.ToBuilder();
-                ParsedInput = input.ParsedInput;
+                ParsedInput = input.ParsedInput.ToBuilder();
             }
 
             public CommandContext.Builder Context { get; }
 
             public ImmutableList<IToken>.Builder Tokens { get; }
 
-            public IParsedInput ParsedInput { get; set; }
+            public ParsedInput.Builder ParsedInput { get; set; }
 
             public Input ToImmutable()
             {

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.Model.View;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Runtime
 {
     public class RuntimeCoordinatorService : IRuntimeCoordinatorService
     {
+        private readonly IEnvironmentService environment;
         private readonly IInputEvaluationService evaluator;
         private readonly ICommandManagementService commandManagement;
         private readonly IDidYouMeanService didYouMean;
@@ -17,12 +18,14 @@ namespace BeaverSoft.Texo.Core.Runtime
         private readonly IViewService view;
 
         public RuntimeCoordinatorService(
+            IEnvironmentService environment,
             IInputEvaluationService evaluator,
             ICommandManagementService commandManagement,
             IResultProcessingService resultProcessing,
             IViewService view,
             IDidYouMeanService didYouMean)
         {
+            this.environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.evaluator = evaluator ?? throw new ArgumentNullException(nameof(evaluator));
             this.commandManagement = commandManagement ?? throw new ArgumentNullException(nameof(commandManagement));
             this.resultProcessing = resultProcessing ?? throw new ArgumentNullException(nameof(resultProcessing));
@@ -32,13 +35,25 @@ namespace BeaverSoft.Texo.Core.Runtime
 
         public void Initialise()
         {
+            environment.Initialise();
             evaluator.Initialise();
-            view.Initialise();
+            view.Initialise(this);
+        }
+
+        public void Start()
+        {
+            view.Start();
+        }
+
+        public void PreProcess(string input)
+        {
+            Input.Input inputModel = evaluator.Evaluate(input);
+            view.Render(inputModel);
         }
 
         public void Process(string input)
         {
-            IInput inputModel = evaluator.Evaluate(input);
+            Input.Input inputModel = evaluator.Evaluate(input);
 
             if (!inputModel.Context.IsValid)
             {
@@ -67,7 +82,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             commandManagement.Dispose();
         }
 
-        private void ProcessContext(ICommandContext context)
+        private void ProcessContext(CommandContext context)
         {
             ICommand command = commandManagement.BuildCommand(context.Key);
 
@@ -83,7 +98,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             }
         }
 
-        private void ProcessCommand(ICommand command, ICommandContext context)
+        private void ProcessCommand(ICommand command, CommandContext context)
         {
             try
             {
@@ -96,7 +111,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             }
         }
 
-        private async void ProcessAsyncCommand(IAsyncCommand command, ICommandContext context)
+        private async void ProcessAsyncCommand(IAsyncCommand command, CommandContext context)
         {
             try
             {

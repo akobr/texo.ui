@@ -1,17 +1,19 @@
 ﻿using System.Collections.Immutable;
+using System.Linq;
 
 namespace BeaverSoft.Texo.Core.Commands
 {
-    public partial class CommandContext : ICommandContext
+    public partial class CommandContext
     {
         private readonly ImmutableList<string> queryPath;
-        private readonly ImmutableDictionary<string, IOptionContext> options;
-        private readonly ImmutableDictionary<string, IParameterContext> parameters;
+        private readonly ImmutableDictionary<string, OptionContext> options;
+        private readonly ImmutableDictionary<string, ParameterContext> parameters;
 
         private CommandContext()
         {
-            options = ImmutableDictionary<string, IOptionContext>.Empty;
-            parameters = ImmutableDictionary<string, IParameterContext>.Empty;
+            queryPath = ImmutableList<string>.Empty;
+            options = ImmutableDictionary<string, OptionContext>.Empty;
+            parameters = ImmutableDictionary<string, ParameterContext>.Empty;
         }
 
         private CommandContext(CommandContext toClone)
@@ -36,13 +38,35 @@ namespace BeaverSoft.Texo.Core.Commands
 
         public bool IsValid { get; }
 
-        public IImmutableList<string> QueryPath { get; }
+        public ImmutableList<string> QueryPath => queryPath;
 
-        public IImmutableDictionary<string, IOptionContext> Options => options;
+        public ImmutableDictionary<string, OptionContext> Options => options;
 
-        public IImmutableDictionary<string, IParameterContext> Parameters => parameters;
+        public ImmutableDictionary<string, ParameterContext> Parameters => parameters;
 
         public static CommandContext Empty { get; } = new CommandContext();
+
+        public string FirstQuery => QueryPath.FirstOrDefault() ?? string.Empty;
+
+        public string GetParameterValue(string parameterName)
+        {
+            if (!Parameters.TryGetValue(parameterName, out ParameterContext parameter))
+            {
+                return string.Empty;
+            }
+
+            return parameter.GetValue();
+        }
+
+        public IImmutableList<string> GetParameterValues(string parameterName)
+        {
+            if (!Parameters.TryGetValue(parameterName, out ParameterContext parameter))
+            {
+                return ImmutableList<string>.Empty;
+            }
+
+            return parameter.GetValues();
+        }
 
         public Builder ToBuilder()
         {

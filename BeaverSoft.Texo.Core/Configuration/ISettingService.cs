@@ -1,6 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Model.Configuration;
-
-namespace BeaverSoft.Texo.Core.Configuration
+﻿namespace BeaverSoft.Texo.Core.Configuration
 {
     public interface ISettingService
     {

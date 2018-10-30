@@ -10,7 +10,7 @@ namespace BeaverSoft.Texo.Test.Core
         {
             const string input = "cd ../folder";
             InputParseService parser = new InputParseService();
-            IParsedInput parsed = parser.Parse(input);
+            ParsedInput parsed = parser.Parse(input);
 
             Assert.Equal(input, parsed.RawInput);
             Assert.Equal(2, parsed.Tokens.Count);
@@ -23,7 +23,7 @@ namespace BeaverSoft.Texo.Test.Core
         {
             const string input = "manager --ignore-folders ../folder ../second/sub";
             InputParseService parser = new InputParseService();
-            IParsedInput parsed = parser.Parse(input);
+            ParsedInput parsed = parser.Parse(input);
 
             Assert.Equal(input, parsed.RawInput);
             Assert.Equal(4, parsed.Tokens.Count);
@@ -38,7 +38,7 @@ namespace BeaverSoft.Texo.Test.Core
         {
             const string input = "_command42 \"complex param '## $ ! | text' \" 'second complex param with \"inner text\"'";
             InputParseService parser = new InputParseService();
-            IParsedInput parsed = parser.Parse(input);
+            ParsedInput parsed = parser.Parse(input);
 
             Assert.Equal(input, parsed.RawInput);
             Assert.Equal(3, parsed.Tokens.Count);

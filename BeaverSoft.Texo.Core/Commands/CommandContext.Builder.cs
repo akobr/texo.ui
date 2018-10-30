@@ -21,9 +21,9 @@ namespace BeaverSoft.Texo.Core.Commands
 
             public ImmutableList<string>.Builder QueryPath { get; }
 
-            public ImmutableDictionary<string, IOptionContext>.Builder Options { get; }
+            public ImmutableDictionary<string, OptionContext>.Builder Options { get; }
 
-            public ImmutableDictionary<string, IParameterContext>.Builder Parameters { get; }
+            public ImmutableDictionary<string, ParameterContext>.Builder Parameters { get; }
 
             public CommandContext ToImmutable()
             {

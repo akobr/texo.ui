@@ -10,7 +10,6 @@ namespace BeaverSoft.Texo.View.Console
 
         public static void WritePrompt(string prompt)
         {
-            SysConsole.Write(SPACE);
             WriteWithColor($"{prompt}>", ConsoleColor.Gray, ConsoleColor.DarkGray);
             SysConsole.Write(SPACE);
         }
