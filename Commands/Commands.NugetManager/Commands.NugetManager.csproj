@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>BeaverSoft.Texo.Commands.NugetManager</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BeaverSoft.Texo.Core.MarkDown\BeaverSoft.Texo.Core.Markdown.csproj" />
+    <ProjectReference Include="..\..\BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj" />
+  </ItemGroup>
+
+</Project>
