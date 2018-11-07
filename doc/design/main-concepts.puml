@@ -1,0 +1,74 @@
+@startuml
+title Overview
+
+interface IImmutable {
+    ToBuilder() : IBuilder
+}
+
+interface IBuilder {
+    ToImmutable() : IImmutable
+}
+
+interface IModel {
+
+}
+
+interface IConfiguration {
+
+}
+
+class TextoConfiguration {
+     Commands: ImmutableDictionary<string, ParameterConfiguration>
+     DefaultCommand: string
+     ParameterTemplates: ImmutableList<string>
+}
+
+class CommandCofiguration {
+    Name: string
+    Help: string
+    Parameters: ImmutableDictionary<string, ParameterConfiguration>
+    DefaultParameter: string
+    CommandType: Type
+}
+
+class ParameterConfiguration {
+    Name: string
+    Aliases: IImmutableList<string>
+    Frequency: ParameterFrequencyEnum
+    InputRegEx: string
+}
+
+interface ICommand {
+    Execute() : ICommandResult
+}
+
+class Command {
+
+}
+
+interface ICommandResult {
+    ResultType : ResultTypeEnum
+    Items : ImmutableList<IResultItem>
+}
+
+interface IResultItem {
+    Keywords : ImmutableList<string>
+}
+
+IImmutable <|.. IModel 
+IModel <|.. IConfiguration
+
+IConfiguration <|.. TextoConfiguration
+IConfiguration <|.. CommandCofiguration
+IConfiguration <|.. ParameterConfiguration
+
+TextoConfiguration -> CommandCofiguration
+CommandCofiguration -> ParameterConfiguration
+
+Command ..|> ICommand
+ICommand -> ICommandResult
+ICommandResult --> IResultItem
+
+IModel <|- IResultItem
+
+@enduml
