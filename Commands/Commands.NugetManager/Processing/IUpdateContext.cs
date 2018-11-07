@@ -1,5 +1,5 @@
-﻿using BeaverSoft.Texo.Commands.NugetManager.Packages;
-using BeaverSoft.Texo.Commands.NugetManager.Projects;
+﻿using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
+using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Processing
 {

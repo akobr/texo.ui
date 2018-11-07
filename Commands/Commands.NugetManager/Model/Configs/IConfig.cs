@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Sources;
+using BeaverSoft.Texo.Commands.NugetManager.Model.Sources;
 
-namespace BeaverSoft.Texo.Commands.NugetManager.Configs
+namespace BeaverSoft.Texo.Commands.NugetManager.Model.Configs
 {
     public interface IConfig
     {

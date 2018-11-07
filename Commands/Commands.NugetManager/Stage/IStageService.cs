@@ -1,10 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 {
-    interface IStageService
+    public interface IStageService
     {
+        IImmutableList<IProject> GetPaths();
+
+        void Add(IEnumerable<IProject> projects);
+
+        void Remove(IEnumerable<string> projectPaths);
+
+        void Clear();
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using BeaverSoft.Texo.Commands.NugetManager.Configs;
+﻿using BeaverSoft.Texo.Commands.NugetManager.Model.Configs;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {

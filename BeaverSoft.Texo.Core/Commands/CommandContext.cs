@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
+using BeaverSoft.Texo.Core.Path;
 
 namespace BeaverSoft.Texo.Core.Commands
 {
@@ -48,9 +49,9 @@ namespace BeaverSoft.Texo.Core.Commands
 
         public string FirstQuery => QueryPath.FirstOrDefault() ?? string.Empty;
 
-        public string GetParameterValue(string parameterName)
+        public string GetParameterValue(string parameterKey)
         {
-            if (!Parameters.TryGetValue(parameterName, out ParameterContext parameter))
+            if (!Parameters.TryGetValue(parameterKey, out ParameterContext parameter))
             {
                 return string.Empty;
             }
@@ -58,14 +59,37 @@ namespace BeaverSoft.Texo.Core.Commands
             return parameter.GetValue();
         }
 
-        public IImmutableList<string> GetParameterValues(string parameterName)
+        public IImmutableList<string> GetParameterValues(string parameterKey)
         {
-            if (!Parameters.TryGetValue(parameterName, out ParameterContext parameter))
+            if (!Parameters.TryGetValue(parameterKey, out ParameterContext parameter))
             {
                 return ImmutableList<string>.Empty;
             }
 
             return parameter.GetValues();
+        }
+
+        public TexoPath GetParameterPath()
+        {
+            string stringPath = GetParameterValue(ParameterKeys.PATH);
+
+            if (string.IsNullOrEmpty(stringPath))
+            {
+                return null;
+            }
+
+            return new TexoPath(stringPath);
+        }
+
+        public bool HasOption(string optionKey)
+        {
+            return options.ContainsKey(optionKey);
+        }
+
+        public OptionContext GetOption(string optionKey)
+        {
+            options.TryGetValue(optionKey, out OptionContext result);
+            return result;
         }
 
         public Builder ToBuilder()

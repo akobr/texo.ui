@@ -1,10 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 {
-    class OptionAttribute
+    [AttributeUsage(
+        AttributeTargets.Class | AttributeTargets.Method,
+        Inherited = false,
+        AllowMultiple = false)]
+    public class OptionAttribute : Attribute
     {
+        public OptionAttribute(string optionKey)
+        {
+            OptionKey = optionKey;
+        }
+
+        public string OptionKey { get; }
     }
 }

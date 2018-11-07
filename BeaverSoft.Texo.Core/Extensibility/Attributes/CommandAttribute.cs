@@ -2,14 +2,14 @@
 
 namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public class CommandAttribute : Attribute
     {
         public CommandAttribute(string commandKey)
         {
-            Key = commandKey;
+            CommandKey = commandKey;
         }
 
-        public string Key { get; }
+        public string CommandKey { get; }
     }
 }

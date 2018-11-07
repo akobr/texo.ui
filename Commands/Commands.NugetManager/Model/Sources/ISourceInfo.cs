@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BeaverSoft.Texo.Commands.NugetManager.Sources
+namespace BeaverSoft.Texo.Commands.NugetManager.Model.Sources
 {
     public interface ISourceInfo
     {

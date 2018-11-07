@@ -1,10 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 {
-    class ParameterAttribute
+    [AttributeUsage(
+        AttributeTargets.Class | AttributeTargets.Method,
+        Inherited = false,
+        AllowMultiple = false)]
+    public class ParameterAttribute : Attribute
     {
+        public ParameterAttribute(string parameterKey)
+        {
+            ParameterKey = parameterKey;
+        }
+
+        public string ParameterKey { get; }
+
+        public string ParameterTemplate { get; set; }
+
+        public bool IsOptional { get; set; }
+
+        public bool IsRepetable { get; set; }
     }
 }

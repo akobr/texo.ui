@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BeaverSoft.Texo.Commands.NugetManager.Packages;
+﻿using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {

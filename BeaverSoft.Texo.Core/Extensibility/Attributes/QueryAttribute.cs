@@ -2,14 +2,14 @@
 
 namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
     public class QueryAttribute : Attribute
     {
         public QueryAttribute(string queryKey)
         {
-            Key = queryKey;
+            QueryKey = queryKey;
         }
 
-        public string Key { get; }
+        public string QueryKey { get; }
     }
 }

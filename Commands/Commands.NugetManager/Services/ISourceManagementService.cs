@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Packages;
+using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {

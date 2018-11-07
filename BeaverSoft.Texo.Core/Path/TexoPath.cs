@@ -17,6 +17,12 @@ namespace BeaverSoft.Texo.Core.Path
         private List<int> wildcardIndexes;
         private Regex regularExpression;
 
+        public TexoPath(Uri path)
+            : this(path?.AbsolutePath)
+        {
+            // no operation
+        }
+
         public TexoPath(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -54,6 +60,16 @@ namespace BeaverSoft.Texo.Core.Path
         public bool IsRelative { get; }
 
         public IImmutableList<PathSegment> Segments { get; private set; }
+
+        public Uri ToUri()
+        {
+            return new Uri(AbsolutePath, UriKind.Absolute);
+        }
+
+        public override string ToString()
+        {
+            return AbsolutePath;
+        }
 
         public IImmutableList<string> GetItems()
         {
@@ -237,6 +253,7 @@ namespace BeaverSoft.Texo.Core.Path
 
             return path;
         }
+
         private static List<string> ProcessLeafItems(List<string> directories, PathSegment leafSegment)
         {
             List<string> newItems = new List<string>();
@@ -248,6 +265,26 @@ namespace BeaverSoft.Texo.Core.Path
             }
 
             return newItems;
+        }
+
+        public static implicit operator TexoPath(string path)
+        {
+            return new TexoPath(path);
+        }
+
+        public static implicit operator TexoPath(Uri path)
+        {
+            return new TexoPath(path);
+        }
+
+        public static explicit operator string(TexoPath path)
+        {
+            return path?.AbsolutePath;
+        }
+
+        public static explicit operator Uri(TexoPath path)
+        {
+            return path?.ToUri();
         }
     }
 }

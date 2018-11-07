@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Packages;
+using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
 
-namespace BeaverSoft.Texo.Commands.NugetManager.Projects
+namespace BeaverSoft.Texo.Commands.NugetManager.Model.Projects
 {
     public interface IProject
     {

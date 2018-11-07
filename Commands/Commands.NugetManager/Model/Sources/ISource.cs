@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Packages;
 
-namespace BeaverSoft.Texo.Commands.NugetManager.Sources
+namespace BeaverSoft.Texo.Commands.NugetManager.Model.Sources
 {
     public interface ISource
     {
