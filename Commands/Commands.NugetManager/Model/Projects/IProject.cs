@@ -10,6 +10,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model.Projects
 
         Uri Path { get; }
 
-        IImmutableList<IPackage> Packages { get; }
+        IImmutableDictionary<string, IPackage> Packages { get; }
     }
 }

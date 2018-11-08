@@ -6,5 +6,6 @@
         public const string STATUS = "status";
         public const string ADD = "add";
         public const string REMOVE = "remove";
+        public const string FETCH = "fetch";
     }
 }

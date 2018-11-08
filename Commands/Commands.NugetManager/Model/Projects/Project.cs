@@ -7,7 +7,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model.Projects
 {
     public class Project : IProject
     {
-        public Project(Uri path, IImmutableList<IPackage> packages)
+        public Project(Uri path, IImmutableDictionary<string, IPackage> packages)
         {
             Path = path ?? throw new ArgumentNullException(nameof(path));
             Packages = packages ?? throw new ArgumentNullException(nameof(packages));
@@ -18,6 +18,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model.Projects
 
         public Uri Path { get; }
 
-        public IImmutableList<IPackage> Packages { get; }
+        public IImmutableDictionary<string, IPackage> Packages { get; }
     }
 }
