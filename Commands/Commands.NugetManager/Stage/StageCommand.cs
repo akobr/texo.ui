@@ -43,7 +43,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
             if (context.Options.Count < 1 || context.HasOption(StageOptions.PROJECTS))
             {
-                items.AddRange(BuildProjects(stage.GetProjects()));
+                items.AddRange(BuildProjectItems(stage.GetProjects()));
             }
 
             return new ItemsResult(items.ToImmutable());
@@ -58,7 +58,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
                 return new TextResult("No project has been added.");
             }
 
-            return new ItemsResult(BuildProjects(addedProjects).ToImmutableList());
+            return new ItemsResult(BuildProjectItems(addedProjects).ToImmutableList());
         }
 
         private ICommandResult Remove(CommandContext context)
@@ -105,7 +105,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
             return result;
         }
 
-        private static IEnumerable<Item> BuildProjects(IEnumerable<IProject> projects)
+        private static IEnumerable<Item> BuildProjectItems(IEnumerable<IProject> projects)
         {
             List<Item> result = new List<Item>();
 

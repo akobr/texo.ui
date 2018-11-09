@@ -31,12 +31,17 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
             var items = ImmutableList<Item>.Empty.ToBuilder();
             bool allVersions = context.HasOption(ManageOptions.ALL_VERSIONS);
 
-            foreach (string packageTerm in context.GetParameterValues(ManageParameters.PACKAGE_ID))
+            foreach (string packageTerm in context.GetParameterValues(NugetManagerParameters.SEARCH_TERM))
             {
                 foreach (IPackageInfo package in packages.FindPackages(packageTerm))
                 {
                     items.Add(BuildPackageResult(package, allVersions));
                 }
+            }
+
+            if (items.Count < 1)
+            {
+                return new TextResult("No package found.");
             }
 
             return new ItemsResult(items.ToImmutable());

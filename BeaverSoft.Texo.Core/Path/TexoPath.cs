@@ -33,9 +33,10 @@ namespace BeaverSoft.Texo.Core.Path
             Path = path;
             IsRelative = path.IsRelative();
             ContainsWildcard = BuildSegments();
+            FixedPartOfPath = BuildInitialPath();
 
             if (ContainsWildcard)
-            {
+            {        
                 return;
             }
 
@@ -53,11 +54,13 @@ namespace BeaverSoft.Texo.Core.Path
 
         public string AbsolutePath { get; }
 
+        public string FixedPartOfPath { get; }
+
         public bool ContainsWildcard { get; }
 
-        public bool IsAbsolute => !IsRelative;
-
         public bool IsRelative { get; }
+
+        public bool IsAbsolute => !IsRelative;
 
         public IImmutableList<PathSegment> Segments { get; private set; }
 
@@ -73,35 +76,17 @@ namespace BeaverSoft.Texo.Core.Path
 
         public IImmutableList<string> GetItems()
         {
-            List<string> items = new List<string>
-            {
-                BuildInitialPath(out int wildcardIndex)
-            };
-
-            items = ProcessItems(items, wildcardIndex);
-            return items.ToImmutableList();
+            return BuildItemList().ToImmutableList();
         }
 
         public IImmutableList<string> GetFiles()
         {
-            List<string> items = new List<string>
-            {
-                BuildInitialPath(out int wildcardIndex)
-            };
-
-            items = ProcessItems(items, wildcardIndex);
-            return items.Where(File.Exists).ToImmutableList();
+            return BuildItemList().Where(File.Exists).ToImmutableList();
         }
 
         public IImmutableList<string> GetDirectories()
         {
-            List<string> items = new List<string>
-            {
-                BuildInitialPath(out int wildcardIndex)
-            };
-
-            items = ProcessItems(items, wildcardIndex);
-            return items.Where(Directory.Exists).ToImmutableList();
+            return BuildItemList().Where(Directory.Exists).ToImmutableList();
         }
 
         public IImmutableList<string> GetFilesFromDirectories()
@@ -175,8 +160,18 @@ namespace BeaverSoft.Texo.Core.Path
                 : StringComparer.OrdinalIgnoreCase.GetHashCode(AbsolutePath);
         }
 
-        private List<string> ProcessItems(List<string> directories, int wildcardIndex)
+        private List<string> BuildItemList()
         {
+            return ProcessItems(new List<string>
+            {
+                FixedPartOfPath
+            });
+        }
+
+        private List<string> ProcessItems(List<string> directories)
+        {
+            int wildcardIndex = GetFirstWildcardOrLastIndex();
+
             while (true)
             {
                 PathSegment wildcard = Segments[wildcardIndex];
@@ -262,10 +257,10 @@ namespace BeaverSoft.Texo.Core.Path
             return wildcard;
         }
 
-        private string BuildInitialPath(out int segmentIndex)
+        private string BuildInitialPath()
         {
             string path = IsRelative ? System.IO.Path.GetFullPath(".") : string.Empty;
-            segmentIndex = ContainsWildcard ? wildcardIndexes.First() : Segments.Count - 1;
+            int segmentIndex = GetFirstWildcardOrLastIndex();
 
             for (int i = 0; i < segmentIndex; i++)
             {
@@ -274,6 +269,11 @@ namespace BeaverSoft.Texo.Core.Path
             }
 
             return path;
+        }
+
+        private int GetFirstWildcardOrLastIndex()
+        {
+            return ContainsWildcard ? wildcardIndexes.First() : Segments.Count - 1;
         }
 
         private static List<string> ProcessLeafItems(List<string> directories, PathSegment leafSegment)

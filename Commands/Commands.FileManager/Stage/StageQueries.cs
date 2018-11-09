@@ -8,5 +8,6 @@
         public const string ADD = "add";
         public const string REMOVE = "remove";
         public const string LOBBY = "lobby";
+        public const string REMOVE_LOBBY = "remove-lobby";
     }
 }

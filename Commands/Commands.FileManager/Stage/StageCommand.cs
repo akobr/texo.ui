@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
 using BeaverSoft.Texo.Commands.FileManager.Extensions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Extensions;
@@ -22,14 +22,15 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
             RegisterQueryMethod(StageQueries.STATUS, Status);
             RegisterQueryMethod(StageQueries.LIST, List);
-            RegisterQueryMethod(StageQueries.LOBBY, Lobby);
             RegisterQueryMethod(StageQueries.ADD, Add);
             RegisterQueryMethod(StageQueries.REMOVE, Remove);
+            RegisterQueryMethod(StageQueries.LOBBY, Lobby);
+            RegisterQueryMethod(StageQueries.REMOVE_LOBBY, RemoveLobby);
         }
 
         private ICommandResult Status(CommandContext context)
         {
-            return BuildStageResult(stage.GetLobby(), stage.GetPaths());
+            return new ItemsResult(BuildStageItem(stage.GetLobby(), stage.GetPaths(), "The stage"));
         }
 
         private ICommandResult List(CommandContext context)
@@ -37,32 +38,17 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
             if (context.HasPath())
             {
                 string current = Environment.CurrentDirectory;
-                return BuildStageResult(current, Directory.GetFileSystemEntries(current), current);
+                return new ItemsResult(BuildStageItem(current, Directory.GetFileSystemEntries(current), current));
             }
 
-            var pathValues = context.Parameters[ParameterKeys.PATH].GetValues();
-            string header = pathValues.Count < 2
-                ? pathValues[0]
-                : $"{pathValues.Count} paths";
+            var items = ImmutableList<Item>.Empty.ToBuilder();
 
-            return BuildStageResult(
-                string.Empty,
-                context.GetParameterPaths().SelectMany(path => path.GetItems()),
-                header);
-
-        }
-
-        private ICommandResult Lobby(CommandContext context)
-        {
-            if (context.HasOption(StageOptions.DELETE))
+            foreach (TexoPath path in context.GetParameterPaths())
             {
-                stage.RemoveLobby();
-                return new TextResult("Lobby has been removed from the stage.");
+                items.Add(BuildStageItem(path.FixedPartOfPath, path.GetItems(), path.Path));
             }
 
-            string lobbyPath = context.GetParameterValue(FileManagerParameters.SIMPLE_PATH);
-            stage.SetLobby(lobbyPath);
-            return new TextResult($"Lobby of the stage: {stage.GetLobby()}");
+            return new ItemsResult(items.ToImmutable());
         }
 
         private ICommandResult Add(CommandContext context)
@@ -82,7 +68,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
                 return new TextResult("No new path has been added to the stage.");
             }
 
-            return BuildStageResult(stage.GetLobby(), newPaths, "Added to the stage");
+            return new ItemsResult(BuildStageItem(stage.GetLobby(), newPaths, "Added to the stage"));
         }
 
         private ICommandResult Remove(CommandContext context)
@@ -102,10 +88,23 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
                 return new TextResult("No path has been removed from the stage.");
             }
 
-            return BuildStageResult(stage.GetLobby(), removedPaths, "Removed from the stage");
+            return new ItemsResult(BuildStageItem(stage.GetLobby(), removedPaths, "Removed from the stage"));
         }
 
-        private static ICommandResult BuildStageResult(string lobbyPath, IEnumerable<string> paths, string header = "Stage")
+        private ICommandResult Lobby(CommandContext context)
+        {
+            string lobbyPath = context.GetParameterValue(FileManagerParameters.SIMPLE_PATH);
+            stage.SetLobby(lobbyPath);
+            return new TextResult($"Lobby of the stage: {stage.GetLobby()}");
+        }
+
+        private ICommandResult RemoveLobby(CommandContext arg)
+        {
+            stage.RemoveLobby();
+            return new TextResult("Lobby has been removed from the stage.");
+        }
+
+        private static Item BuildStageItem(string lobbyPath, IEnumerable<string> paths, string header)
         {
             MarkdownBuilder builder = new MarkdownBuilder();
             builder.Header(header);
@@ -122,7 +121,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
             builder.WriteLine();
             builder.WritePathLists(lobbyPath, paths);
 
-            return new ItemsResult(Item.Markdown(builder.ToString()));
+            return Item.Markdown(builder.ToString());
         }
     }
 }
