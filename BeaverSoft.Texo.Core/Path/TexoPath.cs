@@ -104,6 +104,28 @@ namespace BeaverSoft.Texo.Core.Path
             return items.Where(Directory.Exists).ToImmutableList();
         }
 
+        public IImmutableList<string> GetFilesFromDirectories()
+        {
+            return GetFilesFromDirectories(string.Empty, SearchOption.TopDirectoryOnly);
+        }
+
+        public IImmutableList<string> GetFilesFromDirectories(string pattern)
+        {
+            return GetFilesFromDirectories(pattern, SearchOption.TopDirectoryOnly);
+        }
+
+        public IImmutableList<string> GetFilesFromDirectories(string pattern, SearchOption options)
+        {
+            var result = ImmutableList<string>.Empty.ToBuilder();
+
+            foreach (string directory in GetDirectories())
+            {
+                result.AddRange(Directory.GetFiles(directory, pattern, options));
+            }
+
+            return result.ToImmutable();
+        }
+
         public bool Equals(TexoPath other)
         {
             if (ReferenceEquals(null, other))

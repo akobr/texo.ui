@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using BeaverSoft.Texo.Commands.FileManager.Extensions;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Markdown.Builder;
@@ -33,7 +34,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
             if (allStashes.Count < 1)
             {
-                return new TextResult("Stash stack is empty.");
+                return new TextResult("The stash stack is empty.");
             }
 
             var result = ImmutableList<Item>.Empty.ToBuilder();
@@ -49,6 +50,11 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
         private ICommandResult Apply(CommandContext context)
         {
+            if (!context.HasParameter(StashParameters.IDENTIFIER))
+            {
+                return Peek(context);
+            }
+
             string id = context.GetParameterValue(StashParameters.IDENTIFIER);
             IStashEntry stash = int.TryParse(id, out int index)
                 ? stashes.GetStash(index)
@@ -59,9 +65,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
                 return new ErrorTextResult($"No stash with identifier: {id}");
             }
 
-            stage.Clear();
-            stage.Add(stash);
-
+            ApplyStashToStage(stash);
             return new ItemsResult(BuildStashItem(stash, index));
         }
 
@@ -71,12 +75,10 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
             if (stash == null)
             {
-                return new TextResult("Stash stack is empty.");
+                return new TextResult("The stash stack is empty.");
             }
 
-            stage.Clear();
-            stage.Add(stash);
-
+            ApplyStashToStage(stash);
             return new ItemsResult(BuildStashItem(stash, 0));
         }
 
@@ -86,11 +88,11 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
             if (paths == null || paths.Count < 1)
             {
-                return new ErrorTextResult("Stage is empty.");
+                return new ErrorTextResult("The stage is empty.");
             }
 
             string name = context.GetParameterValue(ParameterKeys.NAME);
-            IStashEntry stash = stashes.CreateStash(paths, name);
+            IStashEntry stash = stashes.CreateStash(stage.GetLobby(), paths, name);
             return new ItemsResult(BuildStashItem(stash, 0));
         }
 
@@ -116,58 +118,30 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             return new TextResult("All stashes have been dropped.");
         }
 
+        private void ApplyStashToStage(IStashEntry stash)
+        {
+            stage.Clear();
+            stage.SetLobby(stash.LobbyPath);
+            stage.Add(stash);
+        }
+
         private Item BuildStashItem(IStashEntry stash, int index)
         {
             MarkdownBuilder builder = new MarkdownBuilder();
             builder.Header(string.IsNullOrWhiteSpace(stash.Name) ? $"Stash @{index}" : $"Stash @{stash.Name}");
 
-            List<string> directories = new List<string>();
-            List<string> files = new List<string>();
-            List<string> nonExists = new List<string>();
-
-            foreach (string path in stash.Paths)
+            if (string.IsNullOrEmpty(stash.LobbyPath))
             {
-                PathTypeEnum type = path.GetPathType();
-
-                switch (type)
-                {
-                    case PathTypeEnum.Directory:
-                        directories.Add(path.GetRelativePath());
-                        break;
-
-                    case PathTypeEnum.File:
-                        files.Add(path.GetRelativePath());
-                        break;
-
-                    case PathTypeEnum.NonExistent:
-                        nonExists.Add(path.GetRelativePath());
-                        break;
-
-                }
+                builder.Italic("No lobby directory.");
+            }
+            else
+            {
+                builder.CodeInline(stash.LobbyPath);
             }
 
-            WritePaths(directories, "Directories", builder);
-            WritePaths(files, "Files", builder);
-            WritePaths(nonExists, "Non-Existing", builder);
-
-            return Item.Markdown(builder.ToString());
-        }
-
-        private static void WritePaths(List<string> paths, string title, MarkdownBuilder builder)
-        {
-            if (paths.Count <= 0)
-            {
-                return;
-            }
-
-            paths.Sort();
-            builder.Header(title, 2);
             builder.WriteLine();
-
-            foreach (string directory in paths)
-            {
-                builder.Bullet(directory);
-            }
+            builder.WritePathLists(stash.LobbyPath, stash.Paths);
+            return Item.Markdown(builder.ToString());
         }
     }
 }

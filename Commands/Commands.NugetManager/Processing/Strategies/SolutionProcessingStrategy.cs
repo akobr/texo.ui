@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
 using Microsoft.CodeAnalysis;
@@ -18,25 +19,12 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 
         public IImmutableList<IProject> Process(string filePath)
         {
-            if (!File.Exists(filePath))
-            {
-                return null;
-            }
-
-            MSBuildWorkspace msWorkspace = MSBuildWorkspace.Create();
-            Solution solution = msWorkspace.OpenSolutionAsync(filePath).Result;
             var result = ImmutableList<IProject>.Empty.ToBuilder();
 
-            foreach (var project in solution.Projects)
+            foreach (var projectPath in GetProjectPaths(filePath))
             {
-                if (string.IsNullOrEmpty(project.FilePath)
-                    || project.Language != "csharp")
-                {
-                    continue;
-                }
-
                 var strategy = new CsharpProjectProcessingStrategy(logger);
-                IProject model = strategy.Process(project.FilePath);
+                IProject model = strategy.Process(projectPath);
 
                 if (model == null)
                 {
@@ -47,6 +35,28 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
             }
 
             return result.ToImmutable();
+        }
+
+        public static IEnumerable<string> GetProjectPaths(string solutionPath)
+        {
+            if (!File.Exists(solutionPath))
+            {
+                yield break;
+            }
+
+            MSBuildWorkspace msWorkspace = MSBuildWorkspace.Create();
+            Solution solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
+
+            foreach (var project in solution.Projects)
+            {
+                if (string.IsNullOrEmpty(project.FilePath)
+                    || project.Language != "csharp")
+                {
+                    continue;
+                }
+
+                yield return project.FilePath;
+            }
         }
     }
 }

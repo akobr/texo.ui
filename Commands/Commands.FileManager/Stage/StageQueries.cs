@@ -7,5 +7,6 @@
         public const string LIST = "list";
         public const string ADD = "add";
         public const string REMOVE = "remove";
+        public const string LOBBY = "lobby";
     }
 }

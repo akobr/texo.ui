@@ -38,18 +38,18 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             return stashes.ToImmutableList();
         }
 
-        public IStashEntry CreateStash(IImmutableList<string> paths)
+        public IStashEntry CreateStash(string lobbyPath, IImmutableList<string> paths)
         {
-            StashEntry stash = new StashEntry(null, paths);
+            StashEntry stash = new StashEntry(null, lobbyPath, paths);
             stashes.Insert(0, stash);
             return stash;
         }
 
-        public IStashEntry CreateStash(IImmutableList<string> paths, string name)
+        public IStashEntry CreateStash(string lobbyPath, IImmutableList<string> paths, string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return CreateStash(paths);
+                return CreateStash(lobbyPath, paths);
             }
 
             if (nameMap.TryGetValue(name, out int existingIndex))
@@ -57,7 +57,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
                 RemoveStash(existingIndex);
             }
 
-            StashEntry stash = new StashEntry(name, paths);
+            StashEntry stash = new StashEntry(name, lobbyPath, paths);
             stashes.Insert(0, stash);
             nameMap[name] = 0;
 

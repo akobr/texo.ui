@@ -42,7 +42,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
                 ProcessPackageConfig(info);
             }
 
-            return new Project(info.Path, info.Packages.ToImmutableList());
+            return new Project(info.Path, info.Packages.ToImmutableDictionary());
         }
 
         private ProjectInfo ProcessProject(XDocument document, Uri filePath)
@@ -56,7 +56,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 
             bool isNewFormat = root.Attribute("Sdk") != null;
             XNamespace xmlNamespace = root.GetDefaultNamespace();
-            List<IPackage> packages = new List<IPackage>();
+            Dictionary<string, IPackage> packages = new Dictionary<string, IPackage>();
 
             foreach (XElement elementReference in root.Descendants(xmlNamespace + "PackageReference"))
             {
@@ -70,7 +70,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
                     continue;
                 }
 
-                packages.Add(new Package(packageId, version));
+                packages[packageId] = new Package(packageId, version);
             }
 
             return new ProjectInfo()
@@ -115,7 +115,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
                     continue;
                 }
 
-                info.Packages.Add(new Package(packageId, version));
+                info.Packages[packageId] = new Package(packageId, version);
             }
         }
 
@@ -125,7 +125,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 
             public bool IsNewFormat { get; set; }
 
-            public List<IPackage> Packages { get; set; }
+            public Dictionary<string, IPackage> Packages { get; set; }
         }
     }
 }

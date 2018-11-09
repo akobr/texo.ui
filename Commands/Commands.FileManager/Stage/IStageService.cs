@@ -14,6 +14,12 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
         void Remove(IEnumerable<string> paths);
 
+        string GetLobby();
+
+        void SetLobby(string path);
+
+        void RemoveLobby();
+
         void Clear();
     }
 }

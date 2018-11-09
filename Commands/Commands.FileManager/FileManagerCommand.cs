@@ -16,7 +16,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             this.stageService = stageService;
             this.stashService = stashService;
 
-            RegisterCommand(StageQueries.STAGE, new StageCommand(stageService, stashService));
+            RegisterCommand(StageQueries.STAGE, new StageCommand(stageService));
             RegisterCommand(StashQueries.STASH, new StashCommand(stashService, stageService));
             RegisterCommand(ApplyQueries.APPLY, new ApplyCommand());
         }

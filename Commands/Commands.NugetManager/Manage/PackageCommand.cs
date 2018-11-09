@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using BeaverSoft.Texo.Commands.NugetManager.Extenssions;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
 using BeaverSoft.Texo.Commands.NugetManager.Services;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Extensions;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
@@ -17,7 +17,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
     {
         private readonly IPackageManagementService packages;
         private readonly IProjectManagementService projects;
-        private readonly 
 
         public PackageCommand(
             IPackageManagementService packages,
@@ -54,9 +53,9 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
 
         private void AddVersionsToResult(IPackageInfo package, MarkdownBuilder builder, bool allVersions)
         {
-            builder.Header($"Available in {package.AllVersions.Count} version(s)");
+            builder.Header($"Available in {package.AllVersions.Count} version(s)", 2);
 
-            IEnumerable<string> versionsToShow = allVersions 
+            IEnumerable<string> versionsToShow = allVersions
                 ? package.AllVersions.Take(10)
                 : package.AllVersions;
 
@@ -79,7 +78,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
 
             foreach (IProject project in usedInProjects)
             {
-                builder.Bullet($"{project.Id} ({project.Packages[package.Id].FullVersion})"); // TODO: change to name
+                builder.Bullet($"{project.Name} ({project.Packages[package.Id].Id})");
             }
         }
     }

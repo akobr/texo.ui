@@ -11,10 +11,15 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model.Projects
         {
             Path = path ?? throw new ArgumentNullException(nameof(path));
             Packages = packages ?? throw new ArgumentNullException(nameof(packages));
-            Id = path.AbsolutePath.GetPathId();
+
+            string filePath = path.AbsolutePath;
+            Name = System.IO.Path.GetFileNameWithoutExtension(filePath);
+            Id = filePath.GetPathId();
         }
 
         public string Id { get; }
+
+        public string Name { get; set; }
 
         public Uri Path { get; }
 

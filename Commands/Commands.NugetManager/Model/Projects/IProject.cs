@@ -8,6 +8,8 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model.Projects
     {
         string Id { get; }
 
+        string Name { get; }
+
         Uri Path { get; }
 
         IImmutableDictionary<string, IPackage> Packages { get; }

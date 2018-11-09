@@ -6,6 +6,8 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
     {
         string Name { get; }
 
+        string LobbyPath { get; }
+
         IImmutableList<string> Paths { get; }
     }
 }

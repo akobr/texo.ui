@@ -2,9 +2,9 @@
 
 namespace BeaverSoft.Texo.Commands.FileManager
 {
-    public partial class FileManagerCommand
+    public static class FileManagerBuilder
     {
-        public static Query BuildCommand()
+        public static Query Build()
         {
             return null;
         }

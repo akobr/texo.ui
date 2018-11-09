@@ -56,6 +56,35 @@ namespace BeaverSoft.Texo.Core.Path
             return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString());
         }
 
+        public static string GetFriendlyPath(this string path)
+        {
+            return GetFriendlyPath(path, System.Environment.CurrentDirectory);
+        }
+
+        public static string GetFriendlyPath(this string path, string relativeTo)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return string.Empty;
+            }
+
+            path = System.IO.Path.GetFullPath(path);
+
+            if (string.IsNullOrWhiteSpace(relativeTo))
+            {
+                return path;
+            }
+
+            relativeTo = System.IO.Path.GetFullPath(relativeTo);
+
+            if (!path.StartsWith(relativeTo, StringComparison.OrdinalIgnoreCase))
+            {
+                return path;
+            }
+
+            return GetRelativePath(path, relativeTo);
+        }
+
         public static PathTypeEnum GetPathType(this string path)
         {
             if (File.Exists(path))
