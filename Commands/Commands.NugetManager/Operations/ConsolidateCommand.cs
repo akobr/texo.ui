@@ -1,10 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using BeaverSoft.Texo.Core.Commands;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Operations
 {
-    class ConsolidateCommand
+    public class ConsolidateCommand : ICommand
     {
+        public ICommandResult Execute(CommandContext context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

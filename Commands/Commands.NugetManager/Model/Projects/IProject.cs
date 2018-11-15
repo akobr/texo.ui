@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Model.Projects
 {
     public interface IProject
     {
-        string Id { get; }
-
         string Name { get; }
 
-        Uri Path { get; }
+        string Path { get; }
 
         IImmutableDictionary<string, IPackage> Packages { get; }
     }

@@ -12,9 +12,31 @@ namespace BeaverSoft.Texo.Core.Path
             return System.IO.Path.Combine(appDataFolder, PathConstants.TEXO_FOLDER_NAME);
         }
 
+        public static string GetTexoDataDirectoryPath(string childDirectory)
+        {
+            return GetTexoDataDirectoryPath().CombinePathWith(childDirectory);
+        }
+
+        public static string GetAndCreateDataDirectoryPath(string childDirectory)
+        {
+            string fullPath = GetTexoDataDirectoryPath().CombinePathWith(childDirectory);
+            Directory.CreateDirectory(fullPath);
+            return fullPath;
+        }
+
         public static string GetFullPath(this string path)
         {
             return System.IO.Path.GetFullPath(path);
+        }
+
+        public static string GetFullConsolidatedPath(this string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return string.Empty;
+            }
+
+            return path.NormalisePath().GetFullPath().ToLowerInvariant();
         }
 
         public static bool IsSamePath(this string path, string otherPath)
@@ -91,16 +113,8 @@ namespace BeaverSoft.Texo.Core.Path
                 return string.Empty;
             }
 
-            path = System.IO.Path.GetFullPath(path);
-
-            if (string.IsNullOrWhiteSpace(relativeTo))
-            {
-                return path;
-            }
-
-            relativeTo = System.IO.Path.GetFullPath(relativeTo);
-
-            if (!path.StartsWith(relativeTo, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(relativeTo)
+                || !path.IsSubPathOf(relativeTo))
             {
                 return path;
             }

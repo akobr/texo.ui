@@ -14,7 +14,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing
             this.logger = logger;
         }
 
-        public Uri FilePath { get; private set; }
+        public string FilePath { get; private set; }
 
         public XDocument Content { get; private set; }
 
@@ -30,7 +30,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing
             }
 
             string fullPath = Path.GetFullPath(filePath);
-            FilePath = new Uri(fullPath, UriKind.Absolute);
+            FilePath = fullPath;
             Content =  TryLoadDocument(filePath);
         }
 

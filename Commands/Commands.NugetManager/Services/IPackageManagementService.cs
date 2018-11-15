@@ -9,5 +9,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         IEnumerable<IPackageInfo> FindPackages(string searchTerm);
 
+        void Clear();
     }
 }

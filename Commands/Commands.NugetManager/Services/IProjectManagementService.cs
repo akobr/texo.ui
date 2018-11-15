@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
+using StrongBeaver.Core;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {
-    public interface IProjectManagementService
+    public interface IProjectManagementService : IInitialisable, IDisposable
     {
         IEnumerable<IProject> GetAllProjects();
 
@@ -14,8 +16,12 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         void Remove(IProject project);
 
+        void Remove(string projectPath);
+
         IImmutableList<IProject> FindProjects(string searchTerm);
 
         IImmutableList<IProject> FindProjectsByPackage(string packageId);
+
+        void Clear();
     }
 }

@@ -10,5 +10,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
         IEnumerable<ISource> GetAllSources();
 
         IImmutableDictionary<string, IPackageInfo> GetPackages(string searchTerm);
+
+        void Clear();
     }
 }

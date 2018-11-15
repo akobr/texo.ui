@@ -17,49 +17,38 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
         private const string FILE_EXTENSION_SOLUTION = ".sln";
         private const string FILE_EXTENSION_PROJECT = ".csproj";
 
-        private readonly IProjectManagementService projectManagement;
+        private readonly IManagementService management;
         private readonly ILogService logger;
 
-        public StageService(
-            IProjectManagementService projectManagement,
-            ILogService logger)
+        public StageService(IManagementService management, ILogService logger)
         {
-            this.projectManagement = projectManagement ?? throw new ArgumentNullException(nameof(projectManagement));
+            this.management = management ?? throw new ArgumentNullException(nameof(management));
             this.logger = logger;
         }
 
         public IImmutableList<IProject> GetProjects()
         {
-            return projectManagement.GetAllProjects().ToImmutableList();
+            return management.Projects.GetAllProjects().ToImmutableList();
         }
 
         public IImmutableList<IConfig> GetConfigs()
         {
-            throw new NotImplementedException();
+            return management.Configs.GetAllConfigs().ToImmutableList();
         }
 
         public IImmutableList<ISource> GetSources()
         {
-            throw new NotImplementedException();
+            return management.Sources.GetAllSources().ToImmutableList();
         }
 
-        public IImmutableList<IProject> Add(IEnumerable<string> paths)
+        public void Add(IEnumerable<string> paths)
         {
-            foreach (string stringPath in paths)
-            {
-                TexoPath path = new TexoPath(stringPath);
-                ProcessDirectories(path);
-
-                foreach (string filePath in path.GetFiles())
-                {
-                    ProcessFile(filePath);
-                }
-            }
+            ProcessTexoPaths(paths, AddCSharpProject);
         }
 
-        public IImmutableList<IProject> Remove(IEnumerable<string> paths)
+        public void Remove(IEnumerable<string> paths)
         {
-            throw new NotImplementedException();
+            ProcessTexoPaths(paths, RemoveProject);
         }
 
         public void Fetch()
@@ -69,26 +58,56 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            management.Projects.Clear();
+            management.Packages.Clear();
+            management.Configs.Clear();
+            management.Sources.Clear();
         }
 
-        private void ProcessDirectories(TexoPath path)
+        private void AddCSharpProject(string filePath)
+        {
+            var projectStrategy = new CsharpProjectProcessingStrategy(logger);
+            management.Projects.AddOrUpdate(projectStrategy.Process(filePath));
+        }
+
+        private void RemoveProject(string filePath)
+        {
+            management.Projects.Remove(filePath);
+        }
+
+        private static void ProcessTexoPaths(IEnumerable<string> paths, Action<string> projectAction)
+        {
+            ISet<string> visitedFiles = new HashSet<string>(new InsensitiveFullPathComparer());
+
+            foreach (string stringPath in paths)
+            {
+                TexoPath path = new TexoPath(stringPath);
+                ProcessDirectories(path, projectAction, visitedFiles);
+
+                foreach (string filePath in path.GetFiles())
+                {
+                    ProcessFile(filePath, projectAction, visitedFiles);
+                }
+            }
+        }
+
+        private static void ProcessDirectories(TexoPath path, Action<string> projectAction, ISet<string> visitedFiles)
         {
             foreach (string directory in path.GetTopDirectories())
             {
                 foreach (string solutionFile in TexoDirectory.GetFiles(directory, PathConstants.ANY_PATH_WILDCARD + FILE_EXTENSION_SOLUTION, SearchOption.AllDirectories))
                 {
-                    ProcessSolution(solutionFile);
+                    ProcessSolution(solutionFile, projectAction, visitedFiles);
                 }
 
                 foreach (string projectFile in TexoDirectory.GetFiles(directory, PathConstants.ANY_PATH_WILDCARD + FILE_EXTENSION_PROJECT, SearchOption.AllDirectories))
                 {
-                    ProcessCSharpProject(projectFile);
+                    ProcessProjectFile(projectFile, projectAction, visitedFiles);
                 }
             }
         }
 
-        private void ProcessFile(string filePath)
+        private static void ProcessFile(string filePath, Action<string> projectAction, ISet<string> visitedFiles)
         {
             if (!File.Exists(filePath))
             {
@@ -98,27 +117,38 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
             switch (Path.GetExtension(filePath))
             {
                 case FILE_EXTENSION_SOLUTION:
-                    ProcessSolution(filePath);
+                    ProcessSolution(filePath, projectAction, visitedFiles);
                     break;
 
                 case FILE_EXTENSION_PROJECT:
-                    ProcessCSharpProject(filePath);
+                    ProcessProjectFile(filePath, projectAction, visitedFiles);
                     break;
             }
         }
 
-        private void ProcessCSharpProject(string filePath)
+        private static void ProcessProjectFile(string filePath, Action<string> projectAction, ISet<string> visitedFiles)
         {
-            var projectStrategy = new CsharpProjectProcessingStrategy(logger);
-            projectManagement.AddOrUpdate(projectStrategy.Process(filePath));
+            if (visitedFiles.Contains(filePath))
+            {
+                return;
+            }
+
+            visitedFiles.Add(filePath);
+            projectAction(filePath);
         }
 
-        private void ProcessSolution(string filePath)
+        private static void ProcessSolution(string filePath, Action<string> projectAction, ISet<string> visitedFiles)
         {
-            var solutionStrategy = new SolutionProcessingStrategy(logger);
-            foreach (IProject project in solutionStrategy.Process(filePath))
+            if (visitedFiles.Contains(filePath))
             {
-                projectManagement.AddOrUpdate(project);
+                return;
+            }
+
+            visitedFiles.Add(filePath);
+            var solutionStrategy = new SolutionProcessingStrategy();
+            foreach (string projectPath in solutionStrategy.Process(filePath))
+            {
+                ProcessProjectFile(projectPath, projectAction, visitedFiles);
             }
         }
     }

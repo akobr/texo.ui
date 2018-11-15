@@ -45,7 +45,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
             return new Project(info.Path, info.Packages.ToImmutableDictionary());
         }
 
-        private ProjectInfo ProcessProject(XDocument document, Uri filePath)
+        private ProjectInfo ProcessProject(XDocument document, string filePath)
         {
             XElement root = document.Root;
 
@@ -83,7 +83,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 
         private void ProcessPackageConfig(ProjectInfo info)
         {
-            string directoryPath = Path.GetDirectoryName(info.Path.AbsolutePath);
+            string directoryPath = Path.GetDirectoryName(info.Path);
             string configPath = Path.Combine(directoryPath, PACKAGES_CONFIG_FILE_NAME);
 
             IXmlContentLoader loader = new XmlContentLoader(logger);
@@ -121,7 +121,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 
         private class ProjectInfo
         {
-            public Uri Path { get; set; }
+            public string Path { get; set; }
 
             public bool IsNewFormat { get; set; }
 

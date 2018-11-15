@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using StrongBeaver.Core.Services.Logging;
@@ -10,31 +8,9 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 {
     public class SolutionProcessingStrategy : ISolutionProcessingStrategy
     {
-        private readonly ILogService logger;
-
-        public SolutionProcessingStrategy(ILogService logger)
+        public IEnumerable<string> Process(string filePath)
         {
-            this.logger = logger;
-        }
-
-        public IImmutableList<IProject> Process(string filePath)
-        {
-            var result = ImmutableList<IProject>.Empty.ToBuilder();
-
-            foreach (var projectPath in GetProjectPaths(filePath))
-            {
-                var strategy = new CsharpProjectProcessingStrategy(logger);
-                IProject model = strategy.Process(projectPath);
-
-                if (model == null)
-                {
-                    continue;
-                }
-
-                result.Add(model);
-            }
-
-            return result.ToImmutable();
+            return GetProjectPaths(filePath);
         }
 
         public static IEnumerable<string> GetProjectPaths(string solutionPath)

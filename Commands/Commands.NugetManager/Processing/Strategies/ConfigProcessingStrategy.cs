@@ -29,7 +29,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
             return ProcessConfig(loader.Content, loader.FilePath);
         }
 
-        private IConfig ProcessConfig(XDocument document, Uri filePath)
+        private IConfig ProcessConfig(XDocument document, string filePath)
         {
             XElement root = document.Root;
 

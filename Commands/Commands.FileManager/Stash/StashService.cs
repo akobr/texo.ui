@@ -9,8 +9,6 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 {
     public class StashService : IStashService
     {
-        private const string STASH_FILE_NAME = "Stashes.json";
-
         private readonly ISerialisationService serialisation;
         private readonly Dictionary<string, int> nameMap;
         private readonly List<IStashEntry> stashes;
@@ -166,14 +164,8 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
         private void LoadStashes()
         {
-            string texoDataFolder = PathExtensions.GetTexoDataDirectoryPath();
-
-            if (!Directory.Exists(texoDataFolder))
-            {
-                return;
-            }
-
-            string filePath = Path.Combine(texoDataFolder, STASH_FILE_NAME);
+            string texoDataFolder = PathExtensions.GetAndCreateDataDirectoryPath(FileManagerConstants.STORAGE_DIRECTORY_NAME);
+            string filePath = texoDataFolder.CombinePathWith(FileManagerConstants.STORAGE_STASHES_FILE_NAME);
 
             if (!File.Exists(filePath))
             {
@@ -201,14 +193,8 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
         private void SaveStashes()
         {
-            string texoDataFolder = PathExtensions.GetTexoDataDirectoryPath();
-
-            if (!Directory.Exists(texoDataFolder))
-            {
-                Directory.CreateDirectory(texoDataFolder);
-            }
-
-            string filePath = Path.Combine(texoDataFolder, STASH_FILE_NAME);
+            string texoDataFolder = PathExtensions.GetAndCreateDataDirectoryPath(FileManagerConstants.STORAGE_DIRECTORY_NAME);
+            string filePath = texoDataFolder.CombinePathWith(FileManagerConstants.STORAGE_STASHES_FILE_NAME);
 
             using (FileStream file = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write))
             {
@@ -218,14 +204,8 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
         private static void DeletePersistentStashes()
         {
-            string texoDataFolder = PathExtensions.GetTexoDataDirectoryPath();
-
-            if (!Directory.Exists(texoDataFolder))
-            {
-                return;
-            }
-
-            string filePath = Path.Combine(texoDataFolder, STASH_FILE_NAME);
+            string texoDataFolder = PathExtensions.GetAndCreateDataDirectoryPath(FileManagerConstants.STORAGE_DIRECTORY_NAME);
+            string filePath = texoDataFolder.CombinePathWith(FileManagerConstants.STORAGE_STASHES_FILE_NAME);
             File.Delete(filePath);
         }
     }

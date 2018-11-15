@@ -14,9 +14,9 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
         IImmutableList<ISource> GetSources();
 
-        IImmutableList<IProject> Add(IEnumerable<string> paths);
+        void Add(IEnumerable<string> paths);
 
-        IImmutableList<IProject> Remove(IEnumerable<string> paths);
+        void Remove(IEnumerable<string> paths);
 
         void Fetch();
 

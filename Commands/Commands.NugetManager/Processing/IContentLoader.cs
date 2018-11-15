@@ -5,7 +5,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing
 {
     public interface FileIContentLoader<TContent>
     {
-        Uri FilePath { get; }
+        string FilePath { get; }
 
         TContent Content { get; }
 

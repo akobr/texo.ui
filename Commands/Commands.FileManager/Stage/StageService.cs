@@ -10,8 +10,6 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 {
     public class StageService : IStageService
     {
-        private const string STAGE_FILE_NAME = "Stage.json";
-
         private readonly ISerialisationService serialisation;
         private string lobby;
         private ImmutableSortedSet<string> paths;
@@ -94,24 +92,16 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
         public void Clear()
         {
             EmptyStage();
-            DeletePersistentStashes();
+            DeletePersistentStage();
         }
 
         private void LoadStage()
         {
-            string texoDataFolder = PathExtensions.GetTexoDataDirectoryPath();
-
-            if (!Directory.Exists(texoDataFolder))
-            {
-                EmptyStage();
-                return;
-            }
-
-            string filePath = texoDataFolder.CombinePathWith(STAGE_FILE_NAME);
+            string texoDataFolder = PathExtensions.GetAndCreateDataDirectoryPath(FileManagerConstants.STORAGE_DIRECTORY_NAME);
+            string filePath = texoDataFolder.CombinePathWith(FileManagerConstants.STORAGE_STAGE_FILE_NAME);
 
             if (!File.Exists(filePath))
             {
-                EmptyStage();
                 return;
             }
 
@@ -121,12 +111,11 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
                 if (stage == null)
                 {
-                    EmptyStage();
                     return;
                 }
 
                 lobby = stage.LobbyPath ?? string.Empty;
-                var pathsBuilder = ImmutableSortedSet.CreateBuilder(new StagePathComparer());
+                var pathsBuilder = ImmutableSortedSet.CreateBuilder(new InsensitiveFullPathComparer());
                 pathsBuilder.UnionWith(stage.Paths);
                 paths = pathsBuilder.ToImmutable();
             }
@@ -134,14 +123,8 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
         private void SaveStage()
         {
-            string texoDataFolder = PathExtensions.GetTexoDataDirectoryPath();
-
-            if (!Directory.Exists(texoDataFolder))
-            {
-                Directory.CreateDirectory(texoDataFolder);
-            }
-
-            string filePath = Path.Combine(texoDataFolder, STAGE_FILE_NAME);
+            string texoDataFolder = PathExtensions.GetAndCreateDataDirectoryPath(FileManagerConstants.STORAGE_DIRECTORY_NAME);
+            string filePath = texoDataFolder.CombinePathWith(FileManagerConstants.STORAGE_STAGE_FILE_NAME);
 
             using (FileStream file = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write))
             {
@@ -152,7 +135,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
         private void EmptyStage()
         {
             lobby = string.Empty;
-            paths = ImmutableSortedSet.Create((IComparer<string>) new StagePathComparer());
+            paths = ImmutableSortedSet.Create((IComparer<string>) new InsensitiveFullPathComparer());
         }
 
         private StashEntry BuildStash()
@@ -160,16 +143,10 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
             return new StashEntry(null, lobby, paths.ToImmutableList());
         }
 
-        private static void DeletePersistentStashes()
+        private static void DeletePersistentStage()
         {
-            string texoDataFolder = PathExtensions.GetTexoDataDirectoryPath();
-
-            if (!Directory.Exists(texoDataFolder))
-            {
-                return;
-            }
-
-            string filePath = Path.Combine(texoDataFolder, STAGE_FILE_NAME);
+            string texoDataFolder = PathExtensions.GetAndCreateDataDirectoryPath(FileManagerConstants.STORAGE_DIRECTORY_NAME);
+            string filePath = texoDataFolder.CombinePathWith(FileManagerConstants.STORAGE_STAGE_FILE_NAME);
             File.Delete(filePath);
         }
     }

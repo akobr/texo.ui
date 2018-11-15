@@ -2,6 +2,7 @@
 using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.FileManager.Stash;
+using BeaverSoft.Texo.Commands.NugetManager.Services;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
@@ -63,17 +64,24 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<IConsoleRenderService, ConsoleMarkdownRenderService>();
             container.Register<IViewService, ConsoleViewService>();
 
+            // Core commands
             container.Register<ICurrentDirectoryService, CurrentDirectoryService>();
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
+
+            // Simple commands
             container.Register<ReferenceCheckCommand>();
             container.Register<DirCommand>();
             container.Register<CommandLineCommand>();
 
+            // File manager
             container.Register<ISerialisationService, JsonSerialisationService>();
             container.Register<IStageService, StageService>();
             container.Register<IStashService, StashService>();
             container.Register<FileManagerCommand>();
+
+            // Nuget manager
+            container.Register<IProjectManagementService, ProjectManagementService>();
 
             CommandFactory commandFactory = new CommandFactory();
             container.Register<ITexoFactory<ICommand, string>>(() => commandFactory);

@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Configs;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
 
@@ -19,7 +19,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing
         // no member
     }
 
-    public interface ISolutionProcessingStrategy : IProcessingStrategy<IImmutableList<IProject>>
+    public interface ISolutionProcessingStrategy : IProcessingStrategy<IEnumerable<string>>
     {
         // no member
     }
