@@ -25,11 +25,6 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             return targetPath;
         }
 
-        internal static bool IsFlatten(this CommandContext context)
-        {
-            return context.HasOption(ApplyOptions.FLATTEN);
-        }
-
         internal static bool IsEmpty(this IStageService stage)
         {
             return stage.GetPaths().Count < 1;

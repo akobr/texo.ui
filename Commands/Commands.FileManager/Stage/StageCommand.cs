@@ -30,12 +30,19 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
         private ICommandResult Status(CommandContext context)
         {
+            var paths = stage.GetPaths();
+
+            if (paths.Count < 1)
+            {
+                return new TextResult("The stage is empty.");
+            }
+
             return new ItemsResult(BuildStageItem(stage.GetLobby(), stage.GetPaths(), "The stage"));
         }
 
-        private ICommandResult List(CommandContext context)
+        private static ICommandResult List(CommandContext context)
         {
-            if (context.HasPath())
+            if (context.HasParameter(ParameterKeys.PATH))
             {
                 string current = Environment.CurrentDirectory;
                 return new ItemsResult(BuildStageItem(current, Directory.GetFileSystemEntries(current), current));
@@ -45,7 +52,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
             foreach (TexoPath path in context.GetParameterPaths())
             {
-                items.Add(BuildStageItem(path.FixedPartOfPath, path.GetItems(), path.Path));
+                items.Add(BuildStageItem(path.GetFixedPrefixPath(), path.GetItems(), path.Path));
             }
 
             return new ItemsResult(items.ToImmutable());
@@ -94,6 +101,13 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
         private ICommandResult Lobby(CommandContext context)
         {
             string lobbyPath = context.GetParameterValue(FileManagerParameters.SIMPLE_PATH);
+            string actualLobby = stage.GetLobby();
+
+            if (actualLobby.IsSamePath(lobbyPath))
+            {
+                return new TextResult($"The stage already has lobby: {actualLobby}");
+            }
+
             stage.SetLobby(lobbyPath);
             return new TextResult($"Lobby of the stage: {stage.GetLobby()}");
         }
@@ -109,14 +123,9 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
             MarkdownBuilder builder = new MarkdownBuilder();
             builder.Header(header);
 
-            if (string.IsNullOrEmpty(lobbyPath))
-            {
-                builder.Italic("No lobby directory.");
-            }
-            else
-            {
-                builder.CodeInline(lobbyPath);
-            }
+            builder.Italic(string.IsNullOrEmpty(lobbyPath)
+                ? "No lobby directory."
+                : lobbyPath);
 
             builder.WriteLine();
             builder.WritePathLists(lobbyPath, paths);

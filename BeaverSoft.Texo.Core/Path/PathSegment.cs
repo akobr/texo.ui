@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+﻿using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -8,7 +8,7 @@ namespace BeaverSoft.Texo.Core.Path
     {
         public PathSegment(string segment)
         {
-            Value = segment;
+            Value = segment ?? throw new ArgumentNullException(nameof(segment));
             WildcardType = ProcessWildcards(segment, out string regularExpression);
             RegularExpression = regularExpression;
         }
@@ -18,32 +18,6 @@ namespace BeaverSoft.Texo.Core.Path
         public WildcardTypeEnum WildcardType { get; }
 
         public string RegularExpression { get; }
-
-        public bool IsValid(string item, string directory)
-        {
-            if (string.IsNullOrWhiteSpace(item)
-                || string.IsNullOrWhiteSpace(directory))
-            {
-                return false;
-            }
-
-            string itemFullPath = System.IO.Path.GetFullPath(item);
-            string directoryFullPath = System.IO.Path.GetFullPath(directory);
-
-            if (itemFullPath.Length <= directoryFullPath.Length + 1)
-            {
-                return false;
-            }
-
-            string pathToValidate = itemFullPath.Substring(directoryFullPath.Length + 1);
-
-            if (WildcardType == WildcardTypeEnum.None)
-            {
-                return pathToValidate.StartsWith(Value, true, CultureInfo.InvariantCulture);
-            }
-
-            return Regex.IsMatch(pathToValidate, RegularExpression);
-        }
 
         private static WildcardTypeEnum ProcessWildcards(string segment, out string regularExpression)
         {
@@ -56,7 +30,7 @@ namespace BeaverSoft.Texo.Core.Path
             {
                 char character = segment[i];
 
-                if (character.IsWildcard())
+                if (character.IsPathWildcard())
                 {
                     if (tokenBuilder.Length > 0)
                     {
@@ -64,9 +38,9 @@ namespace BeaverSoft.Texo.Core.Path
                         tokenBuilder.Clear();
                     }
 
-                    if (character == TexoPath.WILDCARD_ANY_CHARACTER
+                    if (character == PathConstants.WILDCARD_ANY_CHARACTER
                         && i < segment.Length - 1
-                        && segment[i + 1] == TexoPath.WILDCARD_ANY_CHARACTER)
+                        && segment[i + 1] == PathConstants.WILDCARD_ANY_CHARACTER)
                     {
                         regexBuilder.Append(".*");
                         complexWildcard = true;

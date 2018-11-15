@@ -166,7 +166,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
         private void LoadStashes()
         {
-            string texoDataFolder = PathExtensions.GetTexoDataFolder();
+            string texoDataFolder = PathExtensions.GetTexoDataDirectoryPath();
 
             if (!Directory.Exists(texoDataFolder))
             {
@@ -201,7 +201,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
         private void SaveStashes()
         {
-            string texoDataFolder = PathExtensions.GetTexoDataFolder();
+            string texoDataFolder = PathExtensions.GetTexoDataDirectoryPath();
 
             if (!Directory.Exists(texoDataFolder))
             {
@@ -216,9 +216,9 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             }
         }
 
-        private void DeletePersistentStashes()
+        private static void DeletePersistentStashes()
         {
-            string texoDataFolder = PathExtensions.GetTexoDataFolder();
+            string texoDataFolder = PathExtensions.GetTexoDataDirectoryPath();
 
             if (!Directory.Exists(texoDataFolder))
             {

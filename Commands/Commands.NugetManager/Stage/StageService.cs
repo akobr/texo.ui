@@ -14,6 +14,9 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 {
     public class StageService : IStageService
     {
+        private const string FILE_EXTENSION_SOLUTION = ".sln";
+        private const string FILE_EXTENSION_PROJECT = ".csproj";
+
         private readonly IProjectManagementService projectManagement;
         private readonly ILogService logger;
 
@@ -45,11 +48,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
             foreach (string stringPath in paths)
             {
                 TexoPath path = new TexoPath(stringPath);
-
-                foreach (string itemPath in GetFilesFromDirectories(path))
-                {
-                    ProcessFile(itemPath);
-                }
+                ProcessDirectories(path);
 
                 foreach (string filePath in path.GetFiles())
                 {
@@ -73,18 +72,18 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
             throw new NotImplementedException();
         }
 
-        private IEnumerable<string> GetFilesFromDirectories(TexoPath path)
+        private void ProcessDirectories(TexoPath path)
         {
-            foreach (string directory in path.GetDirectories())
+            foreach (string directory in path.GetTopDirectories())
             {
-                foreach (string solutionFile in Directory.GetFiles(directory, "*.sln", SearchOption.AllDirectories))
+                foreach (string solutionFile in TexoDirectory.GetFiles(directory, PathConstants.ANY_PATH_WILDCARD + FILE_EXTENSION_SOLUTION, SearchOption.AllDirectories))
                 {
-                    yield return solutionFile;
+                    ProcessSolution(solutionFile);
                 }
 
-                foreach (string projectFile in Directory.GetFiles(directory, "*.csproj", SearchOption.AllDirectories))
+                foreach (string projectFile in TexoDirectory.GetFiles(directory, PathConstants.ANY_PATH_WILDCARD + FILE_EXTENSION_PROJECT, SearchOption.AllDirectories))
                 {
-                    yield return projectFile;
+                    ProcessCSharpProject(projectFile);
                 }
             }
         }
@@ -98,18 +97,28 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
             switch (Path.GetExtension(filePath))
             {
-                case ".sln":
-                    var solutionStrategy = new SolutionProcessingStrategy(logger);
-                    foreach (IProject project in solutionStrategy.Process(filePath))
-                    {
-                        projectManagement.AddOrUpdate(project);
-                    }
+                case FILE_EXTENSION_SOLUTION:
+                    ProcessSolution(filePath);
                     break;
 
-                case ".csproj":
-                    var projectStrategy = new CsharpProjectProcessingStrategy(logger);
-                    projectManagement.AddOrUpdate(projectStrategy.Process(filePath));
+                case FILE_EXTENSION_PROJECT:
+                    ProcessCSharpProject(filePath);
                     break;
+            }
+        }
+
+        private void ProcessCSharpProject(string filePath)
+        {
+            var projectStrategy = new CsharpProjectProcessingStrategy(logger);
+            projectManagement.AddOrUpdate(projectStrategy.Process(filePath));
+        }
+
+        private void ProcessSolution(string filePath)
+        {
+            var solutionStrategy = new SolutionProcessingStrategy(logger);
+            foreach (IProject project in solutionStrategy.Process(filePath))
+            {
+                projectManagement.AddOrUpdate(project);
             }
         }
     }

@@ -6,30 +6,53 @@ namespace BeaverSoft.Texo.Core.Path
 {
     public static class PathExtensions
     {
-        private const string TEXO_FOLDER_NAME = "Texo";
-
-        private static readonly char[] InvalidPathCharacters =
-        {
-            '\"', '<', '>', '|', '\0',
-            (char)1, (char)2, (char)3, (char)4, (char)5, (char)6, (char)7, (char)8, (char)9, (char)10,
-            (char)11, (char)12, (char)13, (char)14, (char)15, (char)16, (char)17, (char)18, (char)19, (char)20,
-            (char)21, (char)22, (char)23, (char)24, (char)25, (char)26, (char)27, (char)28, (char)29, (char)30,
-            (char)31
-        };
-
-        private static readonly char[] ExtraInvalidPathCharacters =
-        {
-            '\"', '<', '>', '|', '\0',
-            (char)1, (char)2, (char)3, (char)4, (char)5, (char)6, (char)7, (char)8, (char)9, (char)10,
-            (char)11, (char)12, (char)13, (char)14, (char)15, (char)16, (char)17, (char)18, (char)19, (char)20,
-            (char)21, (char)22, (char)23, (char)24, (char)25, (char)26, (char)27, (char)28, (char)29, (char)30,
-            (char)31, '*', '?'
-        };
-
-        public static string GetTexoDataFolder()
+        public static string GetTexoDataDirectoryPath()
         {
             string appDataFolder = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
-            return System.IO.Path.Combine(appDataFolder, TEXO_FOLDER_NAME);
+            return System.IO.Path.Combine(appDataFolder, PathConstants.TEXO_FOLDER_NAME);
+        }
+
+        public static string GetFullPath(this string path)
+        {
+            return System.IO.Path.GetFullPath(path);
+        }
+
+        public static bool IsSamePath(this string path, string otherPath)
+        {
+            if (!path.IsValidPath() || !otherPath.IsValidPath())
+            {
+                return false;
+            }
+
+            return string.Equals(
+                path.GetFullPath(),
+                otherPath.GetFullPath(),
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static string GetDirectoryOrFileName(this string path)
+        {
+            return System.IO.Path.GetFileName(path);
+        }
+
+        public static string GetParentDirectoryPath(this string path)
+        {
+            return System.IO.Path.GetDirectoryName(path);
+        }
+
+        public static string CombinePathWith(this string path, string secondPath)
+        {
+            return System.IO.Path.Combine(path, secondPath);
+        }
+
+        public static string NormalisePath(this string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return string.Empty;
+            }
+
+            return path.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
         }
 
         public static string GetRelativePath(this string path)
@@ -85,6 +108,38 @@ namespace BeaverSoft.Texo.Core.Path
             return GetRelativePath(path, relativeTo);
         }
 
+        public static bool IsSubPathOf(this string childPath, string parentPath)
+        {
+            if (string.IsNullOrWhiteSpace(childPath)
+                || string.IsNullOrWhiteSpace(parentPath))
+            {
+                return false;
+            }
+
+            childPath = NormalisePath(childPath);
+            parentPath = NormalisePath(parentPath);
+
+            if (childPath[childPath.Length - 1] != System.IO.Path.DirectorySeparatorChar)
+            {
+                childPath += System.IO.Path.DirectorySeparatorChar;
+            }
+
+            if (parentPath[parentPath.Length - 1] != System.IO.Path.DirectorySeparatorChar)
+            {
+                parentPath += System.IO.Path.DirectorySeparatorChar;
+            }
+
+            string childNormalisedFullPath = System.IO.Path.GetFullPath(childPath);
+            string parentNormalisedFullPath = System.IO.Path.GetFullPath(parentPath);
+
+            return childNormalisedFullPath.StartsWith(parentNormalisedFullPath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool IsParentPathOf(this string parentPath, string childPath)
+        {
+            return IsSubPathOf(childPath, parentPath);
+        }
+
         public static PathTypeEnum GetPathType(this string path)
         {
             if (File.Exists(path))
@@ -100,7 +155,7 @@ namespace BeaverSoft.Texo.Core.Path
             return PathTypeEnum.NonExistent;
         }
 
-        public static IEnumerable<string> GetDirectories(this IEnumerable<string> paths)
+        public static IEnumerable<string> GetDirectoryPaths(this IEnumerable<string> paths)
         {
             if (paths == null)
             {
@@ -116,7 +171,7 @@ namespace BeaverSoft.Texo.Core.Path
             }
         }
 
-        public static IEnumerable<string> GetFiles(this IEnumerable<string> paths)
+        public static IEnumerable<string> GetFilePaths(this IEnumerable<string> paths)
         {
             if (paths == null)
             {
@@ -132,7 +187,7 @@ namespace BeaverSoft.Texo.Core.Path
             }
         }
 
-        public static IEnumerable<string> GetNonExistents(this IEnumerable<string> paths)
+        public static IEnumerable<string> GetAbsentPaths(this IEnumerable<string> paths)
         {
             if (paths == null)
             {
@@ -148,6 +203,30 @@ namespace BeaverSoft.Texo.Core.Path
             }
         }
 
+        public static IEnumerable<string> SplitToPathSegments(this string path)
+        {
+            if (path == null)
+            {
+                yield break;
+            }
+
+            string[] rawSegments = path.Split(new[]
+            {
+                System.IO.Path.DirectorySeparatorChar,
+                System.IO.Path.AltDirectorySeparatorChar
+            }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string rawSegment in rawSegments)
+            {
+                if (string.IsNullOrWhiteSpace(rawSegment))
+                {
+                    continue;
+                }
+
+                yield return rawSegment;
+            }
+        }
+
         public static bool IsValidWildcardPath(this string path)
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -155,7 +234,7 @@ namespace BeaverSoft.Texo.Core.Path
                 return false;
             }
 
-            return path.IndexOfAny(InvalidPathCharacters) < 0;
+            return path.IndexOfAny(PathConstants.InvalidWildcardPathCharacters) < 0;
         }
 
         public static bool IsValidPath(this string path)
@@ -165,10 +244,10 @@ namespace BeaverSoft.Texo.Core.Path
                 return false;
             }
 
-            return path.IndexOfAny(ExtraInvalidPathCharacters) < 0;
+            return path.IndexOfAny(PathConstants.InvalidPathCharacters) < 0;
         }
 
-        public static bool IsRelative(this string path)
+        public static bool IsRelativePath(this string path)
         {
             if (path == null
                 || IsDirectorySeparator(path[0]))
@@ -187,40 +266,21 @@ namespace BeaverSoft.Texo.Core.Path
             return true;
         }
 
-        public static IEnumerable<string> SplitToSegments(this string path)
-        {
-            if (path == null)
-            {
-                yield break;
-            }
-
-            string[] rawSegments = path.Split(new[]
-            {
-                System.IO.Path.DirectorySeparatorChar,
-                System.IO.Path.AltDirectorySeparatorChar
-            }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string rawSegment in rawSegments)
-            {
-                if(string.IsNullOrWhiteSpace(rawSegment))
-                {
-                    continue;
-                }
-
-                yield return rawSegment;
-            }
-        }
-
         public static bool IsDirectorySeparator(this char character)
         {
             return character == System.IO.Path.DirectorySeparatorChar
                 || character == System.IO.Path.AltDirectorySeparatorChar;
         }
 
-        public static bool IsWildcard(this char character)
+        public static bool IsPathWildcard(this char character)
         {
-            return character == TexoPath.WILDCARD_ANY_CHARACTER
-                || character == TexoPath.WILDCARD_ONE_CHARACTER;
+            return character == PathConstants.WILDCARD_ANY_CHARACTER
+                || character == PathConstants.WILDCARD_ONE_CHARACTER;
+        }
+
+        public static bool IsVolumeSeparatorChar(this char value)
+        {
+            return value == System.IO.Path.VolumeSeparatorChar;
         }
 
         private static bool IsValidDriveChar(char value)

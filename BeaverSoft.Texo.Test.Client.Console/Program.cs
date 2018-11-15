@@ -1,4 +1,7 @@
 ﻿using System;
+using BeaverSoft.Texo.Commands.FileManager;
+using BeaverSoft.Texo.Commands.FileManager.Stage;
+using BeaverSoft.Texo.Commands.FileManager.Stash;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
@@ -15,6 +18,8 @@ using Commands.ReferenceCheck;
 using GalaSoft.MvvmLight.Ioc;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
+using StrongBeaver.Core.Services.Serialisation;
+using StrongBeaver.Core.Services.Serialisation.Json;
 
 namespace BeaverSoft.Texo.Test.Client.Console
 {
@@ -65,6 +70,11 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<DirCommand>();
             container.Register<CommandLineCommand>();
 
+            container.Register<ISerialisationService, JsonSerialisationService>();
+            container.Register<IStageService, StageService>();
+            container.Register<IStashService, StashService>();
+            container.Register<FileManagerCommand>();
+
             CommandFactory commandFactory = new CommandFactory();
             container.Register<ITexoFactory<ICommand, string>>(() => commandFactory);
             commandFactory.Register(CommandKeys.CURRENT_DIRECTORY, () => container.GetInstance<CurrentDirectoryCommand>());
@@ -72,6 +82,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
             commandFactory.Register(ReferenceCheckConstants.REF_CHECK, () => container.GetInstance<ReferenceCheckCommand>());
             commandFactory.Register("dir", () => container.GetInstance<DirCommand>());
             commandFactory.Register("command-line", () => container.GetInstance<CommandLineCommand>());
+            commandFactory.Register("file-manager", () => container.GetInstance<FileManagerCommand>());
 
             engine = new TexoEngineBuilder(container.GetInstance<ServiceMessageBus>())
                 .WithLogService(container.GetInstance<ILogService>())
@@ -90,6 +101,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
             config.Runtime.Commands.Add(ReferenceCheckCommand.BuildConfiguration());
             config.Runtime.Commands.Add(DirCommand.BuildConfiguration());
             config.Runtime.Commands.Add(CommandLineCommand.BuildConfiguration());
+            config.Runtime.Commands.Add(FileManagerBuilder.BuildCommand());
             engine.Configure(config.ToImmutable());
         }
 

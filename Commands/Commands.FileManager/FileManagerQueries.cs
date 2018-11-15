@@ -4,8 +4,8 @@ using System.Text;
 
 namespace BeaverSoft.Texo.Commands.FileManager
 {
-    public interface IFileManagerContext
+    public static class FileManagerQueries
     {
-        
+        public const string FILE_MANAGER = "file-manager";
     }
 }
