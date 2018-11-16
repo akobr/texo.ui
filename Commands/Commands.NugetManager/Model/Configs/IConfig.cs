@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Sources;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Model.Configs
 {
@@ -7,6 +6,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model.Configs
     {
         string Path { get; }
 
-        IImmutableList<ISource> Sources { get; }
+        IImmutableList<string> Sources { get; }
     }
 }

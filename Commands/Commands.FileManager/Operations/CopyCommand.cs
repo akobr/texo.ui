@@ -137,7 +137,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             bool flatten = context.Flat || filePath.IsSubPathOf(context.SourceLobby);
             string destinationPath = context.Destination.CombinePathWith(
                 flatten
-                    ? filePath.GetDirectoryOrFileName()
+                    ? filePath.GetFileNameOrDirectoryName()
                     : filePath.GetRelativePath(context.SourceLobby));
 
             return new FileCopyContext()
@@ -153,7 +153,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             bool flatten = context.Flat || directoryPath.IsSubPathOf(context.SourceLobby);
             string destinationPath = context.Destination.CombinePathWith(
                 flatten
-                    ? directoryPath.GetDirectoryOrFileName()
+                    ? directoryPath.GetFileNameOrDirectoryName()
                     : directoryPath.GetRelativePath(context.SourceLobby));
 
             List<FileCopyContext> files = new List<FileCopyContext>();

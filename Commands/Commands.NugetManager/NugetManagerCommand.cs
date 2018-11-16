@@ -30,7 +30,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager
             RegisterCommand(ApplyQueries.INSTALL, new InstallCommand());
             RegisterCommand(ApplyQueries.UNINSTALL, new UninstallCommand());
             RegisterCommand(ApplyQueries.UPDATE, new UpdateCommand());
-            RegisterCommand(ApplyQueries.CONSOLIDATE, new ConsolidateCommand());
         }
 
         // TODO: implement support for initialisable and disposable commands in core

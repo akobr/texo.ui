@@ -2,7 +2,6 @@
 using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
-using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 {

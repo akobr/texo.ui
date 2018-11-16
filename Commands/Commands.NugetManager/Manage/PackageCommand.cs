@@ -33,7 +33,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
 
             foreach (string packageTerm in context.GetParameterValues(NugetManagerParameters.SEARCH_TERM))
             {
-                foreach (IPackageInfo package in packages.FindPackages(packageTerm))
+                foreach (IPackageInfo package in packages.SearchPackages(packageTerm))
                 {
                     items.Add(BuildPackageResult(package, allVersions));
                 }

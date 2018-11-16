@@ -8,9 +8,13 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
     {
         IEnumerable<string> GetAllSources();
 
-        IPackageInfo GetPackage(string packageId);
+        void Add(string source);
 
-        IImmutableDictionary<string, IPackageInfo> GetPackages(string searchTerm);
+        void AddRange(IEnumerable<string> sources);
+
+        IPackageInfo FetchPackage(string packageId);
+
+        IImmutableDictionary<string, IPackageInfo> SearchPackages(string searchTerm);
 
         void Clear();
     }

@@ -13,12 +13,21 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {
     public class ProjectManagementService : IProjectManagementService
     {
-        private readonly ISerialisationService serialisation;
-        private ImmutableSortedDictionary<string, IProject> projects;
         private readonly ILogService logger;
+        private readonly ISerialisationService serialisation;
+        private readonly IConfigManagementService configs;
+        private readonly IPackageManagementService packages;
 
-        public ProjectManagementService(ISerialisationService serialisation, ILogService logger)
+        private ImmutableSortedDictionary<string, IProject> projects;
+
+        public ProjectManagementService(
+            IPackageManagementService packages,
+            IConfigManagementService configs,
+            ISerialisationService serialisation,
+            ILogService logger)
         {
+            this.packages = packages ?? throw new ArgumentNullException(nameof(packages));
+            this.configs = configs ?? throw new ArgumentNullException(nameof(configs));
             this.serialisation = serialisation ?? throw new ArgumentNullException(nameof(serialisation));
             this.logger = logger;
             ResetProjects();
@@ -49,6 +58,8 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         public void ReloadAll()
         {
+            ResetProjects();
+
             var currentProjects = projects;
             foreach (IProject project in currentProjects.Values)
             {
@@ -118,8 +129,16 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         private IProject BuildProject(string filePath)
         {
-            IProjectProcessingStrategy projectStrategy = new CsharpProjectProcessingStrategy(logger);
-            return projectStrategy.Process(filePath);
+            IProjectProcessingStrategy projectStrategy = new CsharpProjectProcessingStrategy(packages, logger);
+            IProject project = projectStrategy.Process(filePath);
+
+            if (project == null)
+            {
+                return null;
+            }
+
+            configs.LoadFromDirectory(filePath.GetParentDirectoryPath());
+            return project;
         }
 
         private IEnumerable<string> GetProjectPaths()
@@ -166,6 +185,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
         private void ResetProjects()
         {
             projects = ImmutableSortedDictionary.Create<string, IProject>(new InsensitiveFullPathComparer());
+            configs.Clear();
         }
 
         private static void DeletePersistentStageProjects()

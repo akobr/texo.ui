@@ -2,7 +2,6 @@
 using System.Collections.Immutable;
 using System.Xml.Linq;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Configs;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Sources;
 using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
@@ -39,7 +38,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
             }
 
             XNamespace xmlNamespace = root.GetDefaultNamespace();
-            var sources = ImmutableList<ISource>.Empty.ToBuilder();
+            var sources = ImmutableList<string>.Empty.ToBuilder();
 
             foreach (XElement elementSources in root.Descendants(xmlNamespace + "packageSources"))
             {
@@ -49,7 +48,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 
                     if (Uri.TryCreate(value, UriKind.Absolute, out Uri sourceUrl))
                     {
-                        sources.Add(new Source(sourceUrl));
+                        sources.Add(sourceUrl.AbsoluteUri);
                     }
                     else
                     {

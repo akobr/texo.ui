@@ -52,7 +52,7 @@ namespace BeaverSoft.Texo.Core.Path
                 StringComparison.OrdinalIgnoreCase);
         }
 
-        public static string GetDirectoryOrFileName(this string path)
+        public static string GetFileNameOrDirectoryName(this string path)
         {
             return System.IO.Path.GetFileName(path);
         }

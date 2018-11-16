@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Linq;
@@ -14,9 +13,11 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
         private const string PACKAGES_CONFIG_FILE_NAME = "packages.config";
 
         private readonly ILogService logger;
+        private readonly IPackageSource packageSource;
 
-        public CsharpProjectProcessingStrategy(ILogService logger)
+        public CsharpProjectProcessingStrategy(IPackageSource packageSource, ILogService logger)
         {
+            this.packageSource = packageSource;
             this.logger = logger;
         }
 
@@ -70,7 +71,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
                     continue;
                 }
 
-                packages[packageId] = new Package(packageId, version);
+                packages[packageId] = new Package(packageId, version, CanBeUpdated(packageId, version));
             }
 
             return new ProjectInfo()
@@ -115,8 +116,20 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
                     continue;
                 }
 
-                info.Packages[packageId] = new Package(packageId, version);
+                info.Packages[packageId] = new Package(packageId, version, CanBeUpdated(packageId, version));
             }
+        }
+
+        private bool CanBeUpdated(string packageId, string version)
+        {
+            IPackageInfo info = packageSource?.GetPackage(packageId);
+
+            if (info == null)
+            {
+                return false;
+            }
+
+            return info.Versions.Min != version;
         }
 
         private class ProjectInfo

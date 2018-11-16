@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
+using BeaverSoft.Texo.Commands.NugetManager.Processing;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {
     public class PackageManagementService : IPackageManagementService
     {
+        private readonly ISourceManagementService sources;
         private ImmutableSortedDictionary<string, IPackageInfo> packages;
 
-        public PackageManagementService()
+        public PackageManagementService(ISourceManagementService sources)
         {
+            this.sources = sources ?? throw new ArgumentNullException(nameof(sources));
             ResetPackages();
         }
 
@@ -19,14 +22,26 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             return packages.Values;
         }
 
-        public IPackageInfo Get(string packageId)
+        IPackageInfo IPackageSource.GetPackage(string packageId)
         {
-            throw new NotImplementedException();
+            return GetOrFetch(packageId);
         }
 
-        public IEnumerable<IPackageInfo> FindPackages(string searchTerm)
+        public IPackageInfo GetOrFetch(string packageId)
         {
-            throw new NotImplementedException();
+            if (packages.TryGetValue(packageId, out IPackageInfo package))
+            {
+                return package;
+            }
+
+            package = sources.FetchPackage(packageId);
+            packages = packages.SetItem(package.Id, package);
+            return package;
+        }
+
+        public IEnumerable<IPackageInfo> SearchPackages(string searchTerm)
+        {
+            return sources.SearchPackages(searchTerm).Values;
         }
 
         public void Clear()
@@ -38,5 +53,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
         {
             packages = ImmutableSortedDictionary.Create<string, IPackageInfo>(new InsensitiveStringComparer());
         }
+
+        
     }
 }

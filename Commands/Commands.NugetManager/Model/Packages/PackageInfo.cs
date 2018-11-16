@@ -9,7 +9,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model.Packages
             // no member
         }
 
-        public PackageInfo(string packageId, IImmutableSet<string> versions)
+        public PackageInfo(string packageId, ImmutableSortedSet<string> versions)
         {
             Id = packageId;
             Versions = versions;
@@ -17,6 +17,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model.Packages
 
         public string Id { get; set; }
 
-        public IImmutableSet<string> Versions { get; set; }
+        public ImmutableSortedSet<string> Versions { get; set; }
     }
 }

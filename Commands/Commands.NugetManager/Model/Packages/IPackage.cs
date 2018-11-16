@@ -5,5 +5,7 @@
         string Id { get; }
 
         string Version { get; }
+
+        bool CanBeUpdated { get; }
     }
 }

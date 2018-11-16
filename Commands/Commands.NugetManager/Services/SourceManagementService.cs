@@ -17,7 +17,20 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             return sources;
         }
 
-        public IPackageInfo GetPackage(string packageId)
+        public void Add(string source)
+        {
+            sources.Add(source);
+        }
+
+        public void AddRange(IEnumerable<string> sources)
+        {
+            foreach (string source in sources)
+            {
+                Add(source);
+            }
+        }
+
+        public IPackageInfo FetchPackage(string packageId)
         {
             IPackageInfo result = null;
 
@@ -32,7 +45,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             return result;
         }
 
-        public IImmutableDictionary<string, IPackageInfo> GetPackages(string searchTerm)
+        public IImmutableDictionary<string, IPackageInfo> SearchPackages(string searchTerm)
         {
             throw new NotImplementedException();
         }
@@ -46,8 +59,8 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
         private IEnumerable<IPackageInfo> GetPackagesFromRepository(string searchTerm, string repositoryUrl)
         {
             IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(repositoryUrl);
-            var versions = new Dictionary<string, ImmutableSortedSet<string>.Builder>();
-            var previousPackageVersions = ImmutableSortedSet.CreateBuilder<string>(new InsensitiveOpositeStringComparer()); ;
+            var versions = new Dictionary<string, ImmutableSortedSet<string>.Builder>(new InsensitiveStringComparer());
+            var previousPackageVersions = ImmutableSortedSet.CreateBuilder<string>(new InsensitiveOpositeStringComparer());
             string previousPackageId = string.Empty;
 
             foreach (NuGet.IPackage nugetPackage in repo.Search(searchTerm, true))
