@@ -1,23 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Configs;
+using BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies;
 using BeaverSoft.Texo.Core.Path;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {
     public class ConfigManagementService : IConfigManagementService
     {
-        ImmutableSortedDictionary<string, IConfig> configs;
+        private readonly ILogService logger;
+        private ImmutableSortedDictionary<string, IConfig> configs;
 
-        public ConfigManagementService()
+        public ConfigManagementService(ILogService logger)
         {
+            this.logger = logger;
             ResetConfigs();
         }
 
-        public IConfig Add(string configPath)
+        public IEnumerable<IConfig> GetAllConfigs()
         {
-            throw new NotImplementedException();
+            return configs.Values;
+        }
+
+        public void AddOrUpdate(string configPath)
+        {
+            IConfig config = BuildConfig(configPath);
+
+            if (config == null)
+            {
+                return;
+            }
+
+            string key = configPath.GetFullConsolidatedPath();
+            configs.SetItem(key, config);
         }
 
         public void Clear()
@@ -27,12 +43,15 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         public IConfig Get(string configPath)
         {
-            throw new NotImplementedException();
+            string key = configPath.GetFullConsolidatedPath();
+            configs.TryGetValue(key, out IConfig config);
+            return config;
         }
 
-        public IEnumerable<IConfig> GetAllConfigs()
+        private IConfig BuildConfig(string configPath)
         {
-            throw new NotImplementedException();
+            var strategy = new ConfigProcessingStrategy(logger);
+            return strategy.Process(configPath);
         }
 
         private void ResetConfigs()

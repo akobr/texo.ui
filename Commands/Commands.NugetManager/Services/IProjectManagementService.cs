@@ -12,15 +12,15 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         IProject Get(string projectPath);
 
-        void AddOrUpdate(IProject project);
-
-        void Remove(IProject project);
+        void AddOrUpdate(string projectPath);
 
         void Remove(string projectPath);
 
         IImmutableList<IProject> FindProjects(string searchTerm);
 
         IImmutableList<IProject> FindProjectsByPackage(string packageId);
+
+        void ReloadAll();
 
         void Clear();
     }

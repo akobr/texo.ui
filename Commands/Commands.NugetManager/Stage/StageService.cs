@@ -4,11 +4,9 @@ using System.Collections.Immutable;
 using System.IO;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Configs;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Sources;
 using BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies;
 using BeaverSoft.Texo.Commands.NugetManager.Services;
 using BeaverSoft.Texo.Core.Path;
-using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 {
@@ -18,12 +16,10 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
         private const string FILE_EXTENSION_PROJECT = ".csproj";
 
         private readonly IManagementService management;
-        private readonly ILogService logger;
 
-        public StageService(IManagementService management, ILogService logger)
+        public StageService(IManagementService management)
         {
             this.management = management ?? throw new ArgumentNullException(nameof(management));
-            this.logger = logger;
         }
 
         public IImmutableList<IProject> GetProjects()
@@ -36,7 +32,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
             return management.Configs.GetAllConfigs().ToImmutableList();
         }
 
-        public IImmutableList<ISource> GetSources()
+        public IImmutableList<string> GetSources()
         {
             return management.Sources.GetAllSources().ToImmutableList();
         }
@@ -53,7 +49,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
         public void Fetch()
         {
-            throw new NotImplementedException();
+            management.Projects.ReloadAll();
         }
 
         public void Clear()
@@ -66,8 +62,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
         private void AddCSharpProject(string filePath)
         {
-            var projectStrategy = new CsharpProjectProcessingStrategy(logger);
-            management.Projects.AddOrUpdate(projectStrategy.Process(filePath));
+            management.Projects.AddOrUpdate(filePath);
         }
 
         private void RemoveProject(string filePath)

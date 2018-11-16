@@ -2,14 +2,14 @@
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Model.Sources
 {
-    public class SourceInfo : ISourceInfo
+    public class Source : ISource
     {
-        public SourceInfo()
+        public Source()
         {
             // no operation
         }
 
-        public SourceInfo(Uri address)
+        public Source(Uri address)
         {
             Address = address ?? throw new ArgumentNullException(nameof(address));
         }

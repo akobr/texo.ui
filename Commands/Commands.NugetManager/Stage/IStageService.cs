@@ -12,7 +12,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
         IImmutableList<IConfig> GetConfigs();
 
-        IImmutableList<ISource> GetSources();
+        IImmutableList<string> GetSources();
 
         void Add(IEnumerable<string> paths);
 

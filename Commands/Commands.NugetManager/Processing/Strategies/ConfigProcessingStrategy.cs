@@ -39,7 +39,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
             }
 
             XNamespace xmlNamespace = root.GetDefaultNamespace();
-            var sources = ImmutableList<ISourceInfo>.Empty.ToBuilder();
+            var sources = ImmutableList<ISource>.Empty.ToBuilder();
 
             foreach (XElement elementSources in root.Descendants(xmlNamespace + "packageSources"))
             {
@@ -49,7 +49,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 
                     if (Uri.TryCreate(value, UriKind.Absolute, out Uri sourceUrl))
                     {
-                        sources.Add(new SourceInfo(sourceUrl));
+                        sources.Add(new Source(sourceUrl));
                     }
                     else
                     {

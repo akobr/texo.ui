@@ -89,7 +89,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
                 MarkdownBuilder builder = new MarkdownBuilder();
                 builder.Header(config.Path, 2);
 
-                foreach (ISourceInfo source in config.Sources)
+                foreach (ISource source in config.Sources)
                 {
                     builder.Bullet(source.Address.AbsoluteUri);
                 }
@@ -104,9 +104,9 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
         {
             List<Item> result = new List<Item>();
 
-            foreach (ISource source in stage.GetSources())
+            foreach (string source in stage.GetSources())
             {
-                result.Add(Item.Plain(source.Address.AbsoluteUri));
+                result.Add(Item.Plain(source));
             }
 
             return result;

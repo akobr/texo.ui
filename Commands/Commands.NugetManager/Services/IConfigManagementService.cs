@@ -9,7 +9,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         IConfig Get(string configPath);
 
-        IConfig Add(string configPath);
+        void AddOrUpdate(string configPath);
 
         void Clear();
     }

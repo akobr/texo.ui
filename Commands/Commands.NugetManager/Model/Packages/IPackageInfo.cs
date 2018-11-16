@@ -6,6 +6,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model.Packages
     {
         string Id { get; }
 
-        IImmutableList<string> AllVersions { get; }
+        IImmutableSet<string> Versions { get; }
     }
 }

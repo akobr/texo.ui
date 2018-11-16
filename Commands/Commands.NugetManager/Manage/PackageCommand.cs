@@ -58,11 +58,11 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
 
         private void AddVersionsToResult(IPackageInfo package, MarkdownBuilder builder, bool allVersions)
         {
-            builder.Header($"Available in {package.AllVersions.Count} version(s)", 2);
+            builder.Header($"Available in {package.Versions.Count} version(s)", 2);
 
             IEnumerable<string> versionsToShow = allVersions
-                ? package.AllVersions.Take(10)
-                : package.AllVersions;
+                ? package.Versions.Take(10)
+                : package.Versions;
 
             foreach (string version in versionsToShow)
             {

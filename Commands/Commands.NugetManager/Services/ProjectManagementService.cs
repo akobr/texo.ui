@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
+using BeaverSoft.Texo.Commands.NugetManager.Processing;
+using BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies;
 using BeaverSoft.Texo.Core.Path;
+using StrongBeaver.Core.Services.Logging;
 using StrongBeaver.Core.Services.Serialisation;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services
@@ -12,15 +15,12 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
     {
         private readonly ISerialisationService serialisation;
         private ImmutableSortedDictionary<string, IProject> projects;
+        private readonly ILogService logger;
 
-        public ProjectManagementService(ISerialisationService serialisation)
+        public ProjectManagementService(ISerialisationService serialisation, ILogService logger)
         {
             this.serialisation = serialisation ?? throw new ArgumentNullException(nameof(serialisation));
-            ResetProjects();
-        }
-
-        public ProjectManagementService()
-        {
+            this.logger = logger;
             ResetProjects();
         }
 
@@ -33,11 +33,27 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
         {
             SaveStageProjects();
         }
-        
-        public void AddOrUpdate(IProject project)
+
+        public void AddOrUpdate(string projectPath)
         {
-            string key = project.Path.GetFullConsolidatedPath();
+            IProject project = BuildProject(projectPath);
+
+            if (project == null)
+            {
+                return;
+            }
+
+            string key = projectPath.GetFullConsolidatedPath();
             projects.SetItem(key, project);
+        }
+
+        public void ReloadAll()
+        {
+            var currentProjects = projects;
+            foreach (IProject project in currentProjects.Values)
+            {
+                AddOrUpdate(project.Path);
+            }
         }
 
         public void Clear()
@@ -69,7 +85,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
             foreach (IProject project in currentProjects.Values)
             {
-                if(project.Packages.ContainsKey(packageId))
+                if (project.Packages.ContainsKey(packageId))
                 {
                     result.Add(project);
                 }
@@ -89,16 +105,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             return projects.Values;
         }
 
-        public void Remove(IProject project)
-        {
-            if (project == null)
-            {
-                return;
-            }
-
-            Remove(project.Path);
-        }
-
         public void Remove(string projectPath)
         {
             if (string.IsNullOrWhiteSpace(projectPath))
@@ -108,6 +114,21 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
             string key = projectPath.GetFullConsolidatedPath();
             projects = projects.Remove(key);
+        }
+
+        private IProject BuildProject(string filePath)
+        {
+            IProjectProcessingStrategy projectStrategy = new CsharpProjectProcessingStrategy(logger);
+            return projectStrategy.Process(filePath);
+        }
+
+        private IEnumerable<string> GetProjectPaths()
+        {
+            var currentProjects = projects;
+            foreach (IProject project in currentProjects.Values)
+            {
+                yield return project.Path.GetFullPath();
+            }
         }
 
         private void LoadStageProjects()
@@ -122,11 +143,11 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
             using (FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
-                List<Project> loadedProjects = serialisation.DeserializeFromStream<List<Project>>(file);
+                IEnumerable<string> projectPaths = serialisation.DeserializeFromStream<List<string>>(file);
 
-                foreach (IProject project in loadedProjects)
+                foreach (string projectPath in projectPaths)
                 {
-                    AddOrUpdate(project);
+                    AddOrUpdate(projectPath);
                 }
             }
         }
@@ -138,7 +159,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
             using (FileStream file = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write))
             {
-                serialisation.SerializeToStream(projects.Values, file);
+                serialisation.SerializeToStream(GetProjectPaths(), file);
             }
         }
 

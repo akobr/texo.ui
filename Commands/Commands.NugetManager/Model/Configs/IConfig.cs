@@ -7,6 +7,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model.Configs
     {
         string Path { get; }
 
-        IImmutableList<ISourceInfo> Sources { get; }
+        IImmutableList<ISource> Sources { get; }
     }
 }
