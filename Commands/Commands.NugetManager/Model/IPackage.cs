@@ -1,4 +1,4 @@
-﻿namespace BeaverSoft.Texo.Commands.NugetManager.Model.Packages
+﻿namespace BeaverSoft.Texo.Commands.NugetManager.Model
 {
     public interface IPackage
     {

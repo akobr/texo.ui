@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Configs;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Sources;
+using BeaverSoft.Texo.Commands.NugetManager.Model;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 {

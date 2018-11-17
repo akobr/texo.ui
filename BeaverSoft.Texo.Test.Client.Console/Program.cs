@@ -2,6 +2,7 @@
 using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.FileManager.Stash;
+using BeaverSoft.Texo.Commands.NugetManager;
 using BeaverSoft.Texo.Commands.NugetManager.Services;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Commands;
@@ -82,6 +83,12 @@ namespace BeaverSoft.Texo.Test.Client.Console
 
             // Nuget manager
             container.Register<IProjectManagementService, ProjectManagementService>();
+            container.Register<IPackageManagementService, PackageManagementService>();
+            container.Register<IConfigManagementService, ConfigManagementService>();
+            container.Register<ISourceManagementService, SourceManagementService>();
+            container.Register<IManagementService, ManagementService>();
+            container.Register<Commands.NugetManager.Stage.IStageService, Commands.NugetManager.Stage.StageService>();
+            container.Register<NugetManagerCommand>();
 
             CommandFactory commandFactory = new CommandFactory();
             container.Register<ITexoFactory<ICommand, string>>(() => commandFactory);
@@ -91,6 +98,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
             commandFactory.Register("dir", () => container.GetInstance<DirCommand>());
             commandFactory.Register("command-line", () => container.GetInstance<CommandLineCommand>());
             commandFactory.Register("file-manager", () => container.GetInstance<FileManagerCommand>());
+            commandFactory.Register("nuget-manager", () => container.GetInstance<NugetManagerCommand>());
 
             engine = new TexoEngineBuilder(container.GetInstance<ServiceMessageBus>())
                 .WithLogService(container.GetInstance<ILogService>())
@@ -110,6 +118,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
             config.Runtime.Commands.Add(DirCommand.BuildConfiguration());
             config.Runtime.Commands.Add(CommandLineCommand.BuildConfiguration());
             config.Runtime.Commands.Add(FileManagerBuilder.BuildCommand());
+            config.Runtime.Commands.Add(NugetManagerBuilder.BuildCommand());
             engine.Configure(config.ToImmutable());
         }
 

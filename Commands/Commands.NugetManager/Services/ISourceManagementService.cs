@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
+using BeaverSoft.Texo.Commands.NugetManager.Model;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {
@@ -10,7 +10,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         void Add(string source);
 
-        void AddRange(IEnumerable<string> sources);
+        void AddRange(IEnumerable<string> newSources);
 
         IPackageInfo FetchPackage(string packageId);
 

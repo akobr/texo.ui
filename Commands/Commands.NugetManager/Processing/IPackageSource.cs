@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
+﻿using BeaverSoft.Texo.Commands.NugetManager.Model;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Processing
 {

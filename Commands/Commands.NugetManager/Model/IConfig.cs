@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace BeaverSoft.Texo.Commands.NugetManager.Model.Configs
+namespace BeaverSoft.Texo.Commands.NugetManager.Model
 {
     public interface IConfig
     {

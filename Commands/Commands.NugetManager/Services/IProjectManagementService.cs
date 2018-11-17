@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
+using BeaverSoft.Texo.Commands.NugetManager.Model;
 using StrongBeaver.Core;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
 
-namespace BeaverSoft.Texo.Commands.NugetManager.Model.Projects
+namespace BeaverSoft.Texo.Commands.NugetManager.Model
 {
     public interface IProject
     {

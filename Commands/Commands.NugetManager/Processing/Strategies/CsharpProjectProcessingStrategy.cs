@@ -2,8 +2,7 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Linq;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
+using BeaverSoft.Texo.Commands.NugetManager.Model;
 using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies

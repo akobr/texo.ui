@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
-using BeaverSoft.Texo.Core.Path;
 
-namespace BeaverSoft.Texo.Commands.NugetManager.Model.Projects
+namespace BeaverSoft.Texo.Commands.NugetManager.Model
 {
     public class Project : IProject
     {

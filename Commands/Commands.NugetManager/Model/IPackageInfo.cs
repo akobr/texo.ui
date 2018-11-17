@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace BeaverSoft.Texo.Commands.NugetManager.Model.Packages
+namespace BeaverSoft.Texo.Commands.NugetManager.Model
 {
     public interface IPackageInfo
     {

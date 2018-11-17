@@ -13,7 +13,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager
 
             command.Key = NugetManagerQueries.NUGET;
             command.Representations.AddRange(
-                new[] { NugetManagerQueries.NUGET, "nmanager", "nm", "nuget" });
+                new[] { NugetManagerQueries.NUGET, "nman", "nm", "nuget" });
             command.DefaultQueryKey = StageQueries.STAGE;
 
             command.Queries.Add(CreateStageQuery());

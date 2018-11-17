@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
+using BeaverSoft.Texo.Commands.NugetManager.Model;
 using BeaverSoft.Texo.Commands.NugetManager.Processing;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services

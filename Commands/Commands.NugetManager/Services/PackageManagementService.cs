@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
+using BeaverSoft.Texo.Commands.NugetManager.Model;
 using BeaverSoft.Texo.Commands.NugetManager.Processing;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services
@@ -35,6 +35,12 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             }
 
             package = sources.FetchPackage(packageId);
+
+            if (package == null)
+            {
+                return null;
+            }
+
             packages = packages.SetItem(package.Id, package);
             return package;
         }
@@ -53,7 +59,5 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
         {
             packages = ImmutableSortedDictionary.Create<string, IPackageInfo>(new InsensitiveStringComparer());
         }
-
-        
     }
 }

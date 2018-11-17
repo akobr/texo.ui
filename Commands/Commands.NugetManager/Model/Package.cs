@@ -1,5 +1,6 @@
 ﻿using System;
-namespace BeaverSoft.Texo.Commands.NugetManager.Model.Packages
+
+namespace BeaverSoft.Texo.Commands.NugetManager.Model
 {
     public class Package : IPackage
     {

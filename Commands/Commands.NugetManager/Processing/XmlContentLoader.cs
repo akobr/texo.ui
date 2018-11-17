@@ -31,7 +31,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing
 
             string fullPath = Path.GetFullPath(filePath);
             FilePath = fullPath;
-            Content =  TryLoadDocument(filePath);
+            Content = TryLoadDocument(filePath);
         }
 
         public void Reset()
@@ -47,7 +47,9 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing
             {
                 try
                 {
-                    return XDocument.Load(fileStream);
+                    XDocument document = XDocument.Load(fileStream);
+                    IsSuccess = true;
+                    return document;
                 }
                 catch (Exception exception)
                 {

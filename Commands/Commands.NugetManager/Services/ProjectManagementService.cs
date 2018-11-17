@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
+using BeaverSoft.Texo.Commands.NugetManager.Model;
 using BeaverSoft.Texo.Commands.NugetManager.Processing;
 using BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies;
 using BeaverSoft.Texo.Core.Path;
@@ -53,7 +53,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             }
 
             string key = projectPath.GetFullConsolidatedPath();
-            projects.SetItem(key, project);
+            projects = projects.SetItem(key, project);
         }
 
         public void ReloadAll()

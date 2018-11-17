@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Packages;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Projects;
+using BeaverSoft.Texo.Commands.NugetManager.Model;
 using BeaverSoft.Texo.Commands.NugetManager.Services;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Extensions;

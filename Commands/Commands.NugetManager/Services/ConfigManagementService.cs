@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using BeaverSoft.Texo.Commands.NugetManager.Model.Configs;
+using BeaverSoft.Texo.Commands.NugetManager.Model;
 using BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies;
 using BeaverSoft.Texo.Core.Path;
 using StrongBeaver.Core.Services.Logging;
@@ -14,9 +14,9 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         private readonly ILogService logger;
         private readonly ISourceManagementService sources;
+        private readonly HashSet<string> processedDirectories;
 
         private ImmutableSortedDictionary<string, IConfig> configs;
-        private HashSet<string> processedDirectories;
 
         public ConfigManagementService(
             ISourceManagementService sources,
