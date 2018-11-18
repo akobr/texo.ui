@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Threading;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Logging;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core;
@@ -15,7 +15,8 @@ namespace BeaverSoft.Texo.Core
 {
     public class TexoEngineBuilder : IFluentSyntax
     {
-        private readonly ServiceMessageBus messageBus;
+        private readonly IServiceMessageBus messageBus;
+        private readonly IServiceMessageBusRegister registerToMessageBus;
 
         private ILogService logger;
         private ISettingService setting;
@@ -31,14 +32,16 @@ namespace BeaverSoft.Texo.Core
         private IRuntimeCoordinatorService runtime;
 
         public TexoEngineBuilder()
-            : this(new ServiceMessageBus())
         {
-            // no member
+            ServiceMessageBus defaultMessageBus = new ServiceMessageBus();
+            messageBus = defaultMessageBus;
+            registerToMessageBus = defaultMessageBus;
         }
 
-        public TexoEngineBuilder(ServiceMessageBus messageBus)
+        public TexoEngineBuilder(IServiceMessageBus messageBus, IServiceMessageBusRegister registerToMessageBus)
         {
             this.messageBus = messageBus;
+            this.registerToMessageBus = registerToMessageBus;
         }
 
         public TexoEngineBuilder WithLogService(ILogService service)
@@ -71,12 +74,6 @@ namespace BeaverSoft.Texo.Core
             return this;
         }
 
-        public TexoEngineBuilder WithCommandFactory(ITexoFactory<ICommand, string> factory)
-        {
-            commandFactory = factory;
-            return this;
-        }
-
         public TexoEngineBuilder WithCommandManagementService(ICommandManagementService service)
         {
             commandManagement = service;
@@ -95,22 +92,43 @@ namespace BeaverSoft.Texo.Core
             return this;
         }
 
-        public TexoEngine Build(IViewService view)
+        public ITexoEngineServiceLocator GetServiceLocator()
         {
+            return new TexoEngineServiceLocator
+            {
+                MessageBus = () => messageBus,
+                MessageBusRegister = () => registerToMessageBus,
+                Logger = () => logger,
+                Setting = () => setting,
+                Environment = () => environment,
+                Parser = () => parser,
+                Evaluator = () => evaluator,
+                CommandManagement = () => commandManagement,
+                ResultProcessing = () => resultProcessing,
+                DidYouMean = () => didYouMean,
+                View = () => usedView,
+                Runtime = () => runtime
+            };
+        }
+
+        public TexoEngine Build(ITexoFactory<ICommand, string> factory, IViewService view)
+        {
+            commandFactory = factory ?? throw new ArgumentNullException(nameof(factory));
             Initiliase();
             SetViewService(view);
             runtime = new RuntimeCoordinatorService(environment, evaluator, commandManagement, resultProcessing, usedView, didYouMean);
-            return new TexoEngine(runtime, setting);
+            return new TexoEngine(runtime, usedView, setting);
         }
 
         private void Initiliase()
         {
 #if DEBUG
-            logger = logger ?? new DebugLogService();
+            logger = logger ?? new LogAggregationService(
+                         new DebugLogService(),
+                         new UserAppDataLogService(LogMessageLevelEnum.Trace));
 #else
-            logger = logger ?? new EmptyLogService();
+            logger = logger ?? new UserAppDataLogService(LogMessageLevelEnum.Error);
 #endif
-
             setting = setting ?? new SettingService(messageBus);
             SetEnvironmentService(environment ?? new EnvironmentService(messageBus));
             parser = parser ?? new InputParseService();
@@ -124,34 +142,34 @@ namespace BeaverSoft.Texo.Core
         {
             if (environment != null)
             {
-                messageBus.Unregister(environment);
+                registerToMessageBus.Unregister(environment);
             }
 
             environment = service;
-            messageBus.Register<IEnvironmentService, ISettingUpdatedMessage>(environment);
+            registerToMessageBus.Register<ISettingUpdatedMessage>(environment);
         }
 
         private void SetInputEvaluationService(IInputEvaluationService service)
         {
             if (evaluator != null)
             {
-                messageBus.Unregister(evaluator);
+                registerToMessageBus.Unregister(evaluator);
             }
 
             evaluator = service;
-            messageBus.Register<IInputEvaluationService, ISettingUpdatedMessage>(evaluator);
+            registerToMessageBus.Register<ISettingUpdatedMessage>(evaluator);
         }
 
         private void SetViewService(IViewService service)
         {
             if (usedView != null)
             {
-                messageBus.Unregister(usedView);
+                registerToMessageBus.Unregister(usedView);
             }
 
-            usedView = service;
-            messageBus.Register<IViewService, ISettingUpdatedMessage>(usedView);
-            messageBus.Register<IViewService, IVariableUpdatedMessage>(usedView);
+            usedView = service ?? throw new ArgumentNullException(nameof(service));
+            registerToMessageBus.Register<ISettingUpdatedMessage>(usedView);
+            registerToMessageBus.Register<IVariableUpdatedMessage>(usedView);
         }
     }
 }

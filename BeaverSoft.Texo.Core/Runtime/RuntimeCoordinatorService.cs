@@ -17,6 +17,8 @@ namespace BeaverSoft.Texo.Core.Runtime
         private readonly IResultProcessingService resultProcessing;
         private readonly IViewService view;
 
+        private ImmutableList<string> previousCommands;
+
         public RuntimeCoordinatorService(
             IEnvironmentService environment,
             IInputEvaluationService evaluator,
@@ -31,6 +33,8 @@ namespace BeaverSoft.Texo.Core.Runtime
             this.resultProcessing = resultProcessing ?? throw new ArgumentNullException(nameof(resultProcessing));
             this.view = view ?? throw new ArgumentNullException(nameof(view));
             this.didYouMean = didYouMean;
+
+            previousCommands = ImmutableList<string>.Empty;
         }
 
         public void Initialise()
@@ -45,10 +49,11 @@ namespace BeaverSoft.Texo.Core.Runtime
             view.Start();
         }
 
-        public void PreProcess(string input)
+        public Input.Input PreProcess(string input)
         {
             Input.Input inputModel = evaluator.Evaluate(input);
             view.Render(inputModel);
+            return inputModel;
         }
 
         public void Process(string input)
@@ -73,7 +78,13 @@ namespace BeaverSoft.Texo.Core.Runtime
                 return;
             }
 
+            previousCommands = previousCommands.Add(inputModel.ParsedInput.RawInput);
             ProcessContext(inputModel.Context);
+        }
+
+        public IImmutableList<string> GetPreviousCommands()
+        {
+            return previousCommands;
         }
 
         public void Dispose()

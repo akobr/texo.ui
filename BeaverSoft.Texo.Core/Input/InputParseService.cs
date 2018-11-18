@@ -11,6 +11,7 @@ namespace BeaverSoft.Texo.Core.Input
                 return ParsedInput.Empty;
             }
 
+            input = input.Trim();
             Regex tokenExpression = new Regex("\\\"[^\\\"]*\\\"|\\'[^\\']*\\'|[\\S]+", RegexOptions.Compiled);
             MatchCollection matches = tokenExpression.Matches(input);
             string[] tokens = new string[matches.Count];

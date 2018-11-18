@@ -4,6 +4,12 @@
              xmlns:local="clr-namespace:BeaverSoft.Texo.Test.Client.WPF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <Style TargetType="FlowDocument">
+            <Setter Property="FontFamily" Value="Consolas, Calibri" />
+            <Setter Property="TextAlignment" Value="Left" />
+        </Style>
+        <Style TargetType="Paragraph">
+            <Setter Property="FontSize" Value="12" />
+        </Style>
     </Application.Resources>
 </Application>

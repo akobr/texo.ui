@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
+using BeaverSoft.Texo.Core;
+using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Test.Client.WPF.Startup;
+using StrongBeaver.Core.Container;
 
 namespace BeaverSoft.Texo.Test.Client.WPF
 {
@@ -13,5 +12,33 @@ namespace BeaverSoft.Texo.Test.Client.WPF
     /// </summary>
     public partial class App : Application
     {
+        public static TexoEngine TexoEngine { get; private set; }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            SimpleIoc container = new SimpleIoc();
+            container.RegisterServices();
+
+            TexoEngineBuilder engineBuilder = new TexoEngineBuilder();
+            container.RegisterEngineServices(engineBuilder);
+
+            CommandFactory commandFactory = new CommandFactory();
+            commandFactory.RegisterCommands(container);
+            container.RegisterCommandFactory(commandFactory);
+
+            TexoEngine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
+            TexoEngine.InitialiseWithCommands();
+            TexoEngine.Start();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            TexoEngine?.Dispose();
+            TexoEngine = null;
+
+            base.OnExit(e);
+        }
     }
 }

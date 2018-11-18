@@ -1,4 +1,6 @@
-﻿namespace BeaverSoft.Texo.Core.Configuration
+﻿using System.Collections.Generic;
+
+namespace BeaverSoft.Texo.Core.Configuration
 {
     public partial class TextumConfiguration
     {
@@ -54,6 +56,14 @@
             return new TextumConfiguration(this)
             {
                 ui = value
+            };
+        }
+
+        public TextumConfiguration AddCommands(IEnumerable<Query> commands)
+        {
+            return new TextumConfiguration(this)
+            {
+                runtime = runtime.AddCommands(commands)
             };
         }
 

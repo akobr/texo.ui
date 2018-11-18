@@ -14,5 +14,10 @@
         public string Input { get; }
 
         public string Title { get; }
+
+        public override string ToString()
+        {
+            return $"{Input} ({Type})";
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace BeaverSoft.Texo.Core.Configuration
 {
@@ -41,6 +42,21 @@ namespace BeaverSoft.Texo.Core.Configuration
             return new TextumRuntime(this)
             {
                 defaultCommand = value
+            };
+        }
+
+        public TextumRuntime AddCommands(IEnumerable<Query> newCommands)
+        {
+            if (commands == null)
+            {
+                return this;
+            }
+
+            var builder = commands.ToBuilder();
+            builder.AddRange(newCommands);
+            return new TextumRuntime(this)
+            {
+                commands = builder.ToImmutable()
             };
         }
 
