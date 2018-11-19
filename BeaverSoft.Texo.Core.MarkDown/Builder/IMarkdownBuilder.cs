@@ -1,4 +1,5 @@
-﻿using StrongBeaver.Core;
+﻿using BeaverSoft.Texo.Core.View;
+using StrongBeaver.Core;
 
 namespace BeaverSoft.Texo.Core.Markdown.Builder
 {
@@ -17,6 +18,8 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
         IMarkdownBuilder Image(string path, string alternative);
 
         IMarkdownBuilder Link(string title, string path);
+
+        IMarkdownBuilder Link(ILink link);
 
         IMarkdownBuilder Italic(string text);
 

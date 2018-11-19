@@ -24,6 +24,9 @@ namespace BeaverSoft.Texo.Core.Environment
             // TODO: load saved
         }
 
+        public int Count => variables.Count;
+
+
         public void SetVariable(string variable, string value)
         {
             if (string.IsNullOrEmpty(variable))
@@ -88,7 +91,10 @@ namespace BeaverSoft.Texo.Core.Environment
                 variables[variable] = value;
             }
 
-            messageBus?.Send(new VariableUpdatedMessage(variable, value, previousValue));
+            messageBus?.Send(new VariableUpdatedMessage(variable, value, previousValue)
+            {
+                Sender = this
+            });
         }
 
         void IMessageBusRecipient<ISettingUpdatedMessage>.ProcessMessage(ISettingUpdatedMessage message)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -35,17 +36,33 @@ namespace BeaverSoft.Texo.View.WPF
             set => lbTitle.Text = value;
         }
 
+        public void SetHistoryCount(int count)
+        {
+            lbHistoryCount.Text = $"History ({count})";
+        }
+
+        public void SetVariableCount(int count)
+        {
+            lbVariableCount.Text = $"Variables ({count})";
+        }
+
         private void HandleInputTextChanged(object sender, TextChangedEventArgs e)
         {
-            InputChanged?.Invoke(this, GetInput());
+            //InputChanged?.Invoke(this, GetInput());
         }
 
         private void HandleInputKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
+                string input = GetInput();
+
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    InputFinished?.Invoke(this, GetInput());
+                }
+
                 e.Handled = true;
-                InputFinished?.Invoke(this, GetInput());
             }
         }
 
@@ -59,6 +76,12 @@ namespace BeaverSoft.Texo.View.WPF
             {
                 CommandHistoryScrolled?.Invoke(this, HistoryScrollDirection.Forward);
             }
+        }
+
+        private void HandleInputSelectionChanged(object sender, RoutedEventArgs e)
+        {
+            TextRange range = new TextRange(tbInput.Document.ContentStart, tbInput.Document.ContentEnd);
+            range.ApplyPropertyValue(RichTextBox.FontSizeProperty, 16.0);
         }
 
         private string GetInput()

@@ -6,6 +6,7 @@ using BeaverSoft.Texo.Commands.NugetManager.Services;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
+using BeaverSoft.Texo.Core.Input.History;
 using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.View.WPF;
@@ -13,6 +14,7 @@ using BeaverSoft.Texo.View.WPF.Markdown;
 using Commands.CommandLine;
 using Commands.Dir;
 using Commands.ReferenceCheck;
+using StrongBeaver.Core;
 using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services.Serialisation;
 using StrongBeaver.Core.Services.Serialisation.Json;
@@ -63,6 +65,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             container.Register(engineServiceLocator.Logger);
             container.Register(engineServiceLocator.Environment);
             container.Register(engineServiceLocator.Setting);
+            container.Register<IFactory<IInputHistoryService>>(() => new DelegatedFactory<IInputHistoryService>(engineServiceLocator.History));
         }
 
         public static void RegisterCommandFactory(this SimpleIoc container, CommandFactory factory)

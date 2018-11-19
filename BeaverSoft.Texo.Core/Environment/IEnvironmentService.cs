@@ -11,6 +11,8 @@ namespace BeaverSoft.Texo.Core.Environment
         IDisposable,
         IMessageBusService<ISettingUpdatedMessage>
     {
+        int Count { get; }
+
         void SetVariable(string variable, string value);
 
         string GetVariable(string variable);

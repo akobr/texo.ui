@@ -4,6 +4,7 @@ using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Input.History;
 using BeaverSoft.Texo.Core.Logging;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
@@ -23,9 +24,13 @@ namespace BeaverSoft.Texo.Core
         private IEnvironmentService environment;
         private IInputParseService parser;
         private IInputEvaluationService evaluator;
+        private IInputHistoryService history;
+
         private ITexoFactory<ICommand, string> commandFactory;
         private ICommandManagementService commandManagement;
 
+        private IFallbackService fallback;
+        private IIntellisenceService intellisence;
         private IDidYouMeanService didYouMean;
         private IResultProcessingService resultProcessing;
         private IViewService usedView;
@@ -74,6 +79,12 @@ namespace BeaverSoft.Texo.Core
             return this;
         }
 
+        public TexoEngineBuilder WithInputHistoryService(IInputHistoryService service)
+        {
+            history = service;
+            return this;
+        }
+
         public TexoEngineBuilder WithCommandManagementService(ICommandManagementService service)
         {
             commandManagement = service;
@@ -86,9 +97,21 @@ namespace BeaverSoft.Texo.Core
             return this;
         }
 
+        public TexoEngineBuilder WithIntellisenceService(IIntellisenceService service)
+        {
+            intellisence = service;
+            return this;
+        }
+
         public TexoEngineBuilder WithDidYouMeanService(IDidYouMeanService service)
         {
             didYouMean = service;
+            return this;
+        }
+
+        public TexoEngineBuilder WithFallbackService(IFallbackService service)
+        {
+            fallback = service;
             return this;
         }
 
@@ -103,9 +126,12 @@ namespace BeaverSoft.Texo.Core
                 Environment = () => environment,
                 Parser = () => parser,
                 Evaluator = () => evaluator,
+                History = () => history,
                 CommandManagement = () => commandManagement,
                 ResultProcessing = () => resultProcessing,
+                Intellisence = () => intellisence,
                 DidYouMean = () => didYouMean,
+                Fallback = () => fallback,
                 View = () => usedView,
                 Runtime = () => runtime
             };
@@ -116,7 +142,10 @@ namespace BeaverSoft.Texo.Core
             commandFactory = factory ?? throw new ArgumentNullException(nameof(factory));
             Initiliase();
             SetViewService(view);
-            runtime = new RuntimeCoordinatorService(environment, evaluator, commandManagement, resultProcessing, usedView, didYouMean);
+            runtime = new RuntimeCoordinatorService(
+                environment, evaluator, commandManagement,
+                resultProcessing, usedView, history,
+                intellisence, didYouMean, fallback);
             return new TexoEngine(runtime, usedView, setting);
         }
 
@@ -133,9 +162,13 @@ namespace BeaverSoft.Texo.Core
             SetEnvironmentService(environment ?? new EnvironmentService(messageBus));
             parser = parser ?? new InputParseService();
             SetInputEvaluationService(evaluator ?? new InputEvaluationService(parser, environment, logger));
+            history = history ?? new InputHistoryService();
             commandManagement = commandManagement ?? new SingletonCommandManagementService(commandFactory);
             resultProcessing = resultProcessing ?? new ResultProcessingService(logger);
+
+            // intellisence
             // didYouMean
+            // fallback
         }
 
         private void SetEnvironmentService(IEnvironmentService service)

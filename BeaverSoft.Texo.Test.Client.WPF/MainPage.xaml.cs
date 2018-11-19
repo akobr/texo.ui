@@ -1,14 +1,14 @@
-﻿using System.Windows;
+﻿using System.Windows.Controls;
 using BeaverSoft.Texo.View.WPF;
 
 namespace BeaverSoft.Texo.Test.Client.WPF
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for MainPage.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainPage : Page
     {
-        public MainWindow()
+        public MainPage()
         {
             InitializeComponent();
             InitilialiseTexoControl();

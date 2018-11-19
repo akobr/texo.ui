@@ -94,6 +94,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BeaverSoft.Texo.Core.MarkDown\BeaverSoft.Texo.Core.Markdown.csproj">
+      <Project>{9d99b9d9-ed3a-430c-8233-68cb05cb7cca}</Project>
+      <Name>BeaverSoft.Texo.Core.Markdown</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj">
       <Project>{588610d7-7d21-4df8-aad6-e88c83560d87}</Project>
       <Name>BeaverSoft.Texo.Core</Name>

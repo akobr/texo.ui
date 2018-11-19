@@ -9,5 +9,7 @@ namespace BeaverSoft.Texo.Core.Environment
         string NewValue { get; }
 
         string OldValue { get; }
+
+        IEnvironmentService Environment { get; }
     }
 }

@@ -347,8 +347,12 @@ namespace BeaverSoft.Texo.Core.Input.InputTree
 
         private static bool IsParameterMatch(ParameterNode parameter, AnalysedToken token)
         {
-            if (!token.IsEndOfInput
-                && string.IsNullOrEmpty(parameter.Parameter.ArgumentTemplate))
+            if (token.IsEndOfInput)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(parameter.Parameter.ArgumentTemplate))
             {
                 return true;
             }

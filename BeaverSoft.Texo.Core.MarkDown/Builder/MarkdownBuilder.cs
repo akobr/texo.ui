@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Markdown.Builder
 {
@@ -97,6 +98,12 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
         public IMarkdownBuilder Link(string title, string path)
         {
             stringBuilder.AppendFormat("[{0}]({1})", title, path);
+            return this;
+        }
+
+        public IMarkdownBuilder Link(ILink link)
+        {
+            stringBuilder.AppendFormat("[{0}]({1})", link.Title, link.Address.AbsoluteUri);
             return this;
         }
 
