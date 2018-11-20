@@ -1,13 +1,7 @@
 ﻿namespace Commands.CodeBaseSearch.Model
 {
-    public interface ISubject
+    public interface ISubject : ISearchable, ISearchTreeNode
     {
-        string Title { get; }
-
-        string Path { get; }
-
         SubjectTypeEnum Type { get; }
-
-
     }
 }
