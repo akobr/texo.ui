@@ -63,12 +63,7 @@ namespace BeaverSoft.Texo.View.Console
             }
         }
 
-        public void Render(Input input)
-        {
-            // TODO
-        }
-
-        public void Render(IImmutableList<IItem> items)
+        public void Render(Input input, IImmutableList<IItem> items)
         {
             foreach (IItem item in items)
             {
@@ -76,7 +71,7 @@ namespace BeaverSoft.Texo.View.Console
             }
         }
 
-        public void RenderIntellisence(IImmutableList<IItem> items)
+        public void RenderIntellisence(Input input, IImmutableList<IItem> items)
         {
             // TODO
         }

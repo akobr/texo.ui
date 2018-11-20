@@ -47,15 +47,10 @@ namespace BeaverSoft.Texo.View.WPF
             currentTitle = DEFAULT_TITLE;
         }
 
-        public void Render(Input input)
-        {
-            // TODO
-        }
-
-        public void Render(IImmutableList<IItem> items)
+        public void Render(Input input, IImmutableList<IItem> items)
         {
             List<Section> sections = new List<Section>(items.Count);
-            Item headerItem = BuildCommandHeaderItem();
+            Item headerItem = BuildCommandHeaderItem(input);
             Section header = renderer.Render(headerItem);
             header.Loaded += HandleLastSectionLoaded;
             sections.Add(header);
@@ -77,7 +72,7 @@ namespace BeaverSoft.Texo.View.WPF
             section.BringIntoView();
         }
 
-        public void RenderIntellisence(IImmutableList<IItem> items)
+        public void RenderIntellisence(Input input, IImmutableList<IItem> items)
         {
             throw new NotImplementedException();
         }
@@ -172,7 +167,7 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void TexoInputChanged(object sender, string input)
         {
-            executor.PreProcess(input);
+            //executor.PreProcess(input, input.Length);
         }
 
         private void TexoInputFinished(object sender, string input)
@@ -188,20 +183,12 @@ namespace BeaverSoft.Texo.View.WPF
             executor.Process(input);
         }
 
-        private Item BuildCommandHeaderItem()
+        private Item BuildCommandHeaderItem(Input input)
         {
-            IHistoryItem commandHistory = history.GetLastInput();
             MarkdownBuilder headerBuilder = new MarkdownBuilder();
             headerBuilder.WriteLine("***");
 
-            if (commandHistory == null)
-            {
-                headerBuilder.Italic("empty");
-                headerBuilder.WriteLine();
-                return Item.Markdown(headerBuilder.ToString());
-            }
-
-            foreach (IToken token in commandHistory.Input.Tokens)
+            foreach (IToken token in input.Tokens)
             {
                 switch (token.Type)
                 {

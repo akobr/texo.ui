@@ -2,7 +2,7 @@
 {
     public interface IExecutor
     {
-        Input.Input PreProcess(string input);
+        Input.Input PreProcess(string input, int cursorPosition);
 
         void Process(string input);
     }
