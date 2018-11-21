@@ -2,22 +2,29 @@
 using System.Globalization;
 using System.Management.Automation.Host;
 using System.Management.Automation.Runspaces;
+using BeaverSoft.Texo.Core.View;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
     public class TexoPowerShellHost : PSHost, IHostSupportsInteractiveSession
     {
+        private readonly IPromptableViewService view;
+        private readonly ILogService logger;
         private Runspace pushedRunspace;
 
-        public TexoPowerShellHost()
+        public TexoPowerShellHost(IPromptableViewService view, ILogService logger)
         {
+            this.view = view;
+            this.logger = logger;
+
             InstanceId = Guid.NewGuid();
             Name = "Texo.UI PowerShell Fallback Host";
             Version = new Version(0, 9);
             CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
             CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
 
-            UI = new TexoPowerShellHostUserInterface();
+            UI = new TexoPowerShellHostUserInterface(view, logger);
         }
 
         public override CultureInfo CurrentCulture { get; }

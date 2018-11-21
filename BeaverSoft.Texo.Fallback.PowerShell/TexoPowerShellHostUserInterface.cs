@@ -4,14 +4,22 @@ using System.Collections.ObjectModel;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Security;
+using BeaverSoft.Texo.Core.View;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
     class TexoPowerShellHostUserInterface : PSHostUserInterface, IHostUISupportsMultipleChoiceSelection
     {
-        public TexoPowerShellHostUserInterface()
+        private readonly IPromptableViewService view;
+        private readonly ILogService logger;
+
+        public TexoPowerShellHostUserInterface(IPromptableViewService view, ILogService logger)
         {
-            RawUI = new TexoPowerShellHostRawUserInterface();
+            this.view = view;
+            this.logger = logger;
+
+            RawUI = new TexoPowerShellHostRawUserInterface(logger);
         }
 
         public override PSHostRawUserInterface RawUI { get; }
@@ -24,6 +32,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override int PromptForChoice(
             string caption, string message, Collection<ChoiceDescription> choices, int defaultChoice)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Collection<int> PromptForChoice(
+            string caption, string message, Collection<ChoiceDescription> choices, IEnumerable<int> defaultChoices)
         {
             throw new NotImplementedException();
         }
@@ -43,7 +57,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override string ReadLine()
         {
-            throw new NotImplementedException();
+            return view.GetNewInput();
         }
 
         public override SecureString ReadLineAsSecureString()
@@ -89,12 +103,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         }
 
         public override void WriteWarningLine(string message)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Collection<int> PromptForChoice(
-            string caption, string message, Collection<ChoiceDescription> choices, IEnumerable<int> defaultChoices)
         {
             throw new NotImplementedException();
         }

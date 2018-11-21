@@ -1,6 +1,6 @@
 ﻿namespace BeaverSoft.Texo.Core.View
 {
-    public interface IResponsibleViewService
+    public interface IPromptableViewService
     {
         string GetNewInput();
 

@@ -1,10 +1,18 @@
 ﻿using System;
 using System.Management.Automation.Host;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
     public class TexoPowerShellHostRawUserInterface : PSHostRawUserInterface
     {
+        private readonly ILogService logger;
+
+        public TexoPowerShellHostRawUserInterface(ILogService logger)
+        {
+            this.logger = logger;
+        }
+
         public override ConsoleColor BackgroundColor { get; set; }
 
         public override Size BufferSize { get; set; }
