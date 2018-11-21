@@ -10,7 +10,7 @@ using SysConsole = System.Console;
 
 namespace BeaverSoft.Texo.View.Console
 {
-    public class ConsoleViewService : IViewService
+    public class ConsoleViewService : IViewService, IPromptableViewService
     {
         private const string TITLE_TEXO = "Texo UI";
 
@@ -84,6 +84,11 @@ namespace BeaverSoft.Texo.View.Console
         public void Update(string key, IItem item)
         {
             // TODO
+        }
+
+        public string GetNewInput()
+        {
+            return SysConsole.ReadLine();
         }
 
         public void Dispose()

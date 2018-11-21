@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Management.Automation" Version="6.1.1" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
   </ItemGroup>
 
   <ItemGroup>

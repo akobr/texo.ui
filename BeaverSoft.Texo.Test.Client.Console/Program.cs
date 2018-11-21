@@ -12,6 +12,8 @@ using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell;
+using BeaverSoft.Texo.Fallback.PowerShell.Markdown;
 using BeaverSoft.Texo.View.Console;
 using BeaverSoft.Texo.View.Console.Markdown;
 using Commands.CommandLine;
@@ -64,7 +66,13 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<IResultProcessingService, ResultProcessingService>();
             container.Register<IMarkdownService, MarkdownService>();
             container.Register<IConsoleRenderService, ConsoleMarkdownRenderService>();
-            container.Register<IViewService, ConsoleViewService>();
+            container.Register<ConsoleViewService>();
+            container.Register<IViewService>(() => container.GetInstance<ConsoleViewService>());
+            container.Register<IPromptableViewService>(() => container.GetInstance<ConsoleViewService>());
+
+            // PowerShell Fallback 
+            container.Register<IPowerShellResultBuilder, PowerShellResultMarkdownBuilder>();
+            container.Register<IFallbackService, PowerShellFallbackService>();
 
             // Core commands
             container.Register<ICurrentDirectoryService, CurrentDirectoryService>();
@@ -111,6 +119,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
                 .WithSettingService(container.GetInstance<ISettingService>())
                 .WithCommandManagementService(container.GetInstance<ICommandManagementService>())
                 .WithResultProcessingService(container.GetInstance<IResultProcessingService>())
+                .WithFallbackService(container.GetInstance<IFallbackService>())
                 .Build(commandFactory, container.GetInstance<IViewService>());
 
             var config = TextumConfiguration.CreateDefault().ToBuilder();

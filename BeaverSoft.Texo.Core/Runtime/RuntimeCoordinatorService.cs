@@ -49,6 +49,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             environment.Initialise();
             evaluator.Initialise();
             view.Initialise(this);
+            fallback?.Initialise();
         }
 
         public void Start()
@@ -72,7 +73,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             if (!inputModel.Context.IsValid)
             {
                 if (fallback != null
-                    && !string.IsNullOrEmpty(inputModel.Context.Key))
+                    && string.IsNullOrEmpty(inputModel.Context.Key))
                 {
                     Render(inputModel, fallback.Fallback(inputModel));
                 }

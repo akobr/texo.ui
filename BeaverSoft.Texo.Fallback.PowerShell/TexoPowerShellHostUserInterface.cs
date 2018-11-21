@@ -5,17 +5,23 @@ using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Security;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell.Extensions;
 using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
     class TexoPowerShellHostUserInterface : PSHostUserInterface, IHostUISupportsMultipleChoiceSelection
     {
+        private readonly IPowerShellResultBuilder resultBuilder;
         private readonly IPromptableViewService view;
         private readonly ILogService logger;
 
-        public TexoPowerShellHostUserInterface(IPromptableViewService view, ILogService logger)
+        public TexoPowerShellHostUserInterface(
+            IPowerShellResultBuilder resultBuilder,
+            IPromptableViewService view,
+            ILogService logger)
         {
+            this.resultBuilder = resultBuilder;
             this.view = view;
             this.logger = logger;
 
@@ -62,33 +68,33 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override SecureString ReadLineAsSecureString()
         {
-            throw new NotImplementedException();
+            return ReadLine().ToSecureString();
         }
 
         public override void Write(
             ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value)
         {
-            throw new NotImplementedException();
+            resultBuilder.Write(value, foregroundColor, backgroundColor);
         }
 
         public override void Write(string value)
         {
-            throw new NotImplementedException();
+            resultBuilder.Write(value);
         }
 
         public override void WriteDebugLine(string message)
         {
-            throw new NotImplementedException();
+            resultBuilder.WriteDebugLine(message);
         }
 
         public override void WriteErrorLine(string value)
         {
-            throw new NotImplementedException();
+            resultBuilder.WriteErrorLine(value);
         }
 
         public override void WriteLine(string value)
         {
-            throw new NotImplementedException();
+            resultBuilder.WriteLine(value);
         }
 
         public override void WriteProgress(
@@ -99,12 +105,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override void WriteVerboseLine(string message)
         {
-            throw new NotImplementedException();
+            resultBuilder.WriteVerboseLine(message);
         }
 
         public override void WriteWarningLine(string message)
         {
-            throw new NotImplementedException();
+            resultBuilder.WriteWarningLine(message);
         }
     }
 }

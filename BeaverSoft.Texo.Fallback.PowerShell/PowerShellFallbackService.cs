@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Input;
@@ -12,20 +13,23 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
     public class PowerShellFallbackService : IFallbackService
     {
         private readonly object executionLock = new object();
+        private readonly IPowerShellResultBuilder resultBuilder;
         private readonly IPromptableViewService view;
         private readonly ILogService logger;
         private readonly TexoPowerShellHost host;
-        private readonly Runspace runspace;
 
         private System.Management.Automation.PowerShell shell;
 
-        public PowerShellFallbackService(IPromptableViewService view, ILogService logger)
+        public PowerShellFallbackService(
+            IPowerShellResultBuilder resultBuilder, 
+            IPromptableViewService view,
+            ILogService logger)
         {
+            this.resultBuilder = resultBuilder;
             this.view = view;
             this.logger = logger;
 
-            host = new TexoPowerShellHost(view, logger);
-            runspace = RunspaceFactory.CreateRunspace(host);
+            host = new TexoPowerShellHost(resultBuilder, view, logger);
         }
         public ICommandResult Fallback(Input input)
         {
@@ -46,17 +50,15 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
             try
             {
-                shell.Runspace = runspace;
+                shell.Runspace = host.Runspace;
                 shell.AddScript(input.ParsedInput.RawInput);
 
                 shell.AddCommand("out-default");
-                shell.Commands.Commands[0].MergeMyResults(
-                    PipelineResultTypes.Warning | PipelineResultTypes.Error,
-                    PipelineResultTypes.Output);
+                shell.Commands.Commands[0].MergeMyResults(PipelineResultTypes.Error, PipelineResultTypes.Output);
 
-                shell.Invoke();
-                // TODO: build and return result item
-                return new ItemsResult(Item.Plain("TODO: build and return result item"));
+                resultBuilder.StartItem();
+                var result = shell.Invoke();
+                return new ItemsResult(resultBuilder.FinishItem());
             }
             catch (Exception e)
             {
@@ -75,7 +77,40 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public void Initialise()
         {
-            runspace.Open();
+            host.Initialise();
+            LoadPowerShellProfile();
+        }
+
+        private void LoadPowerShellProfile()
+        {
+            lock (executionLock)
+            {
+                shell = System.Management.Automation.PowerShell.Create();
+            }
+
+            try
+            {
+                shell.Runspace = host.Runspace;
+
+                PSCommand[] profileCommands = HostUtilities.GetProfileCommands("SampleHost06");
+                foreach (PSCommand command in profileCommands)
+                {
+                    shell.Commands = command;
+                    shell.Invoke();
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error("Error during profile execution in PowerShell.", e);
+            }
+            finally
+            {
+                lock (executionLock)
+                {
+                    shell?.Dispose();
+                    shell = null;
+                }
+            }
         }
     }
 }

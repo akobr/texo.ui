@@ -2,29 +2,36 @@
 using System.Globalization;
 using System.Management.Automation.Host;
 using System.Management.Automation.Runspaces;
+using System.Threading;
 using BeaverSoft.Texo.Core.View;
+using StrongBeaver.Core;
 using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
-    public class TexoPowerShellHost : PSHost, IHostSupportsInteractiveSession
+    public class TexoPowerShellHost : PSHost, IHostSupportsInteractiveSession, IInitialisable
     {
+        private readonly IPowerShellResultBuilder resultBuilder;
         private readonly IPromptableViewService view;
         private readonly ILogService logger;
         private Runspace pushedRunspace;
 
-        public TexoPowerShellHost(IPromptableViewService view, ILogService logger)
+        public TexoPowerShellHost(
+            IPowerShellResultBuilder resultBuilder,
+            IPromptableViewService view,
+            ILogService logger)
         {
+            this.resultBuilder = resultBuilder;
             this.view = view;
             this.logger = logger;
 
             InstanceId = Guid.NewGuid();
             Name = "Texo.UI PowerShell Fallback Host";
-            Version = new Version(0, 9);
-            CurrentCulture = CultureInfo.DefaultThreadCurrentCulture;
-            CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture;
+            Version = new Version(1, 0);
+            CurrentCulture = Thread.CurrentThread.CurrentCulture;
+            CurrentUICulture = Thread.CurrentThread.CurrentUICulture;
 
-            UI = new TexoPowerShellHostUserInterface(view, logger);
+            UI = new TexoPowerShellHostUserInterface(resultBuilder, view, logger);
         }
 
         public override CultureInfo CurrentCulture { get; }
@@ -42,6 +49,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         public bool IsRunspacePushed => pushedRunspace != null;
 
         public Runspace Runspace { get; private set; }
+
+        public void Initialise()
+        {
+            Runspace = RunspaceFactory.CreateRunspace(this);
+            Runspace.Open();
+        }
 
         public override void EnterNestedPrompt()
         {
@@ -67,7 +80,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             throw new NotImplementedException();
         }
-
 
         public void PopRunspace()
         {

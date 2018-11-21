@@ -52,7 +52,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.CodeBaseSearch", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeaverSoft.Texo.Fallback", "BeaverSoft.Texo.Fallback", "{4005EDEB-D8D4-4662-8EB2-80E4CE64F9DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Texo.Fallback.PowerShell", "BeaverSoft.Texo.Fallback.PowerShell\BeaverSoft.Texo.Fallback.PowerShell.csproj", "{A97A2EDB-7AC3-4F23-963E-D9A924A87A11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Texo.Fallback.PowerShell", "BeaverSoft.Texo.Fallback.PowerShell\BeaverSoft.Texo.Fallback.PowerShell.csproj", "{A97A2EDB-7AC3-4F23-963E-D9A924A87A11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Texo.Fallback.PowerShell.Markdown", "BeaverSoft.Texo.Fallback.PowerShell.Markdown\BeaverSoft.Texo.Fallback.PowerShell.Markdown.csproj", "{6E8522A3-058B-47B9-B8C0-D9A14978647A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -132,6 +134,10 @@ Global
 		{A97A2EDB-7AC3-4F23-963E-D9A924A87A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A97A2EDB-7AC3-4F23-963E-D9A924A87A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A97A2EDB-7AC3-4F23-963E-D9A924A87A11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E8522A3-058B-47B9-B8C0-D9A14978647A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E8522A3-058B-47B9-B8C0-D9A14978647A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E8522A3-058B-47B9-B8C0-D9A14978647A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E8522A3-058B-47B9-B8C0-D9A14978647A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,6 +159,7 @@ Global
 		{620B936C-B2A0-4B37-97DA-11E32B858D7C} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 		{15AFB5D0-4D42-4077-9F04-0D83E8D70D79} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 		{A97A2EDB-7AC3-4F23-963E-D9A924A87A11} = {4005EDEB-D8D4-4662-8EB2-80E4CE64F9DA}
+		{6E8522A3-058B-47B9-B8C0-D9A14978647A} = {4005EDEB-D8D4-4662-8EB2-80E4CE64F9DA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDFCCFD5-8669-4BBF-83FF-8DFCC3F39551}

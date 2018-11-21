@@ -287,6 +287,11 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         private static void GetTextFromInlineContainer(ContainerInline container, StringBuilder builder)
         {
+            if (container == null)
+            {
+                return;
+            }
+
             foreach (Inline child in container)
             {
                 builder.Append(GetText(child));

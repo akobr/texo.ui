@@ -6,6 +6,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 {
     public class TexoPowerShellHostRawUserInterface : PSHostRawUserInterface
     {
+        private readonly Size fakeWindowSize = new Size(1024, 1024);
         private readonly ILogService logger;
 
         public TexoPowerShellHostRawUserInterface(ILogService logger)
@@ -13,27 +14,127 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             this.logger = logger;
         }
 
-        public override ConsoleColor BackgroundColor { get; set; }
+        public override ConsoleColor BackgroundColor
+        {
+            get
+            {
+                return ConsoleColor.Black;
+            }
+            set
+            {
+                logger.Debug("PSHostRawUserInterface: BackgroundColor", value);
+            }
+        }
 
-        public override Size BufferSize { get; set; }
+        public override ConsoleColor ForegroundColor
+        {
+            get
+            {
+                return ConsoleColor.White;
+            }
+            set
+            {
+                logger.Debug("PSHostRawUserInterface: ForegroundColor", value);
+            }
+        }
 
-        public override Coordinates CursorPosition { get; set; }
+        public override Size BufferSize
+        {
+            get
+            {
+                return fakeWindowSize;
+            }
+            set
+            {
+                logger.Debug("PSHostRawUserInterface: BufferSize", value);
+            }
+        }
 
-        public override int CursorSize { get; set; }
+        public override Coordinates CursorPosition
+        {
+            get
+            {
+                return new Coordinates(0, 0);
+            }
+            set
+            {
+                logger.Debug("PSHostRawUserInterface: CursorPosition", value);
+            }
+        }
 
-        public override ConsoleColor ForegroundColor { get; set; }
+        public override int CursorSize
+        {
+            get
+            {
+                return 0;
+            }
+            set
+            {
+                logger.Debug("PSHostRawUserInterface: CursorSize", value);
+            }
+        }
 
-        public override bool KeyAvailable { get; }
 
-        public override Size MaxPhysicalWindowSize { get; }
+        public override bool KeyAvailable
+        {
+            get
+            {
+                return false;
+            }
+        }
 
-        public override Size MaxWindowSize { get; }
+        public override Size MaxPhysicalWindowSize
+        {
+            get
+            {
+                return fakeWindowSize;
+            }
+        }
 
-        public override Coordinates WindowPosition { get; set; }
+        public override Size MaxWindowSize
+        {
+            get
+            {
+                return fakeWindowSize;
+            }
+        }
 
-        public override Size WindowSize { get; set; }
+        public override Coordinates WindowPosition
+        {
+            get
+            {
+                return new Coordinates(0, 0);
+            }
+            set
+            {
+                logger.Debug("PSHostRawUserInterface: WindowPosition", value);
+            }
+        }
 
-        public override string WindowTitle { get; set; }
+
+        public override Size WindowSize
+        {
+            get
+            {
+                return fakeWindowSize;
+            }
+            set
+            {
+                logger.Debug("PSHostRawUserInterface: WindowSize", value);
+            }
+        }
+
+        public override string WindowTitle
+        {
+            get
+            {
+                return "TexoUi Host";
+            }
+            set
+            {
+                logger.Debug("PSHostRawUserInterface: WindowTitle", value);
+            }
+        }
 
         public override void FlushInputBuffer()
         {

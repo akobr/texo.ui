@@ -6,6 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell.Markdown\BeaverSoft.Texo.Fallback.PowerShell.Markdown.csproj" />
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell\BeaverSoft.Texo.Fallback.PowerShell.csproj" />
     <ProjectReference Include="..\BeaverSoft.Texo.View.Console.Markdown\BeaverSoft.Texo.View.Console.Markdown.csproj" />
     <ProjectReference Include="..\Commands\Commands.CommandLine\Commands.CommandLine.csproj" />
     <ProjectReference Include="..\Commands\Commands.Dir\Commands.Dir.csproj" />
