@@ -6,11 +6,21 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 {
     public class TexoPowerShellHostRawUserInterface : PSHostRawUserInterface
     {
-        private readonly Size fakeWindowSize = new Size(1024, 1024);
+        private const int DEFAULT_LINE_LENGHT = 126;
+        private const int DEFAULT_WINDOW_LINE_COUNT = 30;
+        private const int DEFAULT_BUFFER_HEIGHT = 300;
+
         private readonly ILogService logger;
+        private readonly Size windowSize = new Size(DEFAULT_LINE_LENGHT, DEFAULT_WINDOW_LINE_COUNT);
+
+        private Size bufferSize;
+        private BufferCell[,] buffer;
 
         public TexoPowerShellHostRawUserInterface(ILogService logger)
         {
+            bufferSize = new Size(DEFAULT_LINE_LENGHT, DEFAULT_BUFFER_HEIGHT);
+            buffer = new BufferCell[bufferSize.Width, bufferSize.Height];
+
             this.logger = logger;
         }
 
@@ -42,7 +52,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             get
             {
-                return fakeWindowSize;
+                return bufferSize;
             }
             set
             {
@@ -87,7 +97,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             get
             {
-                return fakeWindowSize;
+                return windowSize;
             }
         }
 
@@ -95,7 +105,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             get
             {
-                return fakeWindowSize;
+                return windowSize;
             }
         }
 
@@ -116,7 +126,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             get
             {
-                return fakeWindowSize;
+                return windowSize;
             }
             set
             {
@@ -138,12 +148,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override void FlushInputBuffer()
         {
-            throw new NotImplementedException();
+            // No operation
         }
 
         public override BufferCell[,] GetBufferContents(Rectangle rectangle)
         {
-            throw new NotImplementedException();
+            return new BufferCell[rectangle.Right - rectangle.Left, rectangle.Bottom - rectangle.Top];
         }
 
         public override KeyInfo ReadKey(ReadKeyOptions options)
@@ -153,17 +163,32 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override void ScrollBufferContents(Rectangle source, Coordinates destination, Rectangle clip, BufferCell fill)
         {
-            throw new NotImplementedException();
+            // no operation
         }
 
         public override void SetBufferContents(Coordinates origin, BufferCell[,] contents)
         {
-            throw new NotImplementedException();
+            int xMax = contents.GetUpperBound(0);
+            int yMax = contents.GetUpperBound(1);
+
+            for (int x = 0; x <= xMax; x++)
+            {
+                for (int y = 0; y <= yMax; y++)
+                {
+                    buffer[origin.X + x, origin.Y + y] = contents[x, y];
+                }
+            }
         }
 
         public override void SetBufferContents(Rectangle rectangle, BufferCell fill)
         {
-            throw new NotImplementedException();
+            for (int x = rectangle.Left; x <= rectangle.Right; x++)
+            {
+                for (int y = rectangle.Top; y < rectangle.Bottom; y++)
+                {
+                    buffer[x, y] = fill;
+                }
+            }
         }
     }
 }

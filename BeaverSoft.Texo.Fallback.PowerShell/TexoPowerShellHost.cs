@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Management.Automation.Host;
 using System.Management.Automation.Runspaces;
+using System.Text;
 using System.Threading;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core;
@@ -14,7 +17,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         private readonly IPowerShellResultBuilder resultBuilder;
         private readonly IPromptableViewService view;
         private readonly ILogService logger;
+
         private Runspace pushedRunspace;
+        private Stack<Guid> applications;
+        private Stack<Guid> prompts;
+        private StringBuilder appOutput;
 
         public TexoPowerShellHost(
             IPowerShellResultBuilder resultBuilder,
@@ -31,6 +38,8 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             CurrentCulture = Thread.CurrentThread.CurrentCulture;
             CurrentUICulture = Thread.CurrentThread.CurrentUICulture;
 
+            applications = new Stack<Guid>();
+            prompts = new Stack<Guid>();
             UI = new TexoPowerShellHostUserInterface(resultBuilder, view, logger);
         }
 
@@ -58,22 +67,40 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override void EnterNestedPrompt()
         {
-            throw new NotImplementedException();
+            prompts.Push(Guid.NewGuid());
         }
 
         public override void ExitNestedPrompt()
         {
-            throw new NotImplementedException();
+            prompts.Pop();
         }
 
         public override void NotifyBeginApplication()
         {
-            throw new NotImplementedException();
+            applications.Push(Guid.NewGuid());
+            
+            if (applications.Count != 1)
+            {
+                return;
+            }
+
+            appOutput = new StringBuilder();
+            StringWriter writer = new StringWriter(appOutput);
+            Console.SetOut(writer);
         }
 
         public override void NotifyEndApplication()
         {
-            throw new NotImplementedException();
+            applications.Pop();
+
+            if (applications.Count > 0)
+            {
+                return;
+            }
+
+            StreamWriter standardOutput = new StreamWriter(Console.OpenStandardOutput());
+            standardOutput.AutoFlush = true;
+            Console.SetOut(standardOutput);
         }
 
         public override void SetShouldExit(int exitCode)
