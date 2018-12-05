@@ -18,7 +18,7 @@ using StrongBeaver.Core.Messaging;
 
 namespace BeaverSoft.Texo.View.WPF
 {
-    public class WpfViewService : IViewService, IInitialisable<TexoControl>
+    public class WpfViewService : IViewService, IPromptableViewService, IInitialisable<TexoControl>
     {
         private const string DEFAULT_PROMPT = "tu>";
         private const string DEFAULT_TITLE = "Texo UI";
@@ -107,6 +107,11 @@ namespace BeaverSoft.Texo.View.WPF
         {
             control = context;
             InitialiseControl();
+        }
+
+        public string GetNewInput()
+        {
+            throw new NotImplementedException();
         }
 
         private void InitialiseControl()

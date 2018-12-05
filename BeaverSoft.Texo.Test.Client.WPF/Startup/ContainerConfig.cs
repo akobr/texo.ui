@@ -7,8 +7,11 @@ using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input.History;
+using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell;
+using BeaverSoft.Texo.Fallback.PowerShell.Markdown;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
 using Commands.CommandLine;
@@ -53,7 +56,13 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             // View
             container.Register<IMarkdownService, MarkdownService>();
             container.Register<IWpfRenderService, WpfMarkdownRenderService>();
-            container.Register<IViewService, WpfViewService>();
+            container.Register<WpfViewService>();
+            container.Register<IViewService>(container.GetInstance<WpfViewService>);
+            container.Register<IPromptableViewService>(container.GetInstance<WpfViewService>);
+
+            // PowerShell Fallback
+            container.Register<IPowerShellResultBuilder, PowerShellResultMarkdownBuilder>();
+            container.Register<IFallbackService, PowerShellFallbackService>();
         }
 
         public static void RegisterEngineServices(this SimpleIoc container, TexoEngineBuilder builder)

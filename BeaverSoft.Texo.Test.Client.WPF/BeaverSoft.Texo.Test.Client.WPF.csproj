@@ -112,6 +112,14 @@
       <Project>{588610d7-7d21-4df8-aad6-e88c83560d87}</Project>
       <Name>BeaverSoft.Texo.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell.Markdown\BeaverSoft.Texo.Fallback.PowerShell.Markdown.csproj">
+      <Project>{6e8522a3-058b-47b9-b8c0-d9a14978647a}</Project>
+      <Name>BeaverSoft.Texo.Fallback.PowerShell.Markdown</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell\BeaverSoft.Texo.Fallback.PowerShell.csproj">
+      <Project>{a97a2edb-7ac3-4f23-963e-d9a924a87a11}</Project>
+      <Name>BeaverSoft.Texo.Fallback.PowerShell</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BeaverSoft.Texo.View.WPF.Markdown\BeaverSoft.Texo.View.WPF.Markdown.csproj">
       <Project>{1dc76826-bcbe-4e8d-bb0a-d3d47736c816}</Project>
       <Name>BeaverSoft.Texo.View.WPF.Markdown</Name>
