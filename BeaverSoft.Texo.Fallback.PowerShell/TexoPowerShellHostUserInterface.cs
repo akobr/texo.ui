@@ -97,6 +97,22 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             resultBuilder.WriteLine(value);
         }
 
+        public override void WriteLine(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value)
+        {
+            resultBuilder.Write(value, foregroundColor, backgroundColor);
+            resultBuilder.WriteLine(string.Empty);
+        }
+
+        public override void WriteLine()
+        {
+            resultBuilder.WriteLine(string.Empty);
+        }
+
+        public override void WriteInformation(InformationRecord record)
+        {
+            base.WriteInformation(record);
+        }
+
         public override void WriteProgress(
             long sourceId, ProgressRecord record)
         {

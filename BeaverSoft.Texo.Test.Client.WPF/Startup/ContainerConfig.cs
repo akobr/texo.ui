@@ -15,7 +15,6 @@ using BeaverSoft.Texo.Fallback.PowerShell.Markdown;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
 using Commands.CommandLine;
-using Commands.Dir;
 using Commands.ReferenceCheck;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Container;
@@ -35,7 +34,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
 
             // Simple commands
             container.Register<ReferenceCheckCommand>();
-            container.Register<DirCommand>();
+            //container.Register<DirCommand>();
             container.Register<CommandLineCommand>();
 
             // File manager

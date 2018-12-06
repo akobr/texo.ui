@@ -21,7 +21,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         private System.Management.Automation.PowerShell shell;
 
         public PowerShellFallbackService(
-            IPowerShellResultBuilder resultBuilder, 
+            IPowerShellResultBuilder resultBuilder,
             IPromptableViewService view,
             ILogService logger)
         {
@@ -53,6 +53,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 shell.Runspace = host.Runspace;
                 shell.AddScript(input.ParsedInput.RawInput);
 
+                //shell.AddCommand("write-host");
                 shell.AddCommand("out-default");
                 shell.Commands.Commands[0].MergeMyResults(PipelineResultTypes.Error, PipelineResultTypes.Output);
 
