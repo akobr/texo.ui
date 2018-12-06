@@ -5,5 +5,6 @@
         public const string TEXO = "texo";
         public const string CURRENT_DIRECTORY = "current-directory";
         public const string HELP = "help";
+        public const string CLEAR = "clear";
     }
 }

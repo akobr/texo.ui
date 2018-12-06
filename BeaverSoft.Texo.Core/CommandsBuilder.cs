@@ -1,7 +1,9 @@
 ﻿using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
+using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Input.History;
 
 namespace BeaverSoft.Texo.Core
 {
@@ -21,10 +23,23 @@ namespace BeaverSoft.Texo.Core
 
             command.Key = CommandKeys.CURRENT_DIRECTORY;
             command.Representations.AddRange(
-                new[] { CommandKeys.CURRENT_DIRECTORY, "cd", "chdir", "cdir" });
+                new[] { CommandKeys.CURRENT_DIRECTORY, "cd", "chdir", "cdir", "set-location", "sl" });
             command.Parameters.Add(parameter.ToImmutable());
             command.Documentation.Title = "Current directory";
             command.Documentation.Description = "Gets or sets current working directory.";
+
+            return command.ToImmutable();
+        }
+
+        public static Query BuildClear()
+        {
+            var command = Query.CreateBuilder();
+
+            command.Key = CommandKeys.CLEAR;
+            command.Representations.AddRange(
+                new[] { CommandKeys.CLEAR, "cls", "Clear-Host", "gc" });
+            command.Documentation.Title = "Clear output widnow";
+            command.Documentation.Description = "All previous output will be clear.";
 
             return command.ToImmutable();
         }
@@ -33,20 +48,47 @@ namespace BeaverSoft.Texo.Core
         {
             var command = Query.CreateBuilder();
 
-            var parameter = Parameter.CreateBuilder();
-            parameter.Key = ParameterKeys.ITEM;
-            parameter.ArgumentTemplate = InputRegex.QUERY_OR_OPTION;
-            parameter.IsOptional = true;
-            parameter.IsRepeatable = true;
-            parameter.Documentation.Title = "Query";
-            parameter.Documentation.Description = "Specify command / query / option or parameter name about which you want to know more.";
-
             command.Key = CommandKeys.HELP;
             command.Representations.AddRange(
                 new[] { CommandKeys.HELP, "advice", "aid" });
-            command.Parameters.Add(parameter.ToImmutable());
-            command.Documentation.Title = "Help";
-            command.Documentation.Description = "Shows more information and hint for requested query.";
+            command.DefaultQueryKey = HelpNames.QUERY_INFO;
+
+            var parQuery = Parameter.CreateBuilder();
+            parQuery.Key = ParameterKeys.ITEM;
+            parQuery.ArgumentTemplate = InputRegex.QUERY_OR_OPTION;
+            parQuery.IsOptional = true;
+            parQuery.IsRepeatable = true;
+            parQuery.Documentation.Title = "Query";
+            parQuery.Documentation.Description = "Specify command / query / option or parameter name about which you want to know more.";
+
+            var parCommand = Parameter.CreateBuilder();
+            parCommand.Key = HelpNames.PARAMETER_COMMAND;
+            parCommand.ArgumentTemplate = InputRegex.VARIABLE_NAME;
+            parCommand.Documentation.Title = "Command name";
+            parCommand.Documentation.Description = "Specify command name for which will be generated input tree.";
+
+            var queryInfo = Query.CreateBuilder();
+            queryInfo.Key = HelpNames.QUERY_INFO;
+            queryInfo.Parameters.Add(parQuery.ToImmutable());
+            queryInfo.Documentation.Title = "Help";
+            queryInfo.Documentation.Description = "Shows more information and hint for requested query.";
+
+            var queryList = Query.CreateBuilder();
+            queryList.Key = HelpNames.QUERY_LIST;
+            queryList.Representations.Add(HelpNames.QUERY_LIST);
+
+            var queryTree = Query.CreateBuilder();
+            queryTree.Key = HelpNames.QUERY_TREE;
+            queryTree.Representations.Add(HelpNames.QUERY_TREE);
+            queryTree.Parameters.Add(parCommand.ToImmutable());
+
+            command.Queries.AddRange(
+                new[]
+                {
+                    queryInfo.ToImmutable(),
+                    queryList.ToImmutable(),
+                    queryTree.ToImmutable(),
+                });
 
             return command.ToImmutable();
         }
@@ -60,7 +102,8 @@ namespace BeaverSoft.Texo.Core
                 new[] {CommandKeys.TEXO, "textum", "textus", "texui", "texere", "tex", "tx"});
 
             command.Queries.Add(CreateEnvironmentQuery());
-            command.Queries.Add(CreateSettingQuery());
+            command.Queries.Add(CreateHistoryQuery());
+            //command.Queries.Add(CreateSettingQuery());
 
             return command.ToImmutable();
         }
@@ -113,6 +156,33 @@ namespace BeaverSoft.Texo.Core
                     queryGet.ToImmutable(),
                     querySet.ToImmutable(),
                     queryRemove.ToImmutable()
+                });
+
+            return query.ToImmutable();
+        }
+
+        private static Query CreateHistoryQuery()
+        {
+            var query = Query.CreateBuilder();
+            query.Key = HistoryNames.QUERY_HISTORY;
+            query.Representations.Add(HistoryNames.QUERY_HISTORY);
+            query.DefaultQueryKey = HistoryNames.QUERY_LIST;
+
+            var queryList = Query.CreateBuilder();
+            queryList.Key = HistoryNames.QUERY_LIST;
+            queryList.Representations.AddRange(
+                new[] { HistoryNames.QUERY_LIST, "show" });
+
+            var queryClear = Query.CreateBuilder();
+            queryClear.Key = HistoryNames.QUERY_CLEAR;
+            queryClear.Representations.AddRange(
+                new[] { HistoryNames.QUERY_CLEAR, "cls" });
+
+            query.Queries.AddRange(
+                new[]
+                {
+                    queryList.ToImmutable(),
+                    queryClear.ToImmutable(),
                 });
 
             return query.ToImmutable();
