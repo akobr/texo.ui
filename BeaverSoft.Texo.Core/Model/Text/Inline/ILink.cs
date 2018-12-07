@@ -1,6 +1,6 @@
 ﻿namespace BeaverSoft.Texo.Core.Model.Text
 {
-    public interface ILink : IInlineElement
+    public interface ILink : IInline
     {
 
     }

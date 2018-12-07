@@ -1,6 +1,6 @@
 ﻿namespace BeaverSoft.Texo.Core.Model.Text
 {
-    public interface IParagraph : IBlockElement
+    public interface IParagraph : IBlock
     {
         
     }

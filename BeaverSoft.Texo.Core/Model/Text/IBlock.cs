@@ -1,7 +1,7 @@
 ﻿namespace BeaverSoft.Texo.Core.Model.Text
 {
-    public interface IInlineElement : ITextElement
+    public interface IBlock : IElement
     {
-        
+
     }
 }
