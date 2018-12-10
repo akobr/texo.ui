@@ -2,6 +2,6 @@
 {
     public interface IDocument : IBlockCollection
     {
-        
+        // no member
     }
 }

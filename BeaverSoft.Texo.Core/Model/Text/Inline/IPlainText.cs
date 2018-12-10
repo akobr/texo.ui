@@ -1,6 +1,7 @@
-﻿namespace BeaverSoft.Texo.Core.Model.Text.Inline
+﻿namespace BeaverSoft.Texo.Core.Model.Text
 {
-    interface IPlainText : IInline
+    public interface IPlainText : IInline
     {
+        string Text { get; }
     }
 }

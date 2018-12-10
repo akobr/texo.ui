@@ -2,6 +2,6 @@
 {
     public interface ILink : IInline
     {
-
+        string Address { get; }
     }
 }

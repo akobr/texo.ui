@@ -2,6 +2,6 @@
 {
     public interface IElement
     {
-        
+        // no members
     }
 }

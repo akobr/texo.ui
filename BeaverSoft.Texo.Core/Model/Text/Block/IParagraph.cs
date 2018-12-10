@@ -2,6 +2,6 @@
 {
     public interface IParagraph : IBlock
     {
-        
+        // no member
     }
 }

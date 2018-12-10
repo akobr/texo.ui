@@ -2,6 +2,6 @@
 {
     public interface IInline : IElement
     {
-        
+        IInline Content { get; }
     }
 }

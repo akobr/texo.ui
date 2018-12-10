@@ -1,6 +1,6 @@
 ﻿namespace BeaverSoft.Texo.Core.Model.Text
 {
-    public interface ICodeInline : IEmphasis
+    public interface IStrikethrough : IEmphasis
     {
         // no members
     }

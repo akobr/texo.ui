@@ -2,6 +2,6 @@
 {
     public interface ICodeBlock : IBlock
     {
-        
+        string Language { get; }
     }
 }

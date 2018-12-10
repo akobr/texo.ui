@@ -39,7 +39,7 @@ namespace BeaverSoft.Texo.Core
             command.Representations.AddRange(
                 new[] { CommandKeys.CLEAR, "cls", "Clear-Host", "gc" });
             command.Documentation.Title = "Clear output widnow";
-            command.Documentation.Description = "All previous output will be clear.";
+            command.Documentation.Description = "All previous outputs will be clear.";
 
             return command.ToImmutable();
         }
@@ -71,16 +71,20 @@ namespace BeaverSoft.Texo.Core
             queryInfo.Key = HelpNames.QUERY_INFO;
             queryInfo.Parameters.Add(parQuery.ToImmutable());
             queryInfo.Documentation.Title = "Help";
-            queryInfo.Documentation.Description = "Shows more information and hint for requested query.";
+            queryInfo.Documentation.Description = "Shows more information and hint for requested command/query.";
 
             var queryList = Query.CreateBuilder();
             queryList.Key = HelpNames.QUERY_LIST;
             queryList.Representations.Add(HelpNames.QUERY_LIST);
+            queryList.Documentation.Title = "Command list";
+            queryList.Documentation.Description = "Returns list of all available commands.";
 
             var queryTree = Query.CreateBuilder();
             queryTree.Key = HelpNames.QUERY_TREE;
             queryTree.Representations.Add(HelpNames.QUERY_TREE);
             queryTree.Parameters.Add(parCommand.ToImmutable());
+            queryTree.Documentation.Title = "Command tree";
+            queryTree.Documentation.Description = "Returns tree of possible inputs per specific command.";
 
             command.Queries.AddRange(
                 new[]

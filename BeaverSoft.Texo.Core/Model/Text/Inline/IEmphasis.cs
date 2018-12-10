@@ -2,6 +2,6 @@
 {
     public interface IEmphasis : IInline
     {
-        
+        // no members
     }
 }

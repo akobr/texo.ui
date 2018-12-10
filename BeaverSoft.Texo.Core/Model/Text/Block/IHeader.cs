@@ -2,6 +2,6 @@
 {
     public interface IHeader : IBlock
     {
-        
+        ushort? Level { get; }
     }
 }

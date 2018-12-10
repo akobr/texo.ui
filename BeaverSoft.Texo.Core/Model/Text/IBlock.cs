@@ -2,6 +2,6 @@
 {
     public interface IBlock : IElement
     {
-
+        IInline Content { get; }
     }
 }

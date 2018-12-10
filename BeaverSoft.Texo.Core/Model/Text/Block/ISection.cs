@@ -2,6 +2,6 @@
 {
     public interface ISection : IBlockCollection
     {
-        
+        // no member
     }
 }
