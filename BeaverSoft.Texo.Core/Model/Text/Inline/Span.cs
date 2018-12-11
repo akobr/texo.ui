@@ -49,6 +49,16 @@ namespace BeaverSoft.Texo.Core.Model.Text
             return new Span(children.AddRange(childrenToAdd));
         }
 
+        public Span InsertAt(int index, IInline childToAdd)
+        {
+            return new Span(children.Insert(index, childToAdd));
+        }
+
+        public Span RemoveAt(int index)
+        {
+            return new Span(children.RemoveAt(index));
+        }
+
         public override string ToString()
         {
             StringBuilder result = new StringBuilder();

@@ -4,13 +4,11 @@ namespace BeaverSoft.Texo.Core.Model.Text
 {
     public class DocumentBuilder
     {
-        private readonly BlockCollection result;
-        private BlockCollection context;
+        private BlockCollection current;
 
         public DocumentBuilder(BlockCollection newCollection)
         {
-            result = newCollection ?? throw new ArgumentNullException(nameof(newCollection));
-            context = result;
+            current = newCollection ?? throw new ArgumentNullException(nameof(newCollection));
         }
 
         public static DocumentBuilder Create<T>()
@@ -29,30 +27,27 @@ namespace BeaverSoft.Texo.Core.Model.Text
             return new DocumentBuilder(new Section());
         }
 
-        public BlockCollection Build()
-        {
-            return result;
-        }
+        public BlockCollection Result => current;
 
-        public T Build<T>()
+        public T GetResult<T>()
             where T : BlockCollection
         {
-            return (T)result;
+            return (T)current;
         }
 
         public DocumentBuilder Header(string title)
         {
-            context = context.AddChild(new Header(title));
+            current = current.AddChild(new Header(title));
             return this;
         }
 
-        public ISpanBuilder StartHeader()
-        {
-            Span content = new Span();
-            Header header = new Header(content);
-            context = context.AddChild(header);
-            return new SpanBuilder(content);
-        }
+        //public ISpanBuilder StartHeader()
+        //{
+        //    Span content = new Span();
+        //    Header header = new Header(content);
+        //    current = current.AddChild(header);
+        //    return new SpanBuilder(content);
+        //}
 
     }
 }

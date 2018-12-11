@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Texo.Core.Model.Text;
+using BeaverSoft.Texo.Core.Result;
+using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Help
 {
     class HelpCommand : InlineIntersectionCommand
     {
-        private ISettingService setting;
+        private readonly ISettingService setting;
 
         public HelpCommand(ISettingService setting)
         {
@@ -27,17 +30,24 @@ namespace BeaverSoft.Texo.Core.Help
 
         private ICommandResult Tree(CommandContext context)
         {
-            throw new NotImplementedException();
+            CommandTextTreeBuilder builder = new CommandTextTreeBuilder();
+            return new ItemsResult(Item.Plain(builder.BuildTree(setting.Configuration.Runtime.Commands[0])));
         }
 
         private ICommandResult List(CommandContext context)
         {
-            String
+            List result = new List();
 
             foreach (Query command in setting.Configuration.Runtime.Commands.OrderBy(c => c.Key))
             {
-                
+                result = result.AddItem(new ListItem(
+                    new Span(
+                        new Strong(command.GetMainRepresentation()),
+                        new PlainText(" - "),
+                        new Italic(command.Documentation.Description))));
             }
+
+            return new ItemsResult<ModeledItem>(new ModeledItem(result));
         }
     }
 }

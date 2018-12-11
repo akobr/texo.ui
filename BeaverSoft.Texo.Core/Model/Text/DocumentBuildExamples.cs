@@ -10,14 +10,16 @@
             document.AddChild(new Section(
                 new Header("Section Title"),
                 new Paragraph(
-                    new PlainText("Lorem ipsum "),
-                    new Strong(
-                        new Span(
-                            new PlainText("dolor sit amet, "),
-                            new Strikethrough("consectetur"),
-                            new PlainText(" adipiscing "),
-                            new Italic("elit"),
-                            new PlainText(".")
+                    new Span(
+                        new PlainText("Lorem ipsum "),
+                        new Strong(
+                            new Span(
+                                new PlainText("dolor sit amet, "),
+                                new Strikethrough("consectetur"),
+                                new PlainText(" adipiscing "),
+                                new Italic("elit"),
+                                new PlainText(".")
+                            )
                         )
                     )
                 )

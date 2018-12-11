@@ -46,7 +46,7 @@ namespace BeaverSoft.Texo.Core.Model.Text
                 result.Append("X# ");
             }
 
-            result.Append(base.ToString());
+            result.Append(Content);
             return result.ToString();
         }
     }

@@ -5,7 +5,7 @@ namespace BeaverSoft.Texo.Core.Model.Text
 {
     public interface ISpanBuilder : IFluentSyntax
     {
-        Span Build();
+        Span Span { get; }
 
         ISpanBuilder Write(string text);
 

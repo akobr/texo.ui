@@ -14,5 +14,10 @@
         }
 
         public IInline Content { get; }
+
+        public override string ToString()
+        {
+            return Content.ToString();
+        }
     }
 }

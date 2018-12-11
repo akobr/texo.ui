@@ -4,6 +4,7 @@
     {
         Undefined = 0,
         Other,
+        Model,
         Plain,
         Markdown,
         Html,

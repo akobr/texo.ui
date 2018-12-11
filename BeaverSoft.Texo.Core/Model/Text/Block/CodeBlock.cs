@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace BeaverSoft.Texo.Core.Model.Text
 {
@@ -31,5 +32,17 @@ namespace BeaverSoft.Texo.Core.Model.Text
         public IInline Content { get; }
 
         public string Language { get; }
+
+        public override string ToString()
+        {
+            StringBuilder result = new StringBuilder();
+            result.Append("```");
+            result.AppendLine(Language);
+            result.Append(Content);
+            result.AppendLine();
+            result.Append("```");
+
+            return result.ToString();
+        }
     }
 }

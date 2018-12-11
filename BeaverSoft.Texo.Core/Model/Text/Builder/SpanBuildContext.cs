@@ -1,21 +1,18 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace BeaverSoft.Texo.Core.Model.Text
 {
     public class SpanBuildContext : ISpanBuildContext
     {
-        private readonly Span span;
-        private readonly Guid identifier;
+        private readonly SpanBuildContextModel model;
         private readonly SpanBuilder builder;
-
         private bool disposed;
 
-        public SpanBuildContext(Span span, Guid identifier, SpanBuilder builder)
+        internal SpanBuildContext(SpanBuildContextModel model)
         {
-            this.span = span;
-            this.identifier = identifier;
-            this.builder = builder;
+            this.model = model;
+            model.SetContext(this);
+            builder = model.Builder;
         }
 
         public void Dispose()
@@ -26,13 +23,10 @@ namespace BeaverSoft.Texo.Core.Model.Text
             }
 
             disposed = true;
-            builder.EndContext(identifier);
+            builder.EndContext(model);
         }
 
-        public Span Build()
-        {
-            return span;
-        }
+        public Span Span => model.GetBuildedSpan();
 
         public ISpanBuilder Write(string text)
         {
