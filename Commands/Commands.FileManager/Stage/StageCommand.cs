@@ -42,7 +42,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
         private static ICommandResult List(CommandContext context)
         {
-            if (context.HasParameter(ParameterKeys.PATH))
+            if (!context.HasParameter(ParameterKeys.PATH))
             {
                 string current = Environment.CurrentDirectory;
                 return new ItemsResult(BuildStageItem(current, Directory.GetFileSystemEntries(current), current));
