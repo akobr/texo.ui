@@ -43,7 +43,7 @@ namespace BeaverSoft.Texo.Core.Model.Text
             }
             else
             {
-                result.Append("X# ");
+                result.Append("# ");
             }
 
             result.Append(Content);

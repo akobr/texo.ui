@@ -52,6 +52,8 @@ namespace BeaverSoft.Texo.Core
             command.Representations.AddRange(
                 new[] { CommandKeys.HELP, "advice", "aid" });
             command.DefaultQueryKey = HelpNames.QUERY_INFO;
+            command.Documentation.Title = "Help";
+            command.Documentation.Description = "Help about available commands.";
 
             var parQuery = Parameter.CreateBuilder();
             parQuery.Key = ParameterKeys.ITEM;
@@ -69,6 +71,7 @@ namespace BeaverSoft.Texo.Core
 
             var queryInfo = Query.CreateBuilder();
             queryInfo.Key = HelpNames.QUERY_INFO;
+            queryInfo.Representations.Add(HelpNames.QUERY_INFO);
             queryInfo.Parameters.Add(parQuery.ToImmutable());
             queryInfo.Documentation.Title = "Help";
             queryInfo.Documentation.Description = "Shows more information and hint for requested command/query.";
@@ -104,6 +107,9 @@ namespace BeaverSoft.Texo.Core
             command.Key = CommandKeys.TEXO;
             command.Representations.AddRange(
                 new[] {CommandKeys.TEXO, "textum", "textus", "texui", "texere", "tex", "tx"});
+            command.DefaultQueryKey = EnvironmentNames.QUERY_ENVIRONMENT;
+            command.Documentation.Title = "Texo management";
+            command.Documentation.Description = "Management of the Texo UI environment.";
 
             command.Queries.Add(CreateEnvironmentQuery());
             command.Queries.Add(CreateHistoryQuery());
@@ -119,6 +125,8 @@ namespace BeaverSoft.Texo.Core
             query.Representations.AddRange(
                 new[] { EnvironmentNames.QUERY_ENVIRONMENT, "env", "variable", "var" });
             query.DefaultQueryKey = EnvironmentNames.QUERY_LIST;
+            query.Documentation.Title = "Environment variables";
+            query.Documentation.Description = "Management of environment variables.";
 
             var parName = Parameter.CreateBuilder();
             parName.Key = ParameterKeys.NAME;
@@ -171,6 +179,8 @@ namespace BeaverSoft.Texo.Core
             query.Key = HistoryNames.QUERY_HISTORY;
             query.Representations.Add(HistoryNames.QUERY_HISTORY);
             query.DefaultQueryKey = HistoryNames.QUERY_LIST;
+            query.Documentation.Title = "Command history";
+            query.Documentation.Description = "History of commands.";
 
             var queryList = Query.CreateBuilder();
             queryList.Key = HistoryNames.QUERY_LIST;
@@ -198,6 +208,8 @@ namespace BeaverSoft.Texo.Core
             query.Key = SettingNames.QUERY_SETTING;
             query.Representations.AddRange(
                 new[] { SettingNames.QUERY_SETTING, "config" });
+            query.Documentation.Title = "Configuration";
+            query.Documentation.Description = "Management of the environment configuration.";
 
             var parCategory = Parameter.CreateBuilder();
             parCategory.Key = SettingNames.PARAMETER_CATEGORY;

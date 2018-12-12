@@ -113,10 +113,9 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             base.WriteInformation(record);
         }
 
-        public override void WriteProgress(
-            long sourceId, ProgressRecord record)
+        public override void WriteProgress(long sourceId, ProgressRecord record)
         {
-            throw new NotImplementedException();
+            logger.Info(record.Activity, record.StatusDescription, record.CurrentOperation);
         }
 
         public override void WriteVerboseLine(string message)

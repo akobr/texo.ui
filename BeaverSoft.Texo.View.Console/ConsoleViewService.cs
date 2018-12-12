@@ -134,5 +134,10 @@ namespace BeaverSoft.Texo.View.Console
 
             workingDir = message.NewValue;
         }
+
+        void IMessageBusRecipient<IClearViewOutputMessage>.ProcessMessage(IClearViewOutputMessage message)
+        {
+            SysConsole.Clear();
+        }
     }
 }

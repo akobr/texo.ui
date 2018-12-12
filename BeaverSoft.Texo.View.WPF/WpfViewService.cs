@@ -266,6 +266,11 @@ namespace BeaverSoft.Texo.View.WPF
             }
         }
 
+        void IMessageBusRecipient<IClearViewOutputMessage>.ProcessMessage(IClearViewOutputMessage message)
+        {
+            control.OutputDocument.Document.Blocks.Clear();
+        }
+
         private void SetPrompt(string prompt)
         {
             currentPrompt = $"{prompt}>";

@@ -52,7 +52,7 @@ namespace Commands.ReferenceCheck
 
             command.Key = ReferenceCheckConstants.REF_CHECK;
             command.Representations.AddRange(
-                new[] { ReferenceCheckConstants.REF_CHECK, "rcheck", "projcheck" });
+                new[] { ReferenceCheckConstants.REF_CHECK, "refcheck", "rcheck", "projcheck" });
             command.Parameters.Add(parameter.ToImmutable());
             command.Documentation.Title = "Project reference check";
             command.Documentation.Description = "Check C# project for duplicate references.";

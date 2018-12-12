@@ -6,6 +6,7 @@ using BeaverSoft.Texo.Commands.NugetManager.Services;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
+using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input.History;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.Services;
@@ -31,6 +32,8 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             container.Register<ICurrentDirectoryService, CurrentDirectoryService>();
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
+            container.Register<HelpCommand>();
+            container.Register<ClearCommand>();
 
             // Simple commands
             container.Register<ReferenceCheckCommand>();
@@ -71,6 +74,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             container.Register(engineServiceLocator.MessageBus);
             container.Register(engineServiceLocator.MessageBusRegister);
             container.Register(engineServiceLocator.Logger);
+            container.Register(engineServiceLocator.History);
             container.Register(engineServiceLocator.Environment);
             container.Register(engineServiceLocator.Setting);
             container.Register<IFactory<IInputHistoryService>>(() => new DelegatedFactory<IInputHistoryService>(engineServiceLocator.History));

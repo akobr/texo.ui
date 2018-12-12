@@ -90,7 +90,7 @@ namespace BeaverSoft.Texo.Core.Help
             }
             else
             {
-                result.Append(parameter.IsRepeatable ? "1..*]" : "1]");
+                result.Append(parameter.IsRepeatable ? "1..*]" : "1..1]");
             }
 
             if (!string.IsNullOrWhiteSpace(parameter.ArgumentTemplate))
@@ -103,8 +103,18 @@ namespace BeaverSoft.Texo.Core.Help
 
         private void RenderBullet(ushort level, bool isLast)
         {
-            result.Append(' ', level);
-            result.Append(isLast ? '└' : '├');
+            //if (level > 0)
+            //{
+            //    for (int i = 1; i < level; i++)
+            //    {
+            //        result.Append(' ', 2);
+            //        result.Append('│');
+            //    }
+            //}
+
+            result.Append(' ', level * 2);
+            //result.Append(isLast ? '└' : '├');
+            result.Append('└');
             result.Append(' ');
         }
 
@@ -121,7 +131,7 @@ namespace BeaverSoft.Texo.Core.Help
             {
                 if (string.Equals(representation, mainRepresentation, StringComparison.OrdinalIgnoreCase))
                 {
-                    return;
+                    continue;
                 }
 
                 result.Append(representation);

@@ -34,7 +34,7 @@ namespace BeaverSoft.Texo.Core.Model.Text
 
         public override string ToString()
         {
-            return $"{new string(' ', Level)}• {Content}";
+            return $"{new string(' ', Math.Max((Level - 1) * 2, 1))}* {Content}";
         }
     }
 }

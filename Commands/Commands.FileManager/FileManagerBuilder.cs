@@ -17,6 +17,8 @@ namespace BeaverSoft.Texo.Commands.FileManager
             command.Representations.AddRange(
                 new[] { FileManagerQueries.FILE_MANAGER, "fmanager", "fm" });
             command.DefaultQueryKey = StageQueries.STAGE;
+            command.Documentation.Title = "File manager";
+            command.Documentation.Description = "Command line file manager with stash(es).";
 
             command.Queries.Add(CreateStageQuery());
             command.Queries.Add(CreateStashQuery());

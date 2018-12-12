@@ -9,6 +9,7 @@ namespace Commands.Git
             var command = Query.CreateBuilder();
             command.Key = "git";
             command.Representations.Add("git");
+            command.Documentation.Title = "Git CLI";
             command.Documentation.Description = "the stupid content tracker";
 
             command.Queries.Add(BuildHelpQuery());

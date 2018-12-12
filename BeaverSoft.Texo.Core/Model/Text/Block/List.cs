@@ -60,7 +60,7 @@ namespace BeaverSoft.Texo.Core.Model.Text
                 result.Append(inline);
 
                 if (result.ToString(result.Length - System.Environment.NewLine.Length,
-                        System.Environment.NewLine.Length) == System.Environment.NewLine)
+                        System.Environment.NewLine.Length) != System.Environment.NewLine)
                 {
                     result.AppendLine();
                 }

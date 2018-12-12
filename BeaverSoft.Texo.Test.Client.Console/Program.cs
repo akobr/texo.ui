@@ -8,6 +8,7 @@ using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
+using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.Services;
@@ -70,7 +71,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<IViewService>(() => container.GetInstance<ConsoleViewService>());
             container.Register<IPromptableViewService>(() => container.GetInstance<ConsoleViewService>());
 
-            // PowerShell Fallback 
+            // PowerShell Fallback
             container.Register<IPowerShellResultBuilder, PowerShellResultMarkdownBuilder>();
             container.Register<IFallbackService, PowerShellFallbackService>();
 
@@ -78,6 +79,8 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<ICurrentDirectoryService, CurrentDirectoryService>();
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
+            container.Register<HelpCommand>();
+            container.Register<ClearCommand>();
 
             // Simple commands
             container.Register<ReferenceCheckCommand>();
@@ -103,6 +106,8 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<ITexoFactory<ICommand, string>>(() => commandFactory);
             commandFactory.Register(CommandKeys.CURRENT_DIRECTORY, () => container.GetInstance<CurrentDirectoryCommand>());
             commandFactory.Register(CommandKeys.TEXO, () => container.GetInstance<TexoCommand>());
+            commandFactory.Register(CommandKeys.HELP, container.GetInstance<HelpCommand>);
+            commandFactory.Register(CommandKeys.CLEAR, container.GetInstance<ClearCommand>);
             commandFactory.Register(ReferenceCheckConstants.REF_CHECK, () => container.GetInstance<ReferenceCheckCommand>());
             commandFactory.Register("dir", () => container.GetInstance<DirCommand>());
             commandFactory.Register("command-line", () => container.GetInstance<CommandLineCommand>());

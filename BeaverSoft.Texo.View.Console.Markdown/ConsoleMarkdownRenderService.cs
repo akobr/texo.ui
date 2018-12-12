@@ -21,7 +21,8 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         public void Write(IItem item)
         {
-            if (item.Format == TextFormatEnum.Plain)
+            if (item.Format != TextFormatEnum.Markdown
+                && item.Format != TextFormatEnum.Model)
             {
                 SysConsole.Write(item.Text);
             }

@@ -12,7 +12,8 @@ namespace BeaverSoft.Texo.Core.View
         IInitialisable<IExecutor>,
         IDisposable,
         IMessageBusService<ISettingUpdatedMessage>,
-        IMessageBusService<IVariableUpdatedMessage>
+        IMessageBusService<IVariableUpdatedMessage>,
+        IMessageBusService<IClearViewOutputMessage>
     {
         void Render(Input.Input input, IImmutableList<IItem> items);
 

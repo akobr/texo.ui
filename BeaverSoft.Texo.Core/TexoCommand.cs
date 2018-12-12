@@ -1,5 +1,6 @@
 ﻿using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
+using BeaverSoft.Texo.Core.Input.History;
 using BeaverSoft.Texo.Core.Result;
 
 namespace BeaverSoft.Texo.Core
@@ -7,10 +8,14 @@ namespace BeaverSoft.Texo.Core
     public class TexoCommand : ICommand
     {
         private readonly EnvironmentCommand environment;
+        private readonly HistoryCommand history;
 
-        public TexoCommand(IEnvironmentService environment)
+        public TexoCommand(
+            IEnvironmentService environment,
+            IInputHistoryService history)
         {
             this.environment = new EnvironmentCommand(environment);
+            this.history = new HistoryCommand(history);
         }
 
         public ICommandResult Execute(CommandContext context)
@@ -20,9 +25,11 @@ namespace BeaverSoft.Texo.Core
                 case EnvironmentNames.QUERY_ENVIRONMENT:
                     return environment.Execute(CommandContext.ShiftQuery(context));
 
-                // case SettingNames.QUERY_SETTING:
+                case HistoryNames.QUERY_HISTORY:
+                    return history.Execute(CommandContext.ShiftQuery(context));
+
                 default:
-                    return new TextResult("> Not implemented yet.");
+                    return new ErrorTextResult("Not implemented yet.");
 
             }
         }
