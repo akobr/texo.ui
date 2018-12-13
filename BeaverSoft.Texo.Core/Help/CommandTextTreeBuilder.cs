@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using BeaverSoft.Texo.Core.Configuration;
 
@@ -66,9 +67,20 @@ namespace BeaverSoft.Texo.Core.Help
                 result.Append(listCharacter.Value);
             }
 
+            string mainRepresentation = option.GetMainRepresentation();
             result.Append("--");
-            result.Append(option.GetMainRepresentation());
-            result.Append(" [o]");
+            result.Append(mainRepresentation);
+            result.Append(" [o] ");
+
+            if (listCharacter.HasValue)
+            {
+                RenderRepresentation(option, mainRepresentation, listCharacter.Value.ToString());
+            }
+            else
+            {
+                RenderRepresentation(option, mainRepresentation);
+            }
+
             result.AppendLine();
 
             for (int i = 0, last = option.Parameters.Count - 1; i <= last; i++)
@@ -118,18 +130,24 @@ namespace BeaverSoft.Texo.Core.Help
             result.Append(' ');
         }
 
-        private void RenderRepresentation(InputStatement statement, string mainRepresentation)
+        private void RenderRepresentation(InputStatement statement, params string[] exceptedRepresentations)
         {
-            if (statement.Representations.Count < 2)
+            if (statement.Representations.Count <= exceptedRepresentations.Length)
             {
                 return;
             }
 
             result.Append('(');
 
+            HashSet<string> exceptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string excepted in exceptedRepresentations)
+            {
+                exceptions.Add(excepted);
+            }
+
             foreach (string representation in statement.Representations)
             {
-                if (string.Equals(representation, mainRepresentation, StringComparison.OrdinalIgnoreCase))
+                if (exceptions.Contains(representation))
                 {
                     continue;
                 }

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Text.RegularExpressions;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Model.Text;
 using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
@@ -31,9 +33,10 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
             SearchContext copyContext = new SearchContext
             {
+                SearchTerm = context.GetParameterValue(ApplyParameters.SEARCH_TERM),
                 Items = paths,
                 SourceLobby = stage.GetLobby(),
-                IsRegex = context.HasOption(ApplyOptions.CASE_SENSITIVE),
+                IsRegex = context.HasOption(ApplyOptions.REGEX),
                 IsCaseSensitive = context.HasOption(ApplyOptions.CASE_SENSITIVE),
                 FileFilter = context.GetParameterFromOption(ApplyOptions.FILE_FILTER)
             };
@@ -43,8 +46,23 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
         private ICommandResult Search(SearchContext context)
         {
-            var result = ImmutableList<Item>.Empty.ToBuilder();
+            var result = ImmutableList<ModeledItem>.Empty.ToBuilder();
             context.Result = result;
+            context.FilesCount = 0;
+            context.TotalMatchesCount = 0;
+
+            try
+            {
+                if (context.IsRegex)
+                {
+                    context.Regex = new Regex(context.SearchTerm, RegexOptions.Compiled);
+                }
+            }
+            catch (ArgumentException exception)
+            {
+                logger.Error("Content search: Error during regular expression parse.", exception);
+                return new TextResult("Invalid regular expression.");
+            }
 
             foreach (string path in context.Items)
             {
@@ -60,7 +78,12 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 }
             }
 
-            return new ItemsResult(result.ToImmutable());
+            Document resultDocument = new Document(
+                new Header("Search results"),
+                new Paragraph($"Term: {context.SearchTerm}, {context.FilesCount} files searched, {context.TotalMatchesCount} results founded."));
+
+            result.Add(new ModeledItem(resultDocument));
+            return new ItemsResult<ModeledItem>(result.ToImmutable());
         }
 
         private void SearchDirectory(string directoryPath, SearchContext context)
@@ -80,31 +103,144 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
             try
             {
+                context.LineNumber = 0;
+                context.MatchesCount = 0;
+                context.MatchResults = new Span();
+
                 using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 using (TextReader reader = new StreamReader(stream))
                 {
-                    string line = null;
-
-                    while ((line = reader.ReadLine()) != null)
+                    while ((context.Line = reader.ReadLine()) != null)
                     {
-                        
+                        context.LineNumber++;
+                        SearchLine(context);
                     }
                 }
+
+                if (context.MatchesCount < 1)
+                {
+                    return;
+                }
+
+                Document fileDocoment = new Document(
+                    new Header($"{filePath.GetFileNameOrDirectoryName()} ({context.MatchesCount})"),
+                    new Paragraph(
+                        new Core.Model.Text.Link(
+                            filePath.GetFriendlyPath(context.SourceLobby),
+                            $"action://open-file?path={Uri.EscapeUriString(filePath.GetFullPath())}")),
+                    new Paragraph(context.MatchResults));
+
+                context.Result.Add(new ModeledItem(fileDocoment));
+                context.FilesCount++;
+                context.TotalMatchesCount += context.MatchesCount;
             }
             catch (Exception exception)
             {
                 logger.Error("Error during search in file: " + filePath, exception);
             }
+
+            context.FilesCount++;
+        }
+
+        private static void SearchLine(SearchContext context)
+        {
+            context.MatchResult = new SpanBuilder();
+            context.MatchResult.Strong($"{context.LineNumber:0000}: ");
+            int countBefore = context.MatchesCount;
+
+            if (context.IsRegex)
+            {
+                RegexSearch(context);
+            }
+            else
+            {
+                IndexSearch(context);
+            }
+
+            if (context.MatchesCount <= countBefore)
+            {
+                return;
+            }
+
+            context.MatchResult.WriteLine();
+            context.MatchResults = context.MatchResults.AddChild(context.MatchResult.Span);
+        }
+
+        private static void RegexSearch(SearchContext context)
+        {
+            int start = 0;
+
+            foreach (Match match in context.Regex.Matches(context.Line))
+            {
+                if (start < match.Index)
+                {
+                    context.MatchResult.Write(context.Line.Substring(start, match.Index));
+                }
+
+                context.MatchesCount++;
+                context.MatchResult.Marked(match.Value);
+                start = match.Index + match.Length;
+            }
+
+            if (start < context.Line.Length)
+            {
+                context.MatchResult.Write(context.Line.Substring(start));
+            }
+        }
+
+        private static void IndexSearch(SearchContext context)
+        {
+            int start = 0;
+
+            StringComparison comparison = context.IsCaseSensitive
+                ? StringComparison.Ordinal
+                : StringComparison.OrdinalIgnoreCase;
+
+            while (true)
+            {
+                int index = context.Line.IndexOf(context.Line, start, comparison);
+
+                if (index < 0)
+                {
+                    break;
+                }
+
+                if (start < index)
+                {
+                    context.MatchResult.Write(context.Line.Substring(start, index));
+                }
+
+                context.MatchesCount++;
+                context.MatchResult.Marked(context.Line.Substring(index, context.SearchTerm.Length));
+                start = index + context.SearchTerm.Length;
+            }
+
+            if (start < context.Line.Length)
+            {
+                context.MatchResult.Write(context.Line.Substring(start));
+            }
         }
 
         private class SearchContext
         {
-            public string SourceLobby;
             public IEnumerable<string> Items;
+            public string SearchTerm;
+            public string SourceLobby;
+            public string FileFilter;
             public bool IsRegex;
             public bool IsCaseSensitive;
-            public string FileFilter;
-            public IList<Item> Result;
+
+            public Regex Regex;
+            public IList<ModeledItem> Result;
+
+            public string Line;
+            public int LineNumber;
+            public ISpanBuilder MatchResult;
+            public Span MatchResults;
+
+            public int FilesCount;
+            public int MatchesCount;
+            public int TotalMatchesCount;
         }
     }
 }

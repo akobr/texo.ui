@@ -173,24 +173,103 @@ namespace BeaverSoft.Texo.Commands.FileManager
             parDestinationPath.Key = FileManagerParameters.SIMPLE_PATH;
             parDestinationPath.ArgumentTemplate = InputRegex.PATH;
             parDestinationPath.Documentation.Title = "Destination path";
-            parDestinationPath.Documentation.Description = "Specify the destination directory.";
+            parDestinationPath.Documentation.Description = "Specify the destination directory/file.";
+
+            var parSearchTerm = Parameter.CreateBuilder();
+            parSearchTerm.Key = ApplyParameters.SEARCH_TERM;
+            parSearchTerm.Documentation.Title = "Search term";
+            parSearchTerm.Documentation.Description = "Search term or regular expression.";
+
+            var optionPreview = Option.CreateBuilder();
+            optionPreview.Key = ApplyOptions.PREVIEW;
+            optionPreview.Representations.AddRange(
+                new[] { ApplyOptions.PREVIEW, "p" });
+            optionPreview.Documentation.Title = ApplyOptions.PREVIEW;
+            optionPreview.Documentation.Description = "Do only preview of the operation.";
+
+            var optionOverride = Option.CreateBuilder();
+            optionOverride.Key = ApplyOptions.OVERRIDE;
+            optionOverride.Representations.AddRange(
+                new[] { ApplyOptions.OVERRIDE, "o" });
+            optionOverride.Documentation.Title = ApplyOptions.OVERRIDE;
+            optionOverride.Documentation.Description = "Override target files.";
+
+            var optionAdd = Option.CreateBuilder();
+            optionAdd.Key = ApplyOptions.ADD;
+            optionAdd.Representations.AddRange(
+                new[] { ApplyOptions.ADD, "a" });
+            optionAdd.Documentation.Title = ApplyOptions.ADD;
+            optionAdd.Documentation.Description = "Add files to an existing zip archive.";
+
+            var optionFlatten = Option.CreateBuilder();
+            optionFlatten.Key = ApplyOptions.FLATTEN;
+            optionFlatten.Representations.AddRange(
+                new[] { ApplyOptions.FLATTEN, "f" });
+            optionFlatten.Documentation.Title = ApplyOptions.FLATTEN;
+            optionFlatten.Documentation.Description = "Flat all directories and files.";
+
+            var optionRegex = Option.CreateBuilder();
+            optionRegex.Key = ApplyOptions.REGEX;
+            optionRegex.Representations.AddRange(
+                new[] { ApplyOptions.REGEX, "r" });
+            optionRegex.Documentation.Title = ApplyOptions.REGEX;
+            optionRegex.Documentation.Description = "Search as a regular expression.";
+
+            var optionCaseSensitive = Option.CreateBuilder();
+            optionCaseSensitive.Key = ApplyOptions.CASE_SENSITIVE;
+            optionCaseSensitive.Representations.AddRange(
+                new[] { ApplyOptions.CASE_SENSITIVE, "cs" });
+            optionCaseSensitive.Documentation.Title = ApplyOptions.CASE_SENSITIVE;
+            optionCaseSensitive.Documentation.Description = "Make search case sensitive.";
+
+            var optionFileFilter = Option.CreateBuilder();
+            optionFileFilter.Key = ApplyOptions.FILE_FILTER;
+            optionFileFilter.Representations.AddRange(
+                new[] { ApplyOptions.FILE_FILTER, "ff" });
+            optionFileFilter.Documentation.Title = ApplyOptions.FILE_FILTER;
+            optionFileFilter.Documentation.Description = "Specify a file filter.";
 
             var queryCopy = Query.CreateBuilder();
             queryCopy.Key = ApplyQueries.COPY;
             queryCopy.Representations.AddRange(
                 new[] { ApplyQueries.COPY, "cp" });
             queryCopy.Parameters.Add(parDestinationPath.ToImmutable());
+            queryCopy.Options.Add(optionPreview.ToImmutable());
+            queryCopy.Options.Add(optionOverride.ToImmutable());
+            queryCopy.Options.Add(optionFlatten.ToImmutable());
 
             var queryMove = Query.CreateBuilder();
             queryMove.Key = ApplyQueries.MOVE;
             queryMove.Representations.AddRange(
                 new[] { ApplyQueries.MOVE, "mv" });
             queryMove.Parameters.Add(parDestinationPath.ToImmutable());
+            queryMove.Options.Add(optionPreview.ToImmutable());
+            queryMove.Options.Add(optionOverride.ToImmutable());
+            queryMove.Options.Add(optionFlatten.ToImmutable());
 
             var queryDelete = Query.CreateBuilder();
             queryDelete.Key = ApplyQueries.DELETE;
             queryDelete.Representations.AddRange(
                 new[] { ApplyQueries.DELETE, "remove", "rm", "del", "dl" });
+            queryDelete.Options.Add(optionPreview.ToImmutable());
+
+            var querySearch = Query.CreateBuilder();
+            querySearch.Key = ApplyQueries.SEARCH;
+            querySearch.Representations.AddRange(
+                new[] { ApplyQueries.SEARCH, "s", "find" });
+            querySearch.Parameters.Add(parSearchTerm.ToImmutable());
+            querySearch.Options.Add(optionRegex.ToImmutable());
+            querySearch.Options.Add(optionCaseSensitive.ToImmutable());
+            querySearch.Options.Add(optionFileFilter.ToImmutable());
+
+            var queryArchive = Query.CreateBuilder();
+            queryArchive.Key = ApplyQueries.ARCHIVE;
+            queryArchive.Representations.AddRange(
+                new[] { ApplyQueries.ARCHIVE, "zip" });
+            queryArchive.Parameters.Add(parDestinationPath.ToImmutable());
+            queryArchive.Options.Add(optionFlatten.ToImmutable());
+            queryArchive.Options.Add(optionAdd.ToImmutable());
+            queryArchive.Options.Add(optionOverride.ToImmutable());
 
             query.Queries.AddRange(
                 new[]
@@ -198,6 +277,8 @@ namespace BeaverSoft.Texo.Commands.FileManager
                     queryCopy.ToImmutable(),
                     queryMove.ToImmutable(),
                     queryDelete.ToImmutable(),
+                    querySearch.ToImmutable(),
+                    queryArchive.ToImmutable(),
                 });
 
             return query.ToImmutable();

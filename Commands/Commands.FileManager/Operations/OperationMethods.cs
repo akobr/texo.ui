@@ -25,6 +25,11 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             return targetPath;
         }
 
+        internal static string GetTargetFile(this CommandContext context)
+        {
+            return context.GetParameterValue(FileManagerParameters.SIMPLE_PATH);
+        }
+
         internal static bool IsEmpty(this IStageService stage)
         {
             return stage.GetPaths().Count < 1;
