@@ -37,7 +37,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
         internal static bool HasLobby(this IStageService stage)
         {
-            return string.IsNullOrEmpty(stage.GetLobby());
+            return !string.IsNullOrEmpty(stage.GetLobby());
         }
 
         internal static bool TryGetPaths(this IStageService stage, out IImmutableList<string> paths)

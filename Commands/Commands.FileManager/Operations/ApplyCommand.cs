@@ -14,10 +14,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
         {
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
             this.logger = logger;
-        }
 
-        public ApplyCommand()
-        {
             RegisterCommand(ApplyQueries.COPY, new CopyCommand(stage));
             RegisterCommand(ApplyQueries.MOVE, new MoveCommand(stage));
             //RegisterCommand(ApplyQueries.RENAME, new RenameCommand());

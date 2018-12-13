@@ -64,7 +64,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             }
 
             ApplyStashToStage(stash);
-            return new ItemsResult(BuildStashItem(stash, index));
+            return new TextResult($"{GetStashHeader(stash, index)} has been applied to stage.");
         }
 
         private ICommandResult Peek(CommandContext context)
@@ -77,7 +77,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             }
 
             ApplyStashToStage(stash);
-            return new ItemsResult(BuildStashItem(stash, 0));
+            return new ItemsResult($"{GetStashHeader(stash, 0)} has been applied to stage.");
         }
 
         private ICommandResult Pop(CommandContext context)
@@ -107,13 +107,13 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             }
 
             stashes.RemoveStash(stash);
-            return new TextResult($"The stash has been dropped: {id}");
+            return new TextResult($"{GetStashHeader(stash, index)} has been dropped.");
         }
 
         private ICommandResult Clear(CommandContext context)
         {
             stashes.Clean();
-            return new TextResult("All stashes have been dropped.");
+            return new TextResult("All stashes have been removed.");
         }
 
         private void ApplyStashToStage(IStashEntry stash)
@@ -126,20 +126,23 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
         private Item BuildStashItem(IStashEntry stash, int index)
         {
             MarkdownBuilder builder = new MarkdownBuilder();
-            builder.Header(string.IsNullOrWhiteSpace(stash.Name) ? $"Stash @{index}" : $"Stash @{stash.Name}");
-
-            if (string.IsNullOrEmpty(stash.LobbyPath))
-            {
-                builder.Italic("No lobby directory.");
-            }
-            else
-            {
-                builder.CodeInline(stash.LobbyPath);
-            }
-
+            builder.Header(GetStashHeader(stash, index));
+            builder.Italic(GetStashLobbyTitle(stash));
             builder.WriteLine();
             builder.WritePathLists(stash.LobbyPath, stash.Paths);
             return Item.Markdown(builder.ToString());
+        }
+
+        private static string GetStashLobbyTitle(IStashEntry stash)
+        {
+            return string.IsNullOrEmpty(stash.LobbyPath)
+                                ? "No lobby directory."
+                                : stash.LobbyPath;
+        }
+
+        private static string GetStashHeader(IStashEntry stash, int index)
+        {
+            return string.IsNullOrWhiteSpace(stash.Name) ? $"Stash @{index}" : $"Stash @{index}";
         }
     }
 }

@@ -95,7 +95,7 @@ namespace BeaverSoft.Texo.Core.Help
                 return new ErrorTextResult($"The command '{commandKey}' hasn't been found.");
             }
 
-            CommandTextTreeBuilder builder = new CommandTextTreeBuilder();
+            CommandTextTreeBuilder builder = new CommandTextTreeBuilder(context.HasOption(HelpOptions.TEMPLATE));
             string tree = builder.BuildTree(command);
             return new ItemsResult(Item.Plain(tree));
         }

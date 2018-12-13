@@ -53,7 +53,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
             context.FileOutputList = new List();
 
-            using (FileStream zipStream = new FileStream(context.DestinationZipFile, FileMode.OpenOrCreate, FileAccess.Write))
+            using (FileStream zipStream = new FileStream(context.DestinationZipFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Update))
             {
                 foreach (string path in context.Items)
@@ -98,7 +98,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 return;
             }
 
-            bool flatten = context.Flat || filePath.IsSubPathOf(context.SourceLobby);
+            bool flatten = context.Flat || !filePath.IsSubPathOf(context.SourceLobby);
             string destinationPath = flatten
                 ? filePath.GetFileNameOrDirectoryName()
                 : filePath.GetFriendlyPath(context.SourceLobby);
@@ -113,7 +113,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
             if (fileEntry == null)
             {
-                if (!context.Add)
+                if (context.ZipAlreadyExists && !context.Add)
                 {
                     return;
                 }
@@ -123,8 +123,8 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
             context.FileOutputList = context.FileOutputList.AddItem(
                 new ListItem(new Core.Model.Text.Link(
-                    context.DestinationZipFile.GetFullPath(),
-                    $"action://open-file?path={Uri.EscapeUriString(context.DestinationZipFile.GetFullPath())}")));
+                    destinationPath,
+                    $"action://open-file?path={Uri.EscapeUriString(filePath.GetFullPath())}")));
 
             using (FileStream originalStream = new FileStream(filePath, FileMode.Open))
             using (Stream targetStream = fileEntry.Open())

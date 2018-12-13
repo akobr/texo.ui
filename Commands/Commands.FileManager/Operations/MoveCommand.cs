@@ -141,7 +141,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
         private static FileMoveContext PrepareFileCopy(string filePath, MoveContext context)
         {
-            bool flatten = context.Flat || filePath.IsSubPathOf(context.SourceLobby);
+            bool flatten = context.Flat || !filePath.IsSubPathOf(context.SourceLobby);
             string destinationPath = context.Destination.CombinePathWith(
                 flatten
                     ? filePath.GetFileNameOrDirectoryName()
@@ -157,7 +157,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
         private static DirectoryMoveContext PrepareDirectoryCopy(string directoryPath, MoveContext context)
         {
-            bool flatten = context.Flat || directoryPath.IsSubPathOf(context.SourceLobby);
+            bool flatten = context.Flat || !directoryPath.IsSubPathOf(context.SourceLobby);
             string destinationPath = context.Destination.CombinePathWith(
                 flatten
                     ? directoryPath.GetFileNameOrDirectoryName()

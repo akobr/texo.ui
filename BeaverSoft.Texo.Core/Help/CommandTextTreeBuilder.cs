@@ -7,7 +7,13 @@ namespace BeaverSoft.Texo.Core.Help
 {
     public class CommandTextTreeBuilder
     {
+        private readonly bool showTemplates;
         private StringBuilder result;
+
+        public CommandTextTreeBuilder(bool showTemplates)
+        {
+            this.showTemplates = showTemplates;
+        }
 
         public string BuildTree(Query command)
         {
@@ -105,7 +111,7 @@ namespace BeaverSoft.Texo.Core.Help
                 result.Append(parameter.IsRepeatable ? "1..*]" : "1..1]");
             }
 
-            if (!string.IsNullOrWhiteSpace(parameter.ArgumentTemplate))
+            if (showTemplates && !string.IsNullOrWhiteSpace(parameter.ArgumentTemplate))
             {
                 result.Append($" /{parameter.ArgumentTemplate}/");
             }

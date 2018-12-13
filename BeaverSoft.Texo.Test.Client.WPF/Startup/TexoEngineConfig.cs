@@ -2,6 +2,7 @@
 using BeaverSoft.Texo.Commands.NugetManager;
 using BeaverSoft.Texo.Core;
 using Commands.CommandLine;
+using Commands.Git;
 using Commands.ReferenceCheck;
 
 namespace BeaverSoft.Texo.Test.Client.WPF.Startup
@@ -12,10 +13,10 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
         {
             engine.Initialise(
                 ReferenceCheckCommand.BuildConfiguration(),
-                //DirCommand.BuildConfiguration(),
                 CommandLineCommand.BuildConfiguration(),
                 FileManagerBuilder.BuildCommand(),
-                NugetManagerBuilder.BuildCommand());
+                NugetManagerBuilder.BuildCommand(),
+                GitBuilder.BuildCommand());
         }
     }
 }

@@ -69,6 +69,13 @@ namespace BeaverSoft.Texo.Core
             parCommand.Documentation.Title = "Command name";
             parCommand.Documentation.Description = "Specify command name for which will be generated input tree.";
 
+            var optionTemplate = Option.CreateBuilder();
+            optionTemplate.Key = HelpOptions.TEMPLATE;
+            optionTemplate.Representations.AddRange(
+                new[] { HelpOptions.TEMPLATE, "t" });
+            optionTemplate.Documentation.Title = "Parameters template";
+            optionTemplate.Documentation.Description = "Show parameters template (regular expression).";
+
             var queryInfo = Query.CreateBuilder();
             queryInfo.Key = HelpNames.QUERY_INFO;
             queryInfo.Representations.Add(HelpNames.QUERY_INFO);
@@ -86,6 +93,7 @@ namespace BeaverSoft.Texo.Core
             queryTree.Key = HelpNames.QUERY_TREE;
             queryTree.Representations.Add(HelpNames.QUERY_TREE);
             queryTree.Parameters.Add(parCommand.ToImmutable());
+            queryTree.Options.Add(optionTemplate.ToImmutable());
             queryTree.Documentation.Title = "Command tree";
             queryTree.Documentation.Description = "Returns tree of possible inputs per specific command.";
 
