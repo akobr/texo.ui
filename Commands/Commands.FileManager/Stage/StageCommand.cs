@@ -134,7 +134,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
             }
 
             builder.WriteLine();
-            builder.WritePathLists(lobbyPath, paths);
+            builder.WritePathLists(paths, lobbyPath);
 
             return Item.Markdown(builder.ToString());
         }

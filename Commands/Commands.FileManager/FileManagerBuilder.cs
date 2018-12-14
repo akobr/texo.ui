@@ -187,12 +187,12 @@ namespace BeaverSoft.Texo.Commands.FileManager
             optionPreview.Documentation.Title = ApplyOptions.PREVIEW;
             optionPreview.Documentation.Description = "Do only preview of the operation.";
 
-            var optionOverride = Option.CreateBuilder();
-            optionOverride.Key = ApplyOptions.OVERRIDE;
-            optionOverride.Representations.AddRange(
-                new[] { ApplyOptions.OVERRIDE, "o" });
-            optionOverride.Documentation.Title = ApplyOptions.OVERRIDE;
-            optionOverride.Documentation.Description = "Override target files.";
+            var optionOverwrite = Option.CreateBuilder();
+            optionOverwrite.Key = ApplyOptions.OVERWRITE;
+            optionOverwrite.Representations.AddRange(
+                new[] { ApplyOptions.OVERWRITE, "o" });
+            optionOverwrite.Documentation.Title = ApplyOptions.OVERWRITE;
+            optionOverwrite.Documentation.Description = "Overwrite target files.";
 
             var optionAdd = Option.CreateBuilder();
             optionAdd.Key = ApplyOptions.ADD;
@@ -235,7 +235,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
                 new[] { ApplyQueries.COPY, "cp" });
             queryCopy.Parameters.Add(parDestinationPath.ToImmutable());
             queryCopy.Options.Add(optionPreview.ToImmutable());
-            queryCopy.Options.Add(optionOverride.ToImmutable());
+            queryCopy.Options.Add(optionOverwrite.ToImmutable());
             queryCopy.Options.Add(optionFlatten.ToImmutable());
 
             var queryMove = Query.CreateBuilder();
@@ -244,7 +244,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
                 new[] { ApplyQueries.MOVE, "mv" });
             queryMove.Parameters.Add(parDestinationPath.ToImmutable());
             queryMove.Options.Add(optionPreview.ToImmutable());
-            queryMove.Options.Add(optionOverride.ToImmutable());
+            queryMove.Options.Add(optionOverwrite.ToImmutable());
             queryMove.Options.Add(optionFlatten.ToImmutable());
 
             var queryDelete = Query.CreateBuilder();
@@ -269,7 +269,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryArchive.Parameters.Add(parDestinationPath.ToImmutable());
             queryArchive.Options.Add(optionFlatten.ToImmutable());
             queryArchive.Options.Add(optionAdd.ToImmutable());
-            queryArchive.Options.Add(optionOverride.ToImmutable());
+            queryArchive.Options.Add(optionOverwrite.ToImmutable());
 
             query.Queries.AddRange(
                 new[]

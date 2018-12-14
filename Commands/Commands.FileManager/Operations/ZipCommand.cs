@@ -34,7 +34,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 DestinationZipFile = context.GetTargetFile(),
                 SourceLobby = stage.GetLobby(),
                 Flat = context.HasOption(ApplyOptions.FLATTEN) || !stage.HasLobby(),
-                Override = context.HasOption(ApplyOptions.OVERRIDE),
+                Override = context.HasOption(ApplyOptions.OVERWRITE),
                 Add = context.HasOption(ApplyOptions.ADD),
                 Preview = context.HasOption(ApplyOptions.PREVIEW)
             });

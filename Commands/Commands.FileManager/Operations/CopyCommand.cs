@@ -1,23 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
+using BeaverSoft.Texo.Commands.FileManager.Extensions;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Commands.FileManager.Operations
 {
     public class CopyCommand : ICommand
     {
         private readonly IStageService stage;
+        private readonly ILogService logger;
 
-        public CopyCommand(IStageService stage)
+        public CopyCommand(IStageService stage, ILogService logger)
         {
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
+            this.logger = logger;
         }
 
         public ICommandResult Execute(CommandContext context)
@@ -33,18 +37,15 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 Destination = context.GetTargetDirectory(),
                 SourceLobby = stage.GetLobby(),
                 Flat = context.HasOption(ApplyOptions.FLATTEN) || !stage.HasLobby(),
-                Override = context.HasOption(ApplyOptions.OVERRIDE),
+                Override = context.HasOption(ApplyOptions.OVERWRITE),
                 Preview = context.HasOption(ApplyOptions.PREVIEW)
             };
 
             return Copy(copyContext);
         }
 
-        private static ICommandResult Copy(CopyContext context)
+        private ICommandResult Copy(CopyContext context)
         {
-            IMarkdownBuilder builder = new MarkdownBuilder();
-            builder.Header("Copy");
-
             foreach (string path in context.Items)
             {
                 switch (path.GetPathType())
@@ -54,34 +55,52 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                         break;
 
                     case PathTypeEnum.Directory:
-                        result.Add(CopyDirectory(path, context));
-                        break;
-
-                    // case PathTypeEnum.NonExistent:
-                    default:
-                        result.Add(ItemBuilding.BuildMissingItem(path.GetFriendlyPath(context.SourceLobby)));
+                        CopyDirectory(path, context);
                         break;
                 }
             }
 
-            return new ItemsResult(result.ToImmutable());
+            MarkdownBuilder builder = new MarkdownBuilder();
+            builder.Header("Copy");
+            builder.Link(context.Destination, ActionBuilder.DirectoryOpenUri(context.Destination));
+            builder.WriteExistingPathList(context.CopiedFiles, context.Destination);
+            return new ItemsResult(Item.Markdown(builder.ToString()));
         }
 
-        private static Item CopyFile(string filePath, CopyContext context)
+        private void CopyFile(string filePath, CopyContext context)
         {
-            FileCopyContext fileContext = PrepareFileCopy(filePath, context);
-            ProcessFile(fileContext, context);
-            return BuildFileItem(fileContext, context);
+            bool flatten = context.Flat || !filePath.IsSubPathOf(context.SourceLobby);
+            string destinationPath = context.Destination.CombinePathWith(
+            flatten
+                ? filePath.GetFileNameOrDirectoryName()
+                : filePath.GetRelativePath(context.SourceLobby));
+
+            if (File.Exists(destinationPath))
+            {
+                if (!context.Override)
+                {
+                    return;
+                }
+
+                context.OverridenFiles.Add(destinationPath);
+            }
+            else
+            {
+                context.CopiedFiles.Add(destinationPath);
+            }
+
+            ProcessFileCopy(filePath, destinationPath, context);
         }
 
-        private static Item CopyDirectory(string directoryPath, CopyContext context)
+        private void CopyDirectory(string directoryPath, CopyContext context)
         {
-            DirectoryCopyContext directoryContext = PrepareDirectoryCopy(directoryPath, context);
-            ProcessDirectory(directoryContext, context);
-            return BuildDirectoryItem(directoryContext, context);
+            foreach (string filePath in TexoDirectory.GetFiles(directoryPath))
+            {
+                CopyFile(filePath, context);
+            }
         }
 
-        private static void ProcessFile(FileCopyContext fileContext, CopyContext context)
+        private void ProcessFileCopy(string filePath, string destinationPath, CopyContext context)
         {
             if (context.Preview)
             {
@@ -90,127 +109,16 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
             try
             {
-                string directory = fileContext.Destination.GetParentDirectoryPath();
+                string directory = destinationPath.GetParentDirectoryPath();
                 Directory.CreateDirectory(directory);
-                File.Copy(fileContext.Source, fileContext.Destination, fileContext.Overriden);
+                File.Copy(filePath, destinationPath, context.Override);
+
             }
             catch (Exception exception)
             {
-                fileContext.Exception = exception;
+                logger.Error("File copy: " + filePath, exception);
             }
         }
-
-        private static void ProcessDirectory(DirectoryCopyContext directoryContext, CopyContext context)
-        {
-            if (context.Preview)
-            {
-                return;
-            }
-
-            foreach (FileCopyContext fileContext in directoryContext.Files)
-            {
-                ProcessFile(fileContext, context);
-            }
-        }
-
-        private static Item BuildFileItem(FileCopyContext fileContext, CopyContext context)
-        {
-            MarkdownBuilder builder = new MarkdownBuilder();
-            WriteFileItem(fileContext, context, builder, 1);
-            return Item.Markdown(builder.ToString());
-        }
-
-
-        private static Item BuildDirectoryItem(DirectoryCopyContext directoryContext, CopyContext context)
-        {
-            MarkdownBuilder builder = new MarkdownBuilder();
-            builder.Header(directoryContext.Source.GetFriendlyPath(context.SourceLobby));
-            builder.Write(directoryContext.Destination);
-
-            foreach (FileCopyContext fileContext in directoryContext.Files)
-            {
-                WriteFileItem(fileContext, context, builder, 2);
-            }
-
-            return Item.Markdown(builder.ToString());
-        }
-
-        private static FileCopyContext PrepareFileCopy(string filePath, CopyContext context)
-        {
-            bool flatten = context.Flat || !filePath.IsSubPathOf(context.SourceLobby);
-            string destinationPath = context.Destination.CombinePathWith(
-                flatten
-                    ? filePath.GetFileNameOrDirectoryName()
-                    : filePath.GetRelativePath(context.SourceLobby));
-
-            return new FileCopyContext()
-            {
-                Source = filePath,
-                Destination = destinationPath,
-                Overriden = File.Exists(destinationPath)
-            };
-        }
-
-        private static DirectoryCopyContext PrepareDirectoryCopy(string directoryPath, CopyContext context)
-        {
-            bool flatten = context.Flat || !directoryPath.IsSubPathOf(context.SourceLobby);
-            string destinationPath = context.Destination.CombinePathWith(
-                flatten
-                    ? directoryPath.GetFileNameOrDirectoryName()
-                    : directoryPath.GetRelativePath(context.SourceLobby));
-
-            List<FileCopyContext> files = new List<FileCopyContext>();
-            foreach (string filePath in TexoDirectory.GetFiles(directoryPath))
-            {
-                files.Add(PrepareFileCopy(filePath, context));
-            }
-
-            return new DirectoryCopyContext
-            {
-                Source = directoryPath,
-                Destination = destinationPath,
-                Files = files
-            };
-        }
-
-        private static void WriteFileItem(FileCopyContext fileContext, CopyContext context, MarkdownBuilder builder, int headerLevel)
-        {
-            string header = fileContext.Source.GetFriendlyPath(context.SourceLobby);
-            string description;
-            string destination = fileContext.Destination;
-
-            if (fileContext.Exception != null)
-            {
-                description = fileContext.Exception.Message;
-            }
-            else if (fileContext.Overriden)
-            {
-                if (context.Override)
-                {
-                    description = context.Preview
-                        ? "File will be copy and a destination file overridden."
-                        : "File has been copied and the destination file overridden.";
-                }
-                else
-                {
-                    description = context.Preview
-                        ? "File won't be copy, the destination file already exists."
-                        : "File hasn't been copied, the destination file already exists.";
-                }
-            }
-            else
-            {
-                description = context.Preview
-                    ? "File will be copy."
-                    : "File has been copied.";
-            }
-
-            builder.Header(header, headerLevel);
-            builder.Italic(description);
-            builder.WriteLine();
-            builder.Write(destination);
-        }
-
 
         private class CopyContext
         {
@@ -221,24 +129,8 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             public bool Flat;
             public bool Preview;
 
-            public IMarkdownBuilder DirectoryResult;
-            public IMarkdownBuilder FileResult;
-            public IMarkdownBuilder MissingResult;
-        }
-
-        private class FileCopyContext
-        {
-            public string Source;
-            public string Destination;
-            public bool Overriden;
-            public Exception Exception;
-        }
-
-        private class DirectoryCopyContext
-        {
-            public string Source;
-            public string Destination;
-            public List<FileCopyContext> Files;
+            public readonly IList<string> CopiedFiles = new List<string>();
+            public readonly IList<string> OverridenFiles = new List<string>();
         }
     }
 }

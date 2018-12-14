@@ -33,7 +33,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 Destination = context.GetTargetDirectory(),
                 SourceLobby = stage.GetLobby(),
                 Flat = context.HasOption(ApplyOptions.FLATTEN) || !stage.HasLobby(),
-                Override = context.HasOption(ApplyOptions.OVERRIDE),
+                Overwrite = context.HasOption(ApplyOptions.OVERWRITE),
                 Preview = context.HasOption(ApplyOptions.PREVIEW)
             };
 
@@ -191,7 +191,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             }
             else if (fileContext.Overriden)
             {
-                if (context.Override)
+                if (context.Overwrite)
                 {
                     description = context.Preview
                         ? "File will be copy and a destination file overridden."
@@ -223,7 +223,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             public string Destination;
             public string SourceLobby;
             public IEnumerable<string> Items;
-            public bool Override;
+            public bool Overwrite;
             public bool Flat;
             public bool Preview;
         }

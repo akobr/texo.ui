@@ -129,7 +129,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             builder.Header(GetStashHeader(stash, index));
             builder.Italic(GetStashLobbyTitle(stash));
             builder.WriteLine();
-            builder.WritePathLists(stash.LobbyPath, stash.Paths);
+            builder.WritePathLists(stash.Paths, stash.LobbyPath);
             return Item.Markdown(builder.ToString());
         }
 
