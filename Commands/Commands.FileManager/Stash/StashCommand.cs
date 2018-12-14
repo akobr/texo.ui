@@ -60,7 +60,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
             if (stash == null)
             {
-                return new ErrorTextResult($"No stash with identifier: {id}");
+                return new ErrorTextResult($"No stash @{id} found.");
             }
 
             ApplyStashToStage(stash);
@@ -103,7 +103,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
             if (stash == null)
             {
-                return new ErrorTextResult($"No stash with identifier: {id}");
+                return new ErrorTextResult($"No stash @{id} found.");
             }
 
             stashes.RemoveStash(stash);
@@ -123,7 +123,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             stage.Add(stash);
         }
 
-        private Item BuildStashItem(IStashEntry stash, int index)
+        private static Item BuildStashItem(IStashEntry stash, int index)
         {
             MarkdownBuilder builder = new MarkdownBuilder();
             builder.Header(GetStashHeader(stash, index));
@@ -136,13 +136,15 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
         private static string GetStashLobbyTitle(IStashEntry stash)
         {
             return string.IsNullOrEmpty(stash.LobbyPath)
-                                ? "No lobby directory."
-                                : stash.LobbyPath;
+                ? "No lobby directory."
+                : stash.LobbyPath;
         }
 
         private static string GetStashHeader(IStashEntry stash, int index)
         {
-            return string.IsNullOrWhiteSpace(stash.Name) ? $"Stash @{index}" : $"Stash @{index}";
+            return string.IsNullOrWhiteSpace(stash.Name)
+                ? $"Stash @{index}"
+                : $"Stash @{stash.Name}";
         }
     }
 }

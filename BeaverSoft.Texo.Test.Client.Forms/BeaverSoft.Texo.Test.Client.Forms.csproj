@@ -118,10 +118,6 @@
       <Project>{620b936c-b2a0-4b37-97da-11e32b858d7c}</Project>
       <Name>Commands.CommandLine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Commands\Commands.Dir\Commands.Dir.csproj">
-      <Project>{1b36d37c-17ea-4f66-8ef9-4afb55ed552a}</Project>
-      <Name>Commands.Dir</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.FileManager\Commands.FileManager.csproj">
       <Project>{2afdfe71-d743-49df-9f47-61a94431cf00}</Project>
       <Name>Commands.FileManager</Name>

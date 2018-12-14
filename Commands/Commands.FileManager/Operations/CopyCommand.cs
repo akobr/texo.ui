@@ -42,14 +42,15 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
         private static ICommandResult Copy(CopyContext context)
         {
-            var result = ImmutableList<Item>.Empty.ToBuilder();
+            IMarkdownBuilder builder = new MarkdownBuilder();
+            builder.Header("Copy");
 
             foreach (string path in context.Items)
             {
                 switch (path.GetPathType())
                 {
                     case PathTypeEnum.File:
-                        result.Add(CopyFile(path, context));
+                        CopyFile(path, context);
                         break;
 
                     case PathTypeEnum.Directory:
@@ -89,6 +90,8 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
             try
             {
+                string directory = fileContext.Destination.GetParentDirectoryPath();
+                Directory.CreateDirectory(directory);
                 File.Copy(fileContext.Source, fileContext.Destination, fileContext.Overriden);
             }
             catch (Exception exception)
@@ -217,6 +220,10 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             public bool Override;
             public bool Flat;
             public bool Preview;
+
+            public IMarkdownBuilder DirectoryResult;
+            public IMarkdownBuilder FileResult;
+            public IMarkdownBuilder MissingResult;
         }
 
         private class FileCopyContext

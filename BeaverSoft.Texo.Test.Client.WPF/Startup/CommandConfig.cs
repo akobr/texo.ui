@@ -20,7 +20,6 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             factory.Register(CommandKeys.HELP, container.GetInstance<HelpCommand>);
             factory.Register(CommandKeys.CLEAR, container.GetInstance<ClearCommand>);
             factory.Register(ReferenceCheckConstants.REF_CHECK, container.GetInstance<ReferenceCheckCommand>);
-            //factory.Register("dir", container.GetInstance<DirCommand>);
             factory.Register("command-line", container.GetInstance<CommandLineCommand>);
             factory.Register("file-manager", container.GetInstance<FileManagerCommand>);
             factory.Register("nuget-manager", container.GetInstance<NugetManagerCommand>);

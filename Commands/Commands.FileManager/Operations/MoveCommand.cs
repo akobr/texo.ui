@@ -94,6 +94,8 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                     File.Delete(fileContext.Destination);
                 }
 
+                string directory = fileContext.Destination.GetParentDirectoryPath();
+                Directory.CreateDirectory(directory);
                 File.Move(fileContext.Source, fileContext.Destination);
             }
             catch (Exception exception)

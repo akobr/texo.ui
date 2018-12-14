@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.View;
@@ -21,15 +22,15 @@ namespace BeaverSoft.Texo.Commands.FileManager.Extensions
                 switch (type)
                 {
                     case PathTypeEnum.Directory:
-                        directories.Add(new Link(path.GetFriendlyPath(lobbyPath), path));
+                        directories.Add(new Link(path.GetFriendlyPath(lobbyPath), ActionBuilder.DirectoryOpenUri(path)));
                         break;
 
                     case PathTypeEnum.File:
-                        files.Add(new Link(path.GetFriendlyPath(lobbyPath), path));
+                        files.Add(new Link(path.GetFriendlyPath(lobbyPath), ActionBuilder.FileOpenUri(path)));
                         break;
 
                     case PathTypeEnum.NonExistent:
-                        nonExists.Add(new Link(path.GetFriendlyPath(lobbyPath), path));
+                        nonExists.Add(new Link(path.GetFriendlyPath(lobbyPath), ActionBuilder.PathUri(path)));
                         break;
 
                 }

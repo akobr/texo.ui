@@ -2,7 +2,6 @@
 using BeaverSoft.Texo.Commands.NugetManager;
 using BeaverSoft.Texo.Core;
 using Commands.CommandLine;
-using Commands.Dir;
 using Commands.ReferenceCheck;
 
 namespace BeaverSoft.Texo.Test.Client.Forms.Startup
@@ -13,7 +12,6 @@ namespace BeaverSoft.Texo.Test.Client.Forms.Startup
         {
             engine.Initialise(
                 ReferenceCheckCommand.BuildConfiguration(),
-                DirCommand.BuildConfiguration(),
                 CommandLineCommand.BuildConfiguration(),
                 FileManagerBuilder.BuildCommand(),
                 NugetManagerBuilder.BuildCommand());

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Model.Text;
 using BeaverSoft.Texo.Core.Path;
@@ -75,7 +76,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 new Header(context.DestinationZipFile.GetFileNameOrDirectoryName()),
                 new Paragraph(new Core.Model.Text.Link(
                     context.DestinationZipFile.GetFullPath(),
-                    $"action://open-file?path={Uri.EscapeUriString(context.DestinationZipFile.GetFullPath())}")),
+                    ActionBuilder.FileOpenUri(context.DestinationZipFile.GetFullPath()))),
                 new Section(
                     new Header(2, "Content"),
                     context.FileOutputList));
@@ -124,7 +125,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             context.FileOutputList = context.FileOutputList.AddItem(
                 new ListItem(new Core.Model.Text.Link(
                     destinationPath,
-                    $"action://open-file?path={Uri.EscapeUriString(filePath.GetFullPath())}")));
+                    ActionBuilder.FileOpenUri(filePath.GetFullPath()))));
 
             using (FileStream originalStream = new FileStream(filePath, FileMode.Open))
             using (Stream targetStream = fileEntry.Open())

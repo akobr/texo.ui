@@ -18,7 +18,6 @@ using BeaverSoft.Texo.Fallback.PowerShell.Markdown;
 using BeaverSoft.Texo.View.Console;
 using BeaverSoft.Texo.View.Console.Markdown;
 using Commands.CommandLine;
-using Commands.Dir;
 using Commands.ReferenceCheck;
 using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services;
@@ -84,7 +83,6 @@ namespace BeaverSoft.Texo.Test.Client.Console
 
             // Simple commands
             container.Register<ReferenceCheckCommand>();
-            container.Register<DirCommand>();
             container.Register<CommandLineCommand>();
 
             // File manager
@@ -109,7 +107,6 @@ namespace BeaverSoft.Texo.Test.Client.Console
             commandFactory.Register(CommandKeys.HELP, container.GetInstance<HelpCommand>);
             commandFactory.Register(CommandKeys.CLEAR, container.GetInstance<ClearCommand>);
             commandFactory.Register(ReferenceCheckConstants.REF_CHECK, () => container.GetInstance<ReferenceCheckCommand>());
-            commandFactory.Register("dir", () => container.GetInstance<DirCommand>());
             commandFactory.Register("command-line", () => container.GetInstance<CommandLineCommand>());
             commandFactory.Register("file-manager", () => container.GetInstance<FileManagerCommand>());
             commandFactory.Register("nuget-manager", () => container.GetInstance<NugetManagerCommand>());
@@ -129,7 +126,6 @@ namespace BeaverSoft.Texo.Test.Client.Console
 
             var config = TextumConfiguration.CreateDefault().ToBuilder();
             config.Runtime.Commands.Add(ReferenceCheckCommand.BuildConfiguration());
-            config.Runtime.Commands.Add(DirCommand.BuildConfiguration());
             config.Runtime.Commands.Add(CommandLineCommand.BuildConfiguration());
             config.Runtime.Commands.Add(FileManagerBuilder.BuildCommand());
             config.Runtime.Commands.Add(NugetManagerBuilder.BuildCommand());

@@ -10,7 +10,6 @@
     <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell\BeaverSoft.Texo.Fallback.PowerShell.csproj" />
     <ProjectReference Include="..\BeaverSoft.Texo.View.Console.Markdown\BeaverSoft.Texo.View.Console.Markdown.csproj" />
     <ProjectReference Include="..\Commands\Commands.CommandLine\Commands.CommandLine.csproj" />
-    <ProjectReference Include="..\Commands\Commands.Dir\Commands.Dir.csproj" />
     <ProjectReference Include="..\Commands\Commands.FileManager\Commands.FileManager.csproj" />
     <ProjectReference Include="..\Commands\Commands.NugetManager\Commands.NugetManager.csproj" />
     <ProjectReference Include="..\Commands\Commands.ReferenceCheck\Commands.ReferenceCheck.csproj" />
