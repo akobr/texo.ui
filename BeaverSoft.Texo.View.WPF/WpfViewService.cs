@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Text;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Input.History;
 using BeaverSoft.Texo.Core.Markdown.Builder;
-using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
+using Markdig.Wpf;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Messaging;
 
@@ -60,8 +60,8 @@ namespace BeaverSoft.Texo.View.WPF
                 sections.Add(renderer.Render(item));
             }
 
-            control.OutputDocument.Document.Blocks.AddRange(sections);
-            control.InputBox.IsReadOnlyCaretVisible = false;
+            control.OutputDocument.Blocks.AddRange(sections);
+            control.EnableInput();
             control.SetHistoryCount(history.Count);
         }
 
@@ -103,6 +103,16 @@ namespace BeaverSoft.Texo.View.WPF
             history = historyFactory.Create();
         }
 
+        private void OnLinkCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void OnLinkExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            e.Handled = true;
+        }
+
         public void Initialise(TexoControl context)
         {
             control = context;
@@ -120,20 +130,23 @@ namespace BeaverSoft.Texo.View.WPF
             control.InputFinished += TexoInputFinished;
             control.CommandHistoryScrolled += TexoCommandHistoryScrolled;
 
+            CommandBinding linkCommandBinding = new CommandBinding(Commands.Hyperlink, OnLinkExecuted, OnLinkCanExecute);
+            control.CommandBindings.Add(linkCommandBinding);
+
             control.Prompt = currentPrompt;
             control.Title = currentTitle;
-            control.OutputDocument.Document = BuildInitialFlowDocument();
+            BuildInitialFlowDocument();
         }
 
         private void TexoCommandHistoryScrolled(object sender, HistoryScrollDirection direction)
         {
-            if (direction == HistoryScrollDirection.Back)
+            if (historyItem == null)
             {
-                if (historyItem == null)
-                {
-                    historyItem = history.GetLastInput();
-                }
-                else if (historyItem.IsDeleted)
+                historyItem = history.GetLastInput();
+            }
+            else if (direction == HistoryScrollDirection.Back)
+            {
+                if (historyItem.IsDeleted)
                 {
                     while (historyItem != null && historyItem.IsDeleted)
                     {
@@ -145,7 +158,7 @@ namespace BeaverSoft.Texo.View.WPF
                     historyItem = historyItem.Previous;
                 }
             }
-            else if (historyItem != null)
+            else
             {
                 if (historyItem.IsDeleted)
                 {
@@ -160,14 +173,7 @@ namespace BeaverSoft.Texo.View.WPF
                 }
             }
 
-            if (historyItem == null)
-            {
-                return;
-            }
-
-            TextRange range = new TextRange(control.InputBox.Document.ContentStart, control.InputBox.Document.ContentEnd);
-            range.Text = historyItem.Input.ParsedInput.RawInput;
-            control.InputBox.CaretPosition = control.InputBox.Document.ContentEnd;
+            control.SetInput(historyItem.Input.ParsedInput.RawInput);
         }
 
         private void TexoInputChanged(object sender, string input)
@@ -177,14 +183,9 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void TexoInputFinished(object sender, string input)
         {
-            control.InputBox.IsReadOnlyCaretVisible = true;
-
-            TextRange range = new TextRange(
-                control.InputBox.Document.ContentStart,
-                control.InputBox.Document.ContentEnd);
-            range.Text = string.Empty;
-
+            control.DisableInput();
             lastWorkingDirectory = workingDirectory;
+            historyItem = null;
             executor.Process(input);
         }
 
@@ -268,7 +269,7 @@ namespace BeaverSoft.Texo.View.WPF
 
         void IMessageBusRecipient<IClearViewOutputMessage>.ProcessMessage(IClearViewOutputMessage message)
         {
-            control.OutputDocument.Document.Blocks.Clear();
+            control.OutputDocument.Blocks.Clear();
         }
 
         private void SetPrompt(string prompt)
@@ -295,24 +296,20 @@ namespace BeaverSoft.Texo.View.WPF
             control.Title = currentTitle;
         }
 
-        private static FlowDocument BuildInitialFlowDocument()
+        private void BuildInitialFlowDocument()
         {
-            FlowDocument document = new FlowDocument();
-
-            document.Blocks.Add(new Paragraph(new Run(DEFAULT_TITLE))
+            control.OutputDocument.Blocks.Add(new Paragraph(new Run(DEFAULT_TITLE))
             {
                 FontSize = 14
             });
 
-            document.Blocks.Add(new Paragraph(new Run("Welcome in smart command line..."))
+            control.OutputDocument.Blocks.Add(new Paragraph(new Run("Welcome in smart command line..."))
             {
                 FontSize = 12,
                 FontStyle = FontStyles.Italic,
                 TextAlignment = TextAlignment.Left,
                 Foreground = Brushes.DimGray
             });
-
-            return document;
         }
     }
 }

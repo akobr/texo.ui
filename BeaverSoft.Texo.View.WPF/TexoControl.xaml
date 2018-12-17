@@ -68,15 +68,18 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Name="lbPrompt" Text="tu&gt;" FontFamily="Consolas" FontSize="16" VerticalAlignment="Center" FontWeight="Bold" Padding="5,0,0,2" />
-                <RichTextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
-                             TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" SelectionChanged="HandleInputSelectionChanged" />
+                <TextBlock Name="lbPrompt" Text="tu&gt;" FontFamily="Consolas" FontSize="16" VerticalAlignment="Center" FontWeight="Bold" Padding="5,0,5,2" />
+                <TextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
+                         IsReadOnlyCaretVisible="True" TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" />
+                <!--<RichTextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
+                             TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" SelectionChanged="HandleInputSelectionChanged" />-->
             </Grid>
         </Border>
 
         <!-- OUTPUT -->
         <FlowDocumentScrollViewer Name="docOutput" Grid.Row="2"
-                                  MinZoom="50" VerticalScrollBarVisibility="Auto" />
+                                  MinZoom="50" VerticalScrollBarVisibility="Auto"
+                                  PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseWheel="HandleScrollSpeed" />
 
     </Grid>
 </UserControl>

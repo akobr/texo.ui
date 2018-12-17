@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Text.RegularExpressions;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Model.Text;
 using BeaverSoft.Texo.Core.Path;
@@ -37,8 +38,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 Items = paths,
                 SourceLobby = stage.GetLobby(),
                 IsRegex = context.HasOption(ApplyOptions.REGEX),
-                IsCaseSensitive = context.HasOption(ApplyOptions.CASE_SENSITIVE),
-                FileFilter = context.GetParameterFromOption(ApplyOptions.FILE_FILTER)
+                IsCaseSensitive = context.HasOption(ApplyOptions.CASE_SENSITIVE)
             };
 
             return Search(copyContext);
@@ -61,7 +61,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             catch (ArgumentException exception)
             {
                 logger.Error("Content search: Error during regular expression parse.", exception);
-                return new TextResult("Invalid regular expression.");
+                return new ErrorTextResult("Invalid regular expression.");
             }
 
             foreach (string path in context.Items)
@@ -127,7 +127,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                     new Paragraph(
                         new Core.Model.Text.Link(
                             filePath.GetFriendlyPath(context.SourceLobby),
-                            $"action://open-file?path={Uri.EscapeUriString(filePath.GetFullPath())}")),
+                            ActionBuilder.FileOpenUri(filePath.GetFullPath()))),
                     new Paragraph(context.MatchResults));
 
                 context.Result.Add(new ModeledItem(fileDocoment));
@@ -226,7 +226,6 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             public IEnumerable<string> Items;
             public string SearchTerm;
             public string SourceLobby;
-            public string FileFilter;
             public bool IsRegex;
             public bool IsCaseSensitive;
 

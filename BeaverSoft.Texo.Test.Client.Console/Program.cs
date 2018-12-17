@@ -75,7 +75,6 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<IFallbackService, PowerShellFallbackService>();
 
             // Core commands
-            container.Register<ICurrentDirectoryService, CurrentDirectoryService>();
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
             container.Register<HelpCommand>();

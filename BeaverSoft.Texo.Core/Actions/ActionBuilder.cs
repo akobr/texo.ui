@@ -1,4 +1,6 @@
-﻿namespace BeaverSoft.Texo.Core.Actions
+﻿using System;
+
+namespace BeaverSoft.Texo.Core.Actions
 {
     public static class ActionBuilder
     {
@@ -6,25 +8,19 @@
         private const string SCHEMA_SEPARATOR = "://";
         private const string ACTION_FORMAT = ACTION_SCHEMA + SCHEMA_SEPARATOR + "{0}?{1}";
 
-        public const string PATH = "path";
-        public const string FILE = "file";
-        public const string FILE_OPEN = "file-open";
-        public const string DIRECTORY = "directory";
-        public const string DIRECTORY_OPEN = "directory-open";
-
         public static string PathUri(string fullPath)
         {
-            return string.Format(ACTION_FORMAT, PATH, $"path={fullPath}");
+            return string.Format(ACTION_FORMAT, ActionNames.PATH, $"{ActionParameters.PATH}={Uri.EscapeDataString(fullPath)}");
         }
 
         public static string FileOpenUri(string fileFullPath)
         {
-            return string.Format(ACTION_FORMAT, FILE_OPEN, $"path={fileFullPath}");
+            return string.Format(ACTION_FORMAT, ActionNames.FILE_OPEN, $"{ActionParameters.PATH}={Uri.EscapeDataString(fileFullPath)}");
         }
 
         public static string DirectoryOpenUri(string directoryFullPath)
         {
-            return string.Format(ACTION_FORMAT, DIRECTORY_OPEN, $"path={directoryFullPath}");
+            return string.Format(ACTION_FORMAT, ActionNames.DIRECTORY_OPEN, $"{ActionParameters.PATH}={Uri.EscapeDataString(directoryFullPath)}");
         }
     }
 }

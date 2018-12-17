@@ -13,9 +13,58 @@ namespace Commands.Git
             command.Documentation.Description = "the stupid content tracker";
 
             command.Queries.Add(BuildHelpQuery());
+            command.Queries.Add(BuildCloneQuery());
             command.Queries.Add(BuildBranchQuery());
 
+            command.Options.Add(
+                CreateSimpleOption(
+                    "version",
+                    "Prints the Git suite version that the git program came from."
+                ));
+
+            command.Options.Add(
+                CreateSimpleOption(
+                    "help",
+                    "Prints the synopsis and a list of the most commonly used commands. If the option `--all` or `-a` is given then all available commands are printed. If a Git command is named this option will bring up the manual page for that command."
+                ));
+
             return command.ToImmutable();
+        }
+
+        private static Query BuildCloneQuery()
+        {
+            var query = Query.CreateBuilder();
+            query.Key = "clone";
+            query.Representations.Add("clone");
+
+            query.Documentation.Title = "git-clone";
+            query.Documentation.Description = "Clone a repository into a new directory";
+
+            var parRepository = Parameter.CreateBuilder();
+            parRepository.Key = "repository";
+            parRepository.Documentation.Title = "repository";
+            parRepository.Documentation.Description = "URL to repository";
+
+            var parDirectory = Parameter.CreateBuilder();
+            parDirectory.Key = "directory";
+            parDirectory.IsOptional = true;
+            parDirectory.Documentation.Title = "directory";
+            parDirectory.Documentation.Description = "Directory to clone to";
+
+            query.Options.Add(
+                CreateSimpleOption(
+                    "local",
+                    "When the repository to clone from is on a local machine, this flag bypasses the normal \"Git aware\" transport mechanism and clones the repository by making a copy of HEAD and everything under objects and refs directories. The files under `.git/objects/` directory are hardlinked to save space when possible.\r\n\r\nIf the repository is specified as a local path(e.g., `/path/to/repo`), this is the default, and `--local` is essentially a no-op. If the repository is specified as a URL, then this flag is ignored (and we never use the local optimizations).Specifying `--no-local` will override the default when `/path/to/repo` is given, using the regular Git transport instead.",
+                    "l"
+                ));
+
+            query.Options.Add(
+                CreateSimpleOption(
+                    "no-hardlinks",
+                    "Force the cloning process from a repository on a local filesystem to copy the files under the `.git/objects` directory instead of using hardlinks. This may be desirable if you are trying to make a back-up of your repository."
+                ));
+
+            return query.ToImmutable();
         }
 
         private static Query BuildBranchQuery()

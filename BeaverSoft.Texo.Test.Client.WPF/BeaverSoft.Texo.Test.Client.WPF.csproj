@@ -65,6 +65,7 @@
     </ApplicationDefinition>
     <Compile Include="Startup\CommandConfig.cs" />
     <Compile Include="Startup\ContainerConfig.cs" />
+    <Compile Include="Startup\MessageBusConfig.cs" />
     <Compile Include="Startup\TexoEngineConfig.cs" />
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>

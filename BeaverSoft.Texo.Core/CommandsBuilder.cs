@@ -23,7 +23,7 @@ namespace BeaverSoft.Texo.Core
 
             command.Key = CommandKeys.CURRENT_DIRECTORY;
             command.Representations.AddRange(
-                new[] { CommandKeys.CURRENT_DIRECTORY, "cd", "chdir", "cdir", "set-location", "sl" });
+                new[] { CommandKeys.CURRENT_DIRECTORY, "cd", "chdir", "cdir" });
             command.Parameters.Add(parameter.ToImmutable());
             command.Documentation.Title = "Current directory";
             command.Documentation.Description = "Gets or sets current working directory.";

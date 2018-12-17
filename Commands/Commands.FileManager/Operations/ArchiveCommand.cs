@@ -9,16 +9,19 @@ using BeaverSoft.Texo.Core.Model.Text;
 using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Commands.FileManager.Operations
 {
-    public class ZipCommand : ICommand
+    public class ArchiveCommand : ICommand
     {
         private readonly IStageService stage;
+        private readonly ILogService logger;
 
-        public ZipCommand(IStageService stage)
+        public ArchiveCommand(IStageService stage, ILogService logger)
         {
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
+            this.logger = logger;
         }
 
         public ICommandResult Execute(CommandContext context)
@@ -35,12 +38,11 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 SourceLobby = stage.GetLobby(),
                 Flat = context.HasOption(ApplyOptions.FLATTEN) || !stage.HasLobby(),
                 Override = context.HasOption(ApplyOptions.OVERWRITE),
-                Add = context.HasOption(ApplyOptions.ADD),
-                Preview = context.HasOption(ApplyOptions.PREVIEW)
+                Add = context.HasOption(ApplyOptions.ADD)
             });
         }
 
-        private static ICommandResult Zip(ZipContext context)
+        private ICommandResult Zip(ZipContext context)
         {
             context.ZipAlreadyExists = File.Exists(context.DestinationZipFile);
 
@@ -54,34 +56,34 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
             context.FileOutputList = new List();
 
-            using (FileStream zipStream = new FileStream(context.DestinationZipFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Update))
+            try
             {
-                foreach (string path in context.Items)
+                using (FileStream zipStream = new FileStream(context.DestinationZipFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Update))
                 {
-                    switch (path.GetPathType())
+                    foreach (string path in context.Items)
                     {
-                        case PathTypeEnum.File:
-                            AddFile(path, archive, context);
-                            break;
+                        switch (path.GetPathType())
+                        {
+                            case PathTypeEnum.File:
+                                AddFile(path, archive, context);
+                                break;
 
-                        case PathTypeEnum.Directory:
-                            AddDirectory(path, archive, context);
-                            break;
+                            case PathTypeEnum.Directory:
+                                AddDirectory(path, archive, context);
+                                break;
+                        }
                     }
                 }
             }
+            catch (Exception exception)
+            {
+                const string message = "Zip archive error.";
+                logger.Error(message, exception);
+                return new ErrorTextResult(message);
+            }
 
-            Document document = new Document(
-                new Header(context.DestinationZipFile.GetFileNameOrDirectoryName()),
-                new Paragraph(new Core.Model.Text.Link(
-                    context.DestinationZipFile.GetFullPath(),
-                    ActionBuilder.FileOpenUri(context.DestinationZipFile.GetFullPath()))),
-                new Section(
-                    new Header(2, "Content"),
-                    context.FileOutputList));
-
-            return new ItemsResult<ModeledItem>(new ModeledItem(document));
+            return new ItemsResult<ModeledItem>(BuildOutput(context));
         }
 
         private static void AddDirectory(string directoryPath, ZipArchive archive, ZipContext context)
@@ -134,6 +136,20 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             }
         }
 
+        private static ModeledItem BuildOutput(ZipContext context)
+        {
+            Document document = new Document(
+                new Header(context.DestinationZipFile.GetFileNameOrDirectoryName()),
+                new Paragraph(new Core.Model.Text.Link(
+                    context.DestinationZipFile.GetFullPath(),
+                    ActionBuilder.FileOpenUri(context.DestinationZipFile.GetFullPath()))),
+                new Section(
+                    new Header(2, "Content"),
+                    context.FileOutputList));
+
+            return new ModeledItem(document);
+        }
+
         private class ZipContext
         {
             public string DestinationZipFile;
@@ -143,7 +159,6 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             public bool Flat;
             public bool Add;
             public bool Override;
-            public bool Preview;
 
             public bool ZipAlreadyExists;
             public List FileOutputList;

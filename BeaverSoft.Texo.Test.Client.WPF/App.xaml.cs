@@ -33,6 +33,8 @@ namespace BeaverSoft.Texo.Test.Client.WPF
             TexoEngine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
             TexoEngine.InitialiseWithCommands();
             TexoEngine.Start();
+
+            container.RegisterWithMessageBus();
         }
 
         protected override void OnExit(ExitEventArgs e)

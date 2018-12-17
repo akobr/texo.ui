@@ -28,7 +28,6 @@ namespace BeaverSoft.Texo.Test.Client.Forms.Startup
         public static void RegisterServices(this SimpleIoc container)
         {
             // Core commands (should be in engine)
-            container.Register<ICurrentDirectoryService, CurrentDirectoryService>();
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
 

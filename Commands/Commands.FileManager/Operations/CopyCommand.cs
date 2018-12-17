@@ -37,7 +37,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 Destination = context.GetTargetDirectory(),
                 SourceLobby = stage.GetLobby(),
                 Flat = context.HasOption(ApplyOptions.FLATTEN) || !stage.HasLobby(),
-                Override = context.HasOption(ApplyOptions.OVERWRITE),
+                Overwrite = context.HasOption(ApplyOptions.OVERWRITE),
                 Preview = context.HasOption(ApplyOptions.PREVIEW)
             };
 
@@ -60,11 +60,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 }
             }
 
-            MarkdownBuilder builder = new MarkdownBuilder();
-            builder.Header("Copy");
-            builder.Link(context.Destination, ActionBuilder.DirectoryOpenUri(context.Destination));
-            builder.WriteExistingPathList(context.CopiedFiles, context.Destination);
-            return new ItemsResult(Item.Markdown(builder.ToString()));
+            return new ItemsResult(Item.Markdown(BuildOutput(context)));
         }
 
         private void CopyFile(string filePath, CopyContext context)
@@ -77,12 +73,12 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
             if (File.Exists(destinationPath))
             {
-                if (!context.Override)
+                if (!context.Overwrite)
                 {
                     return;
                 }
 
-                context.OverridenFiles.Add(destinationPath);
+                context.OverwritenFiles.Add(destinationPath);
             }
             else
             {
@@ -111,13 +107,44 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             {
                 string directory = destinationPath.GetParentDirectoryPath();
                 Directory.CreateDirectory(directory);
-                File.Copy(filePath, destinationPath, context.Override);
+                File.Copy(filePath, destinationPath, context.Overwrite);
 
             }
             catch (Exception exception)
             {
-                logger.Error("File copy: " + filePath, exception);
+                logger.Error("File copy: " + filePath, destinationPath, exception);
             }
+        }
+
+        private static string BuildOutput(CopyContext context)
+        {
+            MarkdownBuilder builder = new MarkdownBuilder();
+            builder.Header("Copy");
+            builder.Link(context.Destination, ActionBuilder.DirectoryOpenUri(context.Destination));
+            bool empty = true;
+
+            if (context.CopiedFiles.Count > 0)
+            {
+                builder.Header("Copied", 2);
+                builder.WritePathList(context.CopiedFiles, context.Destination);
+                empty = false;
+            }
+
+            if (context.OverwritenFiles.Count > 0)
+            {
+                builder.Header("Overwriten");
+                builder.WritePathList(context.OverwritenFiles, context.Destination);
+                empty = false;
+            }
+
+            if (empty)
+            {
+                builder.WriteLine();
+                builder.WriteLine();
+                builder.Italic("Nothing copied.");
+            }
+
+            return builder.ToString();
         }
 
         private class CopyContext
@@ -125,12 +152,12 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             public string Destination;
             public string SourceLobby;
             public IEnumerable<string> Items;
-            public bool Override;
+            public bool Overwrite;
             public bool Flat;
             public bool Preview;
 
             public readonly IList<string> CopiedFiles = new List<string>();
-            public readonly IList<string> OverridenFiles = new List<string>();
+            public readonly IList<string> OverwritenFiles = new List<string>();
         }
     }
 }

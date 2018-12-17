@@ -15,13 +15,13 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
             this.logger = logger;
 
-            RegisterCommand(ApplyQueries.COPY, new CopyCommand(stage));
-            RegisterCommand(ApplyQueries.MOVE, new MoveCommand(stage));
+            RegisterCommand(ApplyQueries.COPY, new CopyCommand(stage, logger));
+            RegisterCommand(ApplyQueries.MOVE, new MoveCommand(stage, logger));
             //RegisterCommand(ApplyQueries.RENAME, new RenameCommand());
-            RegisterCommand(ApplyQueries.DELETE, new DeleteCommand(stage));
+            RegisterCommand(ApplyQueries.DELETE, new DeleteCommand(stage, logger));
             RegisterCommand(ApplyQueries.SEARCH, new ContentSearchCommand(stage, logger));
             //RegisterCommand(ApplyQueries.REPLACE, new ContentReplaceCommand());
-            RegisterCommand(ApplyQueries.ARCHIVE, new ZipCommand(stage));
+            RegisterCommand(ApplyQueries.ARCHIVE, new ArchiveCommand(stage, logger));
         }
     }
 }

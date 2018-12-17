@@ -2,17 +2,23 @@
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
+using StrongBeaver.Core.Messaging;
+using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
-    public class PowerShellFallbackService : IFallbackService
+    public class PowerShellFallbackService :
+        IFallbackService,
+        IMessageBusService<IVariableUpdatedMessage>
     {
         private readonly object executionLock = new object();
+
         private readonly IPowerShellResultBuilder resultBuilder;
         private readonly IPromptableViewService view;
         private readonly ILogService logger;
@@ -43,36 +49,23 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 return new ErrorTextResult("A command already in progress.");
             }
 
-            lock (executionLock)
-            {
-                shell = System.Management.Automation.PowerShell.Create();
-            }
+            BuildShell();
 
             try
             {
-                shell.Runspace = host.Runspace;
-                shell.AddScript(input.ParsedInput.RawInput);
-
-                //shell.AddCommand("write-host");
-                shell.AddCommand("out-default");
-                shell.Commands.Commands[0].MergeMyResults(PipelineResultTypes.Error, PipelineResultTypes.Output);
-
                 resultBuilder.StartItem();
-                var result = shell.Invoke();
+                RunScriptToOutput(input.ParsedInput.RawInput);
                 return new ItemsResult(resultBuilder.FinishItem());
             }
             catch (Exception e)
             {
-                logger.Error("Error during command execution in PowerShell.", e);
-                return new ErrorTextResult(e.Message);
+                const string errorMessage = "Error during command execution in PowerShell.";
+                logger.Error(errorMessage, e);
+                return new ErrorTextResult(errorMessage);
             }
             finally
             {
-                lock (executionLock)
-                {
-                    shell?.Dispose();
-                    shell = null;
-                }
+                ReleaseShell();
             }
         }
 
@@ -82,18 +75,40 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             LoadPowerShellProfile();
         }
 
+        void IMessageBusRecipient<IVariableUpdatedMessage>.ProcessMessage(IVariableUpdatedMessage message)
+        {
+            if (shell != null
+                || message.Name != VariableNames.CURRENT_DIRECTORY)
+            {
+                return;
+            }
+
+            BuildShell();
+
+            try
+            {
+                RunCommandQuetly("Set-Location", message.NewValue);
+                shell.Invoke();
+            }
+            catch (Exception e)
+            {
+                logger.Error("Error during Set-Location execution in PowerShell.", message.NewValue, e);
+            }
+            finally
+            {
+                ReleaseShell();
+            }
+        }
+
         private void LoadPowerShellProfile()
         {
-            lock (executionLock)
-            {
-                shell = System.Management.Automation.PowerShell.Create();
-            }
+            BuildShell();
 
             try
             {
                 shell.Runspace = host.Runspace;
+                PSCommand[] profileCommands = HostUtilities.GetProfileCommands("TexoUI");
 
-                PSCommand[] profileCommands = HostUtilities.GetProfileCommands("SampleHost06");
                 foreach (PSCommand command in profileCommands)
                 {
                     shell.Commands = command;
@@ -102,15 +117,45 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             }
             catch (Exception e)
             {
-                logger.Error("Error during profile execution in PowerShell.", e);
+                logger.Error("Error during of profile loading in PowerShell.", e);
             }
             finally
             {
-                lock (executionLock)
-                {
-                    shell?.Dispose();
-                    shell = null;
-                }
+                ReleaseShell();
+            }
+        }
+
+        private void RunCommandQuetly(string command, string argument)
+        {
+            shell.Runspace = host.Runspace;
+            shell.AddCommand(command);
+            shell.AddArgument(argument);
+            shell.Invoke();
+        }
+
+        private void RunScriptToOutput(string script)
+        {
+            shell.Runspace = host.Runspace;
+            shell.AddScript(script);
+            shell.AddCommand("Out-Default");
+            shell.Commands.Commands[0].MergeMyResults(PipelineResultTypes.Error, PipelineResultTypes.Output);
+            shell.Invoke();
+        }
+
+        private void BuildShell()
+        {
+            lock (executionLock)
+            {
+                shell = System.Management.Automation.PowerShell.Create();
+            }
+        }
+
+        private void ReleaseShell()
+        {
+            lock (executionLock)
+            {
+                shell?.Dispose();
+                shell = null;
             }
         }
     }

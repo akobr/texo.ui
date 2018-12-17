@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using BeaverSoft.Texo.Core.Configuration;
 
@@ -39,9 +40,13 @@ namespace BeaverSoft.Texo.Core.Help
             RenderRepresentation(query, mainRepresentation);
             result.AppendLine();
 
+            var orderedQueries = query.Queries.OrderBy(q => q.Key).ToList();
+            var orderedOptions = query.Options.OrderBy(o => o.Key).ToList();
+            var orderedParameters = query.Parameters.OrderBy(p => p.Key).ToList();
+
             for (int i = 0, last = query.Queries.Count - 1; i <= last; i++)
             {
-                Query subQuery = query.Queries[i];
+                Query subQuery = orderedQueries[i];
                 RenderQuery(
                     subQuery,
                     (ushort)(level + 1),
@@ -51,13 +56,13 @@ namespace BeaverSoft.Texo.Core.Help
 
             for (int i = 0, last = query.Options.Count - 1; i <= last; i++)
             {
-                Option option = query.Options[i];
+                Option option = orderedOptions[i];
                 RenderOption(option, (ushort)(level + 1), i == last);
             }
 
             for (int i = 0, last = query.Parameters.Count - 1; i <= last; i++)
             {
-                Parameter parameter = query.Parameters[i];
+                Parameter parameter = orderedParameters[i];
                 RenderParameter(parameter, (ushort)(level + 1), i == last);
             }
         }

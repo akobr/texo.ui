@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace BeaverSoft.Texo.Core.Path
 {
@@ -8,6 +9,11 @@ namespace BeaverSoft.Texo.Core.Path
     // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/file-system/how-to-iterate-through-a-directory-tree
     public static class TexoDirectory
     {
+        public static bool IsEmpty(string path)
+        {
+            return !Directory.EnumerateFileSystemEntries(path).Any();
+        }
+
         public static IEnumerable<string> GetDirectories()
         {
             return GetDirectories(

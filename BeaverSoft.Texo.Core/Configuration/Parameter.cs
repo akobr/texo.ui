@@ -8,6 +8,15 @@
         private string argumentTemplate;
         private Documentation documentation;
 
+        public Parameter(string key, bool isOptional, bool isRepeatable, string argumentTemplate, Documentation documentation)
+        {
+            this.key = key;
+            this.isOptional = isOptional;
+            this.isRepeatable = isRepeatable;
+            this.argumentTemplate = argumentTemplate;
+            this.documentation = documentation;
+        }
+
         private Parameter()
         {
             documentation = Documentation.Empty;

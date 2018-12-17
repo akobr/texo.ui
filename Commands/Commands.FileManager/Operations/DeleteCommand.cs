@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
+using BeaverSoft.Texo.Commands.FileManager.Extensions;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Commands.FileManager.Operations
 {
     public class DeleteCommand : ICommand
     {
         private readonly IStageService stage;
+        private readonly ILogService logger;
 
-        public DeleteCommand(IStageService stage)
+        public DeleteCommand(IStageService stage, ILogService logger)
         {
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
+            this.logger = logger;
         }
 
         public ICommandResult Execute(CommandContext context)
@@ -35,117 +38,107 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             });
         }
 
-        private static ICommandResult Delete(DeleteContext context)
+        private ICommandResult Delete(DeleteContext context)
         {
-            var result = ImmutableList<Item>.Empty.ToBuilder();
-
             foreach (string path in context.Items)
             {
                 switch (path.GetPathType())
                 {
                     case PathTypeEnum.File:
-                        result.Add(DeleteFile(path, context));
+                        DeleteFile(path, context);
                         break;
 
                     case PathTypeEnum.Directory:
-                        result.Add(DeleteDirectory(path, context));
-                        break;
-
-                    // case PathTypeEnum.NonExistent:
-                    default:
-                        result.Add(ItemBuilding.BuildMissingItem(path.GetFriendlyPath(context.SourceLobby)));
+                        DeleteDirectory(path, context);
                         break;
                 }
             }
 
-            return new ItemsResult(result.ToImmutable());
+            return new ItemsResult(Item.Markdown(BuildOutput(context)));
         }
 
-        private static Item DeleteFile(string filePath, DeleteContext context)
+        private void DeleteFile(string filePath, DeleteContext context)
         {
-            ItemDeleteContext fileContext = PrepareFile(filePath, context);
-
-            if (!context.Preview)
+            if (!File.Exists(filePath))
             {
-                ProcessFile(fileContext);
+                return;
             }
 
-            return BuildFileItem(fileContext);
+            context.DeletedFiles.Add(filePath.GetFriendlyPath(context.SourceLobby));
+            ProcessFileDelete(filePath, context);
         }
 
-        private static ItemDeleteContext PrepareFile(string filePath, DeleteContext context)
+        private void ProcessFileDelete(string filePath, DeleteContext context)
         {
-            return new ItemDeleteContext
+            if (context.Preview)
             {
-                Path = filePath,
-                Source = filePath.GetFriendlyPath(context.SourceLobby),
-                Descriptiton = context.Preview
-                    ? "File will be deleted."
-                    : "File has been deleted."
-            };
-        }
+                return;
+            }
 
-        private static void ProcessFile(ItemDeleteContext fileContext)
-        {
             try
             {
-                File.Delete(fileContext.Path);
+                File.Delete(filePath);
             }
             catch (Exception exception)
             {
-                fileContext.Descriptiton = exception.Message;
+                logger.Error("File delete: " + filePath, exception);
             }
         }
 
-        private static Item BuildFileItem(ItemDeleteContext fileContext)
+        private void DeleteDirectory(string directoryPath, DeleteContext context)
         {
-            MarkdownBuilder builder = new MarkdownBuilder();
-            builder.Header(fileContext.Source);
-            builder.Italic(fileContext.Descriptiton);
-            return Item.Markdown(builder.ToString());
-        }
-
-        private static Item DeleteDirectory(string directoryPath, DeleteContext context)
-        {
-            ItemDeleteContext directoryContext = PrepareDirectory(directoryPath, context);
-
-            if (!context.Preview)
+            foreach (string filePath in TexoDirectory.GetFiles(directoryPath))
             {
-                ProcessDirectory(directoryContext);
+                DeleteFile(filePath, context);
             }
 
-            return BuildDirectoryItem(directoryContext);
-        }
-
-        private static ItemDeleteContext PrepareDirectory(string directoryPath, DeleteContext context)
-        {
-            return new ItemDeleteContext
+            if (context.Preview
+               || !TexoDirectory.IsEmpty(directoryPath))
             {
-                Path = directoryPath,
-                Source = directoryPath.GetFriendlyPath(context.SourceLobby),
-                Descriptiton = context.Preview
-                    ? "Directory will be deleted."
-                    : "Directory has been deleted."
-            };
+                return;
+            }
+
+            context.DeletedFolders.Add(directoryPath.GetFriendlyPath(context.SourceLobby));
+            ProcessDirectoryDelete(directoryPath);
         }
 
-        private static void ProcessDirectory(ItemDeleteContext directoryContext)
+        private void ProcessDirectoryDelete(string directoryPath)
         {
             try
             {
-                Directory.Delete(directoryContext.Path, true);
+                Directory.Delete(directoryPath, true);
             }
             catch (Exception exception)
             {
-                directoryContext.Descriptiton = exception.Message;
+                logger.Error("Directory delete: " + directoryPath, exception);
             }
         }
-        private static Item BuildDirectoryItem(ItemDeleteContext directoryContext)
+
+        private static string BuildOutput(DeleteContext context)
         {
             MarkdownBuilder builder = new MarkdownBuilder();
-            builder.Header(directoryContext.Source);
-            builder.Write(directoryContext.Descriptiton);
-            return Item.Markdown(builder.ToString());
+            bool empty = true;
+
+            if (context.DeletedFiles.Count > 0)
+            {
+                builder.Header("Deleted files");
+                builder.WriteRawPathList(context.DeletedFiles);
+                empty = false;
+            }
+
+            if (context.DeletedFolders.Count > 0)
+            {
+                builder.Header("Deleted directories");
+                builder.WriteRawPathList(context.DeletedFolders);
+                empty = false;
+            }
+
+            if (empty)
+            {
+                builder.Italic("Nothing deleted.");
+            }
+
+            return builder.ToString();
         }
 
         private class DeleteContext
@@ -153,13 +146,9 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             public string SourceLobby;
             public IEnumerable<string> Items;
             public bool Preview;
-        }
 
-        private class ItemDeleteContext
-        {
-            public string Path;
-            public string Source;
-            public string Descriptiton;
+            public readonly List<string> DeletedFiles = new List<string>();
+            public readonly List<string> DeletedFolders = new List<string>();
         }
     }
 }

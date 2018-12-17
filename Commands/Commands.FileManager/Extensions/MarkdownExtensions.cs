@@ -9,11 +9,12 @@ namespace BeaverSoft.Texo.Commands.FileManager.Extensions
 {
     public static class MarkdownExtensions
     {
-        public static void WriteExistingPathList(this MarkdownBuilder builder, IEnumerable<string> paths, string relatedTo)
+        public static void WritePathList(this MarkdownBuilder builder, IEnumerable<string> paths, string relatedTo)
         {
             LinksModel model = BuildLinks(paths, relatedTo);
             WritePaths(model.Directories, builder);
             WritePaths(model.Files, builder);
+            WritePaths(model.NonExists, builder);
         }
 
         public static void WritePathLists(this MarkdownBuilder builder, IEnumerable<string> paths, string relatedTo)
@@ -23,6 +24,17 @@ namespace BeaverSoft.Texo.Commands.FileManager.Extensions
             WritePathsWithHeader(model.Directories, "Directories", builder);
             WritePathsWithHeader(model.Files, "Files", builder);
             WritePathsWithHeader(model.NonExists, "Non-Existing", builder);
+        }
+
+        public static void WriteRawPathList(this MarkdownBuilder builder, List<string> paths)
+        {
+            paths.Sort(StringComparer.OrdinalIgnoreCase);
+
+            foreach (string path in paths)
+            {
+                builder.Bullet();
+                builder.Write(path);
+            }
         }
 
         private static void WritePathsWithHeader(List<ILink> paths, string title, MarkdownBuilder builder)

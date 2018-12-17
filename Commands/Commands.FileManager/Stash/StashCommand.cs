@@ -19,6 +19,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             this.stage = stage;
 
             RegisterQueryMethod(StashQueries.LIST, List);
+            RegisterQueryMethod(StashQueries.PUSH, Push);
             RegisterQueryMethod(StashQueries.APPLY, Apply);
             RegisterQueryMethod(StashQueries.PEEK, Peek);
             RegisterQueryMethod(StashQueries.POP, Pop);
@@ -44,6 +45,20 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             }
 
             return new ItemsResult(result.ToImmutable());
+        }
+
+        private ICommandResult Push(CommandContext context)
+        {
+            IImmutableList<string> paths = stage.GetPaths();
+
+            if (paths == null || paths.Count < 1)
+            {
+                return new ErrorTextResult("The stage is empty.");
+            }
+
+            string name = context.GetParameterValue(ParameterKeys.NAME);
+            IStashEntry stash = stashes.CreateStash(stage.GetLobby(), paths, name);
+            return new ItemsResult(BuildStashItem(stash, 0));
         }
 
         private ICommandResult Apply(CommandContext context)
@@ -82,16 +97,16 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
 
         private ICommandResult Pop(CommandContext context)
         {
-            IImmutableList<string> paths = stage.GetPaths();
+            IStashEntry stash = stashes.GetStash(0);
 
-            if (paths == null || paths.Count < 1)
+            if (stash == null)
             {
-                return new ErrorTextResult("The stage is empty.");
+                return new TextResult("The stash stack is empty.");
             }
 
-            string name = context.GetParameterValue(ParameterKeys.NAME);
-            IStashEntry stash = stashes.CreateStash(stage.GetLobby(), paths, name);
-            return new ItemsResult(BuildStashItem(stash, 0));
+            ApplyStashToStage(stash);
+            stashes.RemoveStash(stash);
+            return new TextResult($"{GetStashHeader(stash, 0)} has been applied to stage and removed from top of the stack.");
         }
 
         private ICommandResult Drop(CommandContext context)

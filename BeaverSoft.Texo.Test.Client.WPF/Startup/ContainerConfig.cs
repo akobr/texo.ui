@@ -29,7 +29,6 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
         public static void RegisterServices(this SimpleIoc container)
         {
             // Core commands (should be in engine)
-            container.Register<ICurrentDirectoryService, CurrentDirectoryService>();
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
             container.Register<HelpCommand>();
@@ -37,7 +36,6 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
 
             // Simple commands
             container.Register<ReferenceCheckCommand>();
-            //container.Register<DirCommand>();
             container.Register<CommandLineCommand>();
 
             // File manager
@@ -64,7 +62,8 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
 
             // PowerShell Fallback
             container.Register<IPowerShellResultBuilder, PowerShellResultMarkdownBuilder>();
-            container.Register<IFallbackService, PowerShellFallbackService>();
+            container.Register<PowerShellFallbackService>();
+            container.Register<IFallbackService>(container.GetInstance<PowerShellFallbackService>);
         }
 
         public static void RegisterEngineServices(this SimpleIoc container, TexoEngineBuilder builder)

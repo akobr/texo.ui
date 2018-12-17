@@ -101,7 +101,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             var query = Query.CreateBuilder();
             query.Key = StashQueries.STASH;
             query.Representations.Add(StashQueries.STASH);
-            query.DefaultQueryKey = StashQueries.POP;
+            query.DefaultQueryKey = StashQueries.PUSH;
 
             var parIdentifier = Parameter.CreateBuilder();
             parIdentifier.Key = StashParameters.IDENTIFIER;
@@ -122,6 +122,11 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryList.Representations.AddRange(
                 new[] { StashQueries.LIST, "show" });
 
+            var queryPush = Query.CreateBuilder();
+            queryPush.Key = StashQueries.PUSH;
+            queryPush.Representations.Add(StashQueries.PUSH);
+            queryPush.Parameters.Add(parName.ToImmutable());
+
             var queryApply = Query.CreateBuilder();
             queryApply.Key = StashQueries.APPLY;
             queryApply.Representations.Add(StashQueries.APPLY);
@@ -134,7 +139,6 @@ namespace BeaverSoft.Texo.Commands.FileManager
             var queryPop = Query.CreateBuilder();
             queryPop.Key = StashQueries.POP;
             queryPop.Representations.Add(StashQueries.POP);
-            queryPop.Parameters.Add(parName.ToImmutable());
 
             var queryDrop = Query.CreateBuilder();
             queryDrop.Key = StashQueries.DROP;
@@ -152,6 +156,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
                 new[]
                 {
                     queryList.ToImmutable(),
+                    queryPush.ToImmutable(),
                     queryApply.ToImmutable(),
                     queryPeek.ToImmutable(),
                     queryPop.ToImmutable(),
@@ -222,13 +227,6 @@ namespace BeaverSoft.Texo.Commands.FileManager
             optionCaseSensitive.Documentation.Title = ApplyOptions.CASE_SENSITIVE;
             optionCaseSensitive.Documentation.Description = "Make search case sensitive.";
 
-            var optionFileFilter = Option.CreateBuilder();
-            optionFileFilter.Key = ApplyOptions.FILE_FILTER;
-            optionFileFilter.Representations.AddRange(
-                new[] { ApplyOptions.FILE_FILTER, "ff" });
-            optionFileFilter.Documentation.Title = ApplyOptions.FILE_FILTER;
-            optionFileFilter.Documentation.Description = "Specify a file filter.";
-
             var queryCopy = Query.CreateBuilder();
             queryCopy.Key = ApplyQueries.COPY;
             queryCopy.Representations.AddRange(
@@ -260,7 +258,6 @@ namespace BeaverSoft.Texo.Commands.FileManager
             querySearch.Parameters.Add(parSearchTerm.ToImmutable());
             querySearch.Options.Add(optionRegex.ToImmutable());
             querySearch.Options.Add(optionCaseSensitive.ToImmutable());
-            querySearch.Options.Add(optionFileFilter.ToImmutable());
 
             var queryArchive = Query.CreateBuilder();
             queryArchive.Key = ApplyQueries.ARCHIVE;
