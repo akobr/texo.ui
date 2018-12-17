@@ -88,6 +88,12 @@ namespace BeaverSoft.Texo.Core.Model.Text
             return this;
         }
 
+        public ISpanBuilder Link(string title, string address)
+        {
+            builder.Link(title, address);
+            return this;
+        }
+
         public ISpanBuildContext StartStrongContext()
         {
             return builder.StartStrongContext();

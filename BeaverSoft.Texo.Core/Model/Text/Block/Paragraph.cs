@@ -7,6 +7,12 @@
             Content = content;
         }
 
+        public Paragraph(ISpanBuilder contentBuilder)
+            : this(contentBuilder.Span)
+        {
+            // no operation
+        }
+
         public Paragraph(string text)
             : this(new PlainText(text))
         {

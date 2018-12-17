@@ -85,6 +85,12 @@ namespace BeaverSoft.Texo.Core.Model.Text
             return this;
         }
 
+        public ISpanBuilder Link(string title, string address)
+        {
+            current = current.AddChild(new Link(title, address));
+            return this;
+        }
+
         public ISpanBuildContext StartStrongContext()
         {
             return StartContext(span => new Strong(span));

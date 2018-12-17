@@ -3,5 +3,7 @@
     public static class ActionParameters
     {
         public const string PATH = "path";
+        public const string STATEMENT = "statement";
+        public const string INPUT = "input";
     }
 }

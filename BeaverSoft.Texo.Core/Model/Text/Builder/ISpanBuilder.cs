@@ -27,6 +27,8 @@ namespace BeaverSoft.Texo.Core.Model.Text
 
         ISpanBuilder Highlight(string text, Color highlightColor);
 
+        ISpanBuilder Link(string title, string address);
+
         ISpanBuildContext StartStrongContext();
 
         ISpanBuildContext StartItalicContext();

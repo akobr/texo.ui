@@ -42,7 +42,6 @@ namespace BeaverSoft.Texo.Core.Help
 
             var orderedQueries = query.Queries.OrderBy(q => q.Key).ToList();
             var orderedOptions = query.Options.OrderBy(o => o.Key).ToList();
-            var orderedParameters = query.Parameters.OrderBy(p => p.Key).ToList();
 
             for (int i = 0, last = query.Queries.Count - 1; i <= last; i++)
             {
@@ -62,7 +61,7 @@ namespace BeaverSoft.Texo.Core.Help
 
             for (int i = 0, last = query.Parameters.Count - 1; i <= last; i++)
             {
-                Parameter parameter = orderedParameters[i];
+                Parameter parameter = query.Parameters[i];
                 RenderParameter(parameter, (ushort)(level + 1), i == last);
             }
         }

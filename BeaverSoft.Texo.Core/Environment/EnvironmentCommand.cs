@@ -1,7 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System.Text;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Result;
-using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Environment
 {
@@ -35,13 +34,15 @@ namespace BeaverSoft.Texo.Core.Environment
 
         private ICommandResult GetList()
         {
-            var result = ImmutableList<Item>.Empty.ToBuilder();
+            StringBuilder builder = new StringBuilder();
+
             foreach (var parameter in environment.GetVariables())
             {
-                result.Add($"*{parameter.Key}* = {parameter.Value}");
+                builder.AppendFormat("*{0}* = {1}", parameter.Key, parameter.Value);
+                builder.AppendLine();
             }
 
-            return new ItemsResult(result.ToImmutable());
+            return new MarkdownResult(builder.ToString());
         }
 
         private ICommandResult GetVariable(CommandContext context)
@@ -56,14 +57,14 @@ namespace BeaverSoft.Texo.Core.Environment
             string name = context.GetParameterValue(ParameterKeys.NAME);
             string value = context.GetParameterValue(ParameterKeys.VALUE);
             environment.SetVariable(name, value);
-            return new TextResult($"*{name}* = {value}");
+            return new MarkdownResult($"*{name}* = {value}");
         }
 
         private ICommandResult RemoveVariable(CommandContext context)
         {
             string name = context.GetParameterValue(ParameterKeys.NAME);
             environment.SetVariable(name, string.Empty);
-            return new TextResult($"Variable *{name}* has been removed.");
+            return new MarkdownResult($"Variable *{name}* has been removed.");
         }
     }
 }
