@@ -91,6 +91,17 @@ namespace BeaverSoft.Texo.View.Console
             return SysConsole.ReadLine();
         }
 
+        public void SetInput(string input)
+        {
+            // TODO: overwrite
+            SysConsole.Write(input);
+        }
+
+        public void AddInput(string append)
+        {
+            SysConsole.Write(" " + append.Trim());
+        }
+
         public void Dispose()
         {
             disposed = true;

@@ -56,6 +56,14 @@ namespace BeaverSoft.Texo.View.WPF
             //range.Text = string.Empty;
         }
 
+        public string GetInput()
+        {
+            return tbInput.Text;
+
+            //TextRange range = new TextRange(tbInput.Document.ContentStart, tbInput.Document.ContentEnd);
+            //return range.Text.Trim();
+        }
+
         public void SetInput(string input)
         {
             tbInput.Text = input;
@@ -121,13 +129,6 @@ namespace BeaverSoft.Texo.View.WPF
         {
             //TextRange range = new TextRange(tbInput.Document.ContentStart, tbInput.Document.ContentEnd);
             //range.ApplyPropertyValue(RichTextBox.FontSizeProperty, 16.0);
-        }
-
-        private string GetInput()
-        {
-            return tbInput.Text;
-            //TextRange range = new TextRange(tbInput.Document.ContentStart, tbInput.Document.ContentEnd);
-            //return range.Text.Trim();
         }
 
         private void HandleOutputPreviewKeyDown(object sender, KeyEventArgs e)

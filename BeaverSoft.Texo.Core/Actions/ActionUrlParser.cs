@@ -17,6 +17,8 @@ namespace BeaverSoft.Texo.Core.Actions
 
             string actionName = uri.Host;
             Dictionary<string, string> arguments = new Dictionary<string, string>();
+            arguments[ActionParameters.ACTION_NAME] = actionName;
+
             ParseSegments(uri.Segments, arguments);
             ParseQuery(uri.Query, arguments);
             ParseFragment(uri.Fragment, arguments);
@@ -43,7 +45,7 @@ namespace BeaverSoft.Texo.Core.Actions
                 return;
             }
 
-            string[] pairs = query.Split(new[] {'&'}, StringSplitOptions.RemoveEmptyEntries);
+            string[] pairs = query.Split(new[] {'?', '&'}, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string pair in pairs)
             {
@@ -65,7 +67,7 @@ namespace BeaverSoft.Texo.Core.Actions
                 return;
             }
 
-            arguments[ActionParameters.ARGS] = fragment;
+            arguments[ActionParameters.ACTION_ARGS] = fragment;
         }
     }
 }

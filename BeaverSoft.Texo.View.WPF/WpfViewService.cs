@@ -47,6 +47,36 @@ namespace BeaverSoft.Texo.View.WPF
             currentTitle = DEFAULT_TITLE;
         }
 
+        public void SetInput(string input)
+        {
+            control.SetInput(input.Trim());
+        }
+
+        public void AddInput(string append)
+        {
+            append = append.Trim();
+            string input = control.GetInput();
+
+            if (string.IsNullOrEmpty(input))
+            {
+                control.SetInput(append);
+                return;
+            }
+
+            if (input.EndsWith(" "))
+            {
+                control.SetInput(input + append);
+                return;
+            }
+
+            control.SetInput($"{input} {append}");
+        }
+
+        public string GetNewInput()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Render(Input input, IImmutableList<IItem> items)
         {
             List<Section> sections = new List<Section>(items.Count);
@@ -119,10 +149,6 @@ namespace BeaverSoft.Texo.View.WPF
             InitialiseControl();
         }
 
-        public string GetNewInput()
-        {
-            throw new NotImplementedException();
-        }
 
         private void InitialiseControl()
         {
@@ -194,28 +220,13 @@ namespace BeaverSoft.Texo.View.WPF
             MarkdownBuilder headerBuilder = new MarkdownBuilder();
             headerBuilder.WriteLine("***");
 
-            foreach (IToken token in input.Tokens)
+            if (input.Context.IsValid)
             {
-                switch (token.Type)
-                {
-                    case TokenTypeEnum.Query:
-                        headerBuilder.Bold(token.Input);
-                        break;
-
-                    case TokenTypeEnum.Option:
-                    case TokenTypeEnum.OptionList:
-                        headerBuilder.Italic(token.Input);
-                        break;
-
-                    case TokenTypeEnum.Wrong:
-                    case TokenTypeEnum.Unknown:
-                        continue;
-
-                    default:
-                        headerBuilder.Write(token.Input);
-                        break;
-                }
-
+                WriteInputTokens(input, headerBuilder);
+            }
+            else
+            {
+                headerBuilder.Write(input.ParsedInput.RawInput);
                 headerBuilder.Write(" ");
             }
 
@@ -310,6 +321,34 @@ namespace BeaverSoft.Texo.View.WPF
                 TextAlignment = TextAlignment.Left,
                 Foreground = Brushes.DimGray
             });
+        }
+
+        private static void WriteInputTokens(Input input, IMarkdownBuilder headerBuilder)
+        {
+            foreach (IToken token in input.Tokens)
+            {
+                switch (token.Type)
+                {
+                    case TokenTypeEnum.Query:
+                        headerBuilder.Bold(token.Input);
+                        break;
+
+                    case TokenTypeEnum.Option:
+                    case TokenTypeEnum.OptionList:
+                        headerBuilder.Italic(token.Input);
+                        break;
+
+                    case TokenTypeEnum.Wrong:
+                    case TokenTypeEnum.Unknown:
+                        continue;
+
+                    default:
+                        headerBuilder.Write(token.Input);
+                        break;
+                }
+
+                headerBuilder.Write(" ");
+            }
         }
     }
 }

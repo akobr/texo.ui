@@ -37,6 +37,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
             host = new TexoPowerShellHost(resultBuilder, view, logger);
         }
+
         public ICommandResult Fallback(Input input)
         {
             if (input == null || input.ParsedInput.IsEmpty())

@@ -4,13 +4,13 @@ namespace BeaverSoft.Texo.Core.View
 {
     public class Item : IItem
     {
-        private ImmutableList<IAction> actions;
+        private ImmutableList<IActionLink> actions;
 
         public Item(string text, TextFormatEnum format)
         {
             Text = text;
             Format = format;
-            Actions = ImmutableList<IAction>.Empty;
+            Actions = ImmutableList<IActionLink>.Empty;
         }
 
         public Item(string text)
@@ -29,14 +29,14 @@ namespace BeaverSoft.Texo.Core.View
 
         public TextFormatEnum Format { get; set; }
 
-        public IImmutableList<IAction> Actions { get; set; }
+        public IImmutableList<IActionLink> Actions { get; set; }
 
-        public void AddActions(ImmutableList<IAction> actionsToAdd)
+        public void AddActions(ImmutableList<IActionLink> actionsToAdd)
         {
             actions = actions.AddRange(actionsToAdd);
         }
 
-        public void SetActions(ImmutableList<IAction> newActions)
+        public void SetActions(ImmutableList<IActionLink> newActions)
         {
             actions = newActions;
         }

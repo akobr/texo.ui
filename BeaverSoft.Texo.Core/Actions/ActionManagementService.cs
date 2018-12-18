@@ -1,41 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using StrongBeaver.Core.Services.Logging;
-using StrongBeaver.Core.Services.Reflection;
 
 namespace BeaverSoft.Texo.Core.Actions
 {
-    // TODO: try catch retrieve, creation and execution
     public class ActionManagementService : IActionManagementService
     {
-        private readonly IActionTypeProvider provider;
-        private readonly IInstanceCreationService creation;
+        private readonly IActionFactoryProvider provider;
         private readonly IActionUrlParser parser;
         private readonly ILogService logger;
-        private readonly Dictionary<string, Type> registered;
 
         public ActionManagementService(
-            IActionTypeProvider provider,
-            IInstanceCreationService creation,
+            IActionFactoryProvider provider,
             ILogService logger)
         {
-            registered = new Dictionary<string, Type>();
             parser = new ActionUrlParser();
 
             this.provider = provider;
-            this.creation = creation;
             this.logger = logger;
-        }
-
-        public void Register<TAction>(string actionName)
-            where TAction : IAction
-        {
-            registered[actionName] = typeof(TAction);
-        }
-
-        public void Unregister(string actionName)
-        {
-            registered.Remove(actionName);
         }
 
         public void Execute(string actionUrl)
@@ -52,33 +34,48 @@ namespace BeaverSoft.Texo.Core.Actions
 
         public void Execute(string actionName, IDictionary<string, string> arguments)
         {
-            Type actionType = TryGetActionType(actionName);
+            IActionFactory factory = provider?.GetActionFactory(actionName);
 
-            if (actionType == null)
+            if (factory == null)
             {
-                logger.Warn($"No action type for action name: {actionName}", arguments);
+                logger.Warn($"No action factory for action: {actionName}.", arguments);
                 return;
             }
 
-            IAction action = creation.CreateInstance(actionType) as IAction;
+            IAction action = CreateActionInstance(factory);
 
             if (action == null)
             {
-                logger.Warn($"No action created for action name: {actionName}", actionType, arguments);
+                logger.Warn($"No action created for action: {actionName}.", factory, arguments);
                 return;
             }
 
-            action.Execute(arguments);
+            ExecuteAction(action, arguments);
         }
 
-        private Type TryGetActionType(string actionName)
+        private void ExecuteAction(IAction action, IDictionary<string, string> arguments)
         {
-            if (registered.TryGetValue(actionName, out Type actionType))
+            try
             {
-                return actionType;
+                action.Execute(arguments);
             }
+            catch (Exception)
+            {
+                logger.Error("Error during excution of action.", action, arguments);
+            }
+        }
 
-            return provider?.GetActionType(actionName);
+        private IAction CreateActionInstance(IActionFactory factory)
+        {
+            try
+            {
+                return factory.Build();
+            }
+            catch (Exception exception)
+            {
+                logger.Warn($"Error on action instanciation.", factory, exception);
+                return null;
+            }
         }
     }
 }

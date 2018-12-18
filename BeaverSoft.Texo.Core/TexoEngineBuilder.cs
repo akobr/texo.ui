@@ -175,7 +175,7 @@ namespace BeaverSoft.Texo.Core
             history = history ?? new InputHistoryService();
             commandManagement = commandManagement ?? new SingletonCommandManagementService(commandFactory);
             resultProcessing = resultProcessing ?? new ResultProcessingService(logger);
-            actionManagement = actionManagement ?? new ActionManagementService(null, new InstanceCreationService(logger), logger);
+            actionManagement = actionManagement ?? new ActionManagementService(null, logger);
 
             // intellisence
             // didYouMean
