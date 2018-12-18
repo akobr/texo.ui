@@ -33,6 +33,11 @@ namespace BeaverSoft.Texo.Core.Model.Text
 
         public string Language { get; }
 
+        public string ToString(int level)
+        {
+            return ToString();
+        }
+
         public override string ToString()
         {
             StringBuilder result = new StringBuilder();

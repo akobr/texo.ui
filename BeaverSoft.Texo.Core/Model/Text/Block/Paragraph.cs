@@ -21,6 +21,11 @@
 
         public IInline Content { get; }
 
+        public string ToString(int level)
+        {
+            return ToString();
+        }
+
         public override string ToString()
         {
             return Content.ToString();

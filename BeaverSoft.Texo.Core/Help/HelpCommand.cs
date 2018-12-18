@@ -41,7 +41,7 @@ namespace BeaverSoft.Texo.Core.Help
                 return new ErrorTextResult($"The command '{commandKey}' hasn't been found.");
             }
 
-            foreach (string inputItem in context.GetParameterValues(ParameterKeys.ITEM))
+            foreach (string inputItem in context.GetParameterValues(ParameterKeys.ITEM).Skip(1))
             {
                 if (option != null)
                 {
@@ -82,7 +82,7 @@ namespace BeaverSoft.Texo.Core.Help
 
             if (option != null)
             {
-                return new ModeledResult(BuildOptionInfo(option, input));
+                return new ModeledResult(BuildOptionInfo(option));
             }
 
             if (query != null)
@@ -135,11 +135,17 @@ namespace BeaverSoft.Texo.Core.Help
         private static IBlock BuildQueryInfo(Query query, string input, bool listChildren)
         {
             input += " " + query.GetMainRepresentation();
+            input = input.Trim();
 
             Section result = new Section(
                 new Header(query.Documentation?.Title ?? query.GetMainRepresentation()),
                 new Paragraph(
                     new Model.Text.Link(input, ActionBuilder.CommandRunUri($"help info {input}"))));
+
+            if (!string.IsNullOrEmpty(query.Documentation?.Description))
+            {
+                result = result.AddChild(new Paragraph(query.Documentation.Description));
+            }
 
             if (!listChildren)
             {
@@ -153,7 +159,7 @@ namespace BeaverSoft.Texo.Core.Help
 
             if (query.Options.Count > 0)
             {
-                result = result.AddChild(BuildOptionsSection(query, input));
+                result = result.AddChild(BuildOptionsSection(query));
             }
 
             if (query.Parameters.Count > 0)
@@ -164,10 +170,8 @@ namespace BeaverSoft.Texo.Core.Help
             return result;
         }
 
-        private static IBlock BuildOptionInfo(Option option, string input)
+        private static IBlock BuildOptionInfo(Option option)
         {
-            input += " " + option.GetMainRepresentation();
-
             Section result = new Section(
                 new Header(option.Documentation?.Title ?? option.GetMainRepresentation()));
             ISpanBuilder content = new SpanBuilder();
@@ -180,7 +184,7 @@ namespace BeaverSoft.Texo.Core.Help
                         ? $"--{representation}"
                         : $"-{representation}";
 
-                    content.Link(input, ActionBuilder.InputAddUri(optionInput));
+                    content.Link(optionInput, ActionBuilder.InputAddUri(optionInput));
                 }
 
                 content.WriteLine();
@@ -210,7 +214,7 @@ namespace BeaverSoft.Texo.Core.Help
             {
                 result = result.AddChild(new Paragraph(
                     SpanBuilder.Create()
-                        .Write("Template: ")
+                        .Write("Regular expression: ")
                         .Italic($"/{parameter.ArgumentTemplate}/")));
             }
 
@@ -234,13 +238,13 @@ namespace BeaverSoft.Texo.Core.Help
             return result;
         }
 
-        private static IBlock BuildOptionsSection(Query query, string input)
+        private static IBlock BuildOptionsSection(Query query)
         {
             Section result = new Section(new Header("Options"));
 
             foreach (Option option in query.Options.OrderBy(o => o.Key))
             {
-                result = result.AddChild(BuildOptionInfo(option, input));
+                result = result.AddChild(BuildOptionInfo(option));
             }
 
             return result;

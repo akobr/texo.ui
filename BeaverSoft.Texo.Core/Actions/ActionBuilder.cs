@@ -6,9 +6,6 @@ namespace BeaverSoft.Texo.Core.Actions
 {
     public static class ActionBuilder
     {
-        private const string ACTION_SCHEMA = "action";
-        private const string SCHEMA_SEPARATOR = "://";
-
         public static string PathUri(string fullPath)
         {
             return BuildActionUri(ActionNames.PATH, ActionParameters.PATH, fullPath);
@@ -41,7 +38,7 @@ namespace BeaverSoft.Texo.Core.Actions
 
         private static string BuildActionUri(string actionName, IDictionary<string, string> arguments)
         {
-            StringBuilder builder = new StringBuilder(ACTION_SCHEMA + SCHEMA_SEPARATOR);
+            StringBuilder builder = new StringBuilder(ActionConstants.ACTION_SCHEMA + Uri.SchemeDelimiter);
             builder.Append(actionName ?? throw new ArgumentNullException(nameof(actionName)));
             
             if (arguments == null || arguments.Count < 1)

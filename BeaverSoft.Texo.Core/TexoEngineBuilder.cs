@@ -1,4 +1,5 @@
 ﻿using System;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
@@ -11,6 +12,7 @@ using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
+using StrongBeaver.Core.Services.Reflection;
 
 namespace BeaverSoft.Texo.Core
 {
@@ -34,6 +36,7 @@ namespace BeaverSoft.Texo.Core
         private IDidYouMeanService didYouMean;
         private IResultProcessingService resultProcessing;
         private IViewService usedView;
+        private IActionManagementService actionManagement;
         private IRuntimeCoordinatorService runtime;
 
         public TexoEngineBuilder()
@@ -97,6 +100,12 @@ namespace BeaverSoft.Texo.Core
             return this;
         }
 
+        public TexoEngineBuilder WithActionManagementService(IActionManagementService service)
+        {
+            actionManagement = service;
+            return this;
+        }
+
         public TexoEngineBuilder WithIntellisenceService(IIntellisenceService service)
         {
             intellisence = service;
@@ -133,6 +142,7 @@ namespace BeaverSoft.Texo.Core
                 DidYouMean = () => didYouMean,
                 Fallback = () => fallback,
                 View = () => usedView,
+                ActionManagement = () => actionManagement,
                 Runtime = () => runtime
             };
         }
@@ -144,8 +154,8 @@ namespace BeaverSoft.Texo.Core
             SetViewService(view);
             runtime = new RuntimeCoordinatorService(
                 environment, evaluator, commandManagement,
-                resultProcessing, usedView, history,
-                intellisence, didYouMean, fallback);
+                resultProcessing, usedView, actionManagement,
+                history, intellisence, didYouMean, fallback);
             return new TexoEngine(runtime, usedView, setting);
         }
 
@@ -165,6 +175,7 @@ namespace BeaverSoft.Texo.Core
             history = history ?? new InputHistoryService();
             commandManagement = commandManagement ?? new SingletonCommandManagementService(commandFactory);
             resultProcessing = resultProcessing ?? new ResultProcessingService(logger);
+            actionManagement = actionManagement ?? new ActionManagementService(null, new InstanceCreationService(logger), logger);
 
             // intellisence
             // didYouMean

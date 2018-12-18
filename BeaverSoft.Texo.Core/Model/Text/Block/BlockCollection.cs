@@ -53,13 +53,20 @@ namespace BeaverSoft.Texo.Core.Model.Text
 
         public override string ToString()
         {
+            return ToString(0);
+        }
+
+        public string ToString(int level)
+        {
             StringBuilder result = new StringBuilder();
+            level++;
 
             foreach (IBlock block in Children)
             {
-                result.Append(block);
+                result.Append(block.ToString(level));
 
-                if (result.ToString(result.Length - System.Environment.NewLine.Length,
+                if (result.ToString(
+                        result.Length - System.Environment.NewLine.Length,
                         System.Environment.NewLine.Length) != System.Environment.NewLine)
                 {
                     result.AppendLine();
@@ -70,7 +77,8 @@ namespace BeaverSoft.Texo.Core.Model.Text
 
             if (result.Length > 0)
             {
-                result.Remove(result.Length - System.Environment.NewLine.Length,
+                result.Remove(
+                    result.Length - System.Environment.NewLine.Length,
                     System.Environment.NewLine.Length);
             }
 

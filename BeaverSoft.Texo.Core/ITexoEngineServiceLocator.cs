@@ -1,4 +1,5 @@
 ﻿using System;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
@@ -41,6 +42,8 @@ namespace BeaverSoft.Texo.Core
         Func<IFallbackService> Fallback { get; }
 
         Func<IViewService> View { get; }
+
+        Func<IActionManagementService> ActionManagement { get; }
 
         Func<IRuntimeCoordinatorService> Runtime { get; }
     }

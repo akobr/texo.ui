@@ -34,6 +34,11 @@ namespace BeaverSoft.Texo.Core.Model.Text
 
         public override string ToString()
         {
+            return ToString(0);
+        }
+
+        public string ToString(int level)
+        {
             StringBuilder result = new StringBuilder();
 
             if (Level.HasValue)
@@ -43,7 +48,8 @@ namespace BeaverSoft.Texo.Core.Model.Text
             }
             else
             {
-                result.Append("# ");
+                result.Append('#', Math.Max(1, level));
+                result.Append(' ');
             }
 
             result.Append(Content);

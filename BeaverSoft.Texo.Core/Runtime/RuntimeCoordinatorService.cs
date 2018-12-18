@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
@@ -18,6 +20,7 @@ namespace BeaverSoft.Texo.Core.Runtime
         private readonly IIntellisenceService intelisence;
         private readonly IResultProcessingService resultProcessing;
         private readonly IViewService view;
+        private readonly IActionManagementService actionManagement;
         private readonly IInputHistoryService history;
         private readonly IFallbackService fallback;
 
@@ -27,6 +30,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             ICommandManagementService commandManagement,
             IResultProcessingService resultProcessing,
             IViewService view,
+            IActionManagementService actionManagement,
             IInputHistoryService history,
             IIntellisenceService intelisence,
             IDidYouMeanService didYouMean,
@@ -37,6 +41,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             this.commandManagement = commandManagement ?? throw new ArgumentNullException(nameof(commandManagement));
             this.resultProcessing = resultProcessing ?? throw new ArgumentNullException(nameof(resultProcessing));
             this.view = view ?? throw new ArgumentNullException(nameof(view));
+            this.actionManagement = actionManagement ?? throw new ArgumentNullException(nameof(actionManagement));
 
             this.history = history;
             this.intelisence = intelisence;
@@ -97,6 +102,16 @@ namespace BeaverSoft.Texo.Core.Runtime
             ProcessContext(inputModel, inputModel.Context);
         }
 
+        public void ExecuteAction(string actionUrl)
+        {
+            actionManagement.Execute(actionUrl);
+        }
+
+        public void ExecuteAction(string actionName, IDictionary<string, string> arguments)
+        {
+            actionManagement.Execute(actionName, arguments);
+        }
+
         public void Dispose()
         {
             view.Dispose();
@@ -121,15 +136,15 @@ namespace BeaverSoft.Texo.Core.Runtime
 
         private void ProcessCommand(ICommand command, CommandContext context, Input.Input input)
         {
-            try
-            {
+            //try
+            //{
                 ICommandResult result = command.Execute(context);
                 Render(input, result);
-            }
-            catch (Exception exception)
-            {
-                RenderError(input, exception.Message);
-            }
+            //}
+            //catch (Exception exception)
+            //{
+            //    RenderError(input, exception.Message);
+            //}
         }
 
         private async void ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input.Input input)
