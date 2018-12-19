@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BeaverSoft.Texo.Core.Actions;
 
 namespace BeaverSoft.Texo.Core.View.Actions

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using BeaverSoft.Texo.Core.Actions;
 
-namespace BeaverSoft.Texo.Core.View.Actions
+namespace BeaverSoft.Texo.Core.Actions
 {
     public class NavigateToAction : IAction
     {

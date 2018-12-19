@@ -78,11 +78,11 @@ namespace BeaverSoft.Texo.Commands.FileManager.Extensions
                 switch (type)
                 {
                     case PathTypeEnum.Directory:
-                        result.Directories.Add(new Link(path.GetFriendlyPath(relatedTo), ActionBuilder.DirectoryOpenUri(path)));
+                        result.Directories.Add(new Link(path.GetFriendlyPath(relatedTo), ActionBuilder.PathOpenUri(path)));
                         break;
 
                     case PathTypeEnum.File:
-                        result.Files.Add(new Link(path.GetFriendlyPath(relatedTo), ActionBuilder.FileOpenUri(path)));
+                        result.Files.Add(new Link(path.GetFriendlyPath(relatedTo), ActionBuilder.PathOpenUri(path)));
                         break;
 
                     case PathTypeEnum.NonExistent:
