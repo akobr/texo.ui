@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Security;
@@ -33,7 +34,24 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         public override Dictionary<string, PSObject> Prompt(
             string caption, string message, Collection<FieldDescription> descriptions)
         {
-            throw new NotImplementedException();
+            resultBuilder.WriteLine($"PowerShell expect the parameter(s):");
+
+            if (descriptions != null && descriptions.Count > 0)
+            {
+                resultBuilder.WriteLine(string.Join(", ", descriptions.Select(f => f.Name)));
+            }
+
+            if (string.IsNullOrWhiteSpace(caption))
+            {
+                resultBuilder.WriteLine(caption);
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                resultBuilder.WriteLine(message);
+            }
+
+            return new Dictionary<string, PSObject>();
         }
 
         public override int PromptForChoice(

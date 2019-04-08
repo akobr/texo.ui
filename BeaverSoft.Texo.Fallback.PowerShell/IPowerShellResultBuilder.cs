@@ -5,6 +5,8 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 {
     public interface IPowerShellResultBuilder
     {
+        bool ContainError { get; }
+
         void StartItem();
 
         void Write(string text);

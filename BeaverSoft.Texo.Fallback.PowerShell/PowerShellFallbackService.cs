@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using BeaverSoft.Texo.Core.Commands;
@@ -55,7 +56,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             {
                 resultBuilder.StartItem();
                 RunScriptToOutput(input.ParsedInput.RawInput);
-                return new ItemsResult(resultBuilder.FinishItem());
+                return new ItemsResult(
+                    resultBuilder.ContainError
+                        ? ResultTypeEnum.Failed
+                        : ResultTypeEnum.Success,
+                    ImmutableList.Create(resultBuilder.FinishItem()));
             }
             catch (Exception e)
             {

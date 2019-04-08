@@ -7,6 +7,9 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
     public class PowerShellResultMarkdownBuilder : IPowerShellResultBuilder
     {
         private IMarkdownBuilder markdown;
+        private bool containError;
+
+        public bool ContainError => containError;
 
         public Item FinishItem()
         {
@@ -18,6 +21,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
 
         public void StartItem()
         {
+            containError = false;
             markdown = new MarkdownBuilder();
         }
 
@@ -39,6 +43,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
 
         public void WriteErrorLine(string text)
         {
+            containError = true;
             markdown.Blockquotes(text);
         }
 

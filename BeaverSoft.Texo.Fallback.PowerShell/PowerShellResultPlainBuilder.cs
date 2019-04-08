@@ -7,6 +7,9 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
     public class PowerShellResultPlainBuilder : IPowerShellResultBuilder
     {
         private StringBuilder builder;
+        private bool containError;
+
+        public bool ContainError => containError;
 
         public Item FinishItem()
         {
@@ -15,6 +18,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public void StartItem()
         {
+            containError = false;
             builder = new StringBuilder();
         }
 
@@ -35,6 +39,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public void WriteErrorLine(string text)
         {
+            containError = true;
             builder.AppendLine(text);
         }
 
