@@ -11,19 +11,24 @@ namespace BeaverSoft.Texo.Core.Actions
             return BuildActionUri(ActionNames.PATH, ActionParameters.PATH, fullPath);
         }
 
-        public static string FileOpenUri(string fileFullPath)
+        public static string PathOpenUri(string fileFullPath)
         {
-            return BuildActionUri(ActionNames.FILE_OPEN, ActionParameters.PATH, fileFullPath);
+            return BuildActionUri(ActionNames.PATH_OPEN, ActionParameters.PATH, fileFullPath);
         }
 
-        public static string DirectoryOpenUri(string directoryFullPath)
+        public static string CommandUri(string input)
         {
-            return BuildActionUri(ActionNames.DIRECTORY_OPEN, ActionParameters.PATH, directoryFullPath);
+            return BuildActionUri(ActionNames.COMMAND, ActionParameters.STATEMENT, input);
         }
 
         public static string CommandRunUri(string input)
         {
             return BuildActionUri(ActionNames.COMMAND_RUN, ActionParameters.STATEMENT, input);
+        }
+
+        public static string InputUri(string input)
+        {
+            return BuildActionUri(ActionNames.INPUT, ActionParameters.INPUT, input);
         }
 
         public static string InputSetUri(string input)

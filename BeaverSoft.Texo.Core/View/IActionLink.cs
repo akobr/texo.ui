@@ -2,7 +2,7 @@
 
 namespace BeaverSoft.Texo.Core.View
 {
-    public interface IAction
+    public interface IActionLink
     {
         string Name { get; }
 

@@ -16,6 +16,6 @@ namespace BeaverSoft.Texo.Core.View
 
         public TextFormatEnum Format => TextFormatEnum.Model;
 
-        public IImmutableList<IAction> Actions { get; set; }
+        public IImmutableList<IActionLink> Actions { get; set; }
     }
 }

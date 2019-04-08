@@ -15,6 +15,10 @@ namespace BeaverSoft.Texo.Core.View
         IMessageBusService<IVariableUpdatedMessage>,
         IMessageBusService<IClearViewOutputMessage>
     {
+        void SetInput(string input);
+
+        void AddInput(string append);
+
         void Render(Input.Input input, IImmutableList<IItem> items);
 
         void RenderIntellisence(Input.Input input, IImmutableList<IItem> items);

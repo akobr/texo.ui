@@ -127,7 +127,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             context.FileOutputList = context.FileOutputList.AddItem(
                 new ListItem(new Core.Model.Text.Link(
                     destinationPath,
-                    ActionBuilder.FileOpenUri(filePath.GetFullPath()))));
+                    ActionBuilder.PathOpenUri(filePath.GetFullPath()))));
 
             using (FileStream originalStream = new FileStream(filePath, FileMode.Open))
             using (Stream targetStream = fileEntry.Open())
@@ -142,7 +142,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 new Header(context.DestinationZipFile.GetFileNameOrDirectoryName()),
                 new Paragraph(new Core.Model.Text.Link(
                     context.DestinationZipFile.GetFullPath(),
-                    ActionBuilder.FileOpenUri(context.DestinationZipFile.GetFullPath()))),
+                    ActionBuilder.PathOpenUri(context.DestinationZipFile.GetFullPath()))),
                 new Section(
                     new Header(2, "Content"),
                     context.FileOutputList));

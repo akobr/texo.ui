@@ -172,7 +172,7 @@ namespace BeaverSoft.Texo.Core.Runtime
 
         private void RenderError(Input.Input input, string message)
         {
-            Render(input, ImmutableList<IItem>.Empty.Add(new Item($"> {message}")));
+            Render(input, ImmutableList<IItem>.Empty.Add(Item.Markdown($"> {message}")));
         }
     }
 }

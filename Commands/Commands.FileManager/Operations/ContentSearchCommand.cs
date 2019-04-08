@@ -127,7 +127,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                     new Paragraph(
                         new Core.Model.Text.Link(
                             filePath.GetFriendlyPath(context.SourceLobby),
-                            ActionBuilder.FileOpenUri(filePath.GetFullPath()))),
+                            ActionBuilder.PathOpenUri(filePath.GetFullPath()))),
                     new Paragraph(context.MatchResults));
 
                 context.Result.Add(new ModeledItem(fileDocoment));
