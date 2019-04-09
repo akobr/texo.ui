@@ -21,8 +21,16 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         public void Write(IItem item)
         {
-            MarkdownDocument doc = markdown.Parse(item.Text);
-            WriteBlockContainer(doc);
+            if (item.Format == TextFormatEnum.Plain)
+            {
+                SysConsole.Write(item.Text);
+            }
+            else
+            {
+                MarkdownDocument doc = markdown.Parse(item.Text);
+                WriteBlockContainer(doc);
+            }
+
             SysConsole.WriteLine();
         }
 
@@ -217,7 +225,7 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         private static string GetTextFromSlice(StringSlice slice)
         {
-            if (slice.Length < 1 || slice.Text == null)
+            if (slice.Text == null)
             {
                 return string.Empty;
             }
