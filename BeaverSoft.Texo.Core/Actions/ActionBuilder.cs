@@ -31,14 +31,19 @@ namespace BeaverSoft.Texo.Core.Actions
             return BuildActionUri(ActionNames.INPUT, ActionParameters.INPUT, input);
         }
 
-        public static string InputSetUri(string input)
+        public static string InputUpdateUri(string input)
         {
-            return BuildActionUri(ActionNames.INPUT_SET, ActionParameters.INPUT, input);
+            return BuildActionUri(ActionNames.INPUT_UPDATE, ActionParameters.INPUT, input);
         }
 
         public static string InputAddUri(string append)
         {
             return BuildActionUri(ActionNames.INPUT_ADD, ActionParameters.INPUT, append);
+        }
+
+        public static string InputSetUri(string input)
+        {
+            return BuildActionUri(ActionNames.INPUT_SET, ActionParameters.INPUT, input);
         }
 
         private static string BuildActionUri(string actionName, IDictionary<string, string> arguments)

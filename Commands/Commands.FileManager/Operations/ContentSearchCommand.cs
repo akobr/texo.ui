@@ -96,7 +96,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
         private void SearchFile(string filePath, SearchContext context)
         {
-            if (File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
                 return;
             }
@@ -198,7 +198,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
             while (true)
             {
-                int index = context.Line.IndexOf(context.Line, start, comparison);
+                int index = context.Line.IndexOf(context.SearchTerm, start, comparison);
 
                 if (index < 0)
                 {

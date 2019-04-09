@@ -130,7 +130,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
             }
             else
             {
-                builder.Link(lobbyPath, ActionBuilder.DirectoryOpenUri(lobbyPath));
+                builder.Link(lobbyPath, ActionBuilder.PathOpenUri(lobbyPath));
             }
 
             builder.WriteLine();

@@ -133,7 +133,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
         {
             MarkdownBuilder builder = new MarkdownBuilder();
             builder.Header("Move");
-            builder.Link(context.Destination, ActionBuilder.DirectoryOpenUri(context.Destination));
+            builder.Link(context.Destination, ActionBuilder.PathOpenUri(context.Destination));
             bool empty = true;
 
             if (context.MovedFiles.Count > 0)

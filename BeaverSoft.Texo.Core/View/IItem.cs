@@ -8,6 +8,6 @@ namespace BeaverSoft.Texo.Core.View
 
         TextFormatEnum Format { get; }
 
-        IImmutableList<IActionLink> Actions { get; }
+        IImmutableList<ILink> Actions { get; }
     }
 }

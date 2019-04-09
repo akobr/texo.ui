@@ -34,6 +34,11 @@ namespace BeaverSoft.Texo.Core.Actions
         {
             foreach (string segment in segments)
             {
+                if (segment == "/")
+                {
+                    continue;
+                }
+
                 arguments[segment] = segment;
             }
         }
@@ -56,7 +61,7 @@ namespace BeaverSoft.Texo.Core.Actions
                     continue;
                 }
 
-                arguments[values[0]] = values[1];
+                arguments[values[0]] = Uri.UnescapeDataString(values[1]);
             }
         }
 

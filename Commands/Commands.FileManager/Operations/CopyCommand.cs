@@ -120,7 +120,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
         {
             MarkdownBuilder builder = new MarkdownBuilder();
             builder.Header("Copy");
-            builder.Link(context.Destination, ActionBuilder.DirectoryOpenUri(context.Destination));
+            builder.Link(context.Destination, ActionBuilder.PathOpenUri(context.Destination));
             bool empty = true;
 
             if (context.CopiedFiles.Count > 0)
