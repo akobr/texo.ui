@@ -7,7 +7,6 @@ using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Input.History;
 using BeaverSoft.Texo.Core.Logging;
-using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core;
@@ -176,7 +175,7 @@ namespace BeaverSoft.Texo.Core
             history = history ?? new InputHistoryService();
             commandManagement = commandManagement ?? new SingletonCommandManagementService(commandFactory);
             resultProcessing = resultProcessing ?? new ResultProcessingService(logger);
-            actionManagement = actionManagement ?? new ActionManagementService(null, new InstanceCreationService(logger), logger);
+            actionManagement = actionManagement ?? new ActionManagementService(null, logger);
             intellisence = intellisence ?? CreateIntellisenceService();
             // didYouMean
         }

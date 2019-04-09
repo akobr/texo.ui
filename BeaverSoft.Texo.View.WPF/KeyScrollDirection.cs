@@ -1,6 +1,6 @@
 ﻿namespace BeaverSoft.Texo.View.WPF
 {
-    public enum HistoryScrollDirection
+    public enum KeyScrollDirection
     {
         Back,
         Forward

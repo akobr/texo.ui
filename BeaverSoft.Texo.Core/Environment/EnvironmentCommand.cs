@@ -38,7 +38,7 @@ namespace BeaverSoft.Texo.Core.Environment
 
             foreach (var parameter in environment.GetVariables())
             {
-                builder.AppendFormat("*{0}* = {1}", parameter.Key, parameter.Value);
+                builder.AppendFormat("- *{0}* = {1}", parameter.Key, parameter.Value);
                 builder.AppendLine();
             }
 

@@ -60,7 +60,7 @@
         </Grid>
 
         <!-- COMMAND LINE -->
-        <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0,1" Margin="0,3" Padding="0,3" Background="LightGray">
+        <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0,1" Margin="0,3,0,0" Padding="0,3" Background="LightGray">
             <Grid
                 >
                 <Grid.ColumnDefinitions>
@@ -79,7 +79,31 @@
         <!-- OUTPUT -->
         <FlowDocumentScrollViewer Name="docOutput" Grid.Row="2"
                                   MinZoom="50" VerticalScrollBarVisibility="Auto"
-                                  PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseWheel="HandleScrollSpeed" />
+                                  PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseWheel="HandleScrollSpeed">
+            <FlowDocument>
+                <Section>
+                    <Paragraph>Command(s) output...</Paragraph>
+                </Section>
+            </FlowDocument>
+        </FlowDocumentScrollViewer>
+
+        <!-- INTELLISENCE -->
+        <ListView x:Name="listIntellisence" Grid.Row="2" Background="White"
+                  PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenceMouseDoubleClick"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
+            <!--<ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>-->
+
+            <ListViewItem>
+                <StackPanel>
+                    <TextBlock Text="--example (option)" FontWeight="Bold" Margin="4" />
+                    <TextBlock Text="An example of intellisence item preview." Margin="4"  />
+                </StackPanel>
+            </ListViewItem>
+        </ListView>
 
     </Grid>
 </UserControl>

@@ -8,7 +8,7 @@ using StrongBeaver.Core.Services;
 
 namespace BeaverSoft.Texo.Core.Environment
 {
-    public class EnvironmentService : IEnvironmentService
+    public class EnvironmentService : IEnvironmentService, IMessageBusService<ISettingUpdatedMessage>
     {
         private readonly IServiceMessageBus messageBus;
         private readonly Dictionary<string, string> variables;

@@ -2,6 +2,8 @@
 {
     public static class PathConstants
     {
+        public const string RELATIVE_CURRENT_DIRECTORY = ".";
+
         public const char WILDCARD_ANY_CHARACTER = '*';
         public const char WILDCARD_ONE_CHARACTER = '?';
 

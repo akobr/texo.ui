@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BeaverSoft.Texo.Core.View;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -12,6 +13,8 @@ namespace BeaverSoft.Texo.View.WPF
     /// </summary>
     public partial class TexoControl : UserControl
     {
+        private bool skipNextTextChange;
+
         public TexoControl()
         {
             InitializeComponent();
@@ -20,9 +23,12 @@ namespace BeaverSoft.Texo.View.WPF
 
         public event EventHandler<string> InputChanged;
         public event EventHandler<string> InputFinished;
-        public event EventHandler<HistoryScrollDirection> CommandHistoryScrolled;
+        public event EventHandler<KeyScrollDirection> KeyScrolled;
+        public event EventHandler IntellisenceItemExecuted;
 
         public FlowDocument OutputDocument => docOutput.Document;
+
+        public ListView IntellisenceList => listIntellisence;
 
         public string Prompt
         {
@@ -36,6 +42,8 @@ namespace BeaverSoft.Texo.View.WPF
             set => lbTitle.Text = value;
         }
 
+        public bool IsIntellisenceOpened => listIntellisence.Visibility == Visibility.Visible;
+
         public void EnableInput()
         {
             tbInput.IsReadOnly = false;
@@ -44,6 +52,18 @@ namespace BeaverSoft.Texo.View.WPF
         public void DisableInput()
         {
             tbInput.IsReadOnly = true;
+        }
+
+        public void CloseIntellisence()
+        {
+            listIntellisence.Visibility = Visibility.Collapsed;
+        }
+
+        public string GetInput()
+        {
+            return tbInput.Text;
+            //TextRange range = new TextRange(tbInput.Document.ContentStart, tbInput.Document.ContentEnd);
+            //return range.Text.Trim();
         }
 
         public void EmptyInput()
@@ -56,19 +76,12 @@ namespace BeaverSoft.Texo.View.WPF
             //range.Text = string.Empty;
         }
 
-        public string GetInput()
-        {
-            return tbInput.Text;
-
-            //TextRange range = new TextRange(tbInput.Document.ContentStart, tbInput.Document.ContentEnd);
-            //return range.Text.Trim();
-        }
-
         public void SetInput(string input)
         {
+            skipNextTextChange = true;
             tbInput.Text = input;
             tbInput.CaretIndex = tbInput.Text.Length;
-
+            
             //TextRange range = new TextRange(control.InputBox.Document.ContentStart, control.InputBox.Document.ContentEnd);
             //range.Text = historyItem.Input.ParsedInput.RawInput;
             //control.InputBox.CaretPosition = control.InputBox.Document.ContentEnd;
@@ -91,6 +104,12 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void HandleInputTextChanged(object sender, TextChangedEventArgs e)
         {
+            if (skipNextTextChange)
+            {
+                skipNextTextChange = false;
+                return;
+            }
+
             InputChanged?.Invoke(this, GetInput());
         }
 
@@ -115,13 +134,73 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void HandleInputKeyDownPreview(object sender, KeyEventArgs e)
         {
+            if ((e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) || e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
+                && e.KeyboardDevice.IsKeyDown(Key.Space))
+            {
+                e.Handled = true;
+                InputChanged?.Invoke(this, GetInput());
+                return;
+            }
+
+            if (e.Key == Key.Escape)
+            {
+                e.Handled = true;
+                CloseIntellisence();
+                return;
+            }
+
+            if (e.Key == Key.Enter
+                && IsIntellisenceOpened
+                && listIntellisence.SelectedIndex >= 0)
+            {
+                e.Handled = true;
+                IntellisenceItemExecuted?.Invoke(this, new EventArgs());
+                return;
+            }
+
             if (e.Key == Key.Up)
             {
-                CommandHistoryScrolled?.Invoke(this, HistoryScrollDirection.Back);
+                e.Handled = true;
+
+                if (IsIntellisenceOpened)
+                {
+                    if (listIntellisence.SelectedIndex > 0)
+                    {
+                        listIntellisence.SelectedIndex--;
+                    }
+                    else if(listIntellisence.SelectedIndex < 0)
+                    {
+                        listIntellisence.SelectedIndex = 0;
+                    }
+
+                    listIntellisence.ScrollIntoView(listIntellisence.SelectedItem);
+                }
+                else
+                {
+                    KeyScrolled?.Invoke(this, KeyScrollDirection.Back);
+                }
+                
+                return;
             }
-            else if (e.Key == Key.Down)
+
+            if (e.Key == Key.Down)
             {
-                CommandHistoryScrolled?.Invoke(this, HistoryScrollDirection.Forward);
+                e.Handled = true;
+
+                if (IsIntellisenceOpened)
+                {
+                    if (listIntellisence.SelectedIndex < listIntellisence.Items.Count - 1)
+                    {
+                        listIntellisence.SelectedIndex++;
+                        listIntellisence.ScrollIntoView(listIntellisence.SelectedItem);
+                    }
+                }
+                else
+                {
+                    KeyScrolled?.Invoke(this, KeyScrollDirection.Forward);
+                }
+
+                return;
             }
         }
 
@@ -206,6 +285,16 @@ namespace BeaverSoft.Texo.View.WPF
             }
 
             return null;
+        }
+
+        private void HandleIntellisenceMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (listIntellisence.SelectedItem == null)
+            {
+                return;
+            }
+
+            IntellisenceItemExecuted?.Invoke(this, new EventArgs());
         }
     }
 }
