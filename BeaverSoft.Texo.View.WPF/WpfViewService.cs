@@ -1,30 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Text;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Input.History;
 using BeaverSoft.Texo.Core.Markdown.Builder;
-using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
+using Markdig.Wpf;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Messaging;
 
 namespace BeaverSoft.Texo.View.WPF
 {
-    public class WpfViewService : IViewService, IInitialisable<TexoControl>
+    public class WpfViewService : IViewService, IPromptableViewService, IInitialisable<TexoControl>
     {
         private const string DEFAULT_PROMPT = "tu>";
         private const string DEFAULT_TITLE = "Texo UI";
 
         private readonly IWpfRenderService renderer;
         private readonly IFactory<IInputHistoryService> historyFactory;
+        private readonly IActionUrlParser actionParser;
 
         private IExecutor executor;
         private TexoControl control;
@@ -42,31 +46,66 @@ namespace BeaverSoft.Texo.View.WPF
         {
             this.renderer = renderer;
             this.historyFactory = historyFactory;
+            actionParser = new ActionUrlParser();
 
             currentPrompt = DEFAULT_PROMPT;
             currentTitle = DEFAULT_TITLE;
         }
 
-        public void Render(Input input)
+        public void SetInput(string input)
         {
-            // TODO
+            control.SetInput(input.Trim());
         }
 
-        public void Render(IImmutableList<IItem> items)
+        public void AddInput(string append)
+        {
+            append = append.Trim();
+            string input = control.GetInput();
+
+            if (string.IsNullOrEmpty(input))
+            {
+                control.SetInput(append);
+                return;
+            }
+
+            if (input.EndsWith(" "))
+            {
+                control.SetInput(input + append);
+                return;
+            }
+
+            control.SetInput($"{input} {append}");
+        }
+
+        public string GetNewInput()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Render(Input input, IImmutableList<IItem> items)
         {
             List<Section> sections = new List<Section>(items.Count);
-            Item headerItem = BuildCommandHeaderItem();
+            Item headerItem = BuildCommandHeaderItem(input);
             Section header = renderer.Render(headerItem);
             header.Loaded += HandleLastSectionLoaded;
             sections.Add(header);
 
-            foreach (IItem item in items)
+            if (items == null || items.Count < 1 || (items.Count == 1 && string.IsNullOrWhiteSpace(items[0].Text)))
             {
-                sections.Add(renderer.Render(item));
+                MarkdownBuilder emptyBuilder = new MarkdownBuilder();
+                emptyBuilder.Blockquotes("...empty output.");
+                sections.Add(renderer.Render(Item.Markdown(emptyBuilder.ToString())));
+            }
+            else
+            {
+                foreach (IItem item in items)
+                {
+                    sections.Add(renderer.Render(item));
+                }
             }
 
-            control.OutputDocument.Document.Blocks.AddRange(sections);
-            control.InputBox.IsReadOnlyCaretVisible = false;
+            control.OutputDocument.Blocks.AddRange(sections);
+            control.EnableInput();
             control.SetHistoryCount(history.Count);
         }
 
@@ -77,9 +116,36 @@ namespace BeaverSoft.Texo.View.WPF
             section.BringIntoView();
         }
 
-        public void RenderIntellisence(IImmutableList<IItem> items)
+        public void RenderIntellisence(Input input, IImmutableList<IItem> items)
         {
-            throw new NotImplementedException();
+            control.IntellisenceList.Visibility = Visibility.Collapsed;
+            control.IntellisenceList.Items.Clear();
+
+            if (items == null || items.Count < 1)
+            {
+                return;
+            }
+
+            foreach (IItem item in items)
+            {
+                Section itemSection = renderer.Render(item);
+                RichTextBox box = new RichTextBox()
+                {
+                    IsReadOnly = true,
+                    IsReadOnlyCaretVisible = false,
+                    IsManipulationEnabled = false,
+                    IsHitTestVisible = false,
+                    Margin = new Thickness(4),
+                    BorderThickness = new Thickness(0),
+                    Background = Brushes.Transparent
+                };
+
+                box.Document = new FlowDocument();
+                box.Document.Blocks.AddRange(itemSection.Blocks.ToList());
+                control.IntellisenceList.Items.Add(new ListViewItem() { Content = box, Tag = item });
+            }
+
+            control.IntellisenceList.Visibility = Visibility.Visible;
         }
 
         public void RenderProgress(IProgress progress)
@@ -108,6 +174,16 @@ namespace BeaverSoft.Texo.View.WPF
             history = historyFactory.Create();
         }
 
+        private void OnLinkCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void OnLinkExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            e.Handled = true;
+        }
+
         public void Initialise(TexoControl context)
         {
             control = context;
@@ -118,22 +194,73 @@ namespace BeaverSoft.Texo.View.WPF
         {
             control.InputChanged += TexoInputChanged;
             control.InputFinished += TexoInputFinished;
-            control.CommandHistoryScrolled += TexoCommandHistoryScrolled;
+            control.KeyScrolled += TexoCommandHistoryScrolled;
+            control.IntellisenceItemExecuted += TexoIntellisenceItemExecuted;
+
+            CommandBinding linkCommandBinding = new CommandBinding(Commands.Hyperlink, OnLinkExecuted, OnLinkCanExecute);
+            control.CommandBindings.Add(linkCommandBinding);
 
             control.Prompt = currentPrompt;
             control.Title = currentTitle;
-            control.OutputDocument.Document = BuildInitialFlowDocument();
+            BuildInitialFlowDocument();
         }
 
-        private void TexoCommandHistoryScrolled(object sender, HistoryScrollDirection direction)
+        private void TexoIntellisenceItemExecuted(object sender, EventArgs e)
         {
-            if (direction == HistoryScrollDirection.Back)
+            ListViewItem viewItem = (ListViewItem)control.IntellisenceList.SelectedItem;
+            IItem item = (IItem)viewItem.Tag;
+            control.CloseIntellisence();
+
+            if (item.Actions.Count < 1)
             {
-                if (historyItem == null)
-                {
-                    historyItem = history.GetLastInput();
-                }
-                else if (historyItem.IsDeleted)
+                return;
+            }
+
+            ILink actionLink = item.Actions.First();
+            IActionContext actionContext = actionParser.Parse(actionLink.Address.AbsoluteUri);
+
+            if (actionContext.Name != ActionNames.INPUT_UPDATE
+                || !actionContext.Arguments.ContainsKey(ActionParameters.INPUT))
+            {
+                return;
+            }
+
+            string currentInput = control.GetInput();
+            string value = actionContext.Arguments[ActionParameters.INPUT];
+            bool isAdd = string.IsNullOrWhiteSpace(currentInput) || char.IsWhiteSpace(currentInput[currentInput.Length - 1]);
+
+            if (isAdd)
+            {
+                control.SetInput(currentInput + value);
+            }
+            else
+            {
+                int index = currentInput.LastIndexOf(" ") + 1;
+                control.SetInput(currentInput.Substring(0, index) + value);
+            }
+        }
+
+        private void TexoCommandHistoryScrolled(object sender, KeyScrollDirection direction)
+        {
+            IHistoryItem historyItem = CalculateNewHystoryItem(direction);
+
+            if (historyItem == null)
+            {
+                return;
+            }
+
+            control.SetInput(historyItem.Input.ParsedInput.RawInput);
+        }
+
+        private IHistoryItem CalculateNewHystoryItem(KeyScrollDirection direction)
+        {
+            if (historyItem == null)
+            {
+                historyItem = history.GetLastInput();
+            }
+            else if (direction == KeyScrollDirection.Back)
+            {
+                if (historyItem.IsDeleted)
                 {
                     while (historyItem != null && historyItem.IsDeleted)
                     {
@@ -145,7 +272,7 @@ namespace BeaverSoft.Texo.View.WPF
                     historyItem = historyItem.Previous;
                 }
             }
-            else if (historyItem != null)
+            else
             {
                 if (historyItem.IsDeleted)
                 {
@@ -160,69 +287,35 @@ namespace BeaverSoft.Texo.View.WPF
                 }
             }
 
-            if (historyItem == null)
-            {
-                return;
-            }
-
-            TextRange range = new TextRange(control.InputBox.Document.ContentStart, control.InputBox.Document.ContentEnd);
-            range.Text = historyItem.Input.ParsedInput.RawInput;
-            control.InputBox.CaretPosition = control.InputBox.Document.ContentEnd;
+            return historyItem;
         }
 
         private void TexoInputChanged(object sender, string input)
         {
-            executor.PreProcess(input);
+            executor.PreProcess(input, input.Length);
         }
 
         private void TexoInputFinished(object sender, string input)
         {
-            control.InputBox.IsReadOnlyCaretVisible = true;
-
-            TextRange range = new TextRange(
-                control.InputBox.Document.ContentStart,
-                control.InputBox.Document.ContentEnd);
-            range.Text = string.Empty;
-
+            control.CloseIntellisence();
+            control.DisableInput();
             lastWorkingDirectory = workingDirectory;
+            historyItem = null;
             executor.Process(input);
         }
 
-        private Item BuildCommandHeaderItem()
+        private Item BuildCommandHeaderItem(Input input)
         {
-            IHistoryItem commandHistory = history.GetLastInput();
             MarkdownBuilder headerBuilder = new MarkdownBuilder();
             headerBuilder.WriteLine("***");
 
-            if (commandHistory == null)
+            if (input.Context.IsValid)
             {
-                headerBuilder.Italic("empty");
-                headerBuilder.WriteLine();
-                return Item.Markdown(headerBuilder.ToString());
+                WriteInputTokens(input, headerBuilder);
             }
-
-            foreach (IToken token in commandHistory.Input.Tokens)
+            else
             {
-                switch (token.Type)
-                {
-                    case TokenTypeEnum.Query:
-                        headerBuilder.Bold(token.Input);
-                        break;
-
-                    case TokenTypeEnum.Option:
-                    case TokenTypeEnum.OptionList:
-                        headerBuilder.Italic(token.Input);
-                        break;
-
-                    case TokenTypeEnum.Wrong:
-                    case TokenTypeEnum.Unknown:
-                        continue;
-
-                    default:
-                        headerBuilder.Write(token.Input);
-                        break;
-                }
-
+                headerBuilder.Write(input.ParsedInput.RawInput);
                 headerBuilder.Write(" ");
             }
 
@@ -232,7 +325,9 @@ namespace BeaverSoft.Texo.View.WPF
                 atPath += '\\';
             }
 
-            headerBuilder.WriteLine($"at =={atPath}==");
+            headerBuilder.WriteLine();
+            headerBuilder.Blockquotes(atPath);
+            //headerBuilder.WriteLine($"at =={atPath}==");
             return Item.Markdown(headerBuilder.ToString());
         }
 
@@ -274,6 +369,11 @@ namespace BeaverSoft.Texo.View.WPF
             }
         }
 
+        void IMessageBusRecipient<IClearViewOutputMessage>.ProcessMessage(IClearViewOutputMessage message)
+        {
+            control.OutputDocument.Blocks.Clear();
+        }
+
         private void SetPrompt(string prompt)
         {
             currentPrompt = $"{prompt}>";
@@ -298,24 +398,48 @@ namespace BeaverSoft.Texo.View.WPF
             control.Title = currentTitle;
         }
 
-        private static FlowDocument BuildInitialFlowDocument()
+        private void BuildInitialFlowDocument()
         {
-            FlowDocument document = new FlowDocument();
-
-            document.Blocks.Add(new Paragraph(new Run(DEFAULT_TITLE))
+            control.OutputDocument.Blocks.Add(new Paragraph(new Run(DEFAULT_TITLE))
             {
                 FontSize = 14
             });
 
-            document.Blocks.Add(new Paragraph(new Run("Welcome in smart command line..."))
+            control.OutputDocument.Blocks.Add(new Paragraph(new Run("Welcome in smart command line..."))
             {
                 FontSize = 12,
                 FontStyle = FontStyles.Italic,
                 TextAlignment = TextAlignment.Left,
                 Foreground = Brushes.DimGray
             });
+        }
 
-            return document;
+        private static void WriteInputTokens(Input input, IMarkdownBuilder headerBuilder)
+        {
+            foreach (IToken token in input.Tokens)
+            {
+                switch (token.Type)
+                {
+                    case TokenTypeEnum.Query:
+                        headerBuilder.Bold(token.Input);
+                        break;
+
+                    case TokenTypeEnum.Option:
+                    case TokenTypeEnum.OptionList:
+                        headerBuilder.Italic(token.Input);
+                        break;
+
+                    case TokenTypeEnum.Wrong:
+                    case TokenTypeEnum.Unknown:
+                        continue;
+
+                    default:
+                        headerBuilder.Write(token.Input);
+                        break;
+                }
+
+                headerBuilder.Write(" ");
+            }
         }
     }
 }

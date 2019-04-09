@@ -15,6 +15,8 @@ namespace BeaverSoft.Texo.Commands.NugetManager
             command.Representations.AddRange(
                 new[] { NugetManagerQueries.NUGET, "nman", "nm", "nuget" });
             command.DefaultQueryKey = StageQueries.STAGE;
+            command.Documentation.Title = "Nuget manager";
+            command.Documentation.Description = "Naive command line Nuget manager with stash(es).";
 
             command.Queries.Add(CreateStageQuery());
 

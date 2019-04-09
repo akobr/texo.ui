@@ -8,6 +8,20 @@ namespace BeaverSoft.Texo.Core.Configuration
         private ImmutableList<Option> options;
         private string defaultQueryKey;
 
+        public Query(string key,
+            ImmutableList<string> representations,
+            ImmutableList<Query> queries,
+            ImmutableList<Option> options,
+            ImmutableList<Parameter> parameters,
+            string defaultQueryKey,
+            Documentation documentation)
+            : base(key, representations, parameters, documentation)
+        {
+            this.queries = queries;
+            this.options = options;
+            this.defaultQueryKey = defaultQueryKey;
+        }
+
         private Query()
         {
             queries = ImmutableList<Query>.Empty;

@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E536F739-D617-467C-9AEE-D87E95AF42AB}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>BeaverSoft.Texo.Test.Client.Forms</RootNamespace>
+    <AssemblyName>BeaverSoft.Texo.Test.Client.Forms</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="StrongBeaver.Core, Version=0.9.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BeaverSoft.StrongBeaver.Core.0.9.8-alpha\lib\netstandard2.0\StrongBeaver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.PowerShell.5.ReferenceAssemblies.1.1.0\lib\net4\System.Management.Automation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Startup\CommandConfig.cs" />
+    <Compile Include="Startup\ContainerConfig.cs" />
+    <Compile Include="Startup\TexoEngineConfig.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BeaverSoft.Texo.Core.MarkDown\BeaverSoft.Texo.Core.Markdown.csproj">
+      <Project>{9d99b9d9-ed3a-430c-8233-68cb05cb7cca}</Project>
+      <Name>BeaverSoft.Texo.Core.Markdown</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj">
+      <Project>{588610d7-7d21-4df8-aad6-e88c83560d87}</Project>
+      <Name>BeaverSoft.Texo.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell.Markdown\BeaverSoft.Texo.Fallback.PowerShell.Markdown.csproj">
+      <Project>{6e8522a3-058b-47b9-b8c0-d9a14978647a}</Project>
+      <Name>BeaverSoft.Texo.Fallback.PowerShell.Markdown</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell\BeaverSoft.Texo.Fallback.PowerShell.csproj">
+      <Project>{a97a2edb-7ac3-4f23-963e-d9a924a87a11}</Project>
+      <Name>BeaverSoft.Texo.Fallback.PowerShell</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.View.WPF.Markdown\BeaverSoft.Texo.View.WPF.Markdown.csproj">
+      <Project>{1dc76826-bcbe-4e8d-bb0a-d3d47736c816}</Project>
+      <Name>BeaverSoft.Texo.View.WPF.Markdown</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.View.WPF\BeaverSoft.Texo.View.WPF.csproj">
+      <Project>{415687a3-acd3-463a-9d86-8202ef06071f}</Project>
+      <Name>BeaverSoft.Texo.View.WPF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.CommandLine\Commands.CommandLine.csproj">
+      <Project>{620b936c-b2a0-4b37-97da-11e32b858d7c}</Project>
+      <Name>Commands.CommandLine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.FileManager\Commands.FileManager.csproj">
+      <Project>{2afdfe71-d743-49df-9f47-61a94431cf00}</Project>
+      <Name>Commands.FileManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.NugetManager\Commands.NugetManager.csproj">
+      <Project>{6b1ba988-e9c1-46b7-86ee-1d0269d21906}</Project>
+      <Name>Commands.NugetManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.ReferenceCheck\Commands.ReferenceCheck.csproj">
+      <Project>{02d86f64-24cc-4728-8e3a-e269fa55c109}</Project>
+      <Name>Commands.ReferenceCheck</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

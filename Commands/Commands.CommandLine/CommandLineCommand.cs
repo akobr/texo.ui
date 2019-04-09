@@ -9,8 +9,8 @@ namespace Commands.CommandLine
 {
     public class CommandLineCommand : ICommand
     {
-        private string GIT_BASH_FIRST_PATH = @"c:\Program Files\Git\git-bash.exe";
-        private string GIT_BASH_SECOND_PATH = @"c:\Program Files (x86)\Git\git-bash.exe";
+        private const string GIT_BASH_FIRST_PATH = @"c:\Program Files\Git\git-bash.exe";
+        private const string GIT_BASH_SECOND_PATH = @"c:\Program Files (x86)\Git\git-bash.exe";
 
         public ICommandResult Execute(CommandContext context)
         {
@@ -41,14 +41,17 @@ namespace Commands.CommandLine
             return new TextResult("Command-line is starting...");
         }
 
-        private void StartShell(string path)
+        private static void StartShell(string path)
         {
-            Process cmd = new Process();
-            cmd.StartInfo.FileName = path;
-            cmd.StartInfo.WorkingDirectory = Environment.CurrentDirectory;
-            //cmd.StartInfo.UseShellExecute = false;
-            //cmd.StartInfo.RedirectStandardInput = true;
-            //cmd.StartInfo.RedirectStandardOutput = true;
+            Process cmd = new Process
+            {
+                StartInfo =
+                {
+                    FileName = path,
+                    WorkingDirectory = Environment.CurrentDirectory
+                }
+            };
+
             cmd.Start();
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Linq;
 
 namespace BeaverSoft.Texo.Core.Commands
 {
@@ -32,6 +33,23 @@ namespace BeaverSoft.Texo.Core.Commands
         public Builder ToBuilder()
         {
             return new Builder(this);
+        }
+
+        public string GetParameterValue(string parameterKey)
+        {
+            if (parameters.Count < 1
+                || parameters.TryGetValue(parameterKey, out ParameterContext parameter))
+            {
+                return string.Empty;
+            }
+
+            return parameter.GetValue();
+        }
+
+        public string GetParameterValue()
+        {
+            ParameterContext parameter = parameters.Values.FirstOrDefault();
+            return parameter?.GetValue() ?? string.Empty;
         }
 
         public static OptionContext BuildWithoutParameters(string key)

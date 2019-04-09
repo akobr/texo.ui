@@ -12,13 +12,16 @@ namespace BeaverSoft.Texo.Core.View
         IInitialisable<IExecutor>,
         IDisposable,
         IMessageBusService<ISettingUpdatedMessage>,
-        IMessageBusService<IVariableUpdatedMessage>
+        IMessageBusService<IVariableUpdatedMessage>,
+        IMessageBusService<IClearViewOutputMessage>
     {
-        void Render(Input.Input input);
+        void SetInput(string input);
 
-        void Render(IImmutableList<IItem> items);
+        void AddInput(string append);
 
-        void RenderIntellisence(IImmutableList<IItem> items);
+        void Render(Input.Input input, IImmutableList<IItem> items);
+
+        void RenderIntellisence(Input.Input input, IImmutableList<IItem> items);
 
         void RenderProgress(IProgress progress);
 

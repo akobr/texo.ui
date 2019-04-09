@@ -6,13 +6,16 @@ using BeaverSoft.Texo.Commands.NugetManager.Services;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
+using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input.History;
+using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell;
+using BeaverSoft.Texo.Fallback.PowerShell.Markdown;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
 using Commands.CommandLine;
-using Commands.Dir;
 using Commands.ReferenceCheck;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Container;
@@ -26,13 +29,13 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
         public static void RegisterServices(this SimpleIoc container)
         {
             // Core commands (should be in engine)
-            container.Register<ICurrentDirectoryService, CurrentDirectoryService>();
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
+            container.Register<HelpCommand>();
+            container.Register<ClearCommand>();
 
             // Simple commands
             container.Register<ReferenceCheckCommand>();
-            container.Register<DirCommand>();
             container.Register<CommandLineCommand>();
 
             // File manager
@@ -53,7 +56,14 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             // View
             container.Register<IMarkdownService, MarkdownService>();
             container.Register<IWpfRenderService, WpfMarkdownRenderService>();
-            container.Register<IViewService, WpfViewService>();
+            container.Register<WpfViewService>();
+            container.Register<IViewService>(container.GetInstance<WpfViewService>);
+            container.Register<IPromptableViewService>(container.GetInstance<WpfViewService>);
+
+            // PowerShell Fallback
+            container.Register<IPowerShellResultBuilder, PowerShellResultPlainBuilder>();
+            container.Register<PowerShellFallbackService>();
+            container.Register<IFallbackService>(container.GetInstance<PowerShellFallbackService>);
         }
 
         public static void RegisterEngineServices(this SimpleIoc container, TexoEngineBuilder builder)
@@ -63,6 +73,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             container.Register(engineServiceLocator.MessageBus);
             container.Register(engineServiceLocator.MessageBusRegister);
             container.Register(engineServiceLocator.Logger);
+            container.Register(engineServiceLocator.History);
             container.Register(engineServiceLocator.Environment);
             container.Register(engineServiceLocator.Setting);
             container.Register<IFactory<IInputHistoryService>>(() => new DelegatedFactory<IInputHistoryService>(engineServiceLocator.History));

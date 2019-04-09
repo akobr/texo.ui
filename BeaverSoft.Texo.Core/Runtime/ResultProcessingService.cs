@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services.Logging;
 
@@ -25,6 +26,21 @@ namespace BeaverSoft.Texo.Core.Runtime
             if ((object)result?.Content == null)
             {
                 return ImmutableList<IItem>.Empty;
+            }
+
+            switch (result)
+            {
+                case ErrorTextResult errorResult:
+                    return ImmutableList<IItem>.Empty.Add(Item.Markdown(errorResult.Content));
+
+                case ModeledResult modeledResult:
+                    return ImmutableList<IItem>.Empty.Add(new ModeledItem(modeledResult.Content));
+
+                case MarkdownResult markdownResult:
+                    return ImmutableList<IItem>.Empty.Add(Item.Markdown(markdownResult.Content));
+
+                case MarkdownItemsResult markdownItemsResult:
+                    return ImmutableList<IItem>.Empty.AddRange(markdownItemsResult.Content.Select(t => new Item(t)));
             }
 
             switch ((object)result.Content)

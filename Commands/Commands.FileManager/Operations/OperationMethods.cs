@@ -25,6 +25,11 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             return targetPath;
         }
 
+        internal static string GetTargetFile(this CommandContext context)
+        {
+            return context.GetParameterValue(FileManagerParameters.SIMPLE_PATH);
+        }
+
         internal static bool IsEmpty(this IStageService stage)
         {
             return stage.GetPaths().Count < 1;
@@ -32,7 +37,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
         internal static bool HasLobby(this IStageService stage)
         {
-            return string.IsNullOrEmpty(stage.GetLobby());
+            return !string.IsNullOrEmpty(stage.GetLobby());
         }
 
         internal static bool TryGetPaths(this IStageService stage, out IImmutableList<string> paths)

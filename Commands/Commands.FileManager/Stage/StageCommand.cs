@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using BeaverSoft.Texo.Commands.FileManager.Extensions;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Extensions;
 using BeaverSoft.Texo.Core.Markdown.Builder;
@@ -42,7 +43,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
         private static ICommandResult List(CommandContext context)
         {
-            if (context.HasParameter(ParameterKeys.PATH))
+            if (!context.HasParameter(ParameterKeys.PATH))
             {
                 string current = Environment.CurrentDirectory;
                 return new ItemsResult(BuildStageItem(current, Directory.GetFileSystemEntries(current), current));
@@ -123,12 +124,17 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
             MarkdownBuilder builder = new MarkdownBuilder();
             builder.Header(header);
 
-            builder.Italic(string.IsNullOrEmpty(lobbyPath)
-                ? "No lobby directory."
-                : lobbyPath);
+            if (string.IsNullOrEmpty(lobbyPath))
+            {
+                builder.Italic("No lobby directory.");
+            }
+            else
+            {
+                builder.Link(lobbyPath, ActionBuilder.PathOpenUri(lobbyPath));
+            }
 
             builder.WriteLine();
-            builder.WritePathLists(lobbyPath, paths);
+            builder.WritePathLists(paths, lobbyPath);
 
             return Item.Markdown(builder.ToString());
         }

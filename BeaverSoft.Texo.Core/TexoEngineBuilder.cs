@@ -1,4 +1,5 @@
 ﻿using System;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
@@ -11,6 +12,7 @@ using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
+using StrongBeaver.Core.Services.Reflection;
 
 namespace BeaverSoft.Texo.Core
 {
@@ -34,6 +36,7 @@ namespace BeaverSoft.Texo.Core
         private IDidYouMeanService didYouMean;
         private IResultProcessingService resultProcessing;
         private IViewService usedView;
+        private IActionManagementService actionManagement;
         private IRuntimeCoordinatorService runtime;
 
         public TexoEngineBuilder()
@@ -63,7 +66,7 @@ namespace BeaverSoft.Texo.Core
 
         public TexoEngineBuilder WithEnvironmentService(IEnvironmentService service)
         {
-            SetEnvironmentService(service);
+            environment = service;
             return this;
         }
 
@@ -75,7 +78,7 @@ namespace BeaverSoft.Texo.Core
 
         public TexoEngineBuilder WithInputEvaluationService(IInputEvaluationService service)
         {
-            SetInputEvaluationService(service);
+            evaluator = service;
             return this;
         }
 
@@ -94,6 +97,12 @@ namespace BeaverSoft.Texo.Core
         public TexoEngineBuilder WithResultProcessingService(IResultProcessingService service)
         {
             resultProcessing = service;
+            return this;
+        }
+
+        public TexoEngineBuilder WithActionManagementService(IActionManagementService service)
+        {
+            actionManagement = service;
             return this;
         }
 
@@ -133,6 +142,7 @@ namespace BeaverSoft.Texo.Core
                 DidYouMean = () => didYouMean,
                 Fallback = () => fallback,
                 View = () => usedView,
+                ActionManagement = () => actionManagement,
                 Runtime = () => runtime
             };
         }
@@ -144,8 +154,8 @@ namespace BeaverSoft.Texo.Core
             SetViewService(view);
             runtime = new RuntimeCoordinatorService(
                 environment, evaluator, commandManagement,
-                resultProcessing, usedView, history,
-                intellisence, didYouMean, fallback);
+                resultProcessing, usedView, actionManagement,
+                history, intellisence, didYouMean, fallback);
             return new TexoEngine(runtime, usedView, setting);
         }
 
@@ -159,38 +169,36 @@ namespace BeaverSoft.Texo.Core
             logger = logger ?? new UserAppDataLogService(LogMessageLevelEnum.Error);
 #endif
             setting = setting ?? new SettingService(messageBus);
-            SetEnvironmentService(environment ?? new EnvironmentService(messageBus));
+            environment = environment ?? CreateEnvironmentService();
             parser = parser ?? new InputParseService();
-            SetInputEvaluationService(evaluator ?? new InputEvaluationService(parser, environment, logger));
+            evaluator = evaluator ?? CreateInputEvaluationService();
             history = history ?? new InputHistoryService();
             commandManagement = commandManagement ?? new SingletonCommandManagementService(commandFactory);
             resultProcessing = resultProcessing ?? new ResultProcessingService(logger);
-
-            // intellisence
+            actionManagement = actionManagement ?? new ActionManagementService(null, logger);
+            intellisence = intellisence ?? CreateIntellisenceService();
             // didYouMean
-            // fallback
         }
 
-        private void SetEnvironmentService(IEnvironmentService service)
+        private IEnvironmentService CreateEnvironmentService()
         {
-            if (environment != null)
-            {
-                registerToMessageBus.Unregister(environment);
-            }
-
-            environment = service;
-            registerToMessageBus.Register<ISettingUpdatedMessage>(environment);
+            var service = new EnvironmentService(messageBus);
+            registerToMessageBus.Register<ISettingUpdatedMessage>(service);
+            return service;
         }
 
-        private void SetInputEvaluationService(IInputEvaluationService service)
+        private IInputEvaluationService CreateInputEvaluationService()
         {
-            if (evaluator != null)
-            {
-                registerToMessageBus.Unregister(evaluator);
-            }
+            var service = new InputEvaluationService(parser, environment, messageBus, logger);
+            registerToMessageBus.Register<ISettingUpdatedMessage>(service);
+            return service;
+        }
 
-            evaluator = service;
-            registerToMessageBus.Register<ISettingUpdatedMessage>(evaluator);
+        private IntellisenceService CreateIntellisenceService()
+        {
+            var service = new IntellisenceService(environment, commandManagement);
+            registerToMessageBus.Register<IInputTreeUpdatedMessage>(service);
+            return service;
         }
 
         private void SetViewService(IViewService service)
@@ -203,6 +211,7 @@ namespace BeaverSoft.Texo.Core
             usedView = service ?? throw new ArgumentNullException(nameof(service));
             registerToMessageBus.Register<ISettingUpdatedMessage>(usedView);
             registerToMessageBus.Register<IVariableUpdatedMessage>(usedView);
+            registerToMessageBus.Register<IClearViewOutputMessage>(usedView);
         }
     }
 }

@@ -19,6 +19,7 @@
         internal static void SetDefault(Builder builder)
         {
             builder.Commands.Clear();
+            builder.Commands.Add(CommandsBuilder.BuildClear());
             builder.Commands.Add(CommandsBuilder.BuildCurrentDirectory());
             builder.Commands.Add(CommandsBuilder.BuildTexo());
             builder.Commands.Add(CommandsBuilder.BuildHelp());

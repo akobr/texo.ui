@@ -63,8 +63,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HistoryScrollDirection.cs" />
+    <Compile Include="KeyScrollDirection.cs" />
     <Compile Include="IWpfRenderService.cs" />
+    <Compile Include="KeyUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

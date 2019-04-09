@@ -116,6 +116,16 @@ namespace BeaverSoft.Texo.Core.Commands
             return result;
         }
 
+        public string GetParameterFromOption(string optionKey)
+        {
+            if (!options.TryGetValue(optionKey, out OptionContext option))
+            {
+                return string.Empty;
+            }
+
+            return option.GetParameterValue();
+        }
+
         public Builder ToBuilder()
         {
             return new Builder(this);

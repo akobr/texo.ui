@@ -4,6 +4,16 @@ namespace BeaverSoft.Texo.Core.Configuration
 {
     public sealed partial class Option : InputStatement
     {
+        public Option(
+            string key,
+            ImmutableList<string> representations,
+            ImmutableList<Parameter> parameters,
+            Documentation documentation)
+            : base(key, representations, parameters, documentation)
+        {
+            // no operation
+        }
+
         private Option()
             : base()
         {

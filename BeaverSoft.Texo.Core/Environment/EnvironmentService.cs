@@ -8,15 +8,24 @@ using StrongBeaver.Core.Services;
 
 namespace BeaverSoft.Texo.Core.Environment
 {
-    public class EnvironmentService : IEnvironmentService
+    public class EnvironmentService : IEnvironmentService, IMessageBusService<ISettingUpdatedMessage>
     {
         private readonly IServiceMessageBus messageBus;
         private readonly Dictionary<string, string> variables;
+        private readonly Dictionary<string, IVariableStrategy> strategies;
 
         public EnvironmentService(IServiceMessageBus messageBus)
         {
             this.messageBus = messageBus;
             variables = new Dictionary<string, string>();
+            strategies = new Dictionary<string, IVariableStrategy>();
+
+            CreateVariableStrategies();
+        }
+
+        public void CreateVariableStrategies()
+        {
+            strategies[VariableNames.CURRENT_DIRECTORY] = new CurrentDirectoryStrategy();
         }
 
         public void Initialise()
@@ -77,20 +86,33 @@ namespace BeaverSoft.Texo.Core.Environment
                 return;
             }
 
+            if (previousValue == value)
+            {
+                return;
+            }
+
+            strategies.TryGetValue(variable, out IVariableStrategy strategy);
+
             if (string.IsNullOrEmpty(value))
             {
-                if (variable == VariableNames.CURRENT_DIRECTORY)
+                if (!strategy?.CanBeRemoved(previousValue) ?? false)
                 {
-                    throw new ArgumentException("Variable " + VariableNames.CURRENT_DIRECTORY + " can't be removed.", nameof(variable));
+                    return;
                 }
 
                 variables.Remove(variable);
             }
             else
             {
+                if (!strategy?.IsValueValid(value, previousValue) ?? false)
+                {
+                    return;
+                }
+
                 variables[variable] = value;
             }
 
+            strategy?.OnValueChange(value);
             messageBus?.Send(new VariableUpdatedMessage(variable, value, previousValue)
             {
                 Sender = this

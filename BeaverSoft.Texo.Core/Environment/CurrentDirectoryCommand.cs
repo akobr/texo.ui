@@ -2,6 +2,7 @@
 using System.IO;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Extensions;
+using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Result;
 using StrongBeaver.Core.Services.Logging;
 
@@ -11,10 +12,10 @@ namespace BeaverSoft.Texo.Core.Environment
     {
         private const string PARAMETER_PATH = "path";
 
-        private readonly ICurrentDirectoryService service;
+        private readonly IEnvironmentService service;
         private readonly ILogService logger;
 
-        public CurrentDirectoryCommand(ICurrentDirectoryService service, ILogService logger)
+        public CurrentDirectoryCommand(IEnvironmentService service, ILogService logger)
         {
             this.service = service ?? throw new ArgumentNullException(nameof(service));
             this.logger = logger;
@@ -22,19 +23,18 @@ namespace BeaverSoft.Texo.Core.Environment
 
         public ICommandResult Execute(CommandContext context)
         {
+            string currentPath = service.GetVariable(VariableNames.CURRENT_DIRECTORY);
+
             if (!context.Parameters.TryGetValue(PARAMETER_PATH, out ParameterContext parameter))
             {
-                return new TextResult(service.GetCurrentDirectory());
+                return new TextResult(currentPath);
             }
-
-            string currentPath = service.GetCurrentDirectory();
 
             foreach (string path in parameter.GetValues())
             {
                 try
                 {
-                    // TODO: Even rooted path can be relative
-                    if (System.IO.Path.IsPathRooted(path))
+                    if (!path.IsRelativePath())
                     {
                         currentPath = ChangePathIfExists(currentPath, path);
                         continue;
@@ -49,8 +49,8 @@ namespace BeaverSoft.Texo.Core.Environment
                 }
             }
 
-            service.SetCurrentDirectory(currentPath);
-            return new TextResult(service.GetCurrentDirectory());
+            service.SetVariable(VariableNames.CURRENT_DIRECTORY, currentPath.GetFullPath());
+            return new TextResult(service.GetVariable(VariableNames.CURRENT_DIRECTORY));
         }
 
         private static string ChangePathIfExists(string currentPath, string newPath)

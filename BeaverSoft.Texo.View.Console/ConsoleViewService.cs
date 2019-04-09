@@ -10,7 +10,7 @@ using SysConsole = System.Console;
 
 namespace BeaverSoft.Texo.View.Console
 {
-    public class ConsoleViewService : IViewService
+    public class ConsoleViewService : IViewService, IPromptableViewService
     {
         private const string TITLE_TEXO = "Texo UI";
 
@@ -63,12 +63,7 @@ namespace BeaverSoft.Texo.View.Console
             }
         }
 
-        public void Render(Input input)
-        {
-            // TODO
-        }
-
-        public void Render(IImmutableList<IItem> items)
+        public void Render(Input input, IImmutableList<IItem> items)
         {
             foreach (IItem item in items)
             {
@@ -76,7 +71,7 @@ namespace BeaverSoft.Texo.View.Console
             }
         }
 
-        public void RenderIntellisence(IImmutableList<IItem> items)
+        public void RenderIntellisence(Input input, IImmutableList<IItem> items)
         {
             // TODO
         }
@@ -89,6 +84,22 @@ namespace BeaverSoft.Texo.View.Console
         public void Update(string key, IItem item)
         {
             // TODO
+        }
+
+        public string GetNewInput()
+        {
+            return SysConsole.ReadLine();
+        }
+
+        public void SetInput(string input)
+        {
+            // TODO: overwrite
+            SysConsole.Write(input);
+        }
+
+        public void AddInput(string append)
+        {
+            SysConsole.Write(" " + append.Trim());
         }
 
         public void Dispose()
@@ -133,6 +144,11 @@ namespace BeaverSoft.Texo.View.Console
             }
 
             workingDir = message.NewValue;
+        }
+
+        void IMessageBusRecipient<IClearViewOutputMessage>.ProcessMessage(IClearViewOutputMessage message)
+        {
+            SysConsole.Clear();
         }
     }
 }

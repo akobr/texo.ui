@@ -21,7 +21,8 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         public void Write(IItem item)
         {
-            if (item.Format == TextFormatEnum.Plain)
+            if (item.Format != TextFormatEnum.Markdown
+                && item.Format != TextFormatEnum.Model)
             {
                 SysConsole.Write(item.Text);
             }
@@ -287,6 +288,11 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         private static void GetTextFromInlineContainer(ContainerInline container, StringBuilder builder)
         {
+            if (container == null)
+            {
+                return;
+            }
+
             foreach (Inline child in container)
             {
                 builder.Append(GetText(child));

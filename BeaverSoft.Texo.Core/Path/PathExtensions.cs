@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 
 namespace BeaverSoft.Texo.Core.Path
@@ -278,6 +279,18 @@ namespace BeaverSoft.Texo.Core.Path
             }
 
             return true;
+        }
+
+        public static bool IsDriveRelativePath(this string path)
+        {
+            if (path == null
+                || path.Length != 2)
+            {
+                return false;
+            }
+
+            return path[1] == System.IO.Path.VolumeSeparatorChar
+                && IsValidDriveChar(path[0]);
         }
 
         public static bool IsDirectorySeparator(this char character)

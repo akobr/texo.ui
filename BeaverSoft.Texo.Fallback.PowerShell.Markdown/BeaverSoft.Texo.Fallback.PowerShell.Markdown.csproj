@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BeaverSoft.StrongBeaver.Core" Version="0.9.8-alpha" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BeaverSoft.Texo.Core.MarkDown\BeaverSoft.Texo.Core.Markdown.csproj" />
+    <ProjectReference Include="..\BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj" />
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell\BeaverSoft.Texo.Fallback.PowerShell.csproj" />
+  </ItemGroup>
+
+</Project>

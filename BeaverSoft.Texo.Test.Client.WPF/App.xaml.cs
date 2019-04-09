@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Test.Client.WPF.Startup;
 using StrongBeaver.Core.Container;
@@ -28,9 +29,12 @@ namespace BeaverSoft.Texo.Test.Client.WPF
             commandFactory.RegisterCommands(container);
             container.RegisterCommandFactory(commandFactory);
 
+            engineBuilder.WithFallbackService(container.GetInstance<IFallbackService>());
             TexoEngine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
             TexoEngine.InitialiseWithCommands();
             TexoEngine.Start();
+
+            container.RegisterWithMessageBus();
         }
 
         protected override void OnExit(ExitEventArgs e)

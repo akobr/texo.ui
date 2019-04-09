@@ -17,6 +17,12 @@ namespace BeaverSoft.Texo.View.WPF.Markdown
 
         public Section Render(IItem item)
         {
+            if (item.Format != TextFormatEnum.Markdown
+                && item.Format != TextFormatEnum.Model)
+            {
+                return BuildPlainItem(item);
+            }
+
             return BuildItem(item);
         }
 
@@ -32,6 +38,13 @@ namespace BeaverSoft.Texo.View.WPF.Markdown
             }
 
             itemSection.Tag = item;
+            return itemSection;
+        }
+
+        private static Section BuildPlainItem(IItem item)
+        {
+            Section itemSection = new Section();
+            itemSection.Blocks.Add(new Paragraph(new Run(item.Text)));
             return itemSection;
         }
     }

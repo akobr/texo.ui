@@ -1,16 +1,16 @@
-﻿using System.Collections.Immutable;
+﻿using BeaverSoft.Texo.Core.Actions;
+using System.Collections.Immutable;
+using System.Text;
 
 namespace BeaverSoft.Texo.Core.View
 {
     public class Item : IItem
     {
-        private ImmutableList<IAction> actions;
-
         public Item(string text, TextFormatEnum format)
         {
             Text = text;
             Format = format;
-            Actions = ImmutableList<IAction>.Empty;
+            Actions = ImmutableList<ILink>.Empty;
         }
 
         public Item(string text)
@@ -29,16 +29,16 @@ namespace BeaverSoft.Texo.Core.View
 
         public TextFormatEnum Format { get; set; }
 
-        public IImmutableList<IAction> Actions { get; set; }
+        public IImmutableList<ILink> Actions { get; set; }
 
-        public void AddActions(ImmutableList<IAction> actionsToAdd)
+        public void AddActions(ImmutableList<ILink> links)
         {
-            actions = actions.AddRange(actionsToAdd);
+            Actions = Actions.AddRange(links);
         }
 
-        public void SetActions(ImmutableList<IAction> newActions)
+        public void AddAction(ILink link)
         {
-            actions = newActions;
+            Actions = Actions.Add(link);
         }
 
         public static implicit operator Item(string text)
@@ -74,6 +74,31 @@ namespace BeaverSoft.Texo.Core.View
         public static Item Xml(string text)
         {
             return new Item(text, TextFormatEnum.Xml);
+        }
+
+        public static Item Intellisence(string item, string type, string description)
+        {
+            return Intellisence(item, item, type, description);
+        }
+
+        public static Item Intellisence(string item, string inputUpdate, string type, string description)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append($"**{item}**");
+
+            if (!string.IsNullOrEmpty(type))
+            {
+                builder.Append($" *({type})*");
+            }
+
+            if (!string.IsNullOrEmpty(type))
+            {
+                builder.Append($": {description}");
+            }
+
+            Item viewItem = Markdown(builder.ToString());
+            viewItem.AddAction(new Link("Use", ActionBuilder.InputUpdateUri(inputUpdate)));
+            return viewItem;
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
@@ -18,6 +20,7 @@ namespace BeaverSoft.Texo.Core.Runtime
         private readonly IIntellisenceService intelisence;
         private readonly IResultProcessingService resultProcessing;
         private readonly IViewService view;
+        private readonly IActionManagementService actionManagement;
         private readonly IInputHistoryService history;
         private readonly IFallbackService fallback;
 
@@ -27,6 +30,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             ICommandManagementService commandManagement,
             IResultProcessingService resultProcessing,
             IViewService view,
+            IActionManagementService actionManagement,
             IInputHistoryService history,
             IIntellisenceService intelisence,
             IDidYouMeanService didYouMean,
@@ -37,6 +41,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             this.commandManagement = commandManagement ?? throw new ArgumentNullException(nameof(commandManagement));
             this.resultProcessing = resultProcessing ?? throw new ArgumentNullException(nameof(resultProcessing));
             this.view = view ?? throw new ArgumentNullException(nameof(view));
+            this.actionManagement = actionManagement ?? throw new ArgumentNullException(nameof(actionManagement));
 
             this.history = history;
             this.intelisence = intelisence;
@@ -49,6 +54,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             environment.Initialise();
             evaluator.Initialise();
             view.Initialise(this);
+            fallback?.Initialise();
         }
 
         public void Start()
@@ -56,10 +62,11 @@ namespace BeaverSoft.Texo.Core.Runtime
             view.Start();
         }
 
-        public Input.Input PreProcess(string input)
+        public Input.Input PreProcess(string input, int cursorPosition)
         {
             Input.Input inputModel = evaluator.Evaluate(input);
-            view.Render(inputModel);
+            var items = intelisence?.Help(inputModel, cursorPosition) ?? ImmutableList<IItem>.Empty;
+            view.RenderIntellisence(inputModel, items);
             return inputModel;
         }
 
@@ -71,28 +78,38 @@ namespace BeaverSoft.Texo.Core.Runtime
             if (!inputModel.Context.IsValid)
             {
                 if (fallback != null
-                    && !string.IsNullOrEmpty(inputModel.Context.Key))
+                    && string.IsNullOrEmpty(inputModel.Context.Key))
                 {
-                    Render(fallback.Fallback(inputModel));
+                    Render(inputModel, fallback.Fallback(inputModel));
                 }
                 else if (didYouMean != null)
                 {
-                    Render(didYouMean.Help(inputModel));
+                    Render(inputModel, didYouMean.Help(inputModel));
                 }
                 else
                 {
-                    RenderError("Unknown input.");
+                    RenderError(inputModel, "Unknown input.");
                 }
                 return;
             }
 
             if (!commandManagement.HasCommand(inputModel.Context.Key))
             {
-                RenderError($"The command is not registered: {inputModel.Context.Key}.");
+                RenderError(inputModel, $"The command is not registered: {inputModel.Context.Key}.");
                 return;
             }
 
-            ProcessContext(inputModel.Context);
+            ProcessContext(inputModel, inputModel.Context);
+        }
+
+        public void ExecuteAction(string actionUrl)
+        {
+            actionManagement.Execute(actionUrl);
+        }
+
+        public void ExecuteAction(string actionName, IDictionary<string, string> arguments)
+        {
+            actionManagement.Execute(actionName, arguments);
         }
 
         public void Dispose()
@@ -101,61 +118,61 @@ namespace BeaverSoft.Texo.Core.Runtime
             commandManagement.Dispose();
         }
 
-        private void ProcessContext(CommandContext context)
+        private void ProcessContext(Input.Input input, CommandContext context)
         {
             ICommand command = commandManagement.BuildCommand(context.Key);
 
             switch (command)
             {
                 case IAsyncCommand asyncCommand:
-                    ProcessAsyncCommand(asyncCommand, context);
+                    ProcessAsyncCommand(asyncCommand, context, input);
                     break;
 
                 default:
-                    ProcessCommand(command, context);
+                    ProcessCommand(command, context, input);
                     break;
             }
         }
 
-        private void ProcessCommand(ICommand command, CommandContext context)
+        private void ProcessCommand(ICommand command, CommandContext context, Input.Input input)
         {
-            try
-            {
+            //try
+            //{
                 ICommandResult result = command.Execute(context);
-                Render(result);
-            }
-            catch (Exception exception)
-            {
-                RenderError(exception.Message);
-            }
+                Render(input, result);
+            //}
+            //catch (Exception exception)
+            //{
+            //    RenderError(input, exception.Message);
+            //}
         }
 
-        private async void ProcessAsyncCommand(IAsyncCommand command, CommandContext context)
+        private async void ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input.Input input)
         {
             try
             {
                 ICommandResult result = await command.ExecuteAsync(context);
-                Render(result);
+                Render(input, result);
             }
             catch (Exception exception)
             {
-                RenderError(exception.Message);
+                RenderError(input, exception.Message);
             }
         }
 
-        private void Render(ICommandResult result)
+        private void Render(Input.Input input, ICommandResult result)
         {
-            Render(resultProcessing.Transfort(result));
+            Render(input, resultProcessing.Transfort(result));
         }
 
-        private void Render(IImmutableList<IItem> items)
+        private void Render(Input.Input input, IImmutableList<IItem> items)
         {
-            view.Render(items);
+            view.Render(input, items);
         }
 
-        private void RenderError(string message)
+        private void RenderError(Input.Input input, string message)
         {
-            Render(ImmutableList<IItem>.Empty.Add(new Item($"> {message}")));
+            Render(input, ImmutableList<IItem>.Empty.Add(Item.Markdown($"> {message}")));
         }
     }
 }
