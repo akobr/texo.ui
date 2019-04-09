@@ -15,6 +15,7 @@ using BeaverSoft.Texo.Fallback.PowerShell;
 using BeaverSoft.Texo.Fallback.PowerShell.Markdown;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
+using Commands.Calc;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
 using StrongBeaver.Core;
@@ -52,6 +53,9 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             container.Register<IManagementService, ManagementService>();
             container.Register<Commands.NugetManager.Stage.IStageService, Commands.NugetManager.Stage.StageService>();
             container.Register<NugetManagerCommand>();
+
+            // Calculator
+            container.Register<CalcCommand>();
 
             // View
             container.Register<IMarkdownService, MarkdownService>();
