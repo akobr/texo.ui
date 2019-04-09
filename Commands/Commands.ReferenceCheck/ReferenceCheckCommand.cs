@@ -5,9 +5,9 @@ using System.IO;
 using System.Xml.Linq;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
-using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Markdown.Builder;
+using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
 
@@ -15,26 +15,24 @@ namespace Commands.ReferenceCheck
 {
     public class ReferenceCheckCommand : ICommand
     {
-        private readonly ICurrentDirectoryService currentDirectory;
-
-        public ReferenceCheckCommand(ICurrentDirectoryService currentDirectory)
-        {
-            this.currentDirectory = currentDirectory;
-        }
-
         public ICommandResult Execute(CommandContext context)
         {
             var result = ImmutableList<Item>.Empty.ToBuilder();
             var paths = context.GetParameterValues(ParameterKeys.PATH);
 
-            foreach (string path in paths)
+            foreach (string strPath in paths)
             {
-                result.AddRange(ProcessFolder(path));
+                TexoPath path = new TexoPath(strPath);
+
+                foreach (string directory in path.GetDirectories())
+                {
+                    result.AddRange(ProcessFolder(directory));
+                }
             }
 
             if (paths.Count < 1)
             {
-                result.AddRange(ProcessFolder(currentDirectory.GetCurrentDirectory()));
+                result.AddRange(ProcessFolder("."));
             }
 
             return new ItemsResult(result.ToImmutable());
@@ -46,7 +44,7 @@ namespace Commands.ReferenceCheck
 
             var parameter = Parameter.CreateBuilder();
             parameter.Key = ParameterKeys.PATH;
-            parameter.ArgumentTemplate = InputRegex.PATH;
+            parameter.ArgumentTemplate = InputRegex.WILDCARD_PATH;
             parameter.IsOptional = true;
             parameter.IsRepeatable = true;
             parameter.Documentation.Title = "Directory path";

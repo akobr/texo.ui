@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
-using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
@@ -12,13 +11,6 @@ namespace Commands.Dir
 {
     public class DirCommand : ICommand
     {
-        private readonly ICurrentDirectoryService currentDirectory;
-
-        public DirCommand(ICurrentDirectoryService currentDirectory)
-        {
-            this.currentDirectory = currentDirectory;
-        }
-
         public ICommandResult Execute(CommandContext context)
         {
             string path = GetFullPath(context);
@@ -64,7 +56,7 @@ namespace Commands.Dir
             }
             catch
             {
-                return currentDirectory.GetCurrentDirectory();
+                return Path.GetFullPath(".");
             }
         }
 
