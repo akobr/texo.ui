@@ -48,6 +48,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.NugetManager", "Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.CommandLine", "Commands\Commands.CommandLine\Commands.CommandLine.csproj", "{620B936C-B2A0-4B37-97DA-11E32B858D7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands.CodeBaseSearch", "Commands\Commands.CodeBaseSearch\Commands.CodeBaseSearch.csproj", "{15AFB5D0-4D42-4077-9F04-0D83E8D70D79}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -118,6 +120,10 @@ Global
 		{620B936C-B2A0-4B37-97DA-11E32B858D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{620B936C-B2A0-4B37-97DA-11E32B858D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{620B936C-B2A0-4B37-97DA-11E32B858D7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15AFB5D0-4D42-4077-9F04-0D83E8D70D79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15AFB5D0-4D42-4077-9F04-0D83E8D70D79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15AFB5D0-4D42-4077-9F04-0D83E8D70D79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15AFB5D0-4D42-4077-9F04-0D83E8D70D79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -137,6 +143,7 @@ Global
 		{2AFDFE71-D743-49DF-9F47-61A94431CF00} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 		{6B1BA988-E9C1-46B7-86EE-1D0269D21906} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 		{620B936C-B2A0-4B37-97DA-11E32B858D7C} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
+		{15AFB5D0-4D42-4077-9F04-0D83E8D70D79} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDFCCFD5-8669-4BBF-83FF-8DFCC3F39551}
