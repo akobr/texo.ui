@@ -1,6 +1,7 @@
 ﻿using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.NugetManager;
 using BeaverSoft.Texo.Core;
+using Commands.Calc;
 using Commands.CommandLine;
 using Commands.Git;
 using Commands.ReferenceCheck;
@@ -16,7 +17,8 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
                 CommandLineCommand.BuildConfiguration(),
                 FileManagerBuilder.BuildCommand(),
                 NugetManagerBuilder.BuildCommand(),
-                GitBuilder.BuildCommand());
+                CalcCommand.BuildConfiguration()/*,
+                GitBuilder.BuildCommand()*/);
         }
     }
 }

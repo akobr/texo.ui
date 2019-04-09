@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2042
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28721.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Texo.Core", "BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj", "{588610D7-7D21-4DF8-AAD6-E88C83560D87}"
 EndProject
@@ -61,6 +61,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.Git", "Commands\Commands.Git\Commands.Git.csproj", "{9DF2658D-1FF8-48B7-9219-91A316A7C353}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.Dotnet", "Commands\Commands.Dotnet\Commands.Dotnet.csproj", "{6BDE023D-A613-440F-B31D-B27C49B099D0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.Calc", "Commands\Commands.Calc\Commands.Calc.csproj", "{EE949F35-15BD-47D3-BC1E-01C18847CF6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands.Clipboard", "Commands\Commands.Clipboard\Commands.Clipboard.csproj", "{694220F2-5D6E-4543-8C3C-0AC6ACABC957}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -152,6 +156,14 @@ Global
 		{6BDE023D-A613-440F-B31D-B27C49B099D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BDE023D-A613-440F-B31D-B27C49B099D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BDE023D-A613-440F-B31D-B27C49B099D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE949F35-15BD-47D3-BC1E-01C18847CF6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE949F35-15BD-47D3-BC1E-01C18847CF6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE949F35-15BD-47D3-BC1E-01C18847CF6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE949F35-15BD-47D3-BC1E-01C18847CF6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{694220F2-5D6E-4543-8C3C-0AC6ACABC957}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{694220F2-5D6E-4543-8C3C-0AC6ACABC957}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{694220F2-5D6E-4543-8C3C-0AC6ACABC957}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{694220F2-5D6E-4543-8C3C-0AC6ACABC957}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,6 +188,8 @@ Global
 		{7C8EBE06-A263-4BF4-AE84-28572AC5806F} = {033465D5-8DBB-4F82-B013-3FD6137E8569}
 		{9DF2658D-1FF8-48B7-9219-91A316A7C353} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 		{6BDE023D-A613-440F-B31D-B27C49B099D0} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
+		{EE949F35-15BD-47D3-BC1E-01C18847CF6B} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
+		{694220F2-5D6E-4543-8C3C-0AC6ACABC957} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDFCCFD5-8669-4BBF-83FF-8DFCC3F39551}
