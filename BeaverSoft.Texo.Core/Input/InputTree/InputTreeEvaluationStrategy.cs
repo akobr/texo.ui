@@ -24,19 +24,19 @@ namespace BeaverSoft.Texo.Core.Input.InputTree
             this.environment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
 
-        public Core.Input.Input Evaluate(ParsedInput parsedInput)
+        public Input Evaluate(ParsedInput parsedInput)
         {
             input = parsedInput;
 
             if (IsInputNullOrEmpty())
             {
-                return Core.Input.Input.BuildUnrecognised(input);
+                return Input.BuildUnrecognised(input);
             }
 
             PrepareTokenStack();
 
             wrongInput = false;
-            result = Core.Input.Input.Empty.ToBuilder();
+            result = Input.Empty.ToBuilder();
             result.ParsedInput = input.ToBuilder();
             AnalysedToken firstToken = tokenStack.Peek();
 
@@ -76,7 +76,7 @@ namespace BeaverSoft.Texo.Core.Input.InputTree
             }
 
             tokenStack.Pop();
-            while (tokenStack.Count > 0)
+            while (tokenStack.Count > 1)
             {
                 AddWrongTokenToResult(tokenStack.Pop().RawInput);
             }
@@ -181,6 +181,12 @@ namespace BeaverSoft.Texo.Core.Input.InputTree
                 }
 
                 options.Add(option);
+            }
+
+            if (options.Count < 1)
+            {
+                EvaluateParameters(query, result.Context.Parameters);
+                return;
             }
 
             foreach (OptionNode option in options)
@@ -341,8 +347,12 @@ namespace BeaverSoft.Texo.Core.Input.InputTree
 
         private static bool IsParameterMatch(ParameterNode parameter, AnalysedToken token)
         {
-            if (!token.IsEndOfInput
-                && string.IsNullOrEmpty(parameter.Parameter.ArgumentTemplate))
+            if (token.IsEndOfInput)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(parameter.Parameter.ArgumentTemplate))
             {
                 return true;
             }

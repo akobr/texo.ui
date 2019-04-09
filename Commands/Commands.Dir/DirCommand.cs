@@ -43,7 +43,7 @@ namespace Commands.Dir
                     : output.Substring(startIndex);
             }
 
-            return new ItemsResult(Item.Plain(output));
+            return new ItemsResult(Item.Markdown("```cmd" + Environment.NewLine + output + "```"));
         }
 
         private string GetFullPath(CommandContext context)

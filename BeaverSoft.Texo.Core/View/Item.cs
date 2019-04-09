@@ -1,11 +1,16 @@
-﻿namespace BeaverSoft.Texo.Core.View
+﻿using System.Collections.Immutable;
+
+namespace BeaverSoft.Texo.Core.View
 {
     public class Item : IItem
     {
+        private ImmutableList<IAction> actions;
+
         public Item(string text, TextFormatEnum format)
         {
             Text = text;
             Format = format;
+            Actions = ImmutableList<IAction>.Empty;
         }
 
         public Item(string text)
@@ -20,9 +25,21 @@
             // no operation
         }
 
-        public string Text { get; }
+        public string Text { get; set; }
 
-        public TextFormatEnum Format { get; }
+        public TextFormatEnum Format { get; set; }
+
+        public IImmutableList<IAction> Actions { get; set; }
+
+        public void AddActions(ImmutableList<IAction> actionsToAdd)
+        {
+            actions = actions.AddRange(actionsToAdd);
+        }
+
+        public void SetActions(ImmutableList<IAction> newActions)
+        {
+            actions = newActions;
+        }
 
         public static implicit operator Item(string text)
         {

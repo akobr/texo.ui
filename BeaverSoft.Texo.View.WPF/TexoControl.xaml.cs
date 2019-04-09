@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -17,28 +18,76 @@ namespace BeaverSoft.Texo.View.WPF
 
         public event EventHandler<string> InputChanged;
         public event EventHandler<string> InputFinished;
+        public event EventHandler<HistoryScrollDirection> CommandHistoryScrolled;
 
         public RichTextBox InputBox => tbInput;
 
         public FlowDocumentScrollViewer OutputDocument => docOutput;
 
-        private void HandleInputTextChanged(object sender, TextChangedEventArgs e)
+        public string Prompt
         {
-            InputChanged?.Invoke(this, GetInput());
+            get => lbPrompt.Text;
+            set => lbPrompt.Text = value;
         }
 
-        private void HandleInputKeyUp(object sender, KeyEventArgs e)
+        public string Title
+        {
+            get => lbTitle.Text;
+            set => lbTitle.Text = value;
+        }
+
+        public void SetHistoryCount(int count)
+        {
+            lbHistoryCount.Text = $"History ({count})";
+        }
+
+        public void SetVariableCount(int count)
+        {
+            lbVariableCount.Text = $"Variables ({count})";
+        }
+
+        private void HandleInputTextChanged(object sender, TextChangedEventArgs e)
+        {
+            //InputChanged?.Invoke(this, GetInput());
+        }
+
+        private void HandleInputKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
-                InputFinished?.Invoke(this, GetInput());
+                string input = GetInput();
+
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    InputFinished?.Invoke(this, GetInput());
+                }
+
+                e.Handled = true;
             }
+        }
+
+        private void HandleInputKeyDownPreview(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Up)
+            {
+                CommandHistoryScrolled?.Invoke(this, HistoryScrollDirection.Back);
+            }
+            else if (e.Key == Key.Down)
+            {
+                CommandHistoryScrolled?.Invoke(this, HistoryScrollDirection.Forward);
+            }
+        }
+
+        private void HandleInputSelectionChanged(object sender, RoutedEventArgs e)
+        {
+            TextRange range = new TextRange(tbInput.Document.ContentStart, tbInput.Document.ContentEnd);
+            range.ApplyPropertyValue(RichTextBox.FontSizeProperty, 16.0);
         }
 
         private string GetInput()
         {
             TextRange range = new TextRange(tbInput.Document.ContentStart, tbInput.Document.ContentEnd);
-            return range.Text;
+            return range.Text.Trim();
         }
     }
 }

@@ -4,6 +4,7 @@ using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Input.History;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Runtime
@@ -14,8 +15,11 @@ namespace BeaverSoft.Texo.Core.Runtime
         private readonly IInputEvaluationService evaluator;
         private readonly ICommandManagementService commandManagement;
         private readonly IDidYouMeanService didYouMean;
+        private readonly IIntellisenceService intelisence;
         private readonly IResultProcessingService resultProcessing;
         private readonly IViewService view;
+        private readonly IInputHistoryService history;
+        private readonly IFallbackService fallback;
 
         public RuntimeCoordinatorService(
             IEnvironmentService environment,
@@ -23,14 +27,21 @@ namespace BeaverSoft.Texo.Core.Runtime
             ICommandManagementService commandManagement,
             IResultProcessingService resultProcessing,
             IViewService view,
-            IDidYouMeanService didYouMean)
+            IInputHistoryService history,
+            IIntellisenceService intelisence,
+            IDidYouMeanService didYouMean,
+            IFallbackService fallback)
         {
             this.environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.evaluator = evaluator ?? throw new ArgumentNullException(nameof(evaluator));
             this.commandManagement = commandManagement ?? throw new ArgumentNullException(nameof(commandManagement));
             this.resultProcessing = resultProcessing ?? throw new ArgumentNullException(nameof(resultProcessing));
             this.view = view ?? throw new ArgumentNullException(nameof(view));
+
+            this.history = history;
+            this.intelisence = intelisence;
             this.didYouMean = didYouMean;
+            this.fallback = fallback;
         }
 
         public void Initialise()
@@ -45,25 +56,33 @@ namespace BeaverSoft.Texo.Core.Runtime
             view.Start();
         }
 
-        public void PreProcess(string input)
+        public Input.Input PreProcess(string input)
         {
             Input.Input inputModel = evaluator.Evaluate(input);
             view.Render(inputModel);
+            return inputModel;
         }
 
         public void Process(string input)
         {
             Input.Input inputModel = evaluator.Evaluate(input);
+            history?.Enqueue(inputModel);
 
             if (!inputModel.Context.IsValid)
             {
-                if (didYouMean == null)
+                if (fallback != null
+                    && !string.IsNullOrEmpty(inputModel.Context.Key))
+                {
+                    Render(fallback.Fallback(inputModel));
+                }
+                else if (didYouMean != null)
+                {
+                    Render(didYouMean.Help(inputModel));
+                }
+                else
                 {
                     RenderError("Unknown input.");
-                    return;
                 }
-
-                Render(didYouMean.Help(inputModel));
                 return;
             }
 

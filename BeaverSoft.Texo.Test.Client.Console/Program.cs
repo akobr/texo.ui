@@ -17,7 +17,7 @@ using BeaverSoft.Texo.View.Console.Markdown;
 using Commands.CommandLine;
 using Commands.Dir;
 using Commands.ReferenceCheck;
-using GalaSoft.MvvmLight.Ioc;
+using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
 using StrongBeaver.Core.Services.Serialisation;
@@ -53,6 +53,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
 
             container.Register<ServiceMessageBus>();
             container.Register<IServiceMessageBus>(() => container.GetInstance<ServiceMessageBus>());
+            container.Register<IServiceMessageBusRegister>(() => container.GetInstance<ServiceMessageBus>());
 
             container.Register<ILogService, DebugLogService>();
             container.Register<IInputParseService, InputParseService>();
@@ -100,18 +101,17 @@ namespace BeaverSoft.Texo.Test.Client.Console
             commandFactory.Register("file-manager", () => container.GetInstance<FileManagerCommand>());
             commandFactory.Register("nuget-manager", () => container.GetInstance<NugetManagerCommand>());
 
-            engine = new TexoEngineBuilder(container.GetInstance<ServiceMessageBus>())
+            ServiceMessageBus messageBus = container.GetInstance<ServiceMessageBus>();
+
+            engine = new TexoEngineBuilder(messageBus, messageBus)
                 .WithLogService(container.GetInstance<ILogService>())
                 .WithInputParseService(container.GetInstance<IInputParseService>())
                 .WithInputEvaluationService(container.GetInstance<IInputEvaluationService>())
                 .WithEnvironmentService(container.GetInstance<IEnvironmentService>())
                 .WithSettingService(container.GetInstance<ISettingService>())
-                .WithCommandFactory(commandFactory)
                 .WithCommandManagementService(container.GetInstance<ICommandManagementService>())
                 .WithResultProcessingService(container.GetInstance<IResultProcessingService>())
-                .Build(container.GetInstance<IViewService>());
-
-            engine.Initialise();
+                .Build(commandFactory, container.GetInstance<IViewService>());
 
             var config = TextumConfiguration.CreateDefault().ToBuilder();
             config.Runtime.Commands.Add(ReferenceCheckCommand.BuildConfiguration());
@@ -119,7 +119,8 @@ namespace BeaverSoft.Texo.Test.Client.Console
             config.Runtime.Commands.Add(CommandLineCommand.BuildConfiguration());
             config.Runtime.Commands.Add(FileManagerBuilder.BuildCommand());
             config.Runtime.Commands.Add(NugetManagerBuilder.BuildCommand());
-            engine.Configure(config.ToImmutable());
+
+            engine.Initialise(config.ToImmutable());
         }
 
         private static void Shutdown()

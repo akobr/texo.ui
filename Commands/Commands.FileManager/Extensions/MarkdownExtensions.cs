@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Path;
+using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Commands.FileManager.Extensions
 {
@@ -8,9 +10,9 @@ namespace BeaverSoft.Texo.Commands.FileManager.Extensions
     {
         public static void WritePathLists(this MarkdownBuilder builder, string lobbyPath, IEnumerable<string> paths)
         {
-            List<string> directories = new List<string>();
-            List<string> files = new List<string>();
-            List<string> nonExists = new List<string>();
+            List<ILink> directories = new List<ILink>();
+            List<ILink> files = new List<ILink>();
+            List<ILink> nonExists = new List<ILink>();
 
             foreach (string path in paths)
             {
@@ -19,15 +21,15 @@ namespace BeaverSoft.Texo.Commands.FileManager.Extensions
                 switch (type)
                 {
                     case PathTypeEnum.Directory:
-                        directories.Add(path.GetFriendlyPath(lobbyPath));
+                        directories.Add(new Link(path.GetFriendlyPath(lobbyPath), path));
                         break;
 
                     case PathTypeEnum.File:
-                        files.Add(path.GetFriendlyPath(lobbyPath));
+                        files.Add(new Link(path.GetFriendlyPath(lobbyPath), path));
                         break;
 
                     case PathTypeEnum.NonExistent:
-                        nonExists.Add(path.GetFriendlyPath(lobbyPath));
+                        nonExists.Add(new Link(path.GetFriendlyPath(lobbyPath), path));
                         break;
 
                 }
@@ -38,20 +40,23 @@ namespace BeaverSoft.Texo.Commands.FileManager.Extensions
             WritePaths(nonExists, "Non-Existing", builder);
         }
 
-        private static void WritePaths(List<string> paths, string title, MarkdownBuilder builder)
+        private static void WritePaths(List<ILink> paths, string title, MarkdownBuilder builder)
         {
             if (paths.Count <= 0)
             {
                 return;
             }
 
-            paths.Sort();
+            paths.Sort((first, second) =>
+                string.Compare(first.Title, second.Title, StringComparison.OrdinalIgnoreCase));
+
             builder.Header(title, 2);
             builder.WriteLine();
 
-            foreach (string directory in paths)
+            foreach (ILink directory in paths)
             {
-                builder.Bullet(directory);
+                builder.Bullet();
+                builder.Link(directory);
             }
         }
     }

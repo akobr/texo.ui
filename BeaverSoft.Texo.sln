@@ -44,9 +44,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.Dir", "Commands\Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.FileManager", "Commands\Commands.FileManager\Commands.FileManager.csproj", "{2AFDFE71-D743-49DF-9F47-61A94431CF00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands.NugetManager", "Commands\Commands.NugetManager\Commands.NugetManager.csproj", "{6B1BA988-E9C1-46B7-86EE-1D0269D21906}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.NugetManager", "Commands\Commands.NugetManager\Commands.NugetManager.csproj", "{6B1BA988-E9C1-46B7-86EE-1D0269D21906}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands.CommandLine", "Commands\Commands.CommandLine\Commands.CommandLine.csproj", "{620B936C-B2A0-4B37-97DA-11E32B858D7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.CommandLine", "Commands\Commands.CommandLine\Commands.CommandLine.csproj", "{620B936C-B2A0-4B37-97DA-11E32B858D7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

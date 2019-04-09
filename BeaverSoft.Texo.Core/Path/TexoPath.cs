@@ -218,12 +218,6 @@ namespace BeaverSoft.Texo.Core.Path
                 result = System.IO.Path.Combine(result, segment.Value);
             }
 
-            // Fix for drive root path
-            if (result.Length == 2 && result[1].IsVolumeSeparatorChar())
-            {
-                result += System.IO.Path.DirectorySeparatorChar;
-            }
-
             return result;
         }
 
@@ -289,7 +283,8 @@ namespace BeaverSoft.Texo.Core.Path
                 {
                     if (wildcard.WildcardType == PathSegment.WildcardTypeEnum.Simple)
                     {
-                        newDirectories.AddRange(TexoDirectory.GetDirectories(directory, wildcard.Value, SearchOption.TopDirectoryOnly));
+                        newDirectories.AddRange(TexoDirectory.GetDirectories(directory, wildcard.Value,
+                            SearchOption.TopDirectoryOnly));
                     }
                     else
                     {
@@ -318,7 +313,11 @@ namespace BeaverSoft.Texo.Core.Path
 
             foreach (string strSegment in path.SplitToPathSegments())
             {
-                PathSegment segment = new PathSegment(strSegment);
+                PathSegment segment = new PathSegment(
+                    index == 0 && IsAbsolute
+                        ? strSegment + System.IO.Path.DirectorySeparatorChar
+                        : strSegment);
+
                 segments.Add(segment);
 
                 if (segment.WildcardType != PathSegment.WildcardTypeEnum.None)
@@ -352,24 +351,28 @@ namespace BeaverSoft.Texo.Core.Path
             return ContainsWildcard ? wildcardIndexes.First() : GetLastIndex();
         }
 
-        private static List<string> ProcessComplexItems(IEnumerable<string> directories, PathSegment wildcard, Regex regularExpression)
+        private static List<string> ProcessComplexItems(IEnumerable<string> directories, PathSegment wildcard,
+            Regex regularExpression)
         {
             List<string> newItems = new List<string>();
-            int indexOfComplexWildcard = wildcard.Value.IndexOf(PathConstants.ANY_PATH_WILDCARD, StringComparison.OrdinalIgnoreCase);
+            int indexOfComplexWildcard =
+                wildcard.Value.IndexOf(PathConstants.ANY_PATH_WILDCARD, StringComparison.OrdinalIgnoreCase);
             bool hasSimpleStart = false;
             string simpleStart = string.Empty;
 
             if (indexOfComplexWildcard > 0)
             {
                 hasSimpleStart = true;
-                simpleStart = wildcard.Value.Substring(0, indexOfComplexWildcard) + PathConstants.WILDCARD_ANY_CHARACTER;
+                simpleStart = wildcard.Value.Substring(0, indexOfComplexWildcard) +
+                              PathConstants.WILDCARD_ANY_CHARACTER;
             }
 
             foreach (string directory in directories)
             {
                 IEnumerable<string> subItems = hasSimpleStart
                     ? TexoDirectory.GetFileSystemEntries(directory, PathConstants.SEARCH_TERM_ALL, simpleStart)
-                    : TexoDirectory.GetFileSystemEntries(directory, PathConstants.SEARCH_TERM_ALL, SearchOption.AllDirectories);
+                    : TexoDirectory.GetFileSystemEntries(directory, PathConstants.SEARCH_TERM_ALL,
+                        SearchOption.AllDirectories);
 
                 newItems.AddRange(subItems.Where(item => regularExpression.IsMatch(item)));
             }
@@ -383,7 +386,15 @@ namespace BeaverSoft.Texo.Core.Path
 
             foreach (string directory in directories)
             {
-                newItems.AddRange(Directory.GetFileSystemEntries(directory, leafSegment.Value, SearchOption.TopDirectoryOnly));
+                if (leafSegment.WildcardType == PathSegment.WildcardTypeEnum.None)
+                {
+                    newItems.Add(directory.CombinePathWith(leafSegment.Value));
+                }
+                else
+                {
+                    newItems.AddRange(Directory.GetFileSystemEntries(directory, leafSegment.Value,
+                        SearchOption.TopDirectoryOnly));
+                }
             }
 
             return newItems;

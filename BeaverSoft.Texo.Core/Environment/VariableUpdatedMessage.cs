@@ -16,5 +16,7 @@ namespace BeaverSoft.Texo.Core.Environment
         public string NewValue { get; }
 
         public string OldValue { get; }
+
+        public IEnvironmentService Environment => Sender as IEnvironmentService;
     }
 }

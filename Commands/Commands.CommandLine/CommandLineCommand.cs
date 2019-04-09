@@ -9,14 +9,29 @@ namespace Commands.CommandLine
 {
     public class CommandLineCommand : ICommand
     {
-        private string POWER_SHELL_PATH = @"%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe";
+        private string GIT_BASH_FIRST_PATH = @"c:\Program Files\Git\git-bash.exe";
+        private string GIT_BASH_SECOND_PATH = @"c:\Program Files (x86)\Git\git-bash.exe";
 
         public ICommandResult Execute(CommandContext context)
         {
-            if (context.FirstQuery == "power-shell"
-                && File.Exists(POWER_SHELL_PATH))
+            if (context.FirstQuery == "power-shell")
             {
-                StartShell(POWER_SHELL_PATH);
+                StartShell("powershell.exe");
+            }
+            else if (context.FirstQuery == "git-bash")
+            {
+                if (File.Exists(GIT_BASH_FIRST_PATH))
+                {
+                    StartShell(GIT_BASH_FIRST_PATH);
+                }
+                else if (File.Exists(GIT_BASH_SECOND_PATH))
+                {
+                    StartShell(GIT_BASH_SECOND_PATH);
+                }
+                else
+                {
+                    StartShell("cmd.exe");
+                }
             }
             else
             {
@@ -48,11 +63,18 @@ namespace Commands.CommandLine
 
             var powerShell = Query.CreateBuilder();
             powerShell.Key = "power-shell";
-            powerShell.Representations.AddRange(new []{ "power-shell", "powershell", "power", "ps"});
+            powerShell.Representations.AddRange(new [] { "power-shell", "power", "ps", "p" });
             powerShell.Documentation.Title = "Start power shell";
             powerShell.Documentation.Description = "Starts PowerShell in current working directory.";
 
+            var gitBash = Query.CreateBuilder();
+            gitBash.Key = "git-bash";
+            gitBash.Representations.AddRange(new[] { "git-bash", "gbash", "git", "gb", "g" });
+            gitBash.Documentation.Title = "Start git bash";
+            gitBash.Documentation.Description = "Starts Git bash in current working directory.";
+
             command.Queries.Add(powerShell.ToImmutable());
+            command.Queries.Add(gitBash.ToImmutable());
 
             return command.ToImmutable();
         }

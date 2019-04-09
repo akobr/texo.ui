@@ -4,8 +4,41 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:BeaverSoft.Texo.View.WPF"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             FontFamily="Consolas"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <UserControl.Resources>
+        <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading1StyleKey}">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Foreground" Value="#ff000000" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading2StyleKey}">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Foreground" Value="#ff000000" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading3StyleKey}">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="#ff000000" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading4StyleKey}">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="#ff000000" />
+            <Setter Property="FontWeight" Value="Light" />
+            <Setter Property="TextDecorations" Value="Underline" />
+        </Style>
+        <Style TargetType="{x:Type Line}" x:Key="{x:Static markdig:Styles.ThematicBreakStyleKey}">
+            <Setter Property="Stretch" Value="Fill" />
+            <Setter Property="Stroke" Value="DimGray" />
+        </Style>
+        <Style TargetType="{x:Type Span}" x:Key="{x:Static markdig:Styles.MarkedStyleKey}">
+            <Setter Property="Background" Value="#55FFFF00" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -13,20 +46,37 @@
         </Grid.RowDefinitions>
 
         <!-- HEADER -->
-        <Grid>
+        <Grid Margin="5,4">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Name="lbTitle">Texo UI</Label>
+            <TextBlock Name="lbTitle" Text="Texo UI" FontStyle="Italic" TextTrimming="CharacterEllipsis" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <TextBlock Name="lbHistoryCount" Text="History (0)" Foreground="DodgerBlue" Margin="10,0" />
+                <TextBlock Name="lbVariableCount" Text="Variables (0)" Foreground="DodgerBlue" Margin="10,0" />
+            </StackPanel>
         </Grid>
 
         <!-- COMMAND LINE -->
-        <RichTextBox Name="tbInput" Grid.Row="1" TextChanged="HandleInputTextChanged" KeyUp="HandleInputKeyUp"></RichTextBox>
+        <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0,1" Margin="0,3" Padding="0,3" Background="LightGray">
+            <Grid
+                >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Name="lbPrompt" Text="tu&gt;" FontFamily="Consolas" FontSize="16" VerticalAlignment="Center" FontWeight="Bold" Padding="5,0,0,2" />
+                <RichTextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
+                             TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" SelectionChanged="HandleInputSelectionChanged" />
+            </Grid>
+        </Border>
 
         <!-- OUTPUT -->
-        <FlowDocumentScrollViewer Name="docOutput" Grid.Row="2"></FlowDocumentScrollViewer>
+        <FlowDocumentScrollViewer Name="docOutput" Grid.Row="2"
+                                  MinZoom="50" VerticalScrollBarVisibility="Auto" />
 
     </Grid>
 </UserControl>
