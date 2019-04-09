@@ -34,19 +34,22 @@ namespace BeaverSoft.Texo.View.Console.Markdown
                 {
                     case HeadingBlock heading:
                         MarkdownConsole.WriteHeader(GetTextFromInlineContainer(heading.Inline), heading.Level);
+                        SysConsole.WriteLine();
                         break;
 
                     case CodeBlock code:
-                        MarkdownConsole.WriteCode(GetTextFromInlineContainer(code.Inline));
-                        SysConsole.WriteLine();
+                        WriteCode(code);
                         break;
 
                     case QuoteBlock quote:
                         MarkdownConsole.WriteQuote(GetTextFromBlockContainer(quote));
+                        SysConsole.WriteLine();
                         break;
 
                     case ThematicBreakBlock horizontalLine:
+                        SysConsole.WriteLine();
                         MarkdownConsole.WriteHorizontalBreak();
+                        SysConsole.WriteLine();
                         break;
 
                     case ParagraphBlock paragraph:
@@ -62,6 +65,15 @@ namespace BeaverSoft.Texo.View.Console.Markdown
                         break;
                 }
             }
+        }
+
+        private static void WriteCode(CodeBlock code)
+        {
+            foreach (StringLine line in code.Lines)
+            {
+                MarkdownConsole.WriteCode(GetTextFromSlice(line.Slice));
+            }
+            SysConsole.WriteLine();
         }
 
         private static void WriteList(ListBlock list, int intentLevel = 1)
@@ -203,10 +215,19 @@ namespace BeaverSoft.Texo.View.Console.Markdown
             }
         }
 
+        private static string GetTextFromSlice(StringSlice slice)
+        {
+            if (slice.Length < 1 || slice.Text == null)
+            {
+                return string.Empty;
+            }
+
+            return slice.Text.Substring(slice.Start, slice.Length);
+        }
+
         private static string GetTextFromLiteral(LiteralInline literal)
         {
-            StringSlice slice = literal.Content;
-            return slice.Text.Substring(slice.Start, slice.Length);
+            return GetTextFromSlice(literal.Content);
         }
 
         private static string GetTextFromLink(LinkInline link)

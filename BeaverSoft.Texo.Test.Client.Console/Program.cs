@@ -9,6 +9,7 @@ using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.View.Console;
 using BeaverSoft.Texo.View.Console.Markdown;
+using Commands.ReferenceCheck;
 using GalaSoft.MvvmLight.Ioc;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
@@ -58,11 +59,13 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<ICurrentDirectoryService, CurrentDirectoryService>();
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
+            container.Register<ReferenceCheckCommand>();
 
             CommandFactory commandFactory = new CommandFactory();
             container.Register<ITexoFactory<ICommand, string>>(() => commandFactory);
             commandFactory.Register(CommandKeys.CURRENT_DIRECTORY, () => container.GetInstance<CurrentDirectoryCommand>());
             commandFactory.Register(CommandKeys.TEXO, () => container.GetInstance<TexoCommand>());
+            commandFactory.Register(ReferenceCheckConstants.REF_CHECK, () => container.GetInstance<ReferenceCheckCommand>());
 
             engine = new TexoEngineBuilder(container.GetInstance<ServiceMessageBus>())
                 .WithLogService(container.GetInstance<ILogService>())
@@ -76,7 +79,10 @@ namespace BeaverSoft.Texo.Test.Client.Console
                 .Build(container.GetInstance<IViewService>());
 
             engine.Initialise();
-            engine.Configure(TextumConfiguration.CreateDefault());
+
+            var config = TextumConfiguration.CreateDefault().ToBuilder();
+            config.Runtime.Commands.Add(ReferenceCheckCommand.BuildConfiguration());
+            engine.Configure(config.ToImmutable());
         }
 
         private static void Shutdown()
