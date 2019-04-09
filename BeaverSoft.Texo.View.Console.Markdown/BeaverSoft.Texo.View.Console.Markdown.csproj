@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BeaverSoft.Texo.Core.MarkDown\BeaverSoft.Texo.Core.Markdown.csproj" />
+    <ProjectReference Include="..\BeaverSoft.Texo.View.Console\BeaverSoft.Texo.View.Console.csproj" />
+  </ItemGroup>
+
+</Project>
