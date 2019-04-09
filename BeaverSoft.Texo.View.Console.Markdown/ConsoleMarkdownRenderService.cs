@@ -36,13 +36,20 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         private static void WriteBlockContainer(ContainerBlock container)
         {
+            bool needNewLine = false;
+
             foreach (Block block in container)
             {
+                if (needNewLine)
+                {
+                    SysConsole.WriteLine();
+                }
+
                 switch (block)
                 {
                     case HeadingBlock heading:
                         MarkdownConsole.WriteHeader(GetTextFromInlineContainer(heading.Inline), heading.Level);
-                        SysConsole.WriteLine();
+                        needNewLine = true;
                         break;
 
                     case CodeBlock code:
@@ -51,7 +58,6 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
                     case QuoteBlock quote:
                         MarkdownConsole.WriteQuote(GetTextFromBlockContainer(quote));
-                        SysConsole.WriteLine();
                         break;
 
                     case ThematicBreakBlock horizontalLine:
@@ -88,10 +94,15 @@ namespace BeaverSoft.Texo.View.Console.Markdown
         {
             int.TryParse(list.OrderedStart, out int index);
             intentLevel = Math.Max(intentLevel, 1);
-
+            bool needNewLine = false;
 
             foreach (Block item in list)
             {
+                if (needNewLine)
+                {
+                    SysConsole.WriteLine();
+                }
+
                 switch (item)
                 {
                     case ListItemBlock listItem:
@@ -101,10 +112,12 @@ namespace BeaverSoft.Texo.View.Console.Markdown
                                 : GetListItemBullet(intentLevel),
                             intentLevel);
                         WriteBlockContainer(listItem);
+                        needNewLine = true;
                         break;
 
                     case ListBlock childList:
                         WriteList(childList, intentLevel + 1);
+                        needNewLine = true;
                         break;
                 }
             }
@@ -120,17 +133,7 @@ namespace BeaverSoft.Texo.View.Console.Markdown
 
         private static string GetListItemBullet(int intentLevel)
         {
-            if (intentLevel <= 1)
-            {
-                return "•";
-            }
-
-            if (intentLevel >= 3)
-            {
-                return "◘";
-            }
-
-            return "○";
+            return "*";
         }
 
         public static void WriteHtml(HtmlBlock html)

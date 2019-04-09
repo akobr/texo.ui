@@ -105,9 +105,24 @@ namespace Commands.ReferenceCheck
         private static void ProcessProjectContent(FileInfo projectFile, IMarkdownBuilder markdown)
         {
             XDocument content;
-            using (Stream fileContent = projectFile.OpenRead())
+
+            try
             {
-                content = XDocument.Load(fileContent);
+                using (Stream fileContent = projectFile.OpenRead())
+                {
+                    content = XDocument.Load(fileContent);
+                }
+
+                if (content.Root == null)
+                {
+                    markdown.Italic("Invalid content of project file.");
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                markdown.Italic("Invalid content of project file: " + e.Message);
+                return;
             }
 
             XNamespace defaultNamespace = content.Root.GetDefaultNamespace();

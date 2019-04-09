@@ -70,6 +70,18 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
             return this;
         }
 
+        public IMarkdownBuilder Bullet(int intentLevel = 0)
+        {
+            if (!IsOnNewLine())
+            {
+                stringBuilder.AppendLine();
+            }
+
+            stringBuilder.Append(' ', Math.Max(intentLevel, 0) * 3);
+            stringBuilder.Append("* ");
+            return this;
+        }
+
         public IMarkdownBuilder Image(string path)
         {
             stringBuilder.AppendFormat("![][{0}]", path);

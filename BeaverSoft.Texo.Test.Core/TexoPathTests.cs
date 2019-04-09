@@ -23,7 +23,7 @@ namespace BeaverSoft.Texo.Test.Core
         [Fact]
         public void TexoPath_AbsoluteComplexFilePath_OneFile()
         {
-            TexoPath path = new TexoPath("C:/Win**32/Win32_DeviceGuard.dll");
+            TexoPath path = new TexoPath("C:/windows/sy**32/Win32_DeviceGuard.dll");
             var files = path.GetFiles();
             var directories = path.GetDirectories();
 

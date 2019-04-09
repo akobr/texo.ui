@@ -8,9 +8,9 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
     {
         IImmutableList<IStashEntry> GetStashes();
 
-        IStashEntry CreateStash(IImmutableList<string> paths);
+        IStashEntry CreateStash(string lobbyPath, IImmutableList<string> paths);
 
-        IStashEntry CreateStash(IImmutableList<string> paths, string name);
+        IStashEntry CreateStash(string lobbyPath, IImmutableList<string> paths, string name);
 
         IStashEntry GetStash(string name);
 

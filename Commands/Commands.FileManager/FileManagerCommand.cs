@@ -13,12 +13,12 @@ namespace BeaverSoft.Texo.Commands.FileManager
 
         public FileManagerCommand(IStageService stageService, IStashService stashService)
         {
-            this.stageService = stageService;
-            this.stashService = stashService;
+            this.stageService = stageService ?? throw new ArgumentNullException(nameof(stageService));
+            this.stashService = stashService ?? throw new ArgumentNullException(nameof(stashService));
 
-            RegisterCommand(StageQueries.STAGE, new StageCommand(stageService, stashService));
+            RegisterCommand(StageQueries.STAGE, new StageCommand(stageService));
             RegisterCommand(StashQueries.STASH, new StashCommand(stashService, stageService));
-            RegisterCommand(ApplyQueries.APPLY, new ApplyCommand());
+            RegisterCommand(ApplyQueries.APPLY, new ApplyCommand(stageService));
         }
     }
 }
