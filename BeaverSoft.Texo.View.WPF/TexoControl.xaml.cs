@@ -28,7 +28,7 @@ namespace BeaverSoft.Texo.View.WPF
 
         public FlowDocument OutputDocument => docOutput.Document;
 
-        public ListView IntellisenceList => listIntellisence;
+        public ListBox IntellisenceList => listIntellisence;
 
         public string Prompt
         {

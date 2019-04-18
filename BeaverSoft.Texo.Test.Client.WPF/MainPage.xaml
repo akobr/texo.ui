@@ -1,14 +1,23 @@
 ﻿<Window x:Class="BeaverSoft.Texo.Test.Client.WPF.MainPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:local="clr-namespace:BeaverSoft.Texo.Test.Client.WPF"
-      xmlns:texo="clr-namespace:BeaverSoft.Texo.View.WPF;assembly=BeaverSoft.Texo.View.WPF"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-      Height="400" Width="600"
-      mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="600" >
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:local="clr-namespace:BeaverSoft.Texo.Test.Client.WPF"
+        xmlns:texo="clr-namespace:BeaverSoft.Texo.View.WPF;assembly=BeaverSoft.Texo.View.WPF"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
+        VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+        Height="400" Width="600"
+        Title="texo-command-line" fw:AcrylicWindow.Enabled="True" fw:AcrylicWindow.TintOpacity="0.75"
+        mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="600">
     <Grid>
-        <texo:TexoControl Name="TexoControl" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="11*"/>
+            <ColumnDefinition Width="26*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.Background>
+            <SolidColorBrush Color="Black" Opacity="0.5" />
+        </Grid.Background>
+        <texo:TexoControl Name="TexoControl" Grid.ColumnSpan="2" />
     </Grid>
 </Window>

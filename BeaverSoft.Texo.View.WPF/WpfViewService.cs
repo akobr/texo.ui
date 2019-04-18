@@ -90,13 +90,9 @@ namespace BeaverSoft.Texo.View.WPF
             header.Loaded += HandleLastSectionLoaded;
             sections.Add(header);
 
-            if (items == null || items.Count < 1 || (items.Count == 1 && string.IsNullOrWhiteSpace(items[0].Text)))
-            {
-                MarkdownBuilder emptyBuilder = new MarkdownBuilder();
-                emptyBuilder.Blockquotes("...empty output.");
-                sections.Add(renderer.Render(Item.Markdown(emptyBuilder.ToString())));
-            }
-            else
+            if (items != null
+                && items.Count > 0
+                && (items.Count != 1 || !string.IsNullOrWhiteSpace(items[0].Text)))
             {
                 foreach (IItem item in items)
                 {
@@ -137,12 +133,13 @@ namespace BeaverSoft.Texo.View.WPF
                     IsHitTestVisible = false,
                     Margin = new Thickness(4),
                     BorderThickness = new Thickness(0),
-                    Background = Brushes.Transparent
+                    Background = Brushes.Transparent,
                 };
 
+                box.SetResourceReference(Control.ForegroundProperty, "SystemBaseHighColorBrush");
                 box.Document = new FlowDocument();
                 box.Document.Blocks.AddRange(itemSection.Blocks.ToList());
-                control.IntellisenceList.Items.Add(new ListViewItem() { Content = box, Tag = item });
+                control.IntellisenceList.Items.Add(new ListBoxItem() { Content = box, Tag = item });
             }
 
             control.IntellisenceList.Visibility = Visibility.Visible;
@@ -207,7 +204,7 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void TexoIntellisenceItemExecuted(object sender, EventArgs e)
         {
-            ListViewItem viewItem = (ListViewItem)control.IntellisenceList.SelectedItem;
+            ListBoxItem viewItem = (ListBoxItem)control.IntellisenceList.SelectedItem;
             IItem item = (IItem)viewItem.Tag;
             control.CloseIntellisence();
 
@@ -325,9 +322,9 @@ namespace BeaverSoft.Texo.View.WPF
                 atPath += '\\';
             }
 
-            headerBuilder.WriteLine();
-            headerBuilder.Blockquotes(atPath);
-            //headerBuilder.WriteLine($"at =={atPath}==");
+            //headerBuilder.WriteLine();
+            //headerBuilder.Blockquotes(atPath);
+            headerBuilder.Italic($"[{atPath}]");
             return Item.Markdown(headerBuilder.ToString());
         }
 
