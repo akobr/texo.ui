@@ -91,7 +91,7 @@ namespace BeaverSoft.Texo.Core.View
                 builder.Append($" *({type})*");
             }
 
-            if (!string.IsNullOrEmpty(type))
+            if (!string.IsNullOrEmpty(description))
             {
                 builder.Append($": {description}");
             }

@@ -145,7 +145,9 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
         private static void SearchLine(SearchContext context)
         {
             context.MatchResult = new SpanBuilder();
-            context.MatchResult.Strong($"{context.LineNumber:0000}: ");
+            context.MatchResult.Write("- ");
+            context.MatchResult.Strong($"{context.LineNumber:0000}");
+            context.MatchResult.Write(": ");
             int countBefore = context.MatchesCount;
 
             if (context.IsRegex)

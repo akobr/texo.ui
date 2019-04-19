@@ -151,23 +151,31 @@ namespace BeaverSoft.Texo.Core
             queryList.Key = EnvironmentNames.QUERY_LIST;
             queryList.Representations.AddRange(
                 new[] { EnvironmentNames.QUERY_LIST, "show" });
+            queryList.Documentation.Title = "List of variables";
+            queryList.Documentation.Description = "List of all defined variables in Texo UI environment.";
 
             var queryGet = Query.CreateBuilder();
             queryGet.Key = EnvironmentNames.QUERY_GET;
             queryGet.Representations.Add(EnvironmentNames.QUERY_GET);
             queryGet.Parameters.Add(parName.ToImmutable());
+            queryGet.Documentation.Title = "Get a variable";
+            queryGet.Documentation.Description = "Get the value of the variable.";
 
             var querySet = Query.CreateBuilder();
             querySet.Key = EnvironmentNames.QUERY_SET;
             querySet.Representations.Add(EnvironmentNames.QUERY_SET);
             querySet.Parameters.Add(parName.ToImmutable());
             querySet.Parameters.Add(parValue.ToImmutable());
+            querySet.Documentation.Title = "Set a variable";
+            querySet.Documentation.Description = "Set a value to specified variable.";
 
             var queryRemove = Query.CreateBuilder();
             queryRemove.Key = EnvironmentNames.QUERY_REMOVE;
             queryRemove.Representations.AddRange(
                 new[] { EnvironmentNames.QUERY_REMOVE, "delete" });
             queryRemove.Parameters.Add(parName.ToImmutable());
+            queryRemove.Documentation.Title = "Remove a variable";
+            queryRemove.Documentation.Description = "Remove specified variable.";
 
             query.Queries.AddRange(
                 new[]

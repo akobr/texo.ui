@@ -16,7 +16,7 @@
             <ColumnDefinition Width="26*"/>
         </Grid.ColumnDefinitions>
         <Grid.Background>
-            <SolidColorBrush Color="Black" Opacity="0.5" />
+            <SolidColorBrush Color="{DynamicResource SystemAltHighColor}" Opacity="0.5" />
         </Grid.Background>
         <texo:TexoControl Name="TexoControl" Grid.ColumnSpan="2" />
     </Grid>

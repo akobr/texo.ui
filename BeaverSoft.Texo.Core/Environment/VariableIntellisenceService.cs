@@ -27,7 +27,7 @@ namespace BeaverSoft.Texo.Core.Environment
                     continue;
                 }
 
-                yield return Item.Intellisence(variable.Key, "variable", variable.Value ?? "[NULL]");
+                yield return Item.Intellisence(variable.Key, $"${variable.Key}$", "variable", variable.Value ?? "[NULL]");
             }
         }
     }

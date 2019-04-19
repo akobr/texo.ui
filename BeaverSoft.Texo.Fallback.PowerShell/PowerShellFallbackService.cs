@@ -123,6 +123,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             }
             catch (Exception e)
             {
+                // Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
                 logger.Error("Error during of profile loading in PowerShell.", e);
             }
             finally

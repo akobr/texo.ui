@@ -1,0 +1,1 @@
+$env:GIT_REDIRECT_STDERR = '2>&1'
