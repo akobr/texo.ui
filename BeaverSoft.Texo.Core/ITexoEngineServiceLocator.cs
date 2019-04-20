@@ -46,5 +46,9 @@ namespace BeaverSoft.Texo.Core
         Func<IActionManagementService> ActionManagement { get; }
 
         Func<IRuntimeCoordinatorService> Runtime { get; }
+
+        Func<IActionFactoryProvider> ActionProvider { get; }
+
+        Func<IActionFactoryRegister> ActionRegister { get; }
     }
 }

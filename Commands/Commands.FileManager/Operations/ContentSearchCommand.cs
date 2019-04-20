@@ -113,7 +113,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                     while ((context.Line = reader.ReadLine()) != null)
                     {
                         context.LineNumber++;
-                        SearchLine(context);
+                        SearchLine(context, filePath);
                     }
                 }
 
@@ -122,7 +122,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                     return;
                 }
 
-                Document fileDocoment = new Document(
+                Document fileDocument = new Document(
                     new Header($"{filePath.GetFileNameOrDirectoryName()} ({context.MatchesCount})"),
                     new Paragraph(
                         new Core.Model.Text.Link(
@@ -130,7 +130,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                             ActionBuilder.PathOpenUri(filePath.GetFullPath()))),
                     new Paragraph(context.MatchResults));
 
-                context.Result.Add(new ModeledItem(fileDocoment));
+                context.Result.Add(new ModeledItem(fileDocument));
                 context.FilesCount++;
                 context.TotalMatchesCount += context.MatchesCount;
             }
@@ -142,11 +142,25 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             context.FilesCount++;
         }
 
-        private static void SearchLine(SearchContext context)
+        private static void SearchLine(SearchContext context, string filePath)
         {
+            if ((context.IsRegex && !context.Regex.IsMatch(context.Line))
+                || context.Line.IndexOf(context.SearchTerm, 0, StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                return;
+            }
+
             context.MatchResult = new SpanBuilder();
             context.MatchResult.Write("- ");
-            context.MatchResult.Strong($"{context.LineNumber:0000}");
+            context.MatchResult.Link(
+                $"{context.LineNumber:0000}",
+                ActionBuilder.BuildActionUri(
+                    ActionNames.PATH_OPEN,
+                    new Dictionary<string, string>
+                    {
+                        { ActionParameters.PATH, filePath.GetFullPath() },
+                        { "line", context.LineNumber.ToString() }
+                    }));
             context.MatchResult.Write(": ");
             int countBefore = context.MatchesCount;
 

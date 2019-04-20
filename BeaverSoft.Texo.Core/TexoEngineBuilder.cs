@@ -1,5 +1,6 @@
 ﻿using System;
 using BeaverSoft.Texo.Core.Actions;
+using BeaverSoft.Texo.Core.Actions.Implementations;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
@@ -20,6 +21,7 @@ namespace BeaverSoft.Texo.Core
     {
         private readonly IServiceMessageBus messageBus;
         private readonly IServiceMessageBusRegister registerToMessageBus;
+        private readonly ActionFactories actions;
 
         private ILogService logger;
         private ISettingService setting;
@@ -44,6 +46,7 @@ namespace BeaverSoft.Texo.Core
             ServiceMessageBus defaultMessageBus = new ServiceMessageBus();
             messageBus = defaultMessageBus;
             registerToMessageBus = defaultMessageBus;
+            actions = new ActionFactories();
         }
 
         public TexoEngineBuilder(IServiceMessageBus messageBus, IServiceMessageBusRegister registerToMessageBus)
@@ -143,7 +146,9 @@ namespace BeaverSoft.Texo.Core
                 Fallback = () => fallback,
                 View = () => usedView,
                 ActionManagement = () => actionManagement,
-                Runtime = () => runtime
+                Runtime = () => runtime,
+                ActionRegister = () => actions,
+                ActionProvider = () => actions,
             };
         }
 
@@ -156,7 +161,8 @@ namespace BeaverSoft.Texo.Core
                 environment, evaluator, commandManagement,
                 resultProcessing, usedView, actionManagement,
                 history, intellisence, didYouMean, fallback);
-            return new TexoEngine(runtime, usedView, setting);
+            InitialiseActions();
+            return new TexoEngine(runtime, usedView, actions, setting);
         }
 
         private void Initiliase()
@@ -175,9 +181,14 @@ namespace BeaverSoft.Texo.Core
             history = history ?? new InputHistoryService();
             commandManagement = commandManagement ?? new SingletonCommandManagementService(commandFactory);
             resultProcessing = resultProcessing ?? new ResultProcessingService(logger);
-            actionManagement = actionManagement ?? new ActionManagementService(null, logger);
+            actionManagement = actionManagement ?? new ActionManagementService(actions, logger);
             intellisence = intellisence ?? CreateIntellisenceService();
             // didYouMean
+        }
+
+        private void InitialiseActions()
+        {
+            actions.RegisterFactory(new CommandRunActionFactory(runtime), ActionNames.COMMAND_RUN, ActionNames.COMMAND);
         }
 
         private IEnvironmentService CreateEnvironmentService()

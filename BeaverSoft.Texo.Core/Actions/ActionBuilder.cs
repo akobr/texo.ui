@@ -46,7 +46,7 @@ namespace BeaverSoft.Texo.Core.Actions
             return BuildActionUri(ActionNames.INPUT_SET, ActionParameters.INPUT, input);
         }
 
-        private static string BuildActionUri(string actionName, IDictionary<string, string> arguments)
+        public static string BuildActionUri(string actionName, IDictionary<string, string> arguments)
         {
             StringBuilder builder = new StringBuilder(ActionConstants.ACTION_SCHEMA + Uri.SchemeDelimiter);
             builder.Append(actionName ?? throw new ArgumentNullException(nameof(actionName)));

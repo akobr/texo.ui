@@ -3,11 +3,11 @@ using System.Linq;
 
 namespace BeaverSoft.Texo.Core.Actions
 {
-    public class ActionFactoryProvider : IActionFactoryProvider
+    public class ActionFactories : IActionFactoryProvider, IActionFactoryRegister
     {
         private readonly IDictionary<string, IActionFactory> factories;
 
-        public ActionFactoryProvider()
+        public ActionFactories()
         {
             factories = new Dictionary<string, IActionFactory>();
         }

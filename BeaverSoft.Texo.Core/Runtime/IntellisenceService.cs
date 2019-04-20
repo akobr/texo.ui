@@ -113,8 +113,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             foreach (Option subOption in query.Query.Options.OrderBy(o => o.Key))
             {
                 string representation = subOption.GetMainRepresentation();
-                yield return Item.Intellisence(representation, $"--{representation}", "option", subOption.Documentation.Description);
-
+                yield return Item.Intellisence($"--{representation}", "option", subOption.Documentation.Description);
             }
 
             if (!commandManagement.HasCommand(input.Context.Key))

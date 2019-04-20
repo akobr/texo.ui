@@ -8,6 +8,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using BeaverSoft.Texo.Core.Actions;
+using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
@@ -84,6 +85,14 @@ namespace BeaverSoft.Texo.View.WPF
 
         public void Render(Input input, IImmutableList<IItem> items)
         {
+            // TODO: [P2] Solve this by result processing pipeline
+            if (input.Context.Key == CommandKeys.CLEAR)
+            {
+                control.EnableInput();
+                control.SetHistoryCount(history.Count);
+                return;
+            }
+
             List<Section> sections = new List<Section>(items.Count);
             Item headerItem = BuildCommandHeaderItem(input);
             Section header = renderer.Render(headerItem);
@@ -179,6 +188,16 @@ namespace BeaverSoft.Texo.View.WPF
         private void OnLinkExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             e.Handled = true;
+            string url = e.Parameter.ToString();
+            IActionContext actionContext = actionParser.Parse(url);
+            
+            if (actionContext.Name == ActionNames.INPUT_UPDATE)
+            {
+                UpdateInput(actionContext);
+                return;
+            }
+
+            executor.ExecuteAction(url);
         }
 
         public void Initialise(TexoControl context)
@@ -216,8 +235,23 @@ namespace BeaverSoft.Texo.View.WPF
             ILink actionLink = item.Actions.First();
             IActionContext actionContext = actionParser.Parse(actionLink.Address.AbsoluteUri);
 
-            if (actionContext.Name != ActionNames.INPUT_UPDATE
-                || !actionContext.Arguments.ContainsKey(ActionParameters.INPUT))
+            if (actionContext == null)
+            {
+                return;
+            }
+
+            if (actionContext.Name == ActionNames.INPUT_UPDATE)
+            {
+                UpdateInput(actionContext);
+                return;
+            }
+
+            executor.ExecuteAction(actionLink.Address.AbsoluteUri);
+        }
+
+        private void UpdateInput(IActionContext actionContext)
+        {
+            if (!actionContext.Arguments.ContainsKey(ActionParameters.INPUT))
             {
                 return;
             }
