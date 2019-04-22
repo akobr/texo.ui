@@ -66,9 +66,11 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.PowerShell.5.ReferenceAssemblies.1.1.0\lib\net4\System.Management.Automation.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -78,9 +80,11 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -161,6 +165,10 @@
     <ProjectReference Include="..\Commands\Commands.Calc\Commands.Calc.csproj">
       <Project>{ee949f35-15bd-47d3-bc1e-01c18847cf6b}</Project>
       <Name>Commands.Calc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.Clipboard\Commands.Clipboard.csproj">
+      <Project>{694220f2-5d6e-4543-8c3c-0ac6acabc957}</Project>
+      <Name>Commands.Clipboard</Name>
     </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.CommandLine\Commands.CommandLine.csproj">
       <Project>{620b936c-b2a0-4b37-97da-11e32b858d7c}</Project>

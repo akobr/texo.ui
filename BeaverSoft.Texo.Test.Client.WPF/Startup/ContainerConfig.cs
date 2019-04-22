@@ -16,6 +16,7 @@ using BeaverSoft.Texo.Fallback.PowerShell.Markdown;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
 using Commands.Calc;
+using Commands.Clipboard;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
 using StrongBeaver.Core;
@@ -56,6 +57,10 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
 
             // Calculator
             container.Register<CalcCommand>();
+
+            // Clipboard
+            container.Register<ClipboardMonitoringService>();
+            container.Register<ClipboardCommand>();
 
             // View
             container.Register<IMarkdownService, MarkdownService>();
