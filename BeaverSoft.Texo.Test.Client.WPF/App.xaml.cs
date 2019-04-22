@@ -5,6 +5,7 @@ using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Test.Client.WPF.Startup;
 using StrongBeaver.Core.Container;
+using StrongBeaver.Core.Services;
 
 namespace BeaverSoft.Texo.Test.Client.WPF
 {
@@ -14,6 +15,8 @@ namespace BeaverSoft.Texo.Test.Client.WPF
     public partial class App : Application
     {
         public static TexoEngine TexoEngine { get; private set; }
+
+        public static IServiceMessageBus ServiceMessageBus { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -34,6 +37,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF
             TexoEngine.InitialiseWithCommands();
             TexoEngine.Start();
 
+            ServiceMessageBus = container.GetInstance<IServiceMessageBus>();
             container.RegisterWithMessageBus();
         }
 

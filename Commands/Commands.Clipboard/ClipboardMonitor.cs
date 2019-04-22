@@ -2,20 +2,28 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using StrongBeaver.Core.Services;
 
 namespace Commands.Clipboard
 {
     [DefaultEvent("ClipboardChanged")]
-    public class ClipboardMonitor : Control
+    public class ClipboardMonitor : Control, IClipboardMonitor
     {
-        IntPtr nextClipboardViewer;
+        private readonly IServiceMessageBus messageBus;
+        private IntPtr nextClipboardViewer;
 
-        public ClipboardMonitor()
+        public ClipboardMonitor(IServiceMessageBus messageBus)
         {
-            nextClipboardViewer = (IntPtr)SetClipboardViewer((int)Handle);
+            this.messageBus = messageBus;
         }
 
-        public event EventHandler<ClipboardChangedEventArgs> ClipboardChanged;
+        public event EventHandler<EventArgs> ClipboardChanged;
+
+        public void Initialise()
+        {
+            nextClipboardViewer = (IntPtr)SetClipboardViewer((int)Handle);
+            messageBus.Send(new ClipboardMonitorReadyMessage(this));
+        }
 
         protected override void Dispose(bool disposing)
         {
@@ -46,9 +54,13 @@ namespace Commands.Clipboard
 
                 case WM_CHANGECBCHAIN:
                     if (m.WParam == nextClipboardViewer)
+                    {
                         nextClipboardViewer = m.LParam;
+                    }
                     else
+                    {
                         SendMessage(nextClipboardViewer, m.Msg, m.WParam, m.LParam);
+                    }
                     break;
 
                 default:
@@ -59,8 +71,7 @@ namespace Commands.Clipboard
 
         void OnClipboardChanged()
         {
-            IDataObject iData = System.Windows.Forms.Clipboard.GetDataObject();
-            ClipboardChanged?.Invoke(this, new ClipboardChangedEventArgs(iData));
+            ClipboardChanged?.Invoke(this, new EventArgs());
         }
     }
 }

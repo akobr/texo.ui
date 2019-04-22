@@ -12,7 +12,6 @@ using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
-using StrongBeaver.Core.Services.Reflection;
 
 namespace BeaverSoft.Texo.Core
 {
