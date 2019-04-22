@@ -5,7 +5,7 @@ namespace BeaverSoft.Texo.Core.Input.History
 {
     public class InputHistoryService : IInputHistoryService
     {
-        private const int HISTORY_CAPACITY = 20;
+        private const int HISTORY_CAPACITY = 30;
         private readonly LinkedList<HistoryItem> history;
 
         public InputHistoryService()

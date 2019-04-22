@@ -4,12 +4,22 @@
              xmlns:local="clr-namespace:BeaverSoft.Texo.Test.Client.WPF"
              StartupUri="MainPage.xaml">
     <Application.Resources>
-        <Style TargetType="FlowDocument">
-            <Setter Property="FontFamily" Value="Consolas, Calibri" />
-            <Setter Property="TextAlignment" Value="Left" />
-        </Style>
-        <Style TargetType="Paragraph">
-            <Setter Property="FontSize" Value="12" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--  FluentWPF Controls  -->
+                <ResourceDictionary Source="pack://application:,,,/FluentWPF;component/Styles/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="FlowDocument">
+                <Setter Property="FontFamily" Value="Consolas, Calibri" />
+                <Setter Property="TextAlignment" Value="Left" />
+            </Style>
+            <Style TargetType="Paragraph">
+                <Setter Property="FontSize" Value="12" />
+            </Style>
+
+            <Style TargetType="ScrollBar" BasedOn="{StaticResource ScrollBarStyle1}" />
+
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

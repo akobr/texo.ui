@@ -86,6 +86,8 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             container.Register(engineServiceLocator.Environment);
             container.Register(engineServiceLocator.Setting);
             container.Register<IFactory<IInputHistoryService>>(() => new DelegatedFactory<IInputHistoryService>(engineServiceLocator.History));
+            container.Register(engineServiceLocator.ActionProvider);
+            container.Register(engineServiceLocator.ActionRegister);
         }
 
         public static void RegisterCommandFactory(this SimpleIoc container, CommandFactory factory)

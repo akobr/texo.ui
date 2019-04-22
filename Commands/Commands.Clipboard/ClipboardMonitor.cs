@@ -39,7 +39,7 @@ namespace Commands.Clipboard
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int SendMessage(IntPtr hwnd, int wMsg, IntPtr wParam, IntPtr lParam);
 
-        protected override void WndProc(ref System.Windows.Forms.Message m)
+        protected override void WndProc(ref Message m)
         {
             // defined in winuser.h
             const int WM_DRAWCLIPBOARD = 0x308;

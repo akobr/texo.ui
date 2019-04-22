@@ -5,27 +5,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:BeaverSoft.Texo.View.WPF"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             xmlns:win="clr-namespace:System.Windows.Resources;assembly=PresentationFramework"
              FontFamily="Consolas"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading1StyleKey}">
             <Setter Property="FontSize" Value="18" />
-            <Setter Property="Foreground" Value="#ff000000" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading2StyleKey}">
             <Setter Property="FontSize" Value="16" />
-            <Setter Property="Foreground" Value="#ff000000" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading3StyleKey}">
             <Setter Property="FontSize" Value="14" />
-            <Setter Property="Foreground" Value="#ff000000" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading4StyleKey}">
             <Setter Property="FontSize" Value="14" />
-            <Setter Property="Foreground" Value="#ff000000" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
             <Setter Property="FontWeight" Value="Light" />
             <Setter Property="TextDecorations" Value="Underline" />
         </Style>
@@ -34,11 +35,23 @@
             <Setter Property="Stroke" Value="DimGray" />
         </Style>
         <Style TargetType="{x:Type Span}" x:Key="{x:Static markdig:Styles.MarkedStyleKey}">
-            <Setter Property="Background" Value="#55FFFF00" />
+            <Setter Property="Background" Value="#8099FF00" />
+        </Style>
+        <Style TargetType="{x:Type Hyperlink}">
+            <Setter Property="Foreground" Value="{x:Static SystemParameters.WindowGlassBrush}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground">
+                        <Setter.Value>
+                            <SolidColorBrush Color="{x:Static SystemParameters.WindowGlassColor}" Opacity="0.8" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
-    <Grid Background="White">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -54,13 +67,16 @@
 
             <TextBlock Name="lbTitle" Text="Texo UI" FontStyle="Italic" TextTrimming="CharacterEllipsis" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <TextBlock Name="lbHistoryCount" Text="History (0)" Foreground="DodgerBlue" Margin="10,0" />
-                <TextBlock Name="lbVariableCount" Text="Variables (0)" Foreground="DodgerBlue" Margin="10,0" />
+                <TextBlock Name="lbHistoryCount" Text="History (0)" FontSize="10" Foreground="{x:Static SystemParameters.WindowGlassBrush}" VerticalAlignment="Center" Margin="5,0" />
+                <TextBlock Name="lbVariableCount" Text="Variables (0)" FontSize="10" Foreground="{x:Static SystemParameters.WindowGlassBrush}" VerticalAlignment="Center" Margin="5,0" />
             </StackPanel>
         </Grid>
 
         <!-- COMMAND LINE -->
-        <Border Grid.Row="1" BorderBrush="DimGray" BorderThickness="0,1" Margin="0,3,0,0" Padding="0,3" Background="LightGray">
+        <Border Grid.Row="1" BorderBrush="{DynamicResource SystemAltHighColorBrush}" BorderThickness="0,1" Margin="0,3,0,0" Padding="0,3">
+            <Border.Background>
+                <SolidColorBrush Color="{DynamicResource SystemAltHighColor}" Opacity="0.33" />
+            </Border.Background>
             <Grid
                 >
                 <Grid.ColumnDefinitions>
@@ -69,7 +85,8 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Name="lbPrompt" Text="tu&gt;" FontFamily="Consolas" FontSize="16" VerticalAlignment="Center" FontWeight="Bold" Padding="5,0,5,2" />
-                <TextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
+                <TextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16"  AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
+                         Foreground="{DynamicResource SystemBaseHighColorBrush}" CaretBrush="{DynamicResource SystemBaseHighColorBrush}"
                          IsReadOnlyCaretVisible="True" TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" />
                 <!--<RichTextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
                              TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" SelectionChanged="HandleInputSelectionChanged" />-->
@@ -88,22 +105,28 @@
         </FlowDocumentScrollViewer>
 
         <!-- INTELLISENCE -->
-        <ListView x:Name="listIntellisence" Grid.Row="2" Background="White"
+        <ListBox x:Name="listIntellisence" Grid.Row="2" BorderBrush="Transparent" BorderThickness="0"
+                  Foreground="{DynamicResource SystemBaseHighColorBrush}" Focusable="False"
                   PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenceMouseDoubleClick"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
+
+            <ListBox.Background>
+                <SolidColorBrush Color="{DynamicResource SystemAltHighColor}" Opacity="0.95" />
+            </ListBox.Background>
+
             <!--<ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Horizontal" />
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>-->
 
-            <ListViewItem>
+            <ListBoxItem>
                 <StackPanel>
                     <TextBlock Text="--example (option)" FontWeight="Bold" Margin="4" />
                     <TextBlock Text="An example of intellisence item preview." Margin="4"  />
                 </StackPanel>
-            </ListViewItem>
-        </ListView>
+            </ListBoxItem>
+        </ListBox>
 
     </Grid>
 </UserControl>

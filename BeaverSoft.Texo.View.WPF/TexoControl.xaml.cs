@@ -28,7 +28,7 @@ namespace BeaverSoft.Texo.View.WPF
 
         public FlowDocument OutputDocument => docOutput.Document;
 
-        public ListView IntellisenceList => listIntellisence;
+        public ListBox IntellisenceList => listIntellisence;
 
         public string Prompt
         {
@@ -212,6 +212,19 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void HandleOutputPreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.Enter)
+            {
+                string input = GetInput();
+
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    return;
+                }
+
+                tbInput.Text = string.Empty;
+                InputFinished?.Invoke(this, input);
+            }
+
             char character = KeyUtils.GetCharFromKey(e.Key);
 
             if (character < 32 || character > 126)

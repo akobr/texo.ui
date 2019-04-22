@@ -39,6 +39,13 @@ namespace BeaverSoft.Texo.Core.Path
                 yield break;
             }
 
+            string fullPath = path.GetFullPath();
+
+            if (fullPath.IsDriveRelativePath())
+            {
+                path += System.IO.Path.DirectorySeparatorChar;
+            }
+
             Stack<string> directories = new Stack<string>();
             directories.Push(path);
 
@@ -95,6 +102,13 @@ namespace BeaverSoft.Texo.Core.Path
             if (!Directory.Exists(path))
             {
                 yield break;
+            }
+
+            string fullPath = path.GetFullPath();
+
+            if (fullPath.IsDriveRelativePath())
+            {
+                path += System.IO.Path.DirectorySeparatorChar;
             }
 
             Stack<string> directories = new Stack<string>();

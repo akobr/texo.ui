@@ -105,7 +105,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override void SetShouldExit(int exitCode)
         {
-            throw new NotImplementedException();
+            Environment.Exit(exitCode);
         }
 
         public void PopRunspace()

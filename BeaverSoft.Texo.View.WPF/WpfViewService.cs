@@ -8,6 +8,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using BeaverSoft.Texo.Core.Actions;
+using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
@@ -84,19 +85,23 @@ namespace BeaverSoft.Texo.View.WPF
 
         public void Render(Input input, IImmutableList<IItem> items)
         {
+            // TODO: [P2] Solve this by result processing pipeline
+            if (input.Context.Key == CommandKeys.CLEAR)
+            {
+                control.EnableInput();
+                control.SetHistoryCount(history.Count);
+                return;
+            }
+
             List<Section> sections = new List<Section>(items.Count);
             Item headerItem = BuildCommandHeaderItem(input);
             Section header = renderer.Render(headerItem);
             header.Loaded += HandleLastSectionLoaded;
             sections.Add(header);
 
-            if (items == null || items.Count < 1 || (items.Count == 1 && string.IsNullOrWhiteSpace(items[0].Text)))
-            {
-                MarkdownBuilder emptyBuilder = new MarkdownBuilder();
-                emptyBuilder.Blockquotes("...empty output.");
-                sections.Add(renderer.Render(Item.Markdown(emptyBuilder.ToString())));
-            }
-            else
+            if (items != null
+                && items.Count > 0
+                && (items.Count != 1 || !string.IsNullOrWhiteSpace(items[0].Text)))
             {
                 foreach (IItem item in items)
                 {
@@ -137,12 +142,13 @@ namespace BeaverSoft.Texo.View.WPF
                     IsHitTestVisible = false,
                     Margin = new Thickness(4),
                     BorderThickness = new Thickness(0),
-                    Background = Brushes.Transparent
+                    Background = Brushes.Transparent,
                 };
 
+                box.SetResourceReference(Control.ForegroundProperty, "SystemBaseHighColorBrush");
                 box.Document = new FlowDocument();
                 box.Document.Blocks.AddRange(itemSection.Blocks.ToList());
-                control.IntellisenceList.Items.Add(new ListViewItem() { Content = box, Tag = item });
+                control.IntellisenceList.Items.Add(new ListBoxItem() { Content = box, Tag = item });
             }
 
             control.IntellisenceList.Visibility = Visibility.Visible;
@@ -182,6 +188,16 @@ namespace BeaverSoft.Texo.View.WPF
         private void OnLinkExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             e.Handled = true;
+            string url = e.Parameter.ToString();
+            IActionContext actionContext = actionParser.Parse(url);
+            
+            if (actionContext.Name == ActionNames.INPUT_UPDATE)
+            {
+                UpdateInput(actionContext);
+                return;
+            }
+
+            executor.ExecuteAction(url);
         }
 
         public void Initialise(TexoControl context)
@@ -207,7 +223,7 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void TexoIntellisenceItemExecuted(object sender, EventArgs e)
         {
-            ListViewItem viewItem = (ListViewItem)control.IntellisenceList.SelectedItem;
+            ListBoxItem viewItem = (ListBoxItem)control.IntellisenceList.SelectedItem;
             IItem item = (IItem)viewItem.Tag;
             control.CloseIntellisence();
 
@@ -219,8 +235,23 @@ namespace BeaverSoft.Texo.View.WPF
             ILink actionLink = item.Actions.First();
             IActionContext actionContext = actionParser.Parse(actionLink.Address.AbsoluteUri);
 
-            if (actionContext.Name != ActionNames.INPUT_UPDATE
-                || !actionContext.Arguments.ContainsKey(ActionParameters.INPUT))
+            if (actionContext == null)
+            {
+                return;
+            }
+
+            if (actionContext.Name == ActionNames.INPUT_UPDATE)
+            {
+                UpdateInput(actionContext);
+                return;
+            }
+
+            executor.ExecuteAction(actionLink.Address.AbsoluteUri);
+        }
+
+        private void UpdateInput(IActionContext actionContext)
+        {
+            if (!actionContext.Arguments.ContainsKey(ActionParameters.INPUT))
             {
                 return;
             }
@@ -325,9 +356,9 @@ namespace BeaverSoft.Texo.View.WPF
                 atPath += '\\';
             }
 
-            headerBuilder.WriteLine();
-            headerBuilder.Blockquotes(atPath);
-            //headerBuilder.WriteLine($"at =={atPath}==");
+            //headerBuilder.WriteLine();
+            //headerBuilder.Blockquotes(atPath);
+            headerBuilder.Italic($"[{atPath}]");
             return Item.Markdown(headerBuilder.ToString());
         }
 

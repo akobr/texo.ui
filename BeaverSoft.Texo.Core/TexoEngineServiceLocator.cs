@@ -42,8 +42,13 @@ namespace BeaverSoft.Texo.Core
         public Func<IFallbackService> Fallback { get; set; }
 
         public Func<IViewService> View { get; set; }
+
         public Func<IActionManagementService> ActionManagement { get; set; }
 
         public Func<IRuntimeCoordinatorService> Runtime { get; set; }
+
+        public Func<IActionFactoryProvider> ActionProvider { get; set; }
+
+        public Func<IActionFactoryRegister> ActionRegister { get; set; }
     }
 }

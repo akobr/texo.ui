@@ -48,8 +48,8 @@ namespace BeaverSoft.Texo.Core.Environment
         private ICommandResult GetVariable(CommandContext context)
         {
             string name = context.GetParameterValue(ParameterKeys.NAME);
-            environment.GetVariable(name);
-            return new TextResult(name);
+            name.Replace("$", "");
+            return new TextResult(environment.GetVariable(name));
         }
 
         private ICommandResult SetVariable(CommandContext context)

@@ -1,8 +1,10 @@
 ﻿using System.Windows;
 using BeaverSoft.Texo.Core;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Test.Client.WPF.Actions;
 using BeaverSoft.Texo.Test.Client.WPF.Startup;
 using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services;
@@ -35,6 +37,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF
             engineBuilder.WithFallbackService(container.GetInstance<IFallbackService>());
             TexoEngine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
             TexoEngine.InitialiseWithCommands();
+            TexoEngine.RegisterAction(new PathOpenActionFactory(), ActionNames.PATH_OPEN, ActionNames.PATH);
             TexoEngine.Start();
 
             ServiceMessageBus = container.GetInstance<IServiceMessageBus>();
