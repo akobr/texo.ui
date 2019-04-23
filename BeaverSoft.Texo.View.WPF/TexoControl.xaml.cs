@@ -46,11 +46,13 @@ namespace BeaverSoft.Texo.View.WPF
 
         public void EnableInput()
         {
+            progress.IsIndeterminate = false;
             tbInput.IsReadOnly = false;
         }
 
         public void DisableInput()
         {
+            progress.IsIndeterminate = true;
             tbInput.IsReadOnly = true;
         }
 

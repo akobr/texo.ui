@@ -326,13 +326,13 @@ namespace BeaverSoft.Texo.View.WPF
             executor.PreProcess(input, input.Length);
         }
 
-        private void TexoInputFinished(object sender, string input)
+        private async void TexoInputFinished(object sender, string input)
         {
             control.CloseIntellisence();
             control.DisableInput();
             lastWorkingDirectory = workingDirectory;
             historyItem = null;
-            executor.Process(input);
+            await executor.ProcessAsync(input);
         }
 
         private Item BuildCommandHeaderItem(Input input)
@@ -379,8 +379,25 @@ namespace BeaverSoft.Texo.View.WPF
             }
         }
 
-        void IMessageBusRecipient<IVariableUpdatedMessage>.ProcessMessage(IVariableUpdatedMessage message)
+        void IMessageBusRecipient<PromptUpdateMessage>.ProcessMessage(PromptUpdateMessage message)
         {
+            if (control != null && !control.Dispatcher.CheckAccess())
+            {
+                control.Dispatcher.InvokeAsync(() => SetPrompt(message.Prompt));
+                return;
+            }
+
+            SetPrompt(message.Prompt);
+        }
+
+        public void ProcessMessage(IVariableUpdatedMessage message)
+        {
+            if (control != null && !control.Dispatcher.CheckAccess())
+            {
+                control.Dispatcher.InvokeAsync(() => ProcessMessage(message));
+                return;
+            }
+
             control?.SetVariableCount(message.Environment.Count);
 
             if (message.Name != VariableNames.CURRENT_DIRECTORY)
@@ -397,11 +414,18 @@ namespace BeaverSoft.Texo.View.WPF
             else
             {
                 SetTitle(workingDirectory);
+                SetPrompt("tu");
             }
         }
 
         void IMessageBusRecipient<IClearViewOutputMessage>.ProcessMessage(IClearViewOutputMessage message)
         {
+            if (!control.Dispatcher.CheckAccess())
+            {
+                control.Dispatcher.InvokeAsync(() => control.OutputDocument.Blocks.Clear());
+                return;
+            }
+
             control.OutputDocument.Blocks.Clear();
         }
 

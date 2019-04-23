@@ -13,7 +13,8 @@ namespace BeaverSoft.Texo.Core.View
         IDisposable,
         IMessageBusService<ISettingUpdatedMessage>,
         IMessageBusService<IVariableUpdatedMessage>,
-        IMessageBusService<IClearViewOutputMessage>
+        IMessageBusService<IClearViewOutputMessage>,
+        IMessageBusService<PromptUpdateMessage>
     {
         void SetInput(string input);
 

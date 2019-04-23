@@ -116,7 +116,7 @@ namespace Commands.Clipboard
 
             if (path != null)
             {
-                string value = simplify.GetParameterValue(ClipboardConstants.PARAMETER_FLAG);
+                string value = path.GetParameterValue(ClipboardConstants.PARAMETER_FLAG);
                 service.Configuration.ConvertFilesToPaths = string.IsNullOrEmpty(value)
                     ? !service.Configuration.ConvertFilesToPaths
                     : value.IsTrue();

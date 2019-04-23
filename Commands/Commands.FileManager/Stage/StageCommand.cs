@@ -85,7 +85,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
             foreach (TexoPath path in context.GetParameterPaths())
             {
-                stage.Remove(path.GetItems());
+                stage.Remove(path);
             }
 
             var afterPaths = stage.GetPaths();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Runtime;
@@ -62,9 +63,9 @@ namespace BeaverSoft.Texo.Core
             runtime.Start();
         }
 
-        public void Process(string input)
+        public Task ProcessAsync(string input)
         {
-            runtime.Process(input);
+            return runtime.ProcessAsync(input);
         }
 
         public void Dispose()

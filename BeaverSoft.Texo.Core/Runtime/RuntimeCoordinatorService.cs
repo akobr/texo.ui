@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
@@ -70,7 +71,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             return inputModel;
         }
 
-        public void Process(string input)
+        public async Task ProcessAsync(string input)
         {
             Input.Input inputModel = evaluator.Evaluate(input);
             history?.Enqueue(inputModel);
@@ -80,7 +81,7 @@ namespace BeaverSoft.Texo.Core.Runtime
                 if (fallback != null
                     && string.IsNullOrEmpty(inputModel.Context.Key))
                 {
-                    Render(inputModel, fallback.Fallback(inputModel));
+                    Render(inputModel, await fallback.FallbackAsync(inputModel));
                 }
                 else if (didYouMean != null)
                 {
@@ -99,7 +100,7 @@ namespace BeaverSoft.Texo.Core.Runtime
                 return;
             }
 
-            ProcessContext(inputModel, inputModel.Context);
+            await ProcessContextAsync(inputModel, inputModel.Context);
         }
 
         public void ExecuteAction(string actionUrl)
@@ -118,46 +119,57 @@ namespace BeaverSoft.Texo.Core.Runtime
             commandManagement.Dispose();
         }
 
-        private void ProcessContext(Input.Input input, CommandContext context)
+        private Task ProcessContextAsync(Input.Input input, CommandContext context)
         {
             ICommand command = commandManagement.BuildCommand(context.Key);
 
             switch (command)
             {
                 case IAsyncCommand asyncCommand:
-                    ProcessAsyncCommand(asyncCommand, context, input);
-                    break;
+                    return ProcessAsyncCommand(asyncCommand, context, input);
 
                 default:
-                    ProcessCommand(command, context, input);
-                    break;
+                    return ProcessCommand(command, context, input);
             }
         }
 
-        private void ProcessCommand(ICommand command, CommandContext context, Input.Input input)
+        private async Task ProcessCommand(ICommand command, CommandContext context, Input.Input input)
         {
-            //try
-            //{
-                ICommandResult result = command.Execute(context);
-                Render(input, result);
-            //}
-            //catch (Exception exception)
-            //{
-            //    RenderError(input, exception.Message);
-            //}
-        }
-
-        private async void ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input.Input input)
-        {
+#if !DEBUG
             try
             {
-                ICommandResult result = await command.ExecuteAsync(context);
-                Render(input, result);
+#endif
+                await ProcessCommandAsTask(command, context, input);
+#if !DEBUG
             }
             catch (Exception exception)
             {
                 RenderError(input, exception.Message);
             }
+#endif
+        }
+
+        private async Task ProcessCommandAsTask(ICommand command, CommandContext context, Input.Input input)
+        {
+            ICommandResult result = await Task.Run(() => command.Execute(context)).ConfigureAwait(true);
+            Render(input, result);
+        }
+
+        private async Task ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input.Input input)
+        {
+#if !DEBUG
+            try
+            {
+#endif
+                ICommandResult result = await command.ExecuteAsync(context);
+                Render(input, result);
+#if !DEBUG
+            }
+            catch (Exception exception)
+            {
+                RenderError(input, exception.Message);
+            }
+#endif
         }
 
         private void Render(Input.Input input, ICommandResult result)

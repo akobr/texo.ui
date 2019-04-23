@@ -1,4 +1,5 @@
-﻿using BeaverSoft.Texo.Core.Commands;
+﻿using BeaverSoft.Texo.Core.Actions;
+using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
@@ -62,7 +63,9 @@ namespace Commands.Calc
                     continue;
                 }
 
-                yield return Item.Plain(functionName);
+                Item helpItem = Item.Plain(functionName);
+                helpItem.AddAction(new Link("use", ActionBuilder.InputUpdateUri(functionName)));
+                yield return helpItem;
             }
         }
     }

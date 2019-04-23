@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Core.Runtime
 {
@@ -6,7 +7,7 @@ namespace BeaverSoft.Texo.Core.Runtime
     {
         Input.Input PreProcess(string input, int cursorPosition);
 
-        void Process(string input);
+        Task ProcessAsync(string input);
 
         void ExecuteAction(string actionUrl);
 

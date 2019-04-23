@@ -48,7 +48,7 @@ namespace BeaverSoft.Texo.View.Console
             }
         }
 
-        private void WaitForInput()
+        private async void WaitForInput()
         {
             string input = SysConsole.ReadLine();
 
@@ -59,7 +59,7 @@ namespace BeaverSoft.Texo.View.Console
 
             using (new ConsoleStopwatch())
             {
-                executor.Process(input);
+                await executor.ProcessAsync(input);
             }
         }
 

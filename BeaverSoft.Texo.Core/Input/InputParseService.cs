@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 
 namespace BeaverSoft.Texo.Core.Input
 {
@@ -12,6 +13,13 @@ namespace BeaverSoft.Texo.Core.Input
             }
 
             input = input.Trim();
+
+            // TODO: [P3] solve this by input pipeline
+            if (string.Equals(input, "cd..", StringComparison.OrdinalIgnoreCase))
+            {
+                input = input.Substring(0, 2) + " ..";
+            }
+
             Regex tokenExpression = new Regex("\\\"[^\\\"]*\\\"|\\'[^\\']*\\'|[\\S]+", RegexOptions.Compiled);
             MatchCollection matches = tokenExpression.Matches(input);
             string[] tokens = new string[matches.Count];

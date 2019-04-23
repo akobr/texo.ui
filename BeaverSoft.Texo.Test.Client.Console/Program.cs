@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.FileManager.Stash;
@@ -33,7 +34,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
 
         private static TexoEngine engine;
 
-        public static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
             Startup();
 
@@ -43,7 +44,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
             }
             else
             {
-                Run(args);
+                await RunAsync(args);
             }
 
             Shutdown();
@@ -142,9 +143,9 @@ namespace BeaverSoft.Texo.Test.Client.Console
             engine.Start();
         }
 
-        private static void Run(string[] args)
+        private static Task RunAsync(string[] args)
         {
-            engine.Process(string.Join(' ', args));
+            return engine.ProcessAsync(string.Join(' ', args));
         }
 
         private static bool IsLongRunning(string[] args)

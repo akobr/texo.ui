@@ -89,6 +89,11 @@ namespace BeaverSoft.Texo.Core.Path
             return result;
         }
 
+        public bool IsMatch(string path)
+        {
+            return regularExpression.IsMatch(path);
+        }
+
         public IImmutableList<string> GetItems()
         {
             return BuildItemList().ToImmutableList();

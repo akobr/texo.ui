@@ -222,6 +222,7 @@ namespace BeaverSoft.Texo.Core
             registerToMessageBus.Register<ISettingUpdatedMessage>(usedView);
             registerToMessageBus.Register<IVariableUpdatedMessage>(usedView);
             registerToMessageBus.Register<IClearViewOutputMessage>(usedView);
+            registerToMessageBus.Register<PromptUpdateMessage>(usedView);
         }
     }
 }
