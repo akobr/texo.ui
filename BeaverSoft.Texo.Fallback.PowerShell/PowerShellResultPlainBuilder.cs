@@ -34,13 +34,24 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public void WriteDebugLine(string text)
         {
-            builder.AppendLine(text);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                builder.AppendLine();
+            }
+
+            builder.AppendLine($"\u001b[35m{text}\u001b[m");
         }
 
         public void WriteErrorLine(string text)
         {
             containError = true;
-            builder.AppendLine(text);
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                builder.AppendLine();
+            }
+
+            builder.AppendLine($"\u001b[31m{text}\u001b[m");
         }
 
         public void WriteLine(string text)
@@ -50,12 +61,22 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public void WriteVerboseLine(string text)
         {
-            builder.AppendLine(text);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                builder.AppendLine();
+            }
+
+            builder.AppendLine($"\u001b[32m{text}\u001b[m");
         }
 
         public void WriteWarningLine(string text)
         {
-            builder.AppendLine(text);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                builder.AppendLine();
+            }
+
+            builder.AppendLine($"\u001b[33m{text}\u001b[m");
         }
     }
 }

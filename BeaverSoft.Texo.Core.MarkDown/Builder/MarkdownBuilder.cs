@@ -154,6 +154,25 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
             return this;
         }
 
+        public IMarkdownBuilder ContainerBlock(string className, string text)
+        {
+            if (!IsOnNewLine())
+            {
+                stringBuilder.AppendLine();
+            }
+
+            stringBuilder.AppendLine($":::{className}");
+            stringBuilder.AppendLine(text);
+            stringBuilder.AppendLine(":::");
+            return this;
+        }
+
+        public IMarkdownBuilder ContainerInline(string className, string text)
+        {
+            stringBuilder.AppendFormat("::{0}::{{.{1}}}", text, className);
+            return this;
+        }
+
         public IMarkdownBuilder WriteLine()
         {
             stringBuilder.AppendLine();

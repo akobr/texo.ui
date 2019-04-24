@@ -258,6 +258,21 @@ namespace BeaverSoft.Texo.Core.Path
                 return false;
             }
 
+            if (IsVolumeSeparatorChar(path[0]))
+            {
+                return false;
+            }
+
+            if (path.Length == 2 && IsVolumeSeparatorChar(path[1]) && !IsValidDriveChar(path[0]))
+            {
+                return false;
+            }
+
+            if (path.Length > 2 && path.LastIndexOf(System.IO.Path.VolumeSeparatorChar) > 1)
+            {
+                return false;
+            }
+
             return path.IndexOfAny(PathConstants.InvalidPathCharacters) < 0;
         }
 

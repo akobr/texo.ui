@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Management.Automation;
-using System.Management.Automation.Runspaces;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
@@ -62,7 +62,16 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             try
             {
                 resultBuilder.StartItem();
-                await RunScriptToOutputAsync(input.ParsedInput.RawInput);
+
+                // TODO: [P3] move this to pipeline 
+                string commandText = input.ParsedInput.RawInput;
+                if (string.Equals(input.ParsedInput.Tokens[0], "git", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandText = "git -c color.ui=always -c color.status=always -c color.branch=always -c color.diff=always -c color.interactive=always ";
+                    commandText += string.Join(" ", input.ParsedInput.Tokens.Skip(1));
+                }
+
+                await RunScriptToOutputAsync(commandText);
 
                 FallbackContext resultContext = await resultPipeline.ProcessAsync(
                     new FallbackContext()
@@ -159,8 +168,55 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             shell.Runspace = host.Runspace;
             shell.AddScript(script);
             shell.AddCommand("Out-Default");
-            shell.Commands.Commands[0].MergeMyResults(PipelineResultTypes.Error, PipelineResultTypes.Output);
-            return Task.Factory.FromAsync(shell.BeginInvoke(), (_) => { });
+            //shell.Commands.Commands[0].MergeMyResults(PipelineResultTypes.Error, PipelineResultTypes.Output);
+            return Task.Factory.FromAsync(shell.BeginInvoke(), (result) => 
+            {
+                var output = shell.EndInvoke(result);
+            });
+        }
+
+        private void Error_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            var data = shell.Streams.Error[e.Index];
+            resultBuilder.WriteErrorLine(data.Exception.Message);
+
+            if (string.Equals(data.FullyQualifiedErrorId, "NativeCommandError", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            if (data.InvocationInfo != null && !string.IsNullOrWhiteSpace(data.InvocationInfo.PositionMessage))
+            {
+                foreach (string line in data.InvocationInfo.PositionMessage.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+                {
+                    resultBuilder.WriteErrorLine(line);
+                }
+            }
+
+            if (data.CategoryInfo != null)
+            {
+                resultBuilder.WriteErrorLine($"    + CategoryInfo: {data.CategoryInfo.Category}");
+            }
+
+            resultBuilder.WriteErrorLine($"    + FullyQualifiedErrorId: {data.FullyQualifiedErrorId}");
+        }
+
+        private void Warning_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            var data = shell.Streams.Warning[e.Index];
+            resultBuilder.WriteWarningLine(data.Message);
+        }
+
+        private void Verbose_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            var data = shell.Streams.Verbose[e.Index];
+            resultBuilder.WriteVerboseLine(data.Message);
+        }
+
+        private void Debug_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            var data = shell.Streams.Debug[e.Index];
+            resultBuilder.WriteDebugLine(data.Message);
         }
 
         private IPipeline<FallbackContext> BuildPipeline(IServiceMessageBus messageBus)
@@ -175,6 +231,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             lock (executionLock)
             {
                 shell = System.Management.Automation.PowerShell.Create();
+
+                shell.Streams.Error.DataAdded += Error_DataAdded;
+                shell.Streams.Warning.DataAdded += Warning_DataAdded;
+                shell.Streams.Verbose.DataAdded += Verbose_DataAdded;
+                shell.Streams.Debug.DataAdded += Debug_DataAdded;
             }
         }
 
@@ -182,6 +243,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             lock (executionLock)
             {
+                shell.Streams.Error.DataAdded -= Error_DataAdded;
+                shell.Streams.Warning.DataAdded -= Warning_DataAdded;
+                shell.Streams.Verbose.DataAdded -= Verbose_DataAdded;
+                shell.Streams.Debug.DataAdded -= Debug_DataAdded;
+
                 shell?.Dispose();
                 shell = null;
             }
