@@ -180,7 +180,8 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             var data = shell.Streams.Error[e.Index];
             resultBuilder.WriteErrorLine(data.Exception.Message);
 
-            if (string.Equals(data.FullyQualifiedErrorId, "NativeCommandError", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(data.FullyQualifiedErrorId, "NativeCommandError", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(data.FullyQualifiedErrorId, "NativeCommandErrorMessage", StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
