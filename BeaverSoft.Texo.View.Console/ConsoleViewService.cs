@@ -20,6 +20,7 @@ namespace BeaverSoft.Texo.View.Console
         private IExecutor executor;
         private TextumConfiguration configuration;
         private string workingDir;
+        private string prompt;
         private bool disposed;
 
         public ConsoleViewService(IConsoleRenderService renderer)
@@ -127,7 +128,7 @@ namespace BeaverSoft.Texo.View.Console
             }
             else
             {
-                TexoConsole.WritePrompt(configuration.Ui.Prompt);
+                TexoConsole.WritePrompt(prompt);
             }
         }
 
@@ -144,11 +145,17 @@ namespace BeaverSoft.Texo.View.Console
             }
 
             workingDir = message.NewValue;
+            prompt = configuration.Ui.Prompt;
         }
 
         void IMessageBusRecipient<IClearViewOutputMessage>.ProcessMessage(IClearViewOutputMessage message)
         {
             SysConsole.Clear();
+        }
+
+        void IMessageBusRecipient<PromptUpdateMessage>.ProcessMessage(PromptUpdateMessage message)
+        {
+            prompt = message.Prompt;
         }
     }
 }
