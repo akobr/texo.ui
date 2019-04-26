@@ -67,7 +67,7 @@ namespace BeaverSoft.Texo.Core.Path
                     continue;
                 }
 
-                yield return Item.Intellisence(justName, directoryName, "directory", directoryName.GetFullConsolidatedPath());
+                yield return Item.Intellisence(justName, directoryName + System.IO.Path.DirectorySeparatorChar, "directory", directoryName.GetFullConsolidatedPath());
             }
 
             foreach (string fileName in TexoDirectory.GetFiles(directory, filter))
