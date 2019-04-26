@@ -5,7 +5,8 @@ $str = '|','/','-','\'
 do {
 $str | ForEach-Object { Write-Host -Object $_ -NoNewline
         Start-Sleep -Milliseconds 100
-        [console]::setcursorposition($saveX,$saveY)
+        $Host.UI.RawUI.CursorPosition = @{ X = $saveX; Y = $saveY }
+        # [console]::setcursorposition($saveX,$saveY)
         } # end foreach-object
     if ((Get-Job -Name $job).state -eq 'Running') 
     {$running = $true}
