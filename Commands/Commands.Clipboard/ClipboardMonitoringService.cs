@@ -10,7 +10,7 @@ namespace Commands.Clipboard
 {
     public class ClipboardMonitoringService : IMessageBusService<ClipboardMonitorReadyMessage>, IDisposable
     {
-        private const int HISTORY_SIZE = 40;
+        private const int HISTORY_SIZE = 42; // Answer to the Ultimate Question of Life, the Universe, and Everything.
 
         private IClipboardMonitor monitor;
         private HashSet<IClipboardItem> historySet;
@@ -32,6 +32,11 @@ namespace Commands.Clipboard
             if (index < 0 || index >= history.Count)
             {
                 return null;
+            }
+
+            if (monitor.InvokeRequired)
+            {
+                return (IClipboardItem)monitor.Invoke((Func<IClipboardItem>)(() => SetClipboardFromHistory(index)));
             }
 
             IClipboardItem item = history[index];
