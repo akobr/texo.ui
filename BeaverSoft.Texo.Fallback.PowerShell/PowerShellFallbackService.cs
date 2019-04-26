@@ -149,15 +149,41 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         private Task RunScriptToOutputAsync(string script)
         {
             shell.Runspace = host.Runspace;
+
             shell.AddScript(script);
-            shell.AddCommand("Out-Default");
+            //shell.AddCommand("Out-Default");
             //shell.Commands.Commands[0].MergeMyResults(PipelineResultTypes.Error, PipelineResultTypes.Output);
-            return Task.Factory.FromAsync(shell.BeginInvoke(), (result) => 
+
+            shell.Streams.Information.DataAdded += Information_DataAdded;
+            shell.Streams.Error.DataAdded += Error_DataAdded;
+            shell.Streams.Warning.DataAdded += Warning_DataAdded;
+            shell.Streams.Verbose.DataAdded += Verbose_DataAdded;
+            shell.Streams.Debug.DataAdded += Debug_DataAdded;
+
+            PSDataCollection<PSObject> inputStream = new PSDataCollection<PSObject>();
+            PSDataCollection<PSObject> outputStream = new PSDataCollection<PSObject>();
+            outputStream.DataAdded += Output_DataAdded;
+
+            return Task.Factory.FromAsync(shell.BeginInvoke(inputStream, outputStream), (result) => 
             {
                 var output = shell.EndInvoke(result);
                 resultBuilder.Stream.NotifyAboutCompletion();
+                outputStream.DataAdded -= Output_DataAdded;
                 ReleaseShell();
             });
+        }
+
+        private void Output_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            PSDataCollection<PSObject> outputStream = (PSDataCollection<PSObject>)sender;
+            var data = outputStream[e.Index];
+            resultBuilder.WriteLine(data.ToString());
+        }
+
+        private void Information_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            var data = shell.Streams.Information[e.Index];
+            resultBuilder.WriteLine(data.MessageData.ToString());
         }
 
         private void Error_DataAdded(object sender, DataAddedEventArgs e)
@@ -210,11 +236,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             lock (executionLock)
             {
                 shell = System.Management.Automation.PowerShell.Create();
-
-                shell.Streams.Error.DataAdded += Error_DataAdded;
-                shell.Streams.Warning.DataAdded += Warning_DataAdded;
-                shell.Streams.Verbose.DataAdded += Verbose_DataAdded;
-                shell.Streams.Debug.DataAdded += Debug_DataAdded;
             }
         }
 
@@ -222,6 +243,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             lock (executionLock)
             {
+                shell.Streams.Information.DataAdded -= Information_DataAdded;
                 shell.Streams.Error.DataAdded -= Error_DataAdded;
                 shell.Streams.Warning.DataAdded -= Warning_DataAdded;
                 shell.Streams.Verbose.DataAdded -= Verbose_DataAdded;

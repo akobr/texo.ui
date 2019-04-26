@@ -81,6 +81,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             if (string.IsNullOrWhiteSpace(text))
             {
+                stream.Write(text);
                 stream.WriteLine();
                 stream.Flush();
                 return;
