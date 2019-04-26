@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.Pipelines;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.Runtime;
+using BeaverSoft.Texo.Core.Streaming.Text;
+using BeaverSoft.Texo.Core.Transforming;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Fallback.PowerShell.Git;
 using StrongBeaver.Core.Messaging;
@@ -23,46 +24,41 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
     {
         private readonly object executionLock = new object();
 
-        private readonly IPowerShellResultBuilder resultBuilder;
+        private readonly PowerShellResultStreamBuilder resultBuilder;
         private readonly IPromptableViewService view;
         private readonly ILogService logger;
         private readonly TexoPowerShellHost host;
 
         private System.Management.Automation.PowerShell shell;
-        private IPipeline<FallbackContext> resultPipeline;
 
         public PowerShellFallbackService(
-            IPowerShellResultBuilder resultBuilder,
             IPromptableViewService view,
-            IServiceMessageBus mesageBus,
             ILogService logger)
         {
-            this.resultBuilder = resultBuilder;
+            resultBuilder = new PowerShellResultStreamBuilder();
+
             this.view = view;
             this.logger = logger;
 
-            resultPipeline = BuildPipeline(mesageBus);
             host = new TexoPowerShellHost(resultBuilder, view, logger);
         }
 
-        public async Task<ICommandResult> FallbackAsync(Input input)
+        public Task<ICommandResult> FallbackAsync(Input input)
         {
             if (input == null || input.ParsedInput.IsEmpty())
             {
-                return new ErrorTextResult("Empty input.");
+                return Task.FromResult<ICommandResult>(new ErrorTextResult("Empty input."));
             }
 
             if (shell != null)
             {
-                return new ErrorTextResult("A command already in progress.");
+                return Task.FromResult<ICommandResult>(new ErrorTextResult("A command already in progress."));
             }
 
             BuildShell();
 
             try
             {
-                resultBuilder.StartItem();
-
                 // TODO: [P3] move this to pipeline 
                 string commandText = input.ParsedInput.RawInput;
                 if (string.Equals(input.ParsedInput.Tokens[0], "git", StringComparison.OrdinalIgnoreCase))
@@ -71,30 +67,17 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                     commandText += string.Join(" ", input.ParsedInput.Tokens.Skip(1));
                 }
 
-                await RunScriptToOutputAsync(commandText);
-
-                FallbackContext resultContext = await resultPipeline.ProcessAsync(
-                    new FallbackContext()
-                    {
-                        Input = input,
-                        Result = resultBuilder.FinishItem()
-                    });
-
-                return new ItemsResult(
-                    resultBuilder.ContainError
-                        ? ResultTypeEnum.Failed
-                        : ResultTypeEnum.Success,
-                    ImmutableList.Create(resultContext.Result));
+                resultBuilder.StartItem();
+                Task outputTask = RunScriptToOutputAsync(commandText);
+                return Task.FromResult<ICommandResult>(new TextStreamResult(resultBuilder.Stream, outputTask));
             }
             catch (Exception e)
             {
                 const string errorMessage = "Error during command execution in PowerShell.";
                 logger.Error(errorMessage, e);
-                return new ErrorTextResult(errorMessage);
-            }
-            finally
-            {
+                resultBuilder.Stream?.Dispose();
                 ReleaseShell();
+                return Task.FromResult<ICommandResult>(new ErrorTextResult(errorMessage));
             }
         }
 
@@ -172,6 +155,8 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             return Task.Factory.FromAsync(shell.BeginInvoke(), (result) => 
             {
                 var output = shell.EndInvoke(result);
+                resultBuilder.Stream.NotifyAboutCompletion();
+                ReleaseShell();
             });
         }
 
@@ -218,13 +203,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             var data = shell.Streams.Debug[e.Index];
             resultBuilder.WriteDebugLine(data.Message);
-        }
-
-        private IPipeline<FallbackContext> BuildPipeline(IServiceMessageBus messageBus)
-        {
-            var pipeline = new Pipeline<FallbackContext>(logger);
-            pipeline.AddUnit(new GitStatusPipeUnit(messageBus));
-            return pipeline;
         }
 
         private void BuildShell()

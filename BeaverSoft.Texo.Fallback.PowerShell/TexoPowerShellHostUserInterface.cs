@@ -133,7 +133,8 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override void WriteProgress(long sourceId, ProgressRecord record)
         {
-            logger.Info(record.Activity, record.StatusDescription, record.CurrentOperation);
+            view.ShowProgress(record.ActivityId, record.Activity ?? "operation", record.PercentComplete);
+            logger.Debug(record.Activity, record.StatusDescription, record.CurrentOperation);
         }
 
         public override void WriteVerboseLine(string message)

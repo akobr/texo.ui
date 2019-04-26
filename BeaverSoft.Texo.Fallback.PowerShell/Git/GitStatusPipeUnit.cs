@@ -1,5 +1,5 @@
 ﻿using BeaverSoft.Texo.Core.Markdown.Builder;
-using BeaverSoft.Texo.Core.Pipelines;
+using BeaverSoft.Texo.Core.Transforming;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell.Git
 {
-    public class GitStatusPipeUnit : IPipelineUnit<FallbackContext>
+    public class GitStatusPipeUnit : ITransformationPipe<FallbackContext>
     {
         private readonly IServiceMessageBus messageBus;
 
