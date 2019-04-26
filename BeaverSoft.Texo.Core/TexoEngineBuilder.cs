@@ -52,6 +52,7 @@ namespace BeaverSoft.Texo.Core
         {
             this.messageBus = messageBus;
             this.registerToMessageBus = registerToMessageBus;
+            actions = new ActionFactories();
         }
 
         public TexoEngineBuilder WithLogService(ILogService service)

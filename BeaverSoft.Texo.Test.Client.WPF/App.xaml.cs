@@ -8,6 +8,7 @@ using BeaverSoft.Texo.Test.Client.WPF.Actions;
 using BeaverSoft.Texo.Test.Client.WPF.Startup;
 using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Test.Client.WPF
 {
@@ -27,7 +28,10 @@ namespace BeaverSoft.Texo.Test.Client.WPF
             SimpleIoc container = new SimpleIoc();
             container.RegisterServices();
 
-            TexoEngineBuilder engineBuilder = new TexoEngineBuilder();
+            TexoEngineBuilder engineBuilder =
+                new TexoEngineBuilder()
+                .WithLogService(new DebugLogService());
+
             container.RegisterEngineServices(engineBuilder);
 
             CommandFactory commandFactory = new CommandFactory();

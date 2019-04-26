@@ -14,6 +14,7 @@ namespace BeaverSoft.Texo.View.WPF
     public partial class TexoControl : UserControl
     {
         private bool skipNextTextChange;
+        private string prompt;
 
         public TexoControl()
         {
@@ -32,8 +33,12 @@ namespace BeaverSoft.Texo.View.WPF
 
         public string Prompt
         {
-            get => lbPrompt.Text;
-            set => lbPrompt.Text = value;
+            get => prompt;
+            set
+            {
+                prompt = value;
+                lbPrompt.Text = value;
+            }
         }
 
         public string Title
@@ -46,8 +51,8 @@ namespace BeaverSoft.Texo.View.WPF
 
         public void EnableInput()
         {
-            progress.IsIndeterminate = false;
             tbInput.IsReadOnly = false;
+            CancelProgress();
         }
 
         public void DisableInput()
@@ -92,6 +97,33 @@ namespace BeaverSoft.Texo.View.WPF
         public void FocusInput()
         {
             tbInput.Focus();
+        }
+
+        public void SetProgress(string progressName, int progressValue)
+        {
+            if(!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(() => SetProgress(progressName, progressValue));
+                return;
+            }
+
+            lbPrompt.Text = $"{progressName}>";
+
+            if (progressValue < 0)
+            {
+                progress.IsIndeterminate = true;
+                return;
+            }
+
+            progress.IsIndeterminate = false;
+            progress.Value = Math.Min(progressValue, 100);
+        }
+
+        public void CancelProgress()
+        {
+            progress.Value = 0;
+            progress.IsIndeterminate = false;
+            lbPrompt.Text = prompt;
         }
 
         public void SetHistoryCount(int count)

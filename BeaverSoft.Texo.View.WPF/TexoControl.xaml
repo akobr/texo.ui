@@ -59,12 +59,12 @@
             <Setter Property="Background" Value="#8099FF00" />
         </Style>
         <Style TargetType="{x:Type Hyperlink}">
-            <Setter Property="Foreground" Value="{x:Static SystemParameters.WindowGlassBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Foreground">
                         <Setter.Value>
-                            <SolidColorBrush Color="{x:Static SystemParameters.WindowGlassColor}" Opacity="0.8" />
+                            <SolidColorBrush Color="{DynamicResource SystemBaseHighColor}" Opacity="0.5" />
                         </Setter.Value>
                     </Setter>
                 </Trigger>
@@ -116,7 +116,7 @@
         </Border>
 
         <!-- PROGRESS BARS -->
-        <ProgressBar Name="progress" Grid.Row="2" Height="1"
+        <ProgressBar Name="progress" Grid.Row="2" Height="1" Minimum="0" Maximum="100"
                      Foreground="{x:Static SystemParameters.WindowGlassBrush}" BorderBrush="{DynamicResource SystemAltHighColorBrush}" />
 
         <!-- OUTPUT -->

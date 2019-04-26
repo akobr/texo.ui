@@ -1,17 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using BeaverSoft.Texo.Core.Services;
+using BeaverSoft.Texo.Core.Streaming.Text;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.View.WPF.Markdown
 {
     public class WpfMarkdownRenderService : IWpfRenderService
     {
-        private readonly Regex coloringRegex = new Regex(@"(\u001b\[(?<color>\d*)m)(?<text>[^\u001b]*)(\u001b\[m)", RegexOptions.Compiled);
+        private readonly Regex coloringRegex = new Regex(@"\u001b\[(?<code>\d*)m", RegexOptions.Compiled);
         private readonly IMarkdownService markdown;
+
+        private Brush backgroundBrush = Brushes.Transparent;
+        private Brush foregroundBrush = Brushes.White; // TODO: [P1] Solve this
+        private FontStyle fontStyle = FontStyles.Normal;
+        private FontWeight fontWeight = FontWeights.Normal;
+        private TextDecorationCollection decorations = new TextDecorationCollection();
+        private Paragraph streamedParagraph;
+        private Run streamedScrollTreshold;
+        private Action streamedContinueWith;
 
         public WpfMarkdownRenderService(IMarkdownService markdown)
         {
@@ -23,10 +35,97 @@ namespace BeaverSoft.Texo.View.WPF.Markdown
             if (item.Format != TextFormatEnum.Markdown
                 && item.Format != TextFormatEnum.Model)
             {
-                return BuildPlainItem(item);
+                return new Section(new Paragraph(BuildPlainText(item.Text)));
             }
 
             return BuildItem(item);
+        }
+
+        public Section StartStreamRender(TextStreamItem streamItem, Action continueWith)
+        {
+            ITextStream stream = streamItem.Stream;
+
+            if (streamItem.OuterTask?.IsCompleted == true)
+            {
+                continueWith();
+                return new Section(new Paragraph(BuildPlainText(stream.ReadFromBeginningToEnd())));
+            }
+
+            streamedContinueWith = continueWith;
+            streamedScrollTreshold = new Run(string.Empty);
+            streamedScrollTreshold.Loaded += NewText_Loaded;
+            streamedParagraph = new Paragraph(streamedScrollTreshold);
+            stream.StreamModified += Stream_StreamModified;
+            stream.StreamCompleted += Stream_StreamCompleted;
+
+            return new Section(streamedParagraph);
+        }
+
+        private void Stream_StreamCompleted(object sender, EventArgs e)
+        {
+            if (streamedParagraph == null)
+            {
+                return;
+            }
+
+            if (!streamedParagraph.Dispatcher.CheckAccess())
+            {
+                streamedParagraph.Dispatcher.Invoke(() => Stream_StreamCompleted(sender, e));
+            }
+
+            streamedParagraph = null;
+
+            if (streamedScrollTreshold != null)
+            {
+                streamedScrollTreshold.Loaded -= NewText_Loaded;
+                streamedScrollTreshold = null;
+            }
+
+            ITextStream stream = (ITextStream)sender;
+            stream.StreamModified -= Stream_StreamModified;
+            stream.StreamCompleted -= Stream_StreamCompleted;
+            stream.Close();
+
+            streamedContinueWith?.Invoke();
+            streamedContinueWith = null;
+        }
+
+        private void Stream_StreamModified(object sender, EventArgs e)
+        {
+            if (streamedParagraph == null)
+            {
+                return;
+            }
+
+            ITextStream stream = (ITextStream)sender;
+            string text = stream.ReadFromBeginningToEnd();
+
+            if (streamedParagraph.Dispatcher.CheckAccess())
+            {
+                RenderModifiedStream(text);
+            }
+            else
+            {
+                streamedParagraph.Dispatcher.Invoke(() => RenderModifiedStream(text));
+            }
+        }
+
+        private void RenderModifiedStream(string text)
+        {
+            if (streamedParagraph == null)
+            {
+                return;
+            }
+
+            Span newText = BuildPlainText(text);
+            streamedParagraph.Inlines.Clear();
+            streamedParagraph.Inlines.AddRange(new Inline[] { newText, streamedScrollTreshold });
+        }
+
+        private void NewText_Loaded(object sender, RoutedEventArgs e)
+        {
+            Run text = (Run)sender;
+            text.BringIntoView();
         }
 
         private Section BuildItem(IItem item)
@@ -50,105 +149,143 @@ namespace BeaverSoft.Texo.View.WPF.Markdown
             return itemSection;
         }
 
-        //private string ColorReplacement(Match match)
-        //{
-        //    string colorNumber = match.Groups["color"].Value;
-        //    string text = match.Groups["text"].Value;
-
-        //    switch (colorNumber)
-        //    {
-        //        case "31": // red
-        //            return $"**{text}**";
-
-        //        case "32": // green
-        //            return $"*{text}*";
-
-        //        case "33": // yellow
-        //            return $"++{text}++";
-
-        //        case "34": // blue
-        //            return $"=={text}==";
-
-        //        case "35": // magenta
-        //            return $"~~{text}~~";
-
-        //        case "36": // cyan
-        //            return $"~~{text}~~";
-
-        //        default: // white
-        //            return text;
-        //    }
-        //}
-
-        private Brush ColorReplacement(Match match)
+        private Run CreateRun(string text)
         {
-            string colorNumber = match.Groups["color"].Value;
-
-            switch (colorNumber)
+            return new Run(text)
             {
-                case "31": // red
-                    return Brushes.Red;
+                Foreground = foregroundBrush,
+                Background = backgroundBrush,
+                FontStyle = fontStyle,
+                FontWeight = fontWeight,
+                TextDecorations = decorations.Clone()
+            };
+        }
 
-                case "32": // green
-                    return Brushes.Green;
+        private void ResetFormatting()
+        {
+            backgroundBrush = Brushes.Transparent;
+            foregroundBrush = Brushes.White;
+            fontStyle = FontStyles.Normal;
+            fontWeight = FontWeights.Normal;
+            decorations.Clear();
+        }
 
-                case "33": // yellow
-                    return Brushes.Yellow;
+        private void UpdateFormatting(string value)
+        {
+            switch (value)
+            {
+                case "0":
+                case "":
+                    ResetFormatting();
+                    break;
 
-                case "34": // blue
-                    return Brushes.Blue;
+                case "1":
+                    fontWeight = FontWeights.Bold;
+                    break;
 
-                case "35": // magenta
-                    return Brushes.Magenta;
+                case "3":
+                    fontStyle = FontStyles.Italic;
+                    break;
 
-                case "36": // cyan
-                    return Brushes.Cyan;
+                case "4":
+                    decorations.Add(TextDecorations.Underline);
+                    break;
 
-                default: // white
-                    return Brushes.Gray;
+                case "9":
+                    decorations.Add(TextDecorations.Strikethrough);
+                    break;
+
+                case "30":
+                    foregroundBrush = Brushes.Black;
+                    break;
+
+                case "31":
+                    foregroundBrush = Brushes.Red;
+                    break;
+
+                case "32":
+                    foregroundBrush = Brushes.Green;
+                    break;
+
+                case "33":
+                    foregroundBrush = Brushes.Yellow;
+                    break;
+
+                case "34":
+                    foregroundBrush = Brushes.Blue;
+                    break;
+
+                case "35":
+                    foregroundBrush = Brushes.Magenta;
+                    break;
+
+                case "36":
+                    foregroundBrush = Brushes.Cyan;
+                    break;
+
+                case "37":
+                    foregroundBrush = Brushes.White;
+                    break;
+
+                case "40":
+                    backgroundBrush = Brushes.Black;
+                    break;
+
+                case "41":
+                    backgroundBrush = Brushes.Red;
+                    break;
+
+                case "42":
+                    backgroundBrush = Brushes.Green;
+                    break;
+
+                case "43":
+                    backgroundBrush = Brushes.Yellow;
+                    break;
+
+                case "44":
+                    backgroundBrush = Brushes.Blue;
+                    break;
+
+                case "45":
+                    backgroundBrush = Brushes.Magenta;
+                    break;
+
+                case "46":
+                    backgroundBrush = Brushes.Cyan;
+                    break;
+
+                case "47":
+                    backgroundBrush = Brushes.White;
+                    break;
             }
         }
 
-        private Section BuildPlainItem(IItem item)
+        private Span BuildPlainText(string text)
         {
-            // (\n[^\n\x{001b}]*)(\x{001b}\[m)
-            //string text = coloringRegex.Replace(item.Text, ColorReplacement);
-            Section itemSection = new Section();
-            Paragraph paragraph = new Paragraph();
-            Inline nextSibling = new Run(string.Empty);
-            paragraph.Inlines.Add(nextSibling);
+            Span container = new Span();
+            int index = 0;
+            Match match;
 
-            var matches = coloringRegex.Matches(item.Text);
-            int index = item.Text.Length;
+            ResetFormatting();
 
-            for(int i = matches.Count - 1; i >= 0; i--)
+            while ((match = coloringRegex.Match(text, index)).Success)
             {
-                Match match = matches[i];
-                int nextIndex = match.Index + match.Length;
-
-                if (index > nextIndex)
+                if (index < match.Index)
                 {
-                    Inline newInline = new Run(item.Text.Substring(nextIndex, index - nextIndex));
-                    paragraph.Inlines.InsertBefore(nextSibling, newInline);
-                    nextSibling = newInline;
-                    index = nextIndex;
+                    container.Inlines.Add(CreateRun(text.Substring(index, match.Index - index)));
                 }
 
-                Inline replacementInline = new Run(match.Groups["text"].Value);
-                replacementInline.Foreground = ColorReplacement(match);
-                paragraph.Inlines.InsertBefore(nextSibling, replacementInline);
-                nextSibling = replacementInline;
-                index = match.Index;
+                UpdateFormatting(match.Groups["code"].Value);
+                index = match.Index + match.Length;
             }
 
-            if (index > 0)
+            if (index < text.Length)
             {
-                Inline newInline = new Run(item.Text.Substring(0, index));
-                paragraph.Inlines.InsertBefore(nextSibling, newInline);
+                container.Inlines.Add(CreateRun(text.Substring(index, text.Length - index)));
             }
 
-            itemSection.Blocks.Add(paragraph);
-            return itemSection;
+            return container;
         }
     }
 }

@@ -7,5 +7,7 @@
         // int Prompt(IPromptRequest);
 
         // IEnumerable<int> PromptMultiple(IPromptRequest);
+
+        void ShowProgress(int id, string name, int progress);
     }
 }

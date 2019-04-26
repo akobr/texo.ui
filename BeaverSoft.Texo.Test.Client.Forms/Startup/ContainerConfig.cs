@@ -58,7 +58,6 @@ namespace BeaverSoft.Texo.Test.Client.Forms.Startup
             container.Register<IPromptableViewService>(container.GetInstance<WpfViewService>);
 
             // PowerShell Fallback
-            container.Register<IPowerShellResultBuilder, PowerShellResultMarkdownBuilder>();
             container.Register<IFallbackService, PowerShellFallbackService>();
         }
 

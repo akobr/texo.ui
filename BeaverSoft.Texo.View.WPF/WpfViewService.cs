@@ -83,6 +83,11 @@ namespace BeaverSoft.Texo.View.WPF
             throw new NotImplementedException();
         }
 
+        public void ShowProgress(int id, string name, int progress)
+        {
+            control.SetProgress(name, progress);
+        }
+
         public void Render(Input input, IImmutableList<IItem> items)
         {
             // TODO: [P2] Solve this by result processing pipeline
@@ -99,14 +104,36 @@ namespace BeaverSoft.Texo.View.WPF
             header.Loaded += HandleLastSectionLoaded;
             sections.Add(header);
 
-            if (items != null
-                && items.Count > 0
-                && (items.Count != 1 || !string.IsNullOrWhiteSpace(items[0].Text)))
+            if (items != null && items.Count > 0)
             {
-                foreach (IItem item in items)
+                if (items.Count == 1)
                 {
-                    sections.Add(renderer.Render(item));
+                    IItem firstItem = items[0];
+
+                    if (firstItem is TextStreamItem steamItem)
+                    {
+                        sections.Add(renderer.StartStreamRender(steamItem, () => 
+                            {
+                                control.EnableInput();
+                                control.SetHistoryCount(history.Count);
+                            }));
+
+                        control.OutputDocument.Blocks.AddRange(sections);
+                        return;
+                    }
+                    else if (!string.IsNullOrEmpty(firstItem.Text))
+                    {
+                        sections.Add(renderer.Render(firstItem));
+                    }
+
                 }
+                else
+                {
+                    foreach (IItem item in items)
+                    {
+                        sections.Add(renderer.Render(item));
+                    }
+                } 
             }
 
             control.OutputDocument.Blocks.AddRange(sections);
