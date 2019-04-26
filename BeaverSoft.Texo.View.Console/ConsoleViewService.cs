@@ -103,6 +103,11 @@ namespace BeaverSoft.Texo.View.Console
             SysConsole.Write(" " + append.Trim());
         }
 
+        public void ShowProgress(int id, string name, int progress)
+        {
+            SysConsole.WriteLine($"{name}: {progress}%");
+        }
+
         public void Dispose()
         {
             disposed = true;
