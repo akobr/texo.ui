@@ -1,4 +1,4 @@
-﻿namespace BeaverSoft.Texo.Core.Result.Observable
+﻿namespace BeaverSoft.Texo.Core.Streaming.Observable
 {
     public interface IStreamObserver
     {

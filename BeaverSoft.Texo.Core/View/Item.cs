@@ -31,6 +31,8 @@ namespace BeaverSoft.Texo.Core.View
 
         public IImmutableList<ILink> Actions { get; set; }
 
+        public static Item Empty { get; } = Plain(string.Empty);
+
         public void AddActions(ImmutableList<ILink> links)
         {
             Actions = Actions.AddRange(links);

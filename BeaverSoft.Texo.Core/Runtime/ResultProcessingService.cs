@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Result;
+using BeaverSoft.Texo.Core.Streaming.Text;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services.Logging;
 
@@ -41,6 +42,9 @@ namespace BeaverSoft.Texo.Core.Runtime
 
                 case MarkdownItemsResult markdownItemsResult:
                     return ImmutableList<IItem>.Empty.AddRange(markdownItemsResult.Content.Select(t => new Item(t)));
+
+                case TextStreamResult textStreamResult:
+                    return ImmutableList<IItem>.Empty.Add(new TextStreamItem(textStreamResult.Content, textStreamResult.OuterTask));
             }
 
             switch ((object)result.Content)
@@ -59,6 +63,9 @@ namespace BeaverSoft.Texo.Core.Runtime
 
                 case string resultText:
                     return ImmutableList<IItem>.Empty.Add(new Item(resultText));
+
+                case ITextStream textStream:
+                    return ImmutableList<IItem>.Empty.Add(new TextStreamItem(textStream, null));
 
                 default:
                     return TransformByMap((object)result.Content);

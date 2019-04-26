@@ -3,20 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BeaverSoft.Texo.Core.Pipelines
+namespace BeaverSoft.Texo.Core.Transforming
 {
-    public class Pipeline<TData> : IPipeline<TData>
+    public class TransformationPipeline<TData> : ITransformationPipeline<TData>
     {
         private readonly ILogService logger;
-        private readonly LinkedList<IPipelineUnit<TData>> pipe;
+        private readonly LinkedList<ITransformationPipe<TData>> pipe;
 
-        public Pipeline(ILogService logger)
+        public TransformationPipeline(ILogService logger)
         {
             this.logger = logger;
-            pipe = new LinkedList<IPipelineUnit<TData>>();
+            pipe = new LinkedList<ITransformationPipe<TData>>();
         }
 
-        public void AddUnit(IPipelineUnit<TData> pipeUnit)
+        public void AddUnit(ITransformationPipe<TData> pipeUnit)
         {
             if (pipeUnit == null)
             {
@@ -26,7 +26,7 @@ namespace BeaverSoft.Texo.Core.Pipelines
             pipe.AddLast(pipeUnit);
         }
 
-        public bool AddUnitBefore(IPipelineUnit<TData> pipeUnitToAdd, IPipelineUnit<TData> pipeUnitReference)
+        public bool AddUnitBefore(ITransformationPipe<TData> pipeUnitToAdd, ITransformationPipe<TData> pipeUnitReference)
         {
             if (pipeUnitToAdd == null)
             {
@@ -45,7 +45,6 @@ namespace BeaverSoft.Texo.Core.Pipelines
                 return false;
             }
 
-
             pipe.AddBefore(unitNode, pipeUnitToAdd);
             return true;
         }
@@ -55,14 +54,14 @@ namespace BeaverSoft.Texo.Core.Pipelines
             return ProcessUnitAsync(pipe.First, data);
         }
 
-        private Task<TData> ProcessUnitAsync(LinkedListNode<IPipelineUnit<TData>> unitNode, TData data)
+        private Task<TData> ProcessUnitAsync(LinkedListNode<ITransformationPipe<TData>> unitNode, TData data)
         {
             if (unitNode == null)
             {
                 return Task.FromResult(data);
             }
 
-            if (unitNode.Value is IPipelineUnitWithControl<TData> controlUnit)
+            if (unitNode.Value is ITransformationPipeWithControl<TData> controlUnit)
             {
                 return ProcessControlUnitAsync(unitNode, controlUnit, data);
             }
@@ -70,7 +69,7 @@ namespace BeaverSoft.Texo.Core.Pipelines
             return ProcessSimpleUnitAsync(unitNode, data);
         }
 
-        private async Task<TData> ProcessSimpleUnitAsync(LinkedListNode<IPipelineUnit<TData>> unitNode, TData data)
+        private async Task<TData> ProcessSimpleUnitAsync(LinkedListNode<ITransformationPipe<TData>> unitNode, TData data)
         {
             try
             {
@@ -85,8 +84,8 @@ namespace BeaverSoft.Texo.Core.Pipelines
         }
 
         private Task<TData> ProcessControlUnitAsync(
-            LinkedListNode<IPipelineUnit<TData>> unitNode,
-            IPipelineUnitWithControl<TData> controlUnit,
+            LinkedListNode<ITransformationPipe<TData>> unitNode,
+            ITransformationPipeWithControl<TData> controlUnit,
             TData data)
         {
             try

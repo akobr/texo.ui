@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace BeaverSoft.Texo.Core.Pipelines
+namespace BeaverSoft.Texo.Core.Transforming
 {
-    public interface IPipelineUnit<TData>
+    public interface ITransformationPipe<TData>
     {
         Task<TData> ProcessAsync(TData data);
     }

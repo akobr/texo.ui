@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BeaverSoft.Texo.Core.Result.Observable
+namespace BeaverSoft.Texo.Core.Streaming.Observable
 {
     public class ObservableStream<TItem> : IWritableObservableStream<TItem>
     {
@@ -33,7 +33,7 @@ namespace BeaverSoft.Texo.Core.Result.Observable
             observers = ImmutableList<ObservationContext>.Empty;
         }
 
-        public bool IsOpen => isOpen;
+        public bool IsClosed => !isOpen;
 
         public void Open()
         {

@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace BeaverSoft.Texo.Core.Result.Observable
+namespace BeaverSoft.Texo.Core.Streaming.Observable
 {
     public interface IObservableStream<TItem> : IDisposable
     {
-        bool IsOpen { get; }
+        bool IsClosed { get; }
 
         void RegisterObserver(IStreamObserver observer);
 
