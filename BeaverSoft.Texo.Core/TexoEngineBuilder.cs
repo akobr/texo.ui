@@ -160,7 +160,7 @@ namespace BeaverSoft.Texo.Core
             runtime = new RuntimeCoordinatorService(
                 environment, evaluator, commandManagement,
                 resultProcessing, usedView, actionManagement,
-                history, intellisence, didYouMean, fallback);
+                history, intellisence, didYouMean, fallback, logger);
             InitialiseActions();
             return new TexoEngine(runtime, usedView, actions, setting);
         }
@@ -207,7 +207,7 @@ namespace BeaverSoft.Texo.Core
 
         private IntellisenceService CreateIntellisenceService()
         {
-            var service = new IntellisenceService(environment, commandManagement);
+            var service = new IntellisenceService(environment, commandManagement, fallback);
             registerToMessageBus.Register<IInputTreeUpdatedMessage>(service);
             return service;
         }

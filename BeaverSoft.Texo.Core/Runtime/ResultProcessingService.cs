@@ -44,7 +44,7 @@ namespace BeaverSoft.Texo.Core.Runtime
                     return ImmutableList<IItem>.Empty.AddRange(markdownItemsResult.Content.Select(t => new Item(t)));
 
                 case TextStreamResult textStreamResult:
-                    return ImmutableList<IItem>.Empty.Add(new TextStreamItem(textStreamResult.Content, textStreamResult.OuterTask));
+                    return ImmutableList<IItem>.Empty.Add(new StreamedItem(textStreamResult.Content));
             }
 
             switch ((object)result.Content)
@@ -64,8 +64,8 @@ namespace BeaverSoft.Texo.Core.Runtime
                 case string resultText:
                     return ImmutableList<IItem>.Empty.Add(new Item(resultText));
 
-                case ITextStream textStream:
-                    return ImmutableList<IItem>.Empty.Add(new TextStreamItem(textStream, null));
+                case IReportableStream textStream:
+                    return ImmutableList<IItem>.Empty.Add(new StreamedItem(textStream));
 
                 default:
                     return TransformByMap((object)result.Content);

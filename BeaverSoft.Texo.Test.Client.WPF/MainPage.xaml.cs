@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using BeaverSoft.Texo.Fallback.PowerShell;
 using BeaverSoft.Texo.View.WPF;
 using Commands.Clipboard;
 
@@ -16,6 +18,13 @@ namespace BeaverSoft.Texo.Test.Client.WPF
             InitializeComponent();
             InitilialiseTexoControl();
             InitilialiseClipboardControl();
+
+            //ConsoleManager.Show();
+
+            //Console.WriteLine("Application running!");
+            //Console.ForegroundColor = ConsoleColor.Green;
+            //Console.WriteLine("colors");
+            //Console.ResetColor();
         }
 
         private void InitilialiseTexoControl()

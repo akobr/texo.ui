@@ -8,11 +8,20 @@ namespace BeaverSoft.Texo.Core.Streaming.Text
         private readonly MemoryStream innerStream;
         private long writePosition;
         private long readPosition;
+        private Action onFlush;
 
-        public ConcurrentMemoryStream()
+        public ConcurrentMemoryStream(Action onFlush)
         {
             innerStream = new MemoryStream();
+            this.onFlush = onFlush;
         }
+
+        public ConcurrentMemoryStream()
+            : this(null)
+        {
+            // no operation
+        }
+
 
         public override bool CanRead => true;
 
@@ -53,7 +62,7 @@ namespace BeaverSoft.Texo.Core.Streaming.Text
                 lock (innerStream)
                 {
                     innerStream.Position = value;
-                    writePosition = value;
+                    writePosition = innerStream.Position;
                 }
             }
         }
@@ -73,7 +82,7 @@ namespace BeaverSoft.Texo.Core.Streaming.Text
                 lock (innerStream)
                 {
                     innerStream.Position = value;
-                    readPosition = value;
+                    readPosition = innerStream.Position;
                 }
             }
         }
@@ -83,6 +92,7 @@ namespace BeaverSoft.Texo.Core.Streaming.Text
             lock (innerStream)
             {
                 innerStream.Flush();
+                onFlush?.Invoke();
             }
         }
 

@@ -1,98 +1,148 @@
 ﻿using BeaverSoft.Texo.Core.Streaming.Text;
 using BeaverSoft.Texo.Core.View;
 using System;
+using System.Linq;
+using System.Text;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
     class PowerShellResultStreamBuilder : IPowerShellResultBuilder
     {
-        private TextStream stream;
+        private ReportableStream stream;
         private bool containError;
+        private bool customErrorOutput;
+        private FormattableStreamWriter writer;
 
         public bool ContainError => containError;
 
-        public TextStream Stream => stream;
+        public ReportableStream Stream => stream;
 
-        public Item FinishItem()
+        public bool Start()
         {
+            customErrorOutput = false;
+            containError = false;
+
+            stream = new ReportableStream();
+            writer = new FormattableStreamWriter(stream.Stream, Encoding.UTF8, 1024, true);
+            return true;
+        }
+
+        public IStreamedItem BuildStreamItem()
+        {
+            return new StreamedItem(stream);
+        }
+
+        public Item Finish()
+        {
+            writer.Dispose();
+            writer = null;
+            stream = null;
+
             return Item.Empty;
         }
 
-        public void StartItem()
+        public void SetRequireCustomErrorOutput()
         {
-            containError = false;
-            stream = new TextStream();
+            customErrorOutput = true;
         }
 
         public void Write(string text)
         {
-            stream.Write(text);
-            stream.Flush();
-            stream.NotifyAboutChange();
+            writer.Write(text);
+            writer.Flush();
         }
 
         public void Write(string text, ConsoleColor foreground, ConsoleColor background)
         {
             if (foreground != ConsoleColor.White)
             {
-                stream.SetForegroundTextColor(foreground);
+                writer.SetForegroundTextColor(foreground);
             }
 
             if (background != ConsoleColor.Black)
             {
-                stream.SetBackgroundTextColor(background);
+                writer.SetBackgroundTextColor(background);
             }
 
-            stream.Write(text);
-            stream.ResetFormatting();
-            stream.Flush();
-            stream.NotifyAboutChange();
+            writer.Write(text);
+            writer.ResetFormatting();
+            writer.Flush();
         }
 
         public void WriteDebugLine(string text)
         {
-            WriteColorLine(text, ConsoleColor.Magenta);
+            WriteColoredLine(text, ConsoleColor.Magenta);
         }
 
         public void WriteErrorLine(string text)
         {
             containError = true;
-            WriteColorLine(text, ConsoleColor.Red);
+
+            if (customErrorOutput)
+            {
+                if (text.Contains('\r') || text.Contains('\n'))
+                {
+                    Write(text);
+                }
+                else
+                {
+                    WriteLine(text);
+                }
+            }
+            else
+            {
+                WriteColoredLine(text, ConsoleColor.Red);
+            }
         }
 
         public void WriteLine(string text)
         {
-            stream.WriteLine(text);
-            stream.Flush();
-            stream.NotifyAboutChange();
+            writer.WriteLine(text);
+            writer.Flush();
+        }
+
+        public void WriteLine()
+        {
+            writer.WriteLine();
         }
 
         public void WriteVerboseLine(string text)
         {
-            WriteColorLine(text, ConsoleColor.Green);
+            WriteColoredLine(text, ConsoleColor.Green);
         }
 
         public void WriteWarningLine(string text)
         {
-            WriteColorLine(text, ConsoleColor.Yellow);
+            WriteColoredLine(text, ConsoleColor.Yellow);
         }
 
-        private void WriteColorLine(string text, ConsoleColor color)
+        private void WriteColored(string text, ConsoleColor color)
         {
-            if (string.IsNullOrWhiteSpace(text))
+            if (string.IsNullOrEmpty(text))
             {
-                stream.Write(text);
-                stream.WriteLine();
-                stream.Flush();
                 return;
             }
 
-            stream.SetForegroundTextColor(color);
-            stream.Write(text);
-            stream.ResetFormatting();
-            stream.WriteLine();
-            stream.Flush();
-            stream.NotifyAboutChange();
+            writer.SetForegroundTextColor(color);
+            writer.Write(text);
+            writer.ResetFormatting();
+            writer.Flush();
+        }
+
+        private void WriteColoredLine(string text, ConsoleColor color)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                writer.WriteLine();
+                writer.Flush();
+                return;
+            }
+
+            writer.SetForegroundTextColor(color);
+            writer.Write(text);
+            writer.ResetFormatting();
+            writer.WriteLine();
+            writer.Flush();
         }
     }
 }

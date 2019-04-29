@@ -21,7 +21,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         private Runspace pushedRunspace;
         private Stack<Guid> applications;
         private Stack<Guid> prompts;
-        private StringBuilder appOutput;
 
         public TexoPowerShellHost(
             IPowerShellResultBuilder resultBuilder,
@@ -78,29 +77,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         public override void NotifyBeginApplication()
         {
             applications.Push(Guid.NewGuid());
-
-            if (applications.Count != 1)
-            {
-                return;
-            }
-
-            appOutput = new StringBuilder();
-            StringWriter writer = new StringWriter(appOutput);
-            Console.SetOut(writer);
+            resultBuilder.SetRequireCustomErrorOutput();
         }
 
         public override void NotifyEndApplication()
         {
             applications.Pop();
-
-            if (applications.Count > 0)
-            {
-                return;
-            }
-
-            StreamWriter standardOutput = new StreamWriter(Console.OpenStandardOutput());
-            standardOutput.AutoFlush = true;
-            Console.SetOut(standardOutput);
         }
 
         public override void SetShouldExit(int exitCode)

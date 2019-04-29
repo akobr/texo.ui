@@ -20,7 +20,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             bufferSize = new Size(DEFAULT_LINE_LENGHT, DEFAULT_BUFFER_HEIGHT);
             buffer = new BufferCell[bufferSize.Width, bufferSize.Height];
-
             this.logger = logger;
         }
 

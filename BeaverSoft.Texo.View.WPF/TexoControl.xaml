@@ -108,7 +108,7 @@
 
                 <TextBlock Name="lbPrompt" Text="tu&gt;" FontFamily="Consolas" FontSize="16" VerticalAlignment="Center" FontWeight="Bold" Padding="5,0,5,2" />
                 <TextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16"  AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
-                         Foreground="{DynamicResource SystemBaseHighColorBrush}" CaretBrush="{DynamicResource SystemBaseHighColorBrush}"
+                         Foreground="{DynamicResource SystemBaseHighColorBrush}" CaretBrush="{DynamicResource SystemBaseHighColorBrush}" AcceptsTab="False"
                          IsReadOnlyCaretVisible="True" TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" />
                 <!--<RichTextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
                              TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" SelectionChanged="HandleInputSelectionChanged" />-->
@@ -116,11 +116,11 @@
         </Border>
 
         <!-- PROGRESS BARS -->
-        <ProgressBar Name="progress" Grid.Row="2" Height="1" Minimum="0" Maximum="100"
+        <ProgressBar Name="progress" Grid.Row="2" Height="1" Minimum="0" Maximum="100" IsTabStop="False"
                      Foreground="{x:Static SystemParameters.WindowGlassBrush}" BorderBrush="{DynamicResource SystemAltHighColorBrush}" />
 
         <!-- OUTPUT -->
-        <FlowDocumentScrollViewer Name="docOutput" Grid.Row="3"
+        <FlowDocumentScrollViewer Name="docOutput" Grid.Row="3" IsTabStop="False"
                                   MinZoom="50" VerticalScrollBarVisibility="Auto"
                                   PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseWheel="HandleScrollSpeed">
             <FlowDocument>
@@ -132,7 +132,7 @@
 
         <!-- INTELLISENCE -->
         <ListBox x:Name="listIntellisence" Grid.Row="3" BorderBrush="Transparent" BorderThickness="0"
-                  Foreground="{DynamicResource SystemBaseHighColorBrush}" Focusable="False"
+                  Foreground="{DynamicResource SystemBaseHighColorBrush}" Focusable="False" IsTabStop="False"
                   PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenceMouseDoubleClick"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
 

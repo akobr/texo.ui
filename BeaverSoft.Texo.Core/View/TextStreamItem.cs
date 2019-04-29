@@ -1,22 +1,18 @@
 ﻿using BeaverSoft.Texo.Core.Streaming.Text;
 using System.Collections.Immutable;
-using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Core.View
 {
-    public class TextStreamItem : IItem
+    public class StreamedItem : IStreamedItem
     {
-        public TextStreamItem(ITextStream stream, Task outerTask)
+        public StreamedItem(IReportableStream stream)
         {
             Stream = stream;
-            OuterTask = outerTask;
         }
 
-        public ITextStream Stream { get; }
+        public IReportableStream Stream { get; }
 
-        public Task OuterTask { get; }
-
-        public string Text => string.Empty;
+        public string Text => Stream.ReadFromBeginningToEnd();
 
         public TextFormatEnum Format => TextFormatEnum.Plain;
 

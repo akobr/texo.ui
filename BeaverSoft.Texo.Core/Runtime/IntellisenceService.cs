@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
@@ -20,20 +21,22 @@ namespace BeaverSoft.Texo.Core.Runtime
         private const int MAXIMUM_ITEMS_PER_TYPE = 20;
 
         private readonly ICommandManagementService commandManagement;
+        private readonly IFallbackService fallback;
         private readonly IPathIntellisenceService pathIntellisence;
         private readonly IVariableIntellisenceService variableIntellisence;
 
         private TextumConfiguration configuration;
         private InputTree tree;
 
-        public IntellisenceService(IEnvironmentService environment, ICommandManagementService commandManagement)
+        public IntellisenceService(IEnvironmentService environment, ICommandManagementService commandManagement, IFallbackService fallback)
         {
             this.commandManagement = commandManagement;
+            this.fallback = fallback;
             pathIntellisence = new PathIntellisenceService();
             variableIntellisence = new VariableIntellisenceService(environment);
         }
 
-        public IImmutableList<IItem> Help(Input.Input input, int cursorPosition)
+        public async Task<IImmutableList<IItem>> HelpAsync(Input.Input input, int cursorPosition)
         {
             if (input?.ParsedInput == null
                 || input.ParsedInput.IsEmpty())
@@ -57,6 +60,13 @@ namespace BeaverSoft.Texo.Core.Runtime
             if (input.Tokens.Count == 1 && !string.IsNullOrEmpty(activeInput))
             {
                 resultBuilder.AddRange(BuildCommandList(lastToken.Input));
+            }
+            else if (input.ParsedInput.Tokens.Count > 0)
+            {
+                if (string.Equals(input.ParsedInput.Tokens[0], "dotnet", StringComparison.OrdinalIgnoreCase))
+                {
+                    resultBuilder.AddRange(await BuildDotnetHelpAsync(input));
+                }
             }
             else if (!string.IsNullOrEmpty(input.Context.Key))
             {
@@ -130,6 +140,26 @@ namespace BeaverSoft.Texo.Core.Runtime
                     yield return item;
                 }
             }
+        }
+
+        private async Task<IEnumerable<IItem>> BuildDotnetHelpAsync(Input.Input input)
+        {
+            if (input.ParsedInput.RawInput.Length > 50
+                || input.ParsedInput.RawInput.Contains('\"')
+                || input.ParsedInput.RawInput.Contains('\''))
+            {
+                return Enumerable.Empty<IItem>();
+            }
+
+            string command = $"dotnet complete \"{string.Join(" ", input.ParsedInput.Tokens)} \"";
+            var items = await fallback.ProcessCommandQuetlyAsync(command);
+
+            if (items == null)
+            {
+                return Enumerable.Empty<IItem>();
+            }
+
+            return items.Select(item => Item.Intellisence(item, item.StartsWith("-") ? "option" : "query", null));
         }
 
         void IMessageBusRecipient<IInputTreeUpdatedMessage>.ProcessMessage(IInputTreeUpdatedMessage message)

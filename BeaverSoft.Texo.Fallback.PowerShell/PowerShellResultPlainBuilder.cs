@@ -11,15 +11,21 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public bool ContainError => containError;
 
-        public Item FinishItem()
+        public Item Finish()
         {
             return Item.Plain(builder.ToString());
         }
 
-        public void StartItem()
+        public void SetRequireCustomErrorOutput()
+        {
+            // no operation
+        }
+
+        public bool Start()
         {
             containError = false;
             builder = new StringBuilder();
+            return false;
         }
 
         public void Write(string text)
@@ -39,7 +45,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 builder.AppendLine();
             }
 
-            builder.AppendLine($"\u001b[35m{text}\u001b[m");
+            builder.AppendLine(text);
         }
 
         public void WriteErrorLine(string text)
@@ -51,12 +57,17 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 builder.AppendLine();
             }
 
-            builder.AppendLine($"\u001b[31m{text}\u001b[m");
+            builder.AppendLine(text);
         }
 
         public void WriteLine(string text)
         {
             builder.AppendLine(text);
+        }
+
+        public void WriteLine()
+        {
+            builder.AppendLine();
         }
 
         public void WriteVerboseLine(string text)
@@ -66,7 +77,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 builder.AppendLine();
             }
 
-            builder.AppendLine($"\u001b[32m{text}\u001b[m");
+            builder.AppendLine(text);
         }
 
         public void WriteWarningLine(string text)
@@ -76,7 +87,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 builder.AppendLine();
             }
 
-            builder.AppendLine($"\u001b[33m{text}\u001b[m");
+            builder.AppendLine(text);
         }
     }
 }

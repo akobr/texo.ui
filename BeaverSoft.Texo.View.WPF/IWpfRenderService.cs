@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Documents;
+using BeaverSoft.Texo.Core.Streaming.Text;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.View.WPF
@@ -8,6 +10,6 @@ namespace BeaverSoft.Texo.View.WPF
     {
         Section Render(IItem item);
 
-        Section StartStreamRender(TextStreamItem streamItem, Action continueWith);
+        Task<Section> StartStreamRenderAsync(IReportableStream stream, Action<Span> onAfterRender, Action onFinish);
     }
 }

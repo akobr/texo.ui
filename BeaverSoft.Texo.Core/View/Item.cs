@@ -33,6 +33,7 @@ namespace BeaverSoft.Texo.Core.View
 
         public static Item Empty { get; } = Plain(string.Empty);
 
+        // TODO: [P3] this is mutable (:
         public void AddActions(ImmutableList<ILink> links)
         {
             Actions = Actions.AddRange(links);

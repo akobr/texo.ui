@@ -9,6 +9,7 @@ using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Input.History;
 using BeaverSoft.Texo.Core.View;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Core.Runtime
 {
@@ -24,6 +25,7 @@ namespace BeaverSoft.Texo.Core.Runtime
         private readonly IActionManagementService actionManagement;
         private readonly IInputHistoryService history;
         private readonly IFallbackService fallback;
+        private readonly ILogService logger;
 
         public RuntimeCoordinatorService(
             IEnvironmentService environment,
@@ -35,7 +37,8 @@ namespace BeaverSoft.Texo.Core.Runtime
             IInputHistoryService history,
             IIntellisenceService intelisence,
             IDidYouMeanService didYouMean,
-            IFallbackService fallback)
+            IFallbackService fallback,
+            ILogService logger)
         {
             this.environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.evaluator = evaluator ?? throw new ArgumentNullException(nameof(evaluator));
@@ -44,6 +47,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             this.view = view ?? throw new ArgumentNullException(nameof(view));
             this.actionManagement = actionManagement ?? throw new ArgumentNullException(nameof(actionManagement));
 
+            this.logger = logger;
             this.history = history;
             this.intelisence = intelisence;
             this.didYouMean = didYouMean;
@@ -66,8 +70,28 @@ namespace BeaverSoft.Texo.Core.Runtime
         public Input.Input PreProcess(string input, int cursorPosition)
         {
             Input.Input inputModel = evaluator.Evaluate(input);
-            var items = intelisence?.Help(inputModel, cursorPosition) ?? ImmutableList<IItem>.Empty;
-            view.RenderIntellisence(inputModel, items);
+            
+            if (intelisence == null)
+            {
+                return inputModel;
+            }
+
+            intelisence
+                .HelpAsync(inputModel, cursorPosition)
+                .ContinueWith((task) =>
+                    {
+                        if (task.Status == TaskStatus.Faulted)
+                        {
+                            logger.Error("Retrieving of intellisense failed.", task.Exception);
+                            return;
+                        }
+
+                        if (task.Result != null)
+                        {
+                            view.RenderIntellisence(inputModel, task.Result);
+                        }
+                    });
+
             return inputModel;
         }
 

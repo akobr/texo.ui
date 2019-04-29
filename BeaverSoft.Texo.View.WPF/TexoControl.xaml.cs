@@ -144,7 +144,12 @@ namespace BeaverSoft.Texo.View.WPF
                 return;
             }
 
-            InputChanged?.Invoke(this, GetInput());
+            string input = GetInput();
+
+            if (!string.IsNullOrEmpty(input))
+            {
+                InputChanged?.Invoke(this, input);
+            }
         }
 
         private void HandleInputKeyDown(object sender, KeyEventArgs e)
@@ -173,6 +178,29 @@ namespace BeaverSoft.Texo.View.WPF
             {
                 e.Handled = true;
                 InputChanged?.Invoke(this, GetInput());
+                return;
+            }
+
+            if (e.Key == Key.Tab)
+            {
+                e.Handled = true;
+                if (IsIntellisenceOpened)
+                {
+                    int selectedIndex = listIntellisence.SelectedIndex + 1;
+
+                    if (selectedIndex >= listIntellisence.Items.Count)
+                    {
+                        selectedIndex = 0;
+                    }
+
+                    listIntellisence.SelectedIndex = selectedIndex;
+                    listIntellisence.ScrollIntoView(listIntellisence.SelectedItem);
+                }
+                else
+                {
+                    InputChanged?.Invoke(this, GetInput());
+                }
+
                 return;
             }
 

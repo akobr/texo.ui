@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Management.Automation;
+using System.Management.Automation.Runspaces;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
@@ -59,17 +61,39 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
             try
             {
-                // TODO: [P3] move this to pipeline 
+                resultBuilder.Start();
+
+                // TODO: [P2] move this to pipeline (pipeline before powershell fallback)
                 string commandText = input.ParsedInput.RawInput;
                 if (string.Equals(input.ParsedInput.Tokens[0], "git", StringComparison.OrdinalIgnoreCase))
                 {
                     commandText = "git -c color.ui=always -c color.status=always -c color.branch=always -c color.diff=always -c color.interactive=always ";
                     commandText += string.Join(" ", input.ParsedInput.Tokens.Skip(1));
+                    resultBuilder.SetRequireCustomErrorOutput();
+
+                    if (input.ParsedInput.Tokens.Count > 1)
+                    {
+                        string subCommand = input.ParsedInput.Tokens[1];
+                        HashSet<string> targetCommands = new HashSet<string>(
+                            new[] { "push", "pull", "fetch", "checkout", "clone" },
+                            StringComparer.OrdinalIgnoreCase);
+
+                        if (targetCommands.Contains(subCommand))
+                        {
+                            commandText += " --progress";
+                        }
+                    }
+
+                }
+                else if (string.Equals(input.ParsedInput.Tokens[0], "dotnet", StringComparison.OrdinalIgnoreCase)
+                         && input.ParsedInput.Tokens.Count > 1)
+                {
+                    // TODO: [P2] this must be more sofisticated
+                    commandText += " /clp:ForceConsoleColor";
                 }
 
-                resultBuilder.StartItem();
-                Task outputTask = RunScriptToOutputAsync(commandText);
-                return Task.FromResult<ICommandResult>(new TextStreamResult(resultBuilder.Stream, outputTask));
+                _ = RunScriptToOutputAsync(commandText);
+                return Task.FromResult<ICommandResult>(new TextStreamResult(resultBuilder.Stream));
             }
             catch (Exception e)
             {
@@ -78,6 +102,30 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 resultBuilder.Stream?.Dispose();
                 ReleaseShell();
                 return Task.FromResult<ICommandResult>(new ErrorTextResult(errorMessage));
+            }
+        }
+
+        public async Task<IEnumerable<string>> ProcessCommandQuetlyAsync(string input)
+        {
+            if (shell != null || string.IsNullOrWhiteSpace(input))
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            BuildShell();
+
+            try
+            {
+                return (await RunCommandQuetlyAsync(input)).Select(obj => obj.BaseObject.ToString());
+            }
+            catch (Exception e)
+            {
+                logger.Error("Error during processing of command, quetly.", input, e);
+                return Enumerable.Empty<string>();
+            }
+            finally
+            {
+                ReleaseShell();
             }
         }
 
@@ -100,7 +148,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             try
             {
                 RunCommandQuetly("Set-Location", message.NewValue);
-                shell.Invoke();
             }
             catch (Exception e)
             {
@@ -146,44 +193,44 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             shell.Invoke();
         }
 
+        private Task<IEnumerable<PSObject>> RunCommandQuetlyAsync(string input)
+        {
+            shell.Runspace = host.Runspace;
+            shell.AddScript(input);
+
+            return Task.Factory.FromAsync<IEnumerable<PSObject>>(shell.BeginInvoke(), (result) =>
+            {
+                return shell.EndInvoke(result);
+            });
+        }
+
         private Task RunScriptToOutputAsync(string script)
         {
             shell.Runspace = host.Runspace;
-
             shell.AddScript(script);
-            //shell.AddCommand("Out-Default");
+            shell.AddCommand("Out-Default");
             //shell.Commands.Commands[0].MergeMyResults(PipelineResultTypes.Error, PipelineResultTypes.Output);
 
-            shell.Streams.Information.DataAdded += Information_DataAdded;
             shell.Streams.Error.DataAdded += Error_DataAdded;
             shell.Streams.Warning.DataAdded += Warning_DataAdded;
             shell.Streams.Verbose.DataAdded += Verbose_DataAdded;
             shell.Streams.Debug.DataAdded += Debug_DataAdded;
+            shell.Streams.Information.DataAdded += Information_DataAdded;
 
-            PSDataCollection<PSObject> inputStream = new PSDataCollection<PSObject>();
-            PSDataCollection<PSObject> outputStream = new PSDataCollection<PSObject>();
-            outputStream.DataAdded += Output_DataAdded;
-
-            return Task.Factory.FromAsync(shell.BeginInvoke(inputStream, outputStream), (result) => 
+            return Task.Factory.FromAsync(shell.BeginInvoke(), (result) => 
             {
-                var output = shell.EndInvoke(result);
+                //var output = shell.EndInvoke(result);
                 resultBuilder.Stream.NotifyAboutCompletion();
-                outputStream.DataAdded -= Output_DataAdded;
+
+                shell.Streams.Error.DataAdded -= Error_DataAdded;
+                shell.Streams.Warning.DataAdded -= Warning_DataAdded;
+                shell.Streams.Verbose.DataAdded -= Verbose_DataAdded;
+                shell.Streams.Debug.DataAdded -= Debug_DataAdded;
+                shell.Streams.Information.DataAdded -= Information_DataAdded;
+
+                resultBuilder.Finish();
                 ReleaseShell();
             });
-        }
-
-        private void Output_DataAdded(object sender, DataAddedEventArgs e)
-        {
-            PSDataCollection<PSObject> outputStream = (PSDataCollection<PSObject>)sender;
-            var data = outputStream[e.Index];
-            resultBuilder.WriteLine(data.ToString());
-        }
-
-        private void Information_DataAdded(object sender, DataAddedEventArgs e)
-        {
-            var data = shell.Streams.Information[e.Index];
-            resultBuilder.WriteLine(data.MessageData.ToString());
         }
 
         private void Error_DataAdded(object sender, DataAddedEventArgs e)
@@ -231,6 +278,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             resultBuilder.WriteDebugLine(data.Message);
         }
 
+        private void Information_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            var data = shell.Streams.Information[e.Index];
+            resultBuilder.WriteVerboseLine(data.MessageData.ToString());
+        }
+
         private void BuildShell()
         {
             lock (executionLock)
@@ -243,12 +296,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             lock (executionLock)
             {
-                shell.Streams.Information.DataAdded -= Information_DataAdded;
-                shell.Streams.Error.DataAdded -= Error_DataAdded;
-                shell.Streams.Warning.DataAdded -= Warning_DataAdded;
-                shell.Streams.Verbose.DataAdded -= Verbose_DataAdded;
-                shell.Streams.Debug.DataAdded -= Debug_DataAdded;
-
                 shell?.Dispose();
                 shell = null;
             }

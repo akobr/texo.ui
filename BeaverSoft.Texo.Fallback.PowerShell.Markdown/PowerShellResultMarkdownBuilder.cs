@@ -11,7 +11,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
 
         public bool ContainError => containError;
 
-        public Item FinishItem()
+        public Item Finish()
         {
             Item result = Item.Markdown(markdown.ToString());
 
@@ -19,10 +19,16 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
             return result;
         }
 
-        public void StartItem()
+        public void SetRequireCustomErrorOutput()
+        {
+            // no operation
+        }
+
+        public bool Start()
         {
             containError = false;
             markdown = new MarkdownBuilder();
+            return false;
         }
 
         public void Write(string text)
@@ -50,6 +56,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
         public void WriteLine(string text)
         {
             markdown.WriteLine(text);
+        }
+
+        public void WriteLine()
+        {
+            markdown.WriteLine();
         }
 
         public void WriteVerboseLine(string text)

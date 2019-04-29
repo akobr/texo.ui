@@ -107,7 +107,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override void WriteErrorLine(string value)
         {
-            resultBuilder.WriteErrorLine(value);
+             resultBuilder.WriteErrorLine(value);
         }
 
         public override void WriteLine(string value)

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Immutable;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Runtime
 {
     public interface IIntellisenceService
     {
-        IImmutableList<IItem> Help(Input.Input input, int cursorPosition);
+        Task<IImmutableList<IItem>> HelpAsync(Input.Input input, int cursorPosition);
     }
 }

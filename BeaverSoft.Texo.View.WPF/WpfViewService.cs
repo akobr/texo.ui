@@ -88,7 +88,7 @@ namespace BeaverSoft.Texo.View.WPF
             control.SetProgress(name, progress);
         }
 
-        public void Render(Input input, IImmutableList<IItem> items)
+        public async void Render(Input input, IImmutableList<IItem> items)
         {
             // TODO: [P2] Solve this by result processing pipeline
             if (input.Context.Key == CommandKeys.CLEAR)
@@ -101,7 +101,7 @@ namespace BeaverSoft.Texo.View.WPF
             List<Section> sections = new List<Section>(items.Count);
             Item headerItem = BuildCommandHeaderItem(input);
             Section header = renderer.Render(headerItem);
-            header.Loaded += HandleLastSectionLoaded;
+            header.Loaded += HandleLastElementLoaded;
             sections.Add(header);
 
             if (items != null && items.Count > 0)
@@ -110,12 +110,27 @@ namespace BeaverSoft.Texo.View.WPF
                 {
                     IItem firstItem = items[0];
 
-                    if (firstItem is TextStreamItem steamItem)
+                    if (firstItem is IStreamedItem steamItem)
                     {
-                        sections.Add(renderer.StartStreamRender(steamItem, () => 
+                        sections.Add(await renderer.StartStreamRenderAsync(steamItem.Stream, 
+                            (renderedSpan) =>
                             {
-                                control.EnableInput();
-                                control.SetHistoryCount(history.Count);
+                                Inline lastLine = renderedSpan.Inlines.LastInline;
+                                if (lastLine.IsLoaded)
+                                {
+                                    lastLine.BringIntoView();
+                                }
+                                else
+                                {
+                                    lastLine.Loaded += HandleLastElementLoaded;
+                                }
+                            },
+                            () => {
+                                control.Dispatcher.Invoke(() =>
+                                {
+                                    control.EnableInput();
+                                    control.SetHistoryCount(history.Count);
+                                });
                             }));
 
                         control.OutputDocument.Blocks.AddRange(sections);
@@ -125,7 +140,6 @@ namespace BeaverSoft.Texo.View.WPF
                     {
                         sections.Add(renderer.Render(firstItem));
                     }
-
                 }
                 else
                 {
@@ -141,15 +155,21 @@ namespace BeaverSoft.Texo.View.WPF
             control.SetHistoryCount(history.Count);
         }
 
-        private void HandleLastSectionLoaded(object sender, RoutedEventArgs e)
+        private void HandleLastElementLoaded(object sender, RoutedEventArgs e)
         {
-            Section section = (Section)sender;
-            section.Loaded -= HandleLastSectionLoaded;
-            section.BringIntoView();
+            FrameworkContentElement element = (FrameworkContentElement)sender;
+            element.Loaded -= HandleLastElementLoaded;
+            element.BringIntoView();
         }
 
         public void RenderIntellisence(Input input, IImmutableList<IItem> items)
         {
+            if (!control.Dispatcher.CheckAccess())
+            {
+                control.Dispatcher.Invoke(() => RenderIntellisence(input, items));
+                return;
+            }
+
             control.IntellisenceList.Visibility = Visibility.Collapsed;
             control.IntellisenceList.Items.Clear();
 

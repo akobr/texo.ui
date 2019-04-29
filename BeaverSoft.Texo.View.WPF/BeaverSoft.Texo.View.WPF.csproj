@@ -79,9 +79,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Rendering\WpfConsoleTextRenderService.cs" />
     <Compile Include="TexoControl.xaml.cs">
       <DependentUpon>TexoControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Rendering\WpfPlainTextRenderService.cs" />
     <Compile Include="WpfViewService.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
