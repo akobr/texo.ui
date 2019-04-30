@@ -1,0 +1,10 @@
+first-environment>
+
+second-test-environment> git version 2.17.1.windows.2
+ - Problem with --progress attribute, progress is reported to default output not to error output
+
+third-test-environment> git version 2.21.0.windows.1
+ - same problem with --progress reported to default output, maybe is not a problem of git but PowerShell
+
+
+
