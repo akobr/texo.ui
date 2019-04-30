@@ -68,7 +68,8 @@ namespace BeaverSoft.Texo.Core.Runtime
                     resultBuilder.AddRange(await BuildDotnetHelpAsync(input));
                 }
             }
-            else if (!string.IsNullOrEmpty(input.Context.Key))
+
+            if (!string.IsNullOrEmpty(input.Context.Key))
             {
                 resultBuilder.AddRange(BuildCommandHelp(input, activeInput));
             }
@@ -152,7 +153,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             }
 
             string command = $"dotnet complete \"{string.Join(" ", input.ParsedInput.Tokens)} \"";
-            var items = await fallback.ProcessCommandQuetlyAsync(command);
+            var items = await fallback.ProcessIndependentCommandAsync(command);
 
             if (items == null)
             {

@@ -18,6 +18,9 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         private readonly IPromptableViewService view;
         private readonly ILogService logger;
 
+        private Runspace independentRunspace;
+        private object independentLocker = new object(); 
+
         private Runspace pushedRunspace;
         private Stack<Guid> applications;
         private Stack<Guid> prompts;
@@ -57,6 +60,23 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         public bool IsRunspacePushed => pushedRunspace != null;
 
         public Runspace Runspace { get; private set; }
+
+        public Runspace GetIndependentRunspace()
+        {
+            if (independentRunspace == null)
+            {
+                lock (independentLocker)
+                {
+                    if(independentRunspace == null)
+                    {
+                        independentRunspace = RunspaceFactory.CreateRunspace(this);
+                        independentRunspace.Open();
+                    }
+                }
+            }
+
+            return independentRunspace;
+        }
 
         public void Initialise()
         {

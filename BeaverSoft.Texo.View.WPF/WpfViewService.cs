@@ -115,6 +115,11 @@ namespace BeaverSoft.Texo.View.WPF
                         sections.Add(await renderer.StartStreamRenderAsync(steamItem.Stream, 
                             (renderedSpan) =>
                             {
+                                if (renderedSpan.Inlines.Count < 1)
+                                {
+                                    return;
+                                }
+
                                 Inline lastLine = renderedSpan.Inlines.LastInline;
                                 if (lastLine.IsLoaded)
                                 {

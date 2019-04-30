@@ -88,6 +88,12 @@ namespace BeaverSoft.Texo.Core.Streaming.Text
             WriteSgrAnciEscapeSequence(code);
         }
 
+        public void SetForegroundTextColor(int red, int green, int blue)
+        {
+            string code = GetForegroundColorCode(red, green, blue);
+            WriteSgrAnciEscapeSequence(code);
+        }
+
         public void SetBackgroundTextColor(ConsoleColor color)
         {
             string code = GetBackgroundColorCode(color);
@@ -134,6 +140,12 @@ namespace BeaverSoft.Texo.Core.Streaming.Text
                 return Task.CompletedTask;
             }
 
+            return WriteSgrAnciEscapeSequenceAsync(code);
+        }
+
+        public Task SetForegroundTextColorAsync(int red, int green, int blue)
+        {
+            string code = GetForegroundColorCode(red, green, blue);
             return WriteSgrAnciEscapeSequenceAsync(code);
         }
 
@@ -191,6 +203,11 @@ namespace BeaverSoft.Texo.Core.Streaming.Text
                 default:
                     return null;
             }
+        }
+
+        private string GetForegroundColorCode(int red, int green, int blue)
+        {
+            return $"38;2;{red};{green};{blue}";
         }
 
         private string GetBackgroundColorCode(ConsoleColor color)

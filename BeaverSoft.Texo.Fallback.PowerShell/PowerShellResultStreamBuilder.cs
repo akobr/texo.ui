@@ -36,8 +36,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             writer.Dispose();
             writer = null;
-            stream = null;
-
             return Item.Empty;
         }
 
@@ -82,11 +80,14 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             {
                 if (text.Contains('\r') || text.Contains('\n'))
                 {
-                    Write(text);
+                    WriteColored(text, 255, 160, 122);
+                    writer.Flush();
                 }
                 else
                 {
-                    WriteLine(text);
+                    WriteColored(text, 255, 160, 122);
+                    WriteLine();
+                    writer.Flush();
                 }
             }
             else
@@ -126,7 +127,18 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             writer.SetForegroundTextColor(color);
             writer.Write(text);
             writer.ResetFormatting();
-            writer.Flush();
+        }
+
+        private void WriteColored(string text, int red, int green, int blue)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            writer.SetForegroundTextColor(red, green, blue);
+            writer.Write(text);
+            writer.ResetFormatting();
         }
 
         private void WriteColoredLine(string text, ConsoleColor color)

@@ -16,7 +16,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
     public class WpfConsoleTextRenderService : IWpfRenderService
     {
         private static readonly int NewLineLenght = Environment.NewLine.Length;
-        private readonly Regex coloringRegex = new Regex(@"\u001b\[(?<code>\d*(;\d+)?)m", RegexOptions.Compiled);
+        private readonly Regex coloringRegex = new Regex(@"\u001b\[(?<code>\d*(;\d+)*)m", RegexOptions.Compiled);
 
         private delegate void RenderMethod(string text);
 
@@ -320,7 +320,11 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                     break;
 
                 case "31;1":
-                    foregroundBrush = Brushes.DarkSalmon;
+                    foregroundBrush = Brushes.DarkSalmon;                  
+                    break;
+
+                case "38;2;255;160;122": // #FFA07A
+                    foregroundBrush = Brushes.LightSalmon;
                     break;
 
                 case "32":
@@ -336,7 +340,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                     break;
 
                 case "33;1":
-                    foregroundBrush = Brushes.LightYellow;
+                    foregroundBrush = Brushes.LightGoldenrodYellow;
                     break;
 
                 case "34":

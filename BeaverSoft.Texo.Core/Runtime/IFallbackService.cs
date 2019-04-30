@@ -9,6 +9,6 @@ namespace BeaverSoft.Texo.Core.Runtime
     {
         Task<ICommandResult> FallbackAsync(Input.Input input);
 
-        Task<IEnumerable<string>> ProcessCommandQuetlyAsync(string input);
+        Task<IEnumerable<string>> ProcessIndependentCommandAsync(string input);
     }
 }

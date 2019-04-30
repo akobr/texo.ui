@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Management.Automation;
-using System.Management.Automation.Runspaces;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.Runtime;
-using BeaverSoft.Texo.Core.Streaming.Text;
-using BeaverSoft.Texo.Core.Transforming;
 using BeaverSoft.Texo.Core.View;
-using BeaverSoft.Texo.Fallback.PowerShell.Git;
 using StrongBeaver.Core.Messaging;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
@@ -32,6 +27,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         private readonly TexoPowerShellHost host;
 
         private System.Management.Automation.PowerShell shell;
+        private System.Management.Automation.PowerShell independentShell;
 
         public PowerShellFallbackService(
             IPromptableViewService view,
@@ -54,7 +50,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
             if (shell != null)
             {
-                return Task.FromResult<ICommandResult>(new ErrorTextResult("A command already in progress."));
+                return Task.FromResult<ICommandResult>(new ErrorTextResult("A command is already in progress."));
             }
 
             BuildShell();
@@ -88,8 +84,13 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 else if (string.Equals(input.ParsedInput.Tokens[0], "dotnet", StringComparison.OrdinalIgnoreCase)
                          && input.ParsedInput.Tokens.Count > 1)
                 {
-                    // TODO: [P2] this must be more sofisticated
-                    commandText += " /clp:ForceConsoleColor";
+                    HashSet<string> commands = new HashSet<string>(new[] { "clean", "restore", "build", "msbuild", "build-server", "run", "test", "vstest", "pack", "publish" }, StringComparer.OrdinalIgnoreCase);
+
+                    if (commands.Contains(input.ParsedInput.Tokens[1]))
+                    {
+                        // TODO: [P2] this must be more sofisticated
+                        commandText += " /clp:ForceConsoleColor";
+                    }
                 }
 
                 _ = RunScriptToOutputAsync(commandText);
@@ -105,18 +106,18 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             }
         }
 
-        public async Task<IEnumerable<string>> ProcessCommandQuetlyAsync(string input)
+        public async Task<IEnumerable<string>> ProcessIndependentCommandAsync(string input)
         {
-            if (shell != null || string.IsNullOrWhiteSpace(input))
+            if (independentShell != null || string.IsNullOrWhiteSpace(input))
             {
                 return Enumerable.Empty<string>();
             }
 
-            BuildShell();
+            BuildIndependentShell();
 
             try
             {
-                return (await RunCommandQuetlyAsync(input)).Select(obj => obj.BaseObject.ToString());
+                return (await RunIndependentCommandAsync(input)).Select(obj => obj.BaseObject.ToString());
             }
             catch (Exception e)
             {
@@ -125,7 +126,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             }
             finally
             {
-                ReleaseShell();
+                ReleaseIndependentShell();
             }
         }
 
@@ -193,14 +194,14 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             shell.Invoke();
         }
 
-        private Task<IEnumerable<PSObject>> RunCommandQuetlyAsync(string input)
+        private Task<IEnumerable<PSObject>> RunIndependentCommandAsync(string input)
         {
-            shell.Runspace = host.Runspace;
-            shell.AddScript(input);
+            independentShell.Runspace = host.GetIndependentRunspace();
+            independentShell.AddScript(input);
 
-            return Task.Factory.FromAsync<IEnumerable<PSObject>>(shell.BeginInvoke(), (result) =>
+            return Task.Factory.FromAsync<IEnumerable<PSObject>>(independentShell.BeginInvoke(), (result) =>
             {
-                return shell.EndInvoke(result);
+                return independentShell.EndInvoke(result);
             });
         }
 
@@ -220,6 +221,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             return Task.Factory.FromAsync(shell.BeginInvoke(), (result) => 
             {
                 //var output = shell.EndInvoke(result);
+                resultBuilder.Finish();
                 resultBuilder.Stream.NotifyAboutCompletion();
 
                 shell.Streams.Error.DataAdded -= Error_DataAdded;
@@ -227,8 +229,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 shell.Streams.Verbose.DataAdded -= Verbose_DataAdded;
                 shell.Streams.Debug.DataAdded -= Debug_DataAdded;
                 shell.Streams.Information.DataAdded -= Information_DataAdded;
-
-                resultBuilder.Finish();
                 ReleaseShell();
             });
         }
@@ -292,12 +292,29 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             }
         }
 
+        private void BuildIndependentShell()
+        {
+            lock (executionLock)
+            {
+                independentShell = System.Management.Automation.PowerShell.Create();
+            }
+        }
+
         private void ReleaseShell()
         {
             lock (executionLock)
             {
                 shell?.Dispose();
                 shell = null;
+            }
+        }
+
+        private void ReleaseIndependentShell()
+        {
+            lock (executionLock)
+            {
+                independentShell?.Dispose();
+                independentShell = null;
             }
         }
     }
