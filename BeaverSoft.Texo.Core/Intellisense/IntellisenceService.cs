@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -9,11 +9,12 @@ using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Input.InputTree;
 using BeaverSoft.Texo.Core.Path;
+using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Messaging;
 using StrongBeaver.Core.Services;
 
-namespace BeaverSoft.Texo.Core.Runtime
+namespace BeaverSoft.Texo.Core.Intellisense
 {
     public class IntellisenceService : IIntellisenceService, IMessageBusService<IInputTreeUpdatedMessage>
     {
@@ -61,7 +62,8 @@ namespace BeaverSoft.Texo.Core.Runtime
             {
                 resultBuilder.AddRange(BuildCommandList(lastToken.Input));
             }
-            else if (input.ParsedInput.Tokens.Count > 0)
+
+            if (input.ParsedInput.Tokens.Count > 0)
             {
                 if (string.Equals(input.ParsedInput.Tokens[0], "dotnet", StringComparison.OrdinalIgnoreCase))
                 {
