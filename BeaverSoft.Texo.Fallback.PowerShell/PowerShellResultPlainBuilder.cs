@@ -16,7 +16,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             return Item.Plain(builder.ToString());
         }
 
-        public void SetRequireCustomErrorOutput()
+        public void SetRequireCustomOutput()
         {
             // no operation
         }

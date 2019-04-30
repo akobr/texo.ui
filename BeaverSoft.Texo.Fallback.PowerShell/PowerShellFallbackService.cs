@@ -65,7 +65,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 {
                     commandText = "git -c color.ui=always -c color.status=always -c color.branch=always -c color.diff=always -c color.interactive=always ";
                     commandText += string.Join(" ", input.ParsedInput.Tokens.Skip(1));
-                    resultBuilder.SetRequireCustomErrorOutput();
+                    resultBuilder.SetRequireCustomOutput();
 
                     if (input.ParsedInput.Tokens.Count > 1)
                     {

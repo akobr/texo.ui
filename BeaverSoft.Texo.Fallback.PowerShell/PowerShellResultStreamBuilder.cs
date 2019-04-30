@@ -3,15 +3,20 @@ using BeaverSoft.Texo.Core.View;
 using System;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
     class PowerShellResultStreamBuilder : IPowerShellResultBuilder
     {
+        private static Regex progressRegex = new Regex(@"\s\d{1,3}%\s", RegexOptions.Compiled);
+
         private ReportableStream stream;
         private bool containError;
-        private bool customErrorOutput;
+        private bool customOutput;
+        private bool inUpdateMode;
         private FormattableStreamWriter writer;
+
 
         public bool ContainError => containError;
 
@@ -19,7 +24,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public bool Start()
         {
-            customErrorOutput = false;
+            customOutput = false;
             containError = false;
 
             stream = new ReportableStream();
@@ -39,9 +44,9 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             return Item.Empty;
         }
 
-        public void SetRequireCustomErrorOutput()
+        public void SetRequireCustomOutput()
         {
-            customErrorOutput = true;
+            customOutput = true;
         }
 
         public void Write(string text)
@@ -76,7 +81,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             containError = true;
 
-            if (customErrorOutput)
+            if (customOutput)
             {
                 if (text.Contains('\r') || text.Contains('\n'))
                 {
@@ -98,7 +103,29 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public void WriteLine(string text)
         {
-            writer.WriteLine(text);
+            if (customOutput)
+            {
+                if (progressRegex.IsMatch(text))
+                {
+                    inUpdateMode = true;
+                    writer.Write('\r' + text);
+                }
+                else
+                {
+                    if (inUpdateMode)
+                    {
+                        writer.WriteLine();
+                    }
+
+                    inUpdateMode = false;
+                    writer.WriteLine(text);
+                }
+            }
+            else
+            {
+                writer.WriteLine(text);
+            }
+
             writer.Flush();
         }
 

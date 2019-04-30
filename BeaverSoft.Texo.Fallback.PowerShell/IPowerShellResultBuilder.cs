@@ -9,7 +9,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         bool Start();
 
-        void SetRequireCustomErrorOutput();
+        void SetRequireCustomOutput();
 
         void Write(string text);
 

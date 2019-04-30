@@ -97,7 +97,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         public override void NotifyBeginApplication()
         {
             applications.Push(Guid.NewGuid());
-            resultBuilder.SetRequireCustomErrorOutput();
+            resultBuilder.SetRequireCustomOutput();
         }
 
         public override void NotifyEndApplication()

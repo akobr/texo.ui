@@ -19,7 +19,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
             return result;
         }
 
-        public void SetRequireCustomErrorOutput()
+        public void SetRequireCustomOutput()
         {
             // no operation
         }
