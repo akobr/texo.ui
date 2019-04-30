@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Actions;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Result;
@@ -9,7 +9,7 @@ using System.Collections.Immutable;
 
 namespace Commands.Calc
 {
-    public class CalcCommand : ICommand, ISimpleIntellisenceSource
+    public class CalcCommand : ICommand, ISimpleIntellisenseSource
     {
         private readonly CalcEngine.CalcEngine engine;
 

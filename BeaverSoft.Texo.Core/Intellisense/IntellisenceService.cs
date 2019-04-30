@@ -16,25 +16,25 @@ using StrongBeaver.Core.Services;
 
 namespace BeaverSoft.Texo.Core.Intellisense
 {
-    public class IntellisenceService : IIntellisenceService, IMessageBusService<IInputTreeUpdatedMessage>
+    public class IntellisenseService : IIntellisenseService, IMessageBusService<IInputTreeUpdatedMessage>
     {
         private const int MAXIMUM_INPUT_SIZE = 512;
         private const int MAXIMUM_ITEMS_PER_TYPE = 20;
 
         private readonly ICommandManagementService commandManagement;
         private readonly IFallbackService fallback;
-        private readonly IPathIntellisenceService pathIntellisence;
-        private readonly IVariableIntellisenceService variableIntellisence;
+        private readonly IPathIntellisenseService pathIntellisense;
+        private readonly IVariableIntellisenseService variableIntellisense;
 
         private TextumConfiguration configuration;
         private InputTree tree;
 
-        public IntellisenceService(IEnvironmentService environment, ICommandManagementService commandManagement, IFallbackService fallback)
+        public IntellisenseService(IEnvironmentService environment, ICommandManagementService commandManagement, IFallbackService fallback)
         {
             this.commandManagement = commandManagement;
             this.fallback = fallback;
-            pathIntellisence = new PathIntellisenceService();
-            variableIntellisence = new VariableIntellisenceService(environment);
+            pathIntellisense = new PathIntellisenseService();
+            variableIntellisense = new VariableIntellisenseService(environment);
         }
 
         public async Task<IImmutableList<IItem>> HelpAsync(Input.Input input, int cursorPosition)
@@ -78,8 +78,8 @@ namespace BeaverSoft.Texo.Core.Intellisense
 
             if (input.Tokens.Count > 0)
             {
-                resultBuilder.AddRange(variableIntellisence.Help(activeInput).Take(MAXIMUM_ITEMS_PER_TYPE));
-                resultBuilder.AddRange(pathIntellisence.Help(activeInput).Take(MAXIMUM_ITEMS_PER_TYPE));
+                resultBuilder.AddRange(variableIntellisense.Help(activeInput).Take(MAXIMUM_ITEMS_PER_TYPE));
+                resultBuilder.AddRange(pathIntellisense.Help(activeInput).Take(MAXIMUM_ITEMS_PER_TYPE));
             }
 
             return resultBuilder.ToImmutable();
@@ -99,7 +99,7 @@ namespace BeaverSoft.Texo.Core.Intellisense
                     continue;
                 }
 
-                yield return Item.Intellisence(query.GetMainRepresentation(), "command", query.Documentation.Description);
+                yield return Item.Intellisense(query.GetMainRepresentation(), "command", query.Documentation.Description);
             }
         }
 
@@ -120,13 +120,13 @@ namespace BeaverSoft.Texo.Core.Intellisense
 
             foreach (Query subQuery in query.Query.Queries.OrderBy(q => q.Key))
             {
-                yield return Item.Intellisence(subQuery.GetMainRepresentation(), "query", subQuery.Documentation.Description);
+                yield return Item.Intellisense(subQuery.GetMainRepresentation(), "query", subQuery.Documentation.Description);
             }
 
             foreach (Option subOption in query.Query.Options.OrderBy(o => o.Key))
             {
                 string representation = subOption.GetMainRepresentation();
-                yield return Item.Intellisence($"--{representation}", "option", subOption.Documentation.Description);
+                yield return Item.Intellisense($"--{representation}", "option", subOption.Documentation.Description);
             }
 
             if (!commandManagement.HasCommand(input.Context.Key))
@@ -136,9 +136,9 @@ namespace BeaverSoft.Texo.Core.Intellisense
 
             ICommand command = commandManagement.BuildCommand(input.Context.Key);
 
-            if (command is ISimpleIntellisenceSource intellisenceSource)
+            if (command is ISimpleIntellisenseSource intellisenseSource)
             {
-                foreach (IItem item in intellisenceSource.GetHelp(activeInput).Take(MAXIMUM_ITEMS_PER_TYPE))
+                foreach (IItem item in intellisenseSource.GetHelp(activeInput).Take(MAXIMUM_ITEMS_PER_TYPE))
                 {
                     yield return item;
                 }
@@ -162,7 +162,7 @@ namespace BeaverSoft.Texo.Core.Intellisense
                 return Enumerable.Empty<IItem>();
             }
 
-            return items.Select(item => Item.Intellisence(item, item.StartsWith("-") ? "option" : "query", null));
+            return items.Select(item => Item.Intellisense(item, item.StartsWith("-") ? "option" : "query", null));
         }
 
         void IMessageBusRecipient<IInputTreeUpdatedMessage>.ProcessMessage(IInputTreeUpdatedMessage message)

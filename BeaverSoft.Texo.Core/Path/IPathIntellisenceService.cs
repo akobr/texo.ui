@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BeaverSoft.Texo.Core.Path
 {
-    public interface IPathIntellisenceService
+    public interface IPathIntellisenseService
     {
         IEnumerable<IItem> Help(string currentPath);
     }

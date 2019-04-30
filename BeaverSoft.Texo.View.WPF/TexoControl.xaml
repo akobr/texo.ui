@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="BeaverSoft.Texo.View.WPF.TexoControl"
+<UserControl x:Class="BeaverSoft.Texo.View.WPF.TexoControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -130,10 +130,10 @@
             </FlowDocument>
         </FlowDocumentScrollViewer>
 
-        <!-- INTELLISENCE -->
-        <ListBox x:Name="listIntellisence" Grid.Row="3" BorderBrush="Transparent" BorderThickness="0"
+        <!-- INTELLISENSE -->
+        <ListBox x:Name="listIntellisense" Grid.Row="3" BorderBrush="Transparent" BorderThickness="0"
                   Foreground="{DynamicResource SystemBaseHighColorBrush}" Focusable="False" IsTabStop="False"
-                  PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenceMouseDoubleClick"
+                  PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenseMouseDoubleClick"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
 
             <ListBox.Background>
@@ -149,7 +149,7 @@
             <ListBoxItem>
                 <StackPanel>
                     <TextBlock Text="--example (option)" FontWeight="Bold" Margin="4" />
-                    <TextBlock Text="An example of intellisence item preview." Margin="4"  />
+                    <TextBlock Text="An example of intellisense item preview." Margin="4"  />
                 </StackPanel>
             </ListBoxItem>
         </ListBox>

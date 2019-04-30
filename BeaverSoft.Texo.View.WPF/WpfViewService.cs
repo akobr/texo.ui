@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -167,16 +167,16 @@ namespace BeaverSoft.Texo.View.WPF
             element.BringIntoView();
         }
 
-        public void RenderIntellisence(Input input, IImmutableList<IItem> items)
+        public void RenderIntellisense(Input input, IImmutableList<IItem> items)
         {
             if (!control.Dispatcher.CheckAccess())
             {
-                control.Dispatcher.Invoke(() => RenderIntellisence(input, items));
+                control.Dispatcher.Invoke(() => RenderIntellisense(input, items));
                 return;
             }
 
-            control.IntellisenceList.Visibility = Visibility.Collapsed;
-            control.IntellisenceList.Items.Clear();
+            control.IntellisenseList.Visibility = Visibility.Collapsed;
+            control.IntellisenseList.Items.Clear();
 
             if (items == null || items.Count < 1)
             {
@@ -200,10 +200,10 @@ namespace BeaverSoft.Texo.View.WPF
                 box.SetResourceReference(Control.ForegroundProperty, "SystemBaseHighColorBrush");
                 box.Document = new FlowDocument();
                 box.Document.Blocks.AddRange(itemSection.Blocks.ToList());
-                control.IntellisenceList.Items.Add(new ListBoxItem() { Content = box, Tag = item });
+                control.IntellisenseList.Items.Add(new ListBoxItem() { Content = box, Tag = item });
             }
 
-            control.IntellisenceList.Visibility = Visibility.Visible;
+            control.IntellisenseList.Visibility = Visibility.Visible;
         }
 
         public void RenderProgress(IProgress progress)
@@ -263,7 +263,7 @@ namespace BeaverSoft.Texo.View.WPF
             control.InputChanged += TexoInputChanged;
             control.InputFinished += TexoInputFinished;
             control.KeyScrolled += TexoCommandHistoryScrolled;
-            control.IntellisenceItemExecuted += TexoIntellisenceItemExecuted;
+            control.IntellisenseItemExecuted += TexoIntellisenseItemExecuted;
 
             CommandBinding linkCommandBinding = new CommandBinding(Commands.Hyperlink, OnLinkExecuted, OnLinkCanExecute);
             control.CommandBindings.Add(linkCommandBinding);
@@ -273,11 +273,11 @@ namespace BeaverSoft.Texo.View.WPF
             BuildInitialFlowDocument();
         }
 
-        private void TexoIntellisenceItemExecuted(object sender, EventArgs e)
+        private void TexoIntellisenseItemExecuted(object sender, EventArgs e)
         {
-            ListBoxItem viewItem = (ListBoxItem)control.IntellisenceList.SelectedItem;
+            ListBoxItem viewItem = (ListBoxItem)control.IntellisenseList.SelectedItem;
             IItem item = (IItem)viewItem.Tag;
-            control.CloseIntellisence();
+            control.CloseIntellisense();
 
             if (item.Actions.Count < 1)
             {
@@ -380,7 +380,7 @@ namespace BeaverSoft.Texo.View.WPF
 
         private async void TexoInputFinished(object sender, string input)
         {
-            control.CloseIntellisence();
+            control.CloseIntellisense();
             control.DisableInput();
             lastWorkingDirectory = workingDirectory;
             historyItem = null;

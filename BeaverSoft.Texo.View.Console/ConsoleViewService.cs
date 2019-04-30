@@ -72,7 +72,7 @@ namespace BeaverSoft.Texo.View.Console
             }
         }
 
-        public void RenderIntellisence(Input input, IImmutableList<IItem> items)
+        public void RenderIntellisense(Input input, IImmutableList<IItem> items)
         {
             // TODO
         }

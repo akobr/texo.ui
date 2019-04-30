@@ -22,7 +22,7 @@ namespace BeaverSoft.Texo.Core.View
 
         void Render(Input.Input input, IImmutableList<IItem> items);
 
-        void RenderIntellisence(Input.Input input, IImmutableList<IItem> items);
+        void RenderIntellisense(Input.Input input, IImmutableList<IItem> items);
 
         void RenderProgress(IProgress progress);
 

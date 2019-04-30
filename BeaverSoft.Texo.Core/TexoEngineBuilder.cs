@@ -34,7 +34,7 @@ namespace BeaverSoft.Texo.Core
         private ICommandManagementService commandManagement;
 
         private IFallbackService fallback;
-        private IIntellisenceService intellisence;
+        private IIntellisenseService intellisense;
         private IDidYouMeanService didYouMean;
         private IResultProcessingService resultProcessing;
         private IViewService usedView;
@@ -110,9 +110,9 @@ namespace BeaverSoft.Texo.Core
             return this;
         }
 
-        public TexoEngineBuilder WithIntellisenceService(IIntellisenceService service)
+        public TexoEngineBuilder WithIntellisenseService(IIntellisenseService service)
         {
-            intellisence = service;
+            intellisense = service;
             return this;
         }
 
@@ -142,7 +142,7 @@ namespace BeaverSoft.Texo.Core
                 History = () => history,
                 CommandManagement = () => commandManagement,
                 ResultProcessing = () => resultProcessing,
-                Intellisence = () => intellisence,
+                Intellisense = () => intellisense,
                 DidYouMean = () => didYouMean,
                 Fallback = () => fallback,
                 View = () => usedView,
@@ -161,7 +161,7 @@ namespace BeaverSoft.Texo.Core
             runtime = new RuntimeCoordinatorService(
                 environment, evaluator, commandManagement,
                 resultProcessing, usedView, actionManagement,
-                history, intellisence, didYouMean, fallback, logger);
+                history, intellisense, didYouMean, fallback, logger);
             InitialiseActions();
             return new TexoEngine(runtime, usedView, actions, setting);
         }
@@ -183,7 +183,7 @@ namespace BeaverSoft.Texo.Core
             commandManagement = commandManagement ?? new SingletonCommandManagementService(commandFactory);
             resultProcessing = resultProcessing ?? new ResultProcessingService(logger);
             actionManagement = actionManagement ?? new ActionManagementService(actions, logger);
-            intellisence = intellisence ?? CreateIntellisenceService();
+            intellisense = intellisense ?? CreateIntellisenseService();
             // didYouMean
         }
 
@@ -206,9 +206,9 @@ namespace BeaverSoft.Texo.Core
             return service;
         }
 
-        private IntellisenceService CreateIntellisenceService()
+        private IntellisenseService CreateIntellisenseService()
         {
-            var service = new IntellisenceService(environment, commandManagement, fallback);
+            var service = new IntellisenseService(environment, commandManagement, fallback);
             registerToMessageBus.Register<IInputTreeUpdatedMessage>(service);
             return service;
         }

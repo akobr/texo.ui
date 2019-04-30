@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
@@ -19,7 +19,7 @@ namespace BeaverSoft.Texo.Core.Runtime
         private readonly IInputEvaluationService evaluator;
         private readonly ICommandManagementService commandManagement;
         private readonly IDidYouMeanService didYouMean;
-        private readonly IIntellisenceService intelisence;
+        private readonly IIntellisenseService intellisense;
         private readonly IResultProcessingService resultProcessing;
         private readonly IViewService view;
         private readonly IActionManagementService actionManagement;
@@ -35,7 +35,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             IViewService view,
             IActionManagementService actionManagement,
             IInputHistoryService history,
-            IIntellisenceService intelisence,
+            IIntellisenseService intellisense,
             IDidYouMeanService didYouMean,
             IFallbackService fallback,
             ILogService logger)
@@ -49,7 +49,7 @@ namespace BeaverSoft.Texo.Core.Runtime
 
             this.logger = logger;
             this.history = history;
-            this.intelisence = intelisence;
+            this.intellisense = intellisense;
             this.didYouMean = didYouMean;
             this.fallback = fallback;
         }
@@ -71,12 +71,12 @@ namespace BeaverSoft.Texo.Core.Runtime
         {
             Input.Input inputModel = evaluator.Evaluate(input);
             
-            if (intelisence == null)
+            if (intellisense == null)
             {
                 return inputModel;
             }
 
-            intelisence
+            intellisense
                 .HelpAsync(inputModel, cursorPosition)
                 .ContinueWith((task) =>
                     {
@@ -88,7 +88,7 @@ namespace BeaverSoft.Texo.Core.Runtime
 
                         if (task.Result != null)
                         {
-                            view.RenderIntellisence(inputModel, task.Result);
+                            view.RenderIntellisense(inputModel, task.Result);
                         }
                     });
 

@@ -1,9 +1,9 @@
-﻿using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Core.View;
 using System.Collections.Generic;
 
 namespace BeaverSoft.Texo.Core.Commands
 {
-    public interface ISimpleIntellisenceSource
+    public interface ISimpleIntellisenseSource
     {
         IEnumerable<IItem> GetHelp(string input);
     }

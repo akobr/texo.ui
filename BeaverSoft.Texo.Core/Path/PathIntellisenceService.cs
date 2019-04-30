@@ -1,11 +1,11 @@
-﻿using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Core.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace BeaverSoft.Texo.Core.Path
 {
-    public class PathIntellisenceService : IPathIntellisenceService
+    public class PathIntellisenseService : IPathIntellisenseService
     {
         public IEnumerable<IItem> Help(string currentPath)
         {
@@ -67,7 +67,7 @@ namespace BeaverSoft.Texo.Core.Path
                     continue;
                 }
 
-                yield return Item.Intellisence(justName, directoryName + System.IO.Path.DirectorySeparatorChar, "directory", directoryName.GetFullConsolidatedPath());
+                yield return Item.Intellisense(justName, directoryName + System.IO.Path.DirectorySeparatorChar, "directory", directoryName.GetFullConsolidatedPath());
             }
 
             foreach (string fileName in TexoDirectory.GetFiles(directory, filter))
@@ -79,7 +79,7 @@ namespace BeaverSoft.Texo.Core.Path
                     continue;
                 }
 
-                yield return Item.Intellisence(justName, fileName, "file", fileName.GetFullConsolidatedPath());
+                yield return Item.Intellisense(justName, fileName, "file", fileName.GetFullConsolidatedPath());
             }
         }
     }

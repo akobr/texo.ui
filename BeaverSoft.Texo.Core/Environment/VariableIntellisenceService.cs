@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Environment
 {
-    public class VariableIntellisenceService : IVariableIntellisenceService
+    public class VariableIntellisenseService : IVariableIntellisenseService
     {
         private readonly IEnvironmentService environment;
 
-        public VariableIntellisenceService(IEnvironmentService environment)
+        public VariableIntellisenseService(IEnvironmentService environment)
         {
             this.environment = environment;
         }
@@ -27,7 +27,7 @@ namespace BeaverSoft.Texo.Core.Environment
                     continue;
                 }
 
-                yield return Item.Intellisence(variable.Key, $"${variable.Key}$", "variable", variable.Value ?? "[NULL]");
+                yield return Item.Intellisense(variable.Key, $"${variable.Key}$", "variable", variable.Value ?? "[NULL]");
             }
         }
     }

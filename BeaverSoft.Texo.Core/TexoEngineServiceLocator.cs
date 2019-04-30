@@ -35,7 +35,7 @@ namespace BeaverSoft.Texo.Core
 
         public Func<IResultProcessingService> ResultProcessing { get; set; }
 
-        public Func<IIntellisenceService> Intellisence { get; set; }
+        public Func<IIntellisenseService> Intellisense { get; set; }
 
         public Func<IDidYouMeanService> DidYouMean { get; set; }
 

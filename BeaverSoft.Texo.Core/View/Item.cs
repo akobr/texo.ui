@@ -79,12 +79,12 @@ namespace BeaverSoft.Texo.Core.View
             return new Item(text, TextFormatEnum.Xml);
         }
 
-        public static Item Intellisence(string item, string type, string description)
+        public static Item Intellisense(string item, string type, string description)
         {
-            return Intellisence(item, item, type, description);
+            return Intellisense(item, item, type, description);
         }
 
-        public static Item Intellisence(string item, string inputUpdate, string type, string description)
+        public static Item Intellisense(string item, string inputUpdate, string type, string description)
         {
             StringBuilder builder = new StringBuilder();
             builder.Append($"**{item}**");
