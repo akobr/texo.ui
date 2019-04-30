@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using BeaverSoft.Texo.Core.Services;
-using BeaverSoft.Texo.Core.Streaming.Text;
+using BeaverSoft.Texo.Core.Streaming;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.View.WPF.Rendering;
 

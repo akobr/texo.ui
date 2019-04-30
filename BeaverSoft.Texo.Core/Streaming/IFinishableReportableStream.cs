@@ -1,4 +1,4 @@
-﻿namespace BeaverSoft.Texo.Core.Streaming.Text
+﻿namespace BeaverSoft.Texo.Core.Streaming
 {
     public interface IFinishableReportableStream : IReportableStream
     { 

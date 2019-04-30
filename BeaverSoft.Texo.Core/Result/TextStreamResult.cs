@@ -1,5 +1,5 @@
 ﻿using BeaverSoft.Texo.Core.Commands;
-using BeaverSoft.Texo.Core.Streaming.Text;
+using BeaverSoft.Texo.Core.Streaming;
 
 namespace BeaverSoft.Texo.Core.Result
 {

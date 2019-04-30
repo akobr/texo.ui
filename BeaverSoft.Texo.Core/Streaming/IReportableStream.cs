@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace BeaverSoft.Texo.Core.Streaming.Text
+namespace BeaverSoft.Texo.Core.Streaming
 {
     public interface IReportableStream : IDisposable
     {

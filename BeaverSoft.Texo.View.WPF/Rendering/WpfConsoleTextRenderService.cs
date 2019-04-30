@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Streaming.Text;
+using BeaverSoft.Texo.Core.Streaming;
 using BeaverSoft.Texo.Core.View;
 using System;
 using System.Collections.Generic;

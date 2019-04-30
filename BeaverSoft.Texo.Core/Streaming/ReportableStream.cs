@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace BeaverSoft.Texo.Core.Streaming.Text
+namespace BeaverSoft.Texo.Core.Streaming
 {
     public class ReportableStream : IReportableStream, IFinishableReportableStream, IDisposable
     {

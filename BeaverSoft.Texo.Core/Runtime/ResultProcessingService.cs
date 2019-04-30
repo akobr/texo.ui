@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Result;
-using BeaverSoft.Texo.Core.Streaming.Text;
+using BeaverSoft.Texo.Core.Streaming;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services.Logging;
 

@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Windows.Documents;
-using BeaverSoft.Texo.Core.Streaming.Text;
+using BeaverSoft.Texo.Core.Streaming;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.View.WPF.Rendering

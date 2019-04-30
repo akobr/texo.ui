@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeaverSoft.Texo.Core.Streaming.Text
+namespace BeaverSoft.Texo.Core.Streaming
 {
     // TODO: [P3] Move formating constants to value object
     public class FormattableStreamWriter : StreamWriter

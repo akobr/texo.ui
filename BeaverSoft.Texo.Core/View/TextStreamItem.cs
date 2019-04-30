@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Streaming.Text;
+﻿using BeaverSoft.Texo.Core.Streaming;
 using System.Collections.Immutable;
 
 namespace BeaverSoft.Texo.Core.View
