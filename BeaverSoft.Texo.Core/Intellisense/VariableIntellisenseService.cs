@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
+using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.View;
 
-namespace BeaverSoft.Texo.Core.Environment
+namespace BeaverSoft.Texo.Core.Intellisense
 {
-    public class VariableIntellisenseService : IVariableIntellisenseService
+    public class VariableIntellisenseService : ITokenIntellisenseProvider
     {
         private readonly IEnvironmentService environment;
 
         public VariableIntellisenseService(IEnvironmentService environment)
         {
-            this.environment = environment;
+            this.environment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
 
         public IEnumerable<IItem> Help(string input)

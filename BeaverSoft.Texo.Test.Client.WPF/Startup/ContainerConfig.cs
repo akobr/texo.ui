@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Commands.FileManager;
+using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.FileManager.Stash;
 using BeaverSoft.Texo.Commands.NugetManager;
@@ -12,7 +12,6 @@ using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Fallback.PowerShell;
-using BeaverSoft.Texo.Fallback.PowerShell.Markdown;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
 using Commands.Calc;
@@ -84,6 +83,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             container.Register(engineServiceLocator.History);
             container.Register(engineServiceLocator.Environment);
             container.Register(engineServiceLocator.Setting);
+            container.Register(engineServiceLocator.Intellisense);
             container.Register<IFactory<IInputHistoryService>>(() => new DelegatedFactory<IInputHistoryService>(engineServiceLocator.History));
             container.Register(engineServiceLocator.ActionProvider);
             container.Register(engineServiceLocator.ActionRegister);

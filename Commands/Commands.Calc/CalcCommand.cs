@@ -1,15 +1,17 @@
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Intellisense;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Linq;
 
 namespace Commands.Calc
 {
-    public class CalcCommand : ICommand, ISimpleIntellisenseSource
+    public class CalcCommand : ICommand, ISynchronousIntellisenseProvider
     {
         private readonly CalcEngine.CalcEngine engine;
 
@@ -54,11 +56,13 @@ namespace Commands.Calc
             }
         }
 
-        public IEnumerable<IItem> GetHelp(string input)
+        public IEnumerable<IItem> GetHelp(Input input)
         {
+            string lastToken = input.ParsedInput.Tokens.Last();
+
             foreach (string functionName in engine.Functions.Keys)
             {
-                if (!functionName.StartsWith(input, StringComparison.OrdinalIgnoreCase))
+                if (!functionName.StartsWith(lastToken, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }

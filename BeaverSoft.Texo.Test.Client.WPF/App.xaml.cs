@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
@@ -46,6 +46,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF
 
             ServiceMessageBus = container.GetInstance<IServiceMessageBus>();
             container.RegisterWithMessageBus();
+            container.RegisterIntellisense();
         }
 
         protected override void OnExit(ExitEventArgs e)

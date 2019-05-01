@@ -8,6 +8,7 @@ using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Input;
 using BeaverSoft.Texo.Core.Input.History;
+using BeaverSoft.Texo.Core.Intellisense;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services.Logging;
 

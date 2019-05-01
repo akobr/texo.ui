@@ -95,6 +95,7 @@
     <Compile Include="Actions\PathOpenActionFactory.cs" />
     <Compile Include="Startup\CommandConfig.cs" />
     <Compile Include="Startup\ContainerConfig.cs" />
+    <Compile Include="Startup\IntellisenseConfig.cs" />
     <Compile Include="Startup\MessageBusConfig.cs" />
     <Compile Include="Startup\TexoEngineConfig.cs" />
     <Page Include="MainPage.xaml">
@@ -176,6 +177,10 @@
     <ProjectReference Include="..\Commands\Commands.CommandLine\Commands.CommandLine.csproj">
       <Project>{620b936c-b2a0-4b37-97da-11e32b858d7c}</Project>
       <Name>Commands.CommandLine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.Dotnet\Commands.Dotnet.csproj">
+      <Project>{6bde023d-a613-440f-b31d-b27c49b099d0}</Project>
+      <Name>Commands.Dotnet</Name>
     </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.FileManager\Commands.FileManager.csproj">
       <Project>{2afdfe71-d743-49df-9f47-61a94431cf00}</Project>

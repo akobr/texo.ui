@@ -1,11 +1,12 @@
+using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BeaverSoft.Texo.Core.Path
+namespace BeaverSoft.Texo.Core.Intellisense
 {
-    public class PathIntellisenseService : IPathIntellisenseService
+    public class PathIntellisenseProvider : ITokenIntellisenseProvider
     {
         public IEnumerable<IItem> Help(string currentPath)
         {

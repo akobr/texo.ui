@@ -208,7 +208,7 @@ namespace BeaverSoft.Texo.Core
 
         private IntellisenseService CreateIntellisenseService()
         {
-            var service = new IntellisenseService(environment, commandManagement, fallback);
+            var service = new IntellisenseService(environment, commandManagement);
             registerToMessageBus.Register<IInputTreeUpdatedMessage>(service);
             return service;
         }
