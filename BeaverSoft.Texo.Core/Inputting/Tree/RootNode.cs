@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BeaverSoft.Texo.Core.Inputting.InputTree
+namespace BeaverSoft.Texo.Core.Inputting.Tree
 {
     public abstract class ParameteriseNode : BaseNode
     {

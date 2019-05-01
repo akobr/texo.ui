@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 using BeaverSoft.Texo.Core.Environment;
 
-namespace BeaverSoft.Texo.Core.Inputting.InputTree
+namespace BeaverSoft.Texo.Core.Inputting.Tree
 {
     internal class AnalysedToken
     {

@@ -1,4 +1,5 @@
-﻿using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Texo.Core.Inputting.Tree;
 using StrongBeaver.Core.Services;
 
 namespace BeaverSoft.Texo.Core.Inputting
@@ -7,7 +8,7 @@ namespace BeaverSoft.Texo.Core.Inputting
     {
         public InputTreeUpdatedMessage(
             TextumConfiguration configuration,
-            InputTree.InputTree inputTree)
+            InputTree inputTree)
         {
             Configuration = configuration;
             InputTree = inputTree;
@@ -15,6 +16,6 @@ namespace BeaverSoft.Texo.Core.Inputting
 
         public TextumConfiguration Configuration { get; }
 
-        public InputTree.InputTree InputTree { get; }
+        public InputTree InputTree { get; }
     }
 }

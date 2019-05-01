@@ -1,6 +1,6 @@
 ﻿using BeaverSoft.Texo.Core.Configuration;
 
-namespace BeaverSoft.Texo.Core.Inputting.InputTree
+namespace BeaverSoft.Texo.Core.Inputting.Tree
 {
     public class OptionNode : ParameteriseNode
     {

@@ -1,5 +1,5 @@
 using BeaverSoft.Texo.Core;
-using BeaverSoft.Texo.Core.Inputting.InputTree;
+using BeaverSoft.Texo.Core.Inputting.Tree;
 using StrongBeaver.Core.Services.Logging;
 using Xunit;
 

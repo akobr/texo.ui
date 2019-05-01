@@ -4,9 +4,8 @@ using System.Linq;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Inputting;
-using BeaverSoft.Texo.Core.Inputting.InputTree;
+using BeaverSoft.Texo.Core.Inputting.Tree;
 using BeaverSoft.Texo.Core.View;
-using StrongBeaver.Core;
 
 namespace BeaverSoft.Texo.Core.Intellisense
 {

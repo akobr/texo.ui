@@ -5,7 +5,7 @@ using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 
-namespace BeaverSoft.Texo.Core.Inputting.InputTree
+namespace BeaverSoft.Texo.Core.Inputting.Tree
 {
     public class InputTreeEvaluationStrategy : IInputTreeEvaluationStrategy
     {

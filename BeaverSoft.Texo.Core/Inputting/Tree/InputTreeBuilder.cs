@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using BeaverSoft.Texo.Core.Configuration;
 using StrongBeaver.Core.Services.Logging;
 
-namespace BeaverSoft.Texo.Core.Inputting.InputTree
+namespace BeaverSoft.Texo.Core.Inputting.Tree
 {
     public class InputTreeBuilder : IInputTreeBuilder
     {

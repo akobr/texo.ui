@@ -1,6 +1,6 @@
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
-using BeaverSoft.Texo.Core.Inputting.InputTree;
+using BeaverSoft.Texo.Core.Inputting.Tree;
 using StrongBeaver.Core.Messaging;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
@@ -16,7 +16,7 @@ namespace BeaverSoft.Texo.Core.Inputting
         private readonly ILogService logger;
 
         private TextumConfiguration configuration;
-        private InputTree.InputTree tree;
+        private InputTree tree;
 
         public InputEvaluationService(
             IInputParseService parser,
@@ -63,7 +63,7 @@ namespace BeaverSoft.Texo.Core.Inputting
             }            
         }
 
-        private InputTree.InputTree BuildInputTree(TextumConfiguration fromConfiguration)
+        private InputTree BuildInputTree(TextumConfiguration fromConfiguration)
         {
             IInputTreeBuilder treeBuilder = new InputTreeBuilder(logger);
             return treeBuilder.Build(fromConfiguration.Runtime.Commands, fromConfiguration.Runtime.DefaultCommand);
