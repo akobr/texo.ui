@@ -1,7 +1,7 @@
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
-using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.Intellisense;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;

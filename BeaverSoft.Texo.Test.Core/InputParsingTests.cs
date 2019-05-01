@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Input;
+﻿using BeaverSoft.Texo.Core.Inputting;
 using Xunit;
 
 namespace BeaverSoft.Texo.Test.Core

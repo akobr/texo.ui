@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
-using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Messaging;
 using StrongBeaver.Core.Services;
@@ -41,7 +41,7 @@ namespace BeaverSoft.Texo.Core.Intellisense
             externalProviders[command ?? string.Empty] = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
-        public async Task<IImmutableList<IItem>> HelpAsync(Input.Input input, int cursorPosition)
+        public async Task<IImmutableList<IItem>> HelpAsync(Input input, int cursorPosition)
         {
             if (input?.ParsedInput == null
                 || input.ParsedInput.IsEmpty())

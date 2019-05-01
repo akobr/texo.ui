@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using BeaverSoft.Texo.Core.Inputting;
 
 namespace BeaverSoft.Texo.Core.Runtime
 {
     public interface IExecutor
     {
-        Input.Input PreProcess(string input, int cursorPosition);
+        Input PreProcess(string input, int cursorPosition);
 
         Task ProcessAsync(string input);
 

@@ -6,8 +6,8 @@ using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
-using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.Input.History;
+using BeaverSoft.Texo.Core.Inputting;
+using BeaverSoft.Texo.Core.Inputting.History;
 using BeaverSoft.Texo.Core.Intellisense;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services.Logging;
@@ -68,9 +68,9 @@ namespace BeaverSoft.Texo.Core.Runtime
             view.Start();
         }
 
-        public Input.Input PreProcess(string input, int cursorPosition)
+        public Input PreProcess(string input, int cursorPosition)
         {
-            Input.Input inputModel = evaluator.Evaluate(input);
+            Input inputModel = evaluator.Evaluate(input);
             
             if (intellisense == null)
             {
@@ -98,7 +98,7 @@ namespace BeaverSoft.Texo.Core.Runtime
 
         public async Task ProcessAsync(string input)
         {
-            Input.Input inputModel = evaluator.Evaluate(input);
+            Input inputModel = evaluator.Evaluate(input);
             history?.Enqueue(inputModel);
 
             if (!inputModel.Context.IsValid)
@@ -144,7 +144,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             commandManagement.Dispose();
         }
 
-        private Task ProcessContextAsync(Input.Input input, CommandContext context)
+        private Task ProcessContextAsync(Input input, CommandContext context)
         {
             ICommand command = commandManagement.BuildCommand(context.Key);
 
@@ -158,7 +158,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             }
         }
 
-        private async Task ProcessCommand(ICommand command, CommandContext context, Input.Input input)
+        private async Task ProcessCommand(ICommand command, CommandContext context, Input input)
         {
 #if !DEBUG
             try
@@ -174,13 +174,13 @@ namespace BeaverSoft.Texo.Core.Runtime
 #endif
         }
 
-        private async Task ProcessCommandAsTask(ICommand command, CommandContext context, Input.Input input)
+        private async Task ProcessCommandAsTask(ICommand command, CommandContext context, Input input)
         {
             ICommandResult result = await Task.Run(() => command.Execute(context)).ConfigureAwait(true);
             Render(input, result);
         }
 
-        private async Task ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input.Input input)
+        private async Task ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input input)
         {
 #if !DEBUG
             try
@@ -197,17 +197,17 @@ namespace BeaverSoft.Texo.Core.Runtime
 #endif
         }
 
-        private void Render(Input.Input input, ICommandResult result)
+        private void Render(Input input, ICommandResult result)
         {
             Render(input, resultProcessing.Transfort(result));
         }
 
-        private void Render(Input.Input input, IImmutableList<IItem> items)
+        private void Render(Input input, IImmutableList<IItem> items)
         {
             view.Render(input, items);
         }
 
-        private void RenderError(Input.Input input, string message)
+        private void RenderError(Input input, string message)
         {
             Render(input, ImmutableList<IItem>.Empty.Add(Item.Markdown($"> {message}")));
         }

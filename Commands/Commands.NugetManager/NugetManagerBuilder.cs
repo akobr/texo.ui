@@ -1,7 +1,7 @@
 ﻿using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
-using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Inputting;
 
 namespace BeaverSoft.Texo.Commands.NugetManager
 {

@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
+using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.Runtime;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Services;
@@ -20,9 +21,9 @@ namespace BeaverSoft.Texo.Core.View
 
         void AddInput(string append);
 
-        void Render(Input.Input input, IImmutableList<IItem> items);
+        void Render(Input input, IImmutableList<IItem> items);
 
-        void RenderIntellisense(Input.Input input, IImmutableList<IItem> items);
+        void RenderIntellisense(Input input, IImmutableList<IItem> items);
 
         void RenderProgress(IProgress progress);
 

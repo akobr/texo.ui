@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BeaverSoft.Texo.Core.Configuration;
-using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Intellisense
@@ -16,7 +16,7 @@ namespace BeaverSoft.Texo.Core.Intellisense
             this.configuration = configuration;
         }
 
-        public IEnumerable<IItem> GetHelp(Input.Input input)
+        public IEnumerable<IItem> GetHelp(Input input)
         {
             string token = input.ParsedInput.IsEmpty() ? string.Empty : input.ParsedInput.Tokens[0];
 

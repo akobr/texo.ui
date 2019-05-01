@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Input;
+﻿using BeaverSoft.Texo.Core.Inputting;
 
 namespace BeaverSoft.Texo.Core.Runtime
 {

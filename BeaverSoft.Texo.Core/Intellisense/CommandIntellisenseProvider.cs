@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Intellisense
@@ -17,7 +18,7 @@ namespace BeaverSoft.Texo.Core.Intellisense
             this.commandManagement = commandManagement ?? throw new ArgumentNullException(nameof(commandManagement));
         }
 
-        public async Task<IEnumerable<IItem>> GetHelpAsync(Input.Input input)
+        public async Task<IEnumerable<IItem>> GetHelpAsync(Input input)
         {
             IEnumerable<IItem> helpItems = Enumerable.Empty<IItem>();
             ICommand command = commandManagement.BuildCommand(input.Context.Key);

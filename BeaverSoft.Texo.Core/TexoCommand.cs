@@ -1,6 +1,6 @@
 ﻿using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
-using BeaverSoft.Texo.Core.Input.History;
+using BeaverSoft.Texo.Core.Inputting.History;
 using BeaverSoft.Texo.Core.Result;
 
 namespace BeaverSoft.Texo.Core

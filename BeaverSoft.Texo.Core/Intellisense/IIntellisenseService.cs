@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
+using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Intellisense
@@ -8,6 +9,6 @@ namespace BeaverSoft.Texo.Core.Intellisense
     {
         void RegisterExternalHelpProvider(string command, IIntellisenseProvider provider);
 
-        Task<IImmutableList<IItem>> HelpAsync(Input.Input input, int cursorPosition);
+        Task<IImmutableList<IItem>> HelpAsync(Input input, int cursorPosition);
     }
 }

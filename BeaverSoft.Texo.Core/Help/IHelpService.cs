@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Help
