@@ -68,7 +68,7 @@ namespace BeaverSoft.Texo.Core.Intellisense
                     continue;
                 }
 
-                yield return Item.Intellisense(justName, directoryName + System.IO.Path.DirectorySeparatorChar, "directory", directoryName.GetFullConsolidatedPath());
+                yield return Item.Intellisense(justName, directoryName + System.IO.Path.DirectorySeparatorChar, "directory", null);
             }
 
             foreach (string fileName in TexoDirectory.GetFiles(directory, filter))
@@ -80,7 +80,7 @@ namespace BeaverSoft.Texo.Core.Intellisense
                     continue;
                 }
 
-                yield return Item.Intellisense(justName, fileName, "file", fileName.GetFullConsolidatedPath());
+                yield return Item.Intellisense(justName, fileName, "file", null);
             }
         }
     }

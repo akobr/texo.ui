@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Streaming;
+using BeaverSoft.Texo.Core.Streaming;
 using BeaverSoft.Texo.Core.View;
 using System;
 using System.Linq;
@@ -26,6 +26,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             customOutput = false;
             containError = false;
+            inUpdateMode = false;
 
             stream = new ReportableStream();
             writer = new FormattableStreamWriter(stream.Stream, Encoding.UTF8, 1024, true);

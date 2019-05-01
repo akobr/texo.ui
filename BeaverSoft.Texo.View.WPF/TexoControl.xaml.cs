@@ -371,5 +371,22 @@ namespace BeaverSoft.Texo.View.WPF
 
             IntellisenseItemExecuted?.Invoke(this, new EventArgs());
         }
+
+        private void TbInput_GotFocus(object sender, RoutedEventArgs e)
+        {
+            bInput.BorderBrush = SystemParameters.WindowGlassBrush;
+            var brush = progress.BorderBrush;
+            progress.BorderBrush = progress.Foreground;
+            progress.Foreground = brush; 
+        }
+
+        private void TbInput_LostFocus(object sender, RoutedEventArgs e)
+        {
+            bInput.SetResourceReference(BorderBrushProperty, "SystemAltHighColorBrush");
+            var brush = progress.BorderBrush;
+            progress.BorderBrush = progress.Foreground;
+            progress.Foreground = brush;
+            CloseIntellisense();
+        }
     }
 }

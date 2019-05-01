@@ -76,7 +76,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -95,32 +94,29 @@
         </Grid>
 
         <!-- COMMAND LINE -->
-        <Border Grid.Row="1" BorderBrush="{DynamicResource SystemAltHighColorBrush}" BorderThickness="0,1,0,0" Margin="0,3,0,0" Padding="0,3">
+        <Border Name="bInput" Grid.Row="1" BorderBrush="{DynamicResource SystemAltHighColorBrush}" BorderThickness="0,1,0,0" Margin="0,3,0,0">
             <Border.Background>
                 <SolidColorBrush Color="{DynamicResource SystemAltHighColor}" Opacity="0.33" />
             </Border.Background>
-            <Grid
-                >
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Name="lbPrompt" Text="tu&gt;" FontFamily="Consolas" FontSize="16" VerticalAlignment="Center" FontWeight="Bold" Padding="5,0,5,2" />
-                <TextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16"  AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
-                         Foreground="{DynamicResource SystemBaseHighColorBrush}" CaretBrush="{DynamicResource SystemBaseHighColorBrush}" AcceptsTab="False"
-                         IsReadOnlyCaretVisible="True" TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" />
+                <TextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16"  AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,6,0,8"
+                         Foreground="{DynamicResource SystemBaseHighColorBrush}" CaretBrush="{DynamicResource SystemBaseHighColorBrush}" AcceptsTab="False" IsReadOnlyCaretVisible="True"
+                         GotFocus="TbInput_GotFocus" LostFocus="TbInput_LostFocus" TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" />
                 <!--<RichTextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
                              TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" SelectionChanged="HandleInputSelectionChanged" />-->
+                <ProgressBar Name="progress" Grid.ColumnSpan="2" Height="1" Minimum="0" Maximum="100" IsTabStop="False" VerticalAlignment="Bottom"
+                     Foreground="{x:Static SystemParameters.WindowGlassBrush}" BorderBrush="{DynamicResource SystemAltHighColorBrush}" />
             </Grid>
         </Border>
 
-        <!-- PROGRESS BARS -->
-        <ProgressBar Name="progress" Grid.Row="2" Height="1" Minimum="0" Maximum="100" IsTabStop="False"
-                     Foreground="{x:Static SystemParameters.WindowGlassBrush}" BorderBrush="{DynamicResource SystemAltHighColorBrush}" />
-
         <!-- OUTPUT -->
-        <FlowDocumentScrollViewer Name="docOutput" Grid.Row="3" IsTabStop="False"
+        <FlowDocumentScrollViewer Name="docOutput" Grid.Row="2" IsTabStop="False"
                                   MinZoom="50" VerticalScrollBarVisibility="Auto"
                                   PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseWheel="HandleScrollSpeed">
             <FlowDocument>
@@ -130,14 +126,23 @@
             </FlowDocument>
         </FlowDocumentScrollViewer>
 
+        <Border Grid.Row="2" Height="7" VerticalAlignment="Top">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="#C8000000" Offset="0.0" />
+                    <GradientStop Color="#00000000" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
         <!-- INTELLISENSE -->
-        <ListBox x:Name="listIntellisense" Grid.Row="3" BorderBrush="Transparent" BorderThickness="0"
-                  Foreground="{DynamicResource SystemBaseHighColorBrush}" Focusable="False" IsTabStop="False"
-                  PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenseMouseDoubleClick"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
+        <ListBox x:Name="listIntellisense" Grid.Row="2" BorderBrush="{x:Static SystemParameters.WindowGlassBrush}" BorderThickness="0,0,0,1"
+                 MaxHeight="265" VerticalAlignment="Top" Foreground="{DynamicResource SystemBaseHighColorBrush}" Focusable="False" IsTabStop="False"
+                 PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenseMouseDoubleClick"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
 
             <ListBox.Background>
-                <SolidColorBrush Color="{DynamicResource SystemAltHighColor}" Opacity="0.95" />
+                <SolidColorBrush Color="{DynamicResource SystemAltHighColor}" Opacity="0.93" />
             </ListBox.Background>
 
             <!--<ListView.ItemsPanel>
