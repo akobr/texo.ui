@@ -5,19 +5,62 @@ using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.Intellisense;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
+using CalcEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Commands.Calc
 {
     public class CalcCommand : ICommand, ISynchronousIntellisenseProvider
     {
+        private const string VARIABLE_RESULT = "result";
+        private const string FUNCTION_NUMBER = "DEV.NUMBER";
+        private const string FUNCTION_COLOR = "DEV.COLOR";
+
         private readonly CalcEngine.CalcEngine engine;
 
         public CalcCommand()
         {
             engine = new CalcEngine.CalcEngine();
+
+            engine.Variables[VARIABLE_RESULT] = 0;
+            engine.RegisterFunction(FUNCTION_NUMBER, 1, FunctionNumber);
+        }
+
+        private object FunctionNumber(List<Expression> parms)
+        {
+            StringBuilder result = new StringBuilder();
+
+            foreach (Expression para in parms)
+            {
+                string value = para.Evaluate().ToString();
+                string @decimal, hex, binary;
+                int number = 0;
+
+                if (Regex.IsMatch(value, "^(0|b|0b)[01]+$"))
+                {
+                    number = Convert.ToInt32(value, 2);
+                }
+                else if(Regex.IsMatch(value, "^(0|x|0x)[0-9A-Fa-f]+$"))
+                {
+                    number = Convert.ToInt32(value, 16);
+                }
+                else
+                {
+                    number = Convert.ToInt32(value);
+                }
+
+                @decimal = Convert.ToString(number, 10);
+                hex = Convert.ToString(number, 16);
+                binary = Convert.ToString(number, 2);
+
+                result.AppendLine($"\"{value}\"; dec:{@decimal}; hex:{hex}; bin:{binary};");
+            }
+
+            return result.ToString();
         }
 
         public static Query BuildConfiguration()
@@ -48,6 +91,7 @@ namespace Commands.Calc
             try
             {
                 object result = engine.Evaluate(expression);
+                engine.Variables[VARIABLE_RESULT] = result;
                 return new TextResult(result.ToString());
             }
             catch (Exception exception)
