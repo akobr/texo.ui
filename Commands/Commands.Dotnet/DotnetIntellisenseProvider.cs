@@ -44,7 +44,7 @@ namespace Commands.Dotnet
                 return Enumerable.Empty<IItem>();
             }
 
-            var newItems = commandResults.Select<string, IItem>(item => Item.Intellisense(item, item.StartsWith("-") ? "option" : "query", null));
+            var newItems = commandResults.Select<string, IItem>(item => Item.Intellisense(item, item.StartsWith("-") ? "option" : "command", null));
             cache.Set(dotnetInput, newItems);
             return newItems;
         }

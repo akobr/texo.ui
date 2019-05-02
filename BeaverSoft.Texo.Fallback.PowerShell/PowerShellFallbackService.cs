@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
@@ -108,9 +108,20 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public async Task<IEnumerable<string>> ProcessIndependentCommandAsync(string input)
         {
-            if (independentShell != null || string.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrWhiteSpace(input))
             {
                 return Enumerable.Empty<string>();
+            }
+
+            int maxCount = 10;
+            while (independentShell != null)
+            {
+                if (--maxCount < 0)
+                {
+                    return Enumerable.Empty<string>();
+                }
+
+                await Task.Delay(100);
             }
 
             BuildIndependentShell();

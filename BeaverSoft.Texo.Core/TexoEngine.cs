@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
@@ -38,14 +38,29 @@ namespace BeaverSoft.Texo.Core
             setting.Configure(configuration);
         }
 
+        public Task InitialiseAsync(TextumConfiguration configuration)
+        {
+            return Task.Run(() => Initialise(configuration));
+        }
+
         public void Initialise(params Query[] commands)
         {
             Initialise((IEnumerable<Query>)commands);
         }
 
+        public Task InitialiseAsync(params Query[] commands)
+        {
+            return Task.Run(() => Initialise(commands));
+        }
+
         public void Initialise(IEnumerable<Query> commands)
         {
             Initialise(TextumConfiguration.CreateDefault().AddCommands(commands));
+        }
+
+        public Task InitialiseAsync(IEnumerable<Query> commands)
+        {
+            return Task.Run(() => Initialise(commands));
         }
 
         public void Recorfigure(TextumConfiguration configuration)

@@ -1,4 +1,3 @@
-using BeaverSoft.Texo.Core.View;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -69,18 +68,34 @@ namespace BeaverSoft.Texo.View.WPF
         public string GetInput()
         {
             return tbInput.Text;
+
             //TextRange range = new TextRange(tbInput.Document.ContentStart, tbInput.Document.ContentEnd);
             //return range.Text.Trim();
         }
 
         public void EmptyInput()
         {
+            skipNextTextChange = true;
             tbInput.Text = string.Empty;
+            CloseIntellisense();
 
             //TextRange range = new TextRange(
             //    tbInput.Document.ContentStart,
             //    tbInput.Document.ContentEnd);
             //range.Text = string.Empty;
+        }
+
+        public void TryFinishInput()
+        {
+            string input = GetInput();
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return;
+            }
+
+            EmptyInput();
+            InputFinished?.Invoke(this, input);
         }
 
         public void SetInput(string input)
@@ -101,7 +116,7 @@ namespace BeaverSoft.Texo.View.WPF
 
         public void SetProgress(string progressName, int progressValue)
         {
-            if(!Dispatcher.CheckAccess())
+            if (!Dispatcher.CheckAccess())
             {
                 Dispatcher.Invoke(() => SetProgress(progressName, progressValue));
                 return;
@@ -145,11 +160,7 @@ namespace BeaverSoft.Texo.View.WPF
             }
 
             string input = GetInput();
-
-            if (!string.IsNullOrEmpty(input))
-            {
-                InputChanged?.Invoke(this, input);
-            }
+            InputChanged?.Invoke(this, input);
         }
 
         private void HandleInputKeyDown(object sender, KeyEventArgs e)
@@ -160,15 +171,7 @@ namespace BeaverSoft.Texo.View.WPF
             }
 
             e.Handled = true;
-            string input = GetInput();
-
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return;
-            }
-
-            tbInput.Text = string.Empty;
-            InputFinished?.Invoke(this, input);
+            TryFinishInput();
         }
 
         private void HandleInputKeyDownPreview(object sender, KeyEventArgs e)
@@ -276,15 +279,8 @@ namespace BeaverSoft.Texo.View.WPF
         {
             if (e.Key == Key.Enter)
             {
-                string input = GetInput();
-
-                if (string.IsNullOrWhiteSpace(input))
-                {
-                    return;
-                }
-
-                tbInput.Text = string.Empty;
-                InputFinished?.Invoke(this, input);
+                TryFinishInput();
+                return;
             }
 
             char character = KeyUtils.GetCharFromKey(e.Key);
@@ -335,7 +331,7 @@ namespace BeaverSoft.Texo.View.WPF
             }
             catch (Exception exception)
             {
-                // TODO: logging
+                // TODO: [P3] logging
             }
         }
 
@@ -364,29 +360,38 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void HandleIntellisenseMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (listIntellisense.SelectedItem == null)
+            
+        }
+
+        private void HandleInputGotFocus(object sender, RoutedEventArgs e)
+        {
+            bInput.BorderBrush = SystemParameters.WindowGlassBrush;
+            SwitchProgresForegroundAndBorderBrush();
+        }
+
+        private void HandleInputLostFocus(object sender, RoutedEventArgs e)
+        {
+            bInput.SetResourceReference(BorderBrushProperty, "SystemAltHighColorBrush");
+            SwitchProgresForegroundAndBorderBrush();
+            CloseIntellisense();
+        }
+
+        private void SwitchProgresForegroundAndBorderBrush()
+        {
+            var brush = progress.BorderBrush;
+            progress.BorderBrush = progress.Foreground;
+            progress.Foreground = brush;
+        }
+
+        private void ListIntellisense_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!(e.Source is ListBoxItem clickedItem))
             {
                 return;
             }
 
+            listIntellisense.SelectedItem = clickedItem;
             IntellisenseItemExecuted?.Invoke(this, new EventArgs());
-        }
-
-        private void TbInput_GotFocus(object sender, RoutedEventArgs e)
-        {
-            bInput.BorderBrush = SystemParameters.WindowGlassBrush;
-            var brush = progress.BorderBrush;
-            progress.BorderBrush = progress.Foreground;
-            progress.Foreground = brush; 
-        }
-
-        private void TbInput_LostFocus(object sender, RoutedEventArgs e)
-        {
-            bInput.SetResourceReference(BorderBrushProperty, "SystemAltHighColorBrush");
-            var brush = progress.BorderBrush;
-            progress.BorderBrush = progress.Foreground;
-            progress.Foreground = brush;
-            CloseIntellisense();
         }
     }
 }

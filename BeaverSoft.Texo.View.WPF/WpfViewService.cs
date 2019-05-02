@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,7 +25,7 @@ namespace BeaverSoft.Texo.View.WPF
 {
     public class WpfViewService : IViewService, IPromptableViewService, IInitialisable<TexoControl>
     {
-        private const string DEFAULT_PROMPT = "tu>";
+        private const string DEFAULT_PROMPT = "initialising>";
         private const string DEFAULT_TITLE = "Texo UI";
 
         private readonly IWpfRenderService renderer;
@@ -414,8 +415,14 @@ namespace BeaverSoft.Texo.View.WPF
             return Item.Markdown(headerBuilder.ToString());
         }
 
-        void IMessageBusRecipient<ISettingUpdatedMessage>.ProcessMessage(ISettingUpdatedMessage message)
+        public void ProcessMessage(ISettingUpdatedMessage message)
         {
+            if (control != null && !control.Dispatcher.CheckAccess())
+            {
+                control.Dispatcher.InvokeAsync(() => ProcessMessage(message));
+                return;
+            }
+
             showWorkingPathAsPrompt = message.Configuration.Ui.ShowWorkingPathAsPrompt;
             string currentDirectory = message.Configuration.Environment.Variables[VariableNames.CURRENT_DIRECTORY];
 
@@ -505,14 +512,16 @@ namespace BeaverSoft.Texo.View.WPF
             control.Title = currentTitle;
         }
 
+        [Conditional("DEBUG")]
         private void BuildInitialFlowDocument()
         {
+            // TODO: [P3] Write down info and version
             control.OutputDocument.Blocks.Add(new Paragraph(new Run(DEFAULT_TITLE))
             {
                 FontSize = 14
             });
 
-            control.OutputDocument.Blocks.Add(new Paragraph(new Run("Welcome in smart command line..."))
+            control.OutputDocument.Blocks.Add(new Paragraph(new Run("Markdown and text-based command line powered by PowerShell."))
             {
                 FontSize = 12,
                 FontStyle = FontStyles.Italic,

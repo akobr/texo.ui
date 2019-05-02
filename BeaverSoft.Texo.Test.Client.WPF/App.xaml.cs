@@ -21,7 +21,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF
 
         public static IServiceMessageBus ServiceMessageBus { get; private set; }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
@@ -40,13 +40,14 @@ namespace BeaverSoft.Texo.Test.Client.WPF
 
             engineBuilder.WithFallbackService(container.GetInstance<IFallbackService>());
             TexoEngine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
-            TexoEngine.InitialiseWithCommands();
             TexoEngine.RegisterAction(new PathOpenActionFactory(), ActionNames.PATH_OPEN, ActionNames.PATH);
-            TexoEngine.Start();
 
             ServiceMessageBus = container.GetInstance<IServiceMessageBus>();
             container.RegisterWithMessageBus();
             container.RegisterIntellisense();
+
+            await TexoEngine.InitialiseWithCommandsAsync();        
+            TexoEngine.Start();
         }
 
         protected override void OnExit(ExitEventArgs e)

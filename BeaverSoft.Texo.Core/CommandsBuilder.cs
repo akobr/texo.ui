@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
@@ -37,7 +37,7 @@ namespace BeaverSoft.Texo.Core
 
             command.Key = CommandKeys.CLEAR;
             command.Representations.AddRange(
-                new[] { CommandKeys.CLEAR, "cls", "Clear-Host", "gc" });
+                new[] { CommandKeys.CLEAR, "clean", "cls", "Clear-Host", "gc" });
             command.Documentation.Title = "Clear output widnow";
             command.Documentation.Description = "All previous outputs will be clear.";
 
