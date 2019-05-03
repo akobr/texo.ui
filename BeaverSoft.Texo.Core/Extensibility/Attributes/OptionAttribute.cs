@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 {
@@ -14,5 +14,7 @@ namespace BeaverSoft.Texo.Core.Extensibility.Attributes
         }
 
         public string OptionKey { get; }
+
+        public string Representations { get; set; }
     }
 }
