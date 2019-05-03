@@ -1,0 +1,4 @@
+OS Name	Microsoft Windows 10 Pro
+Version	10.0.17134 Build 17134
+
+ - git update in error output
