@@ -151,6 +151,19 @@ namespace BeaverSoft.Texo.View.WPF
             lbVariableCount.Text = $"Variables ({count})";
         }
 
+        public void CleanResults()
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.InvokeAsync(() => CleanResults());
+                return;
+            }
+
+            docOutput.Visibility = Visibility.Collapsed;
+            docOutput.Document.Blocks.Clear();
+            docOutput.Visibility = Visibility.Visible;
+        }
+
         private void HandleInputTextChanged(object sender, TextChangedEventArgs e)
         {
             if (skipNextTextChange)

@@ -479,13 +479,7 @@ namespace BeaverSoft.Texo.View.WPF
 
         void IMessageBusRecipient<IClearViewOutputMessage>.ProcessMessage(IClearViewOutputMessage message)
         {
-            if (!control.Dispatcher.CheckAccess())
-            {
-                control.Dispatcher.InvokeAsync(() => control.OutputDocument.Blocks.Clear());
-                return;
-            }
-
-            control.OutputDocument.Blocks.Clear();
+            control.CleanResults();
         }
 
         private void SetPrompt(string prompt)
