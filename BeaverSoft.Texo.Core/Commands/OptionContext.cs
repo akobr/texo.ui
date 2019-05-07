@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace BeaverSoft.Texo.Core.Commands
@@ -38,7 +38,7 @@ namespace BeaverSoft.Texo.Core.Commands
         public string GetParameterValue(string parameterKey)
         {
             if (parameters.Count < 1
-                || parameters.TryGetValue(parameterKey, out ParameterContext parameter))
+                || !parameters.TryGetValue(parameterKey, out ParameterContext parameter))
             {
                 return string.Empty;
             }

@@ -1,9 +1,9 @@
-﻿using System;
 using BeaverSoft.Texo.Core.Commands;
+using System;
 
 namespace BeaverSoft.Texo.Core.Extensibility
 {
-    public abstract class Command : ICommand
+    public class BuiltCommand : ICommand
     {
         public ICommandResult Execute(CommandContext context)
         {

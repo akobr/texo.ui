@@ -5,7 +5,7 @@ namespace BeaverSoft.Texo.Core.Extensibility.Attributes
     [AttributeUsage(
         AttributeTargets.Class | AttributeTargets.Method,
         Inherited = false,
-        AllowMultiple = false)]
+        AllowMultiple = true)]
     public class OptionAttribute : Attribute
     {
         public OptionAttribute(string optionKey)

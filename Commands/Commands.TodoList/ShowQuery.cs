@@ -4,6 +4,7 @@ using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
 using System;
+using System.Collections.Generic;
 
 namespace BeaverSoft.Texo.Commands.TodoList
 {
@@ -23,22 +24,27 @@ namespace BeaverSoft.Texo.Commands.TodoList
         public ICommandResult Execute(CommandContext context)
         {
             bool openOnly = context.HasOption("open-only");
+            return BuildMarkdownTaskListResult(service.GetList(), openOnly);
+        }
+
+        internal static ICommandResult BuildMarkdownTaskListResult(IEnumerable<TodoItem> items, bool openOnly = false)
+        {
             IMarkdownBuilder builder = new MarkdownBuilder();
 
-            foreach (TodoItem item in service.GetList())
+            foreach (TodoItem item in items)
             {
                 if (openOnly && item.IsFinished)
                 {
                     continue;
                 }
 
-                builder.Bullet($"{GetTaskPrefix(item)} {item.Text}");
+                builder.Bullet($"{GetMarkdownTaskPrefix(item)} {item.Text}");
             }
 
             return new ItemsResult(Item.Markdown(builder.ToString()));
         }
 
-        private string GetTaskPrefix(TodoItem item)
+        private static string GetMarkdownTaskPrefix(TodoItem item)
         {
             return item.IsFinished ? "[x]" : "[ ]";
         }
