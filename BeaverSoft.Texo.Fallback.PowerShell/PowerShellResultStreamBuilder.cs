@@ -1,5 +1,8 @@
 using BeaverSoft.Texo.Core.Streaming;
+using BeaverSoft.Texo.Core.Transforming;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell.Transforming;
+using StrongBeaver.Core.Services.Logging;
 using System;
 using System.Linq;
 using System.Text;
@@ -11,23 +14,42 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
     {
         private static Regex progressRegex = new Regex(@"\s\d{1,3}%\s", RegexOptions.Compiled);
 
-        private ReportableStream stream;
-        private bool containError;
-        private bool customOutput;
-        private bool inUpdateMode;
-        private FormattableStreamWriter writer;
+        private readonly ILogService logger;
+        private readonly IPipeline<OutputModel> pipelineOutput;
+        private readonly IPipeline<OutputModel> pipelineError;
 
+        private ReportableStream stream;
+        private FormattableStreamWriter writer;
+        private InputModel input;
+        private bool containError;
+
+        public PowerShellResultStreamBuilder(ILogService logger)
+        {
+            this.logger = logger;
+            pipelineOutput = new Pipeline<OutputModel>(logger);
+            pipelineError = new Pipeline<OutputModel>(logger);
+
+            InitialisePipeline();
+        }
+
+        private void InitialisePipeline()
+        {
+            pipelineOutput.AddPipe(new GitOutput());
+            pipelineOutput.AddPipe(new GitStatusOutput());
+            pipelineOutput.AddPipe(new GetChildItemOutput());
+
+            pipelineError.AddPipe(new GitError());
+        }
 
         public bool ContainError => containError;
 
         public ReportableStream Stream => stream;
 
-        public bool Start()
+        public bool Start(InputModel inputModel)
         {
-            customOutput = false;
+            input = inputModel;
             containError = false;
-            inUpdateMode = false;
-
+            
             stream = new ReportableStream();
             writer = new FormattableStreamWriter(stream.Stream, Encoding.UTF8, 1024, true);
             return true;
@@ -43,11 +65,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             writer.Dispose();
             writer = null;
             return Item.Empty;
-        }
-
-        public void SetRequireCustomOutput()
-        {
-            customOutput = true;
         }
 
         public void Write(string text)
@@ -78,53 +95,33 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             WriteColoredLine(text, ConsoleColor.Magenta);
         }
 
-        public void WriteErrorLine(string text)
+        public async void WriteErrorLine(string text)
         {
             containError = true;
+            OutputModel output = await pipelineError.ProcessAsync(new OutputModel(text, input));
 
-            if (customOutput)
+            // WriteColored(text, 255, 160, 122);
+            writer.SetForegroundTextColor(ConsoleColor.Red);
+            writer.Write(output.Output);
+            writer.ResetFormatting();
+            
+            if (!output.NoNewLine)
             {
-                if (text.Contains('\r') || text.Contains('\n'))
-                {
-                    WriteColored(text, 255, 160, 122);
-                    writer.Flush();
-                }
-                else
-                {
-                    WriteColored(text, 255, 160, 122);
-                    WriteLine();
-                    writer.Flush();
-                }
+                writer.WriteLine();
             }
-            else
-            {
-                WriteColoredLine(text, ConsoleColor.Red);
-            }
+
+            writer.Flush();
         }
 
-        public void WriteLine(string text)
+        public async void WriteLine(string text)
         {
-            if (customOutput)
-            {
-                if (progressRegex.IsMatch(text))
-                {
-                    inUpdateMode = true;
-                    writer.Write('\r' + text);
-                }
-                else
-                {
-                    if (inUpdateMode)
-                    {
-                        writer.WriteLine();
-                    }
+            OutputModel output = await pipelineOutput.ProcessAsync(new OutputModel(text, input));
 
-                    inUpdateMode = false;
-                    writer.WriteLine(text);
-                }
-            }
-            else
+            writer.Write(output.Output);
+
+            if (!output.NoNewLine)
             {
-                writer.WriteLine(text);
+                writer.WriteLine();
             }
 
             writer.Flush();

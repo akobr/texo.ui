@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -97,7 +97,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         public override void NotifyBeginApplication()
         {
             applications.Push(Guid.NewGuid());
-            resultBuilder.SetRequireCustomOutput();
         }
 
         public override void NotifyEndApplication()

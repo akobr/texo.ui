@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell.Transforming;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
@@ -7,9 +8,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
     {
         bool ContainError { get; }
 
-        bool Start();
-
-        void SetRequireCustomOutput();
+        bool Start(InputModel inputModel);
 
         void Write(string text);
 

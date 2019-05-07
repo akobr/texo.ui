@@ -8,7 +8,9 @@ using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.Runtime;
+using BeaverSoft.Texo.Core.Transforming;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell.Transforming;
 using StrongBeaver.Core.Messaging;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
@@ -21,10 +23,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
     {
         private readonly object executionLock = new object();
 
+        private readonly IPipeline<InputModel> inputPipeline;
         private readonly PowerShellResultStreamBuilder resultBuilder;
         private readonly IPromptableViewService view;
-        private readonly ILogService logger;
         private readonly TexoPowerShellHost host;
+        private readonly ILogService logger;
 
         private System.Management.Automation.PowerShell shell;
         private System.Management.Automation.PowerShell independentShell;
@@ -33,68 +36,45 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             IPromptableViewService view,
             ILogService logger)
         {
-            resultBuilder = new PowerShellResultStreamBuilder();
+            inputPipeline = new Pipeline<InputModel>(logger);
+            resultBuilder = new PowerShellResultStreamBuilder(logger);
+            host = new TexoPowerShellHost(resultBuilder, view, logger);
 
             this.view = view;
             this.logger = logger;
 
-            host = new TexoPowerShellHost(resultBuilder, view, logger);
+            InitialiseInputPipeline();
         }
 
-        public Task<ICommandResult> FallbackAsync(Input input)
+        private void InitialiseInputPipeline()
+        {
+            inputPipeline.AddPipe(new GitInput());
+            inputPipeline.AddPipe(new DotnetInput());
+            inputPipeline.AddPipe(new GetChildItemInput());
+        }
+
+        public async Task<ICommandResult> FallbackAsync(Input input)
         {
             if (input == null || input.ParsedInput.IsEmpty())
             {
-                return Task.FromResult<ICommandResult>(new ErrorTextResult("Empty input."));
+                return new ErrorTextResult("Empty input.");
             }
 
             if (shell != null)
             {
-                return Task.FromResult<ICommandResult>(new ErrorTextResult("A command is already in progress."));
+                return new ErrorTextResult("A command is already in progress.");
             }
 
             BuildShell();
 
             try
             {
-                resultBuilder.Start();
+                InputModel inputModel = await inputPipeline.ProcessAsync(new InputModel(input));
 
-                // TODO: [P2] move this to pipeline (pipeline before powershell fallback)
-                string commandText = input.ParsedInput.RawInput;
-                if (string.Equals(input.ParsedInput.Tokens[0], "git", StringComparison.OrdinalIgnoreCase))
-                {
-                    commandText = "git -c color.ui=always -c color.status=always -c color.branch=always -c color.diff=always -c color.interactive=always ";
-                    commandText += string.Join(" ", input.ParsedInput.Tokens.Skip(1));
-                    resultBuilder.SetRequireCustomOutput();
+                resultBuilder.Start(inputModel);
 
-                    if (input.ParsedInput.Tokens.Count > 1)
-                    {
-                        string subCommand = input.ParsedInput.Tokens[1];
-                        HashSet<string> targetCommands = new HashSet<string>(
-                            new[] { "push", "pull", "fetch", "checkout", "clone" },
-                            StringComparer.OrdinalIgnoreCase);
-
-                        if (targetCommands.Contains(subCommand))
-                        {
-                            commandText += " --progress";
-                        }
-                    }
-
-                }
-                else if (string.Equals(input.ParsedInput.Tokens[0], "dotnet", StringComparison.OrdinalIgnoreCase)
-                         && input.ParsedInput.Tokens.Count > 1)
-                {
-                    HashSet<string> commands = new HashSet<string>(new[] { "clean", "restore", "build", "msbuild", "build-server", "run", "test", "vstest", "pack", "publish" }, StringComparer.OrdinalIgnoreCase);
-
-                    if (commands.Contains(input.ParsedInput.Tokens[1]))
-                    {
-                        // TODO: [P2] this must be more sofisticated
-                        commandText += " /clp:ForceConsoleColor";
-                    }
-                }
-
-                _ = RunScriptToOutputAsync(commandText);
-                return Task.FromResult<ICommandResult>(new TextStreamResult(resultBuilder.Stream));
+                _ = RunScriptToOutputAsync(inputModel.Command);
+                return new TextStreamResult(resultBuilder.Stream);
             }
             catch (Exception e)
             {
@@ -102,7 +82,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 logger.Error(errorMessage, e);
                 resultBuilder.Stream?.Dispose();
                 ReleaseShell();
-                return Task.FromResult<ICommandResult>(new ErrorTextResult(errorMessage));
+                return new ErrorTextResult(errorMessage);
             }
         }
 

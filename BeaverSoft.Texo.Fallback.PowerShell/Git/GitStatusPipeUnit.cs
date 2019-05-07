@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell.Git
 {
-    public class GitStatusPipeUnit : ITransformationPipe<FallbackContext>
+    public class GitStatusPipeUnit : ITransformation<FallbackContext>
     {
         private readonly IServiceMessageBus messageBus;
 

@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell.Transforming;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
 {
@@ -19,12 +20,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
             return result;
         }
 
-        public void SetRequireCustomOutput()
-        {
-            // no operation
-        }
-
-        public bool Start()
+        public bool Start(InputModel inputModel)
         {
             containError = false;
             markdown = new MarkdownBuilder();

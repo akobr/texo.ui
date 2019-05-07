@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Text;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell.Transforming;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
@@ -16,12 +17,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             return Item.Plain(builder.ToString());
         }
 
-        public void SetRequireCustomOutput()
-        {
-            // no operation
-        }
-
-        public bool Start()
+        public bool Start(InputModel inputModel)
         {
             containError = false;
             builder = new StringBuilder();
