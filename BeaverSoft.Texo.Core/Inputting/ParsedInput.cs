@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace BeaverSoft.Texo.Core.Inputting
@@ -26,6 +26,8 @@ namespace BeaverSoft.Texo.Core.Inputting
         public string RawInput { get; }
 
         public ImmutableList<string> Tokens { get; }
+
+        public bool HasMultipleTokens => Tokens?.Count > 1;
 
         public static ParsedInput Empty { get; } = new ParsedInput();
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Commands;
 
 namespace BeaverSoft.Texo.Core.Inputting
@@ -12,7 +12,7 @@ namespace BeaverSoft.Texo.Core.Inputting
         {
             context = CommandContext.Empty;
             tokens = ImmutableList<IToken>.Empty;
-            ParsedInput = Core.Inputting.ParsedInput.Empty;
+            ParsedInput = ParsedInput.Empty;
         }
 
         private Input(Input toClone)
