@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Path;
+using BeaverSoft.Texo.Core.Text;
 using BeaverSoft.Texo.Core.Transforming;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
@@ -72,13 +72,9 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
             }
 
             string fullPath = path.GetFullConsolidatedPath();
-            StringBuilder builder = new StringBuilder();
+            AnsiStringBuilder builder = new AnsiStringBuilder();
             builder.Append(text.Substring(0, index));
-            builder.Append("\u001b[999m");
-            builder.Append(itemPath);
-            builder.Append("|");
-            builder.Append(ActionBuilder.PathUri(fullPath));
-            builder.Append("\u001b[998m");
+            builder.AppendLink(itemPath, ActionBuilder.PathUri(fullPath));
 
             int endIndex = index + itemPath.Length;
 

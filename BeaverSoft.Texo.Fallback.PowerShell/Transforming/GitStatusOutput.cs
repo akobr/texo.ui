@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Path;
+using BeaverSoft.Texo.Core.Text;
 using BeaverSoft.Texo.Core.Transforming;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
@@ -55,13 +56,9 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
             }
 
             fullPath = fullPath.GetFullConsolidatedPath();
-            StringBuilder builder = new StringBuilder();
+            AnsiStringBuilder builder = new AnsiStringBuilder();
             builder.Append(line.Substring(0, fileGroup.Index));
-            builder.Append("\u001b[999m");
-            builder.Append(path);
-            builder.Append("|");
-            builder.Append(ActionBuilder.PathUri(fullPath));
-            builder.Append("\u001b[998m");
+            builder.AppendLink(path, ActionBuilder.PathUri(fullPath));
 
             int endIndex = fileGroup.Index + fileGroup.Length;
 

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using BeaverSoft.Texo.Core.Text;
 
 namespace BeaverSoft.Texo.Core.Streaming
 {
@@ -58,213 +59,129 @@ namespace BeaverSoft.Texo.Core.Streaming
 
         public void WriteLink(string text, string url)
         {
-            WriteSgrAnciEscapeSequence("999");
+            WriteAnsiSgrEscapeSequence(AnsiSgrEscapeCodes.LINK_START);
             Write(text);
-            Write("|");
+            Write(AnsiSgrEscapeCodes.LINK_SEPARATOR);
             Write(url);
-            WriteSgrAnciEscapeSequence("998");
+            WriteAnsiSgrEscapeSequence(AnsiSgrEscapeCodes.LINK_END);
         }
 
         public void SetBoldText()
         {
-            WriteSgrAnciEscapeSequence("1");
+            WriteAnsiSgrEscapeSequence(AnsiSgrEscapeCodes.BOLD);
         }
 
         public void SetItalicText()
         {
-            WriteSgrAnciEscapeSequence("3");
+            WriteAnsiSgrEscapeSequence(AnsiSgrEscapeCodes.ITALIC);
         }
 
         public void SetUnderlineText()
         {
-            WriteSgrAnciEscapeSequence("4");
+            WriteAnsiSgrEscapeSequence(AnsiSgrEscapeCodes.UNDERLINE);
         }
 
         public void SetCrossedOutText()
         {
-            WriteSgrAnciEscapeSequence("9");
+            WriteAnsiSgrEscapeSequence(AnsiSgrEscapeCodes.CROSSED_OUT);
         }
 
         public void SetForegroundTextColor(ConsoleColor color)
         {
-            string code = GetForegroundColorCode(color);
+            string code = AnsiSgrEscapeCodes.GetForegroundColorCode(color);
 
             if (code == null)
             {
                 return;
             }
 
-            WriteSgrAnciEscapeSequence(code);
+            WriteAnsiSgrEscapeSequence(code);
         }
 
         public void SetForegroundTextColor(int red, int green, int blue)
         {
-            string code = GetForegroundColorCode(red, green, blue);
-            WriteSgrAnciEscapeSequence(code);
+            string code = AnsiSgrEscapeCodes.GetForegroundColorCode(red, green, blue);
+            WriteAnsiSgrEscapeSequence(code);
         }
 
         public void SetBackgroundTextColor(ConsoleColor color)
         {
-            string code = GetBackgroundColorCode(color);
+            string code = AnsiSgrEscapeCodes.GetBackgroundColorCode(color);
 
             if (code == null)
             {
                 return;
             }
 
-            WriteSgrAnciEscapeSequence(code);
+            WriteAnsiSgrEscapeSequence(code);
         }
 
         public void ResetFormatting()
         {
-            WriteSgrAnciEscapeSequence(string.Empty);
+            WriteAnsiSgrEscapeSequence(string.Empty);
         }
 
         public Task SetBoldTextAsync()
         {
-            return WriteSgrAnciEscapeSequenceAsync("1");
+            return WriteAnsiSgrEscapeSequenceAsync(AnsiSgrEscapeCodes.BOLD);
         }
 
         public Task SetItalicTextAsync()
         {
-            return WriteSgrAnciEscapeSequenceAsync("3");
+            return WriteAnsiSgrEscapeSequenceAsync(AnsiSgrEscapeCodes.ITALIC);
         }
 
         public Task SetUnderlineTextAsync()
         {
-            return WriteSgrAnciEscapeSequenceAsync("4");
+            return WriteAnsiSgrEscapeSequenceAsync(AnsiSgrEscapeCodes.UNDERLINE);
         }
 
         public Task SetCrossedOutTextAsync()
         {
-            return WriteSgrAnciEscapeSequenceAsync("9");
+            return WriteAnsiSgrEscapeSequenceAsync(AnsiSgrEscapeCodes.CROSSED_OUT);
         }
 
         public Task SetForegroundTextColorAsync(ConsoleColor color)
         {
-            string code = GetForegroundColorCode(color);
+            string code = AnsiSgrEscapeCodes.GetForegroundColorCode(color);
 
             if (code == null)
             {
                 return Task.CompletedTask;
             }
 
-            return WriteSgrAnciEscapeSequenceAsync(code);
+            return WriteAnsiSgrEscapeSequenceAsync(code);
         }
 
         public Task SetForegroundTextColorAsync(int red, int green, int blue)
         {
-            string code = GetForegroundColorCode(red, green, blue);
-            return WriteSgrAnciEscapeSequenceAsync(code);
+            string code = AnsiSgrEscapeCodes.GetForegroundColorCode(red, green, blue);
+            return WriteAnsiSgrEscapeSequenceAsync(code);
         }
 
         public Task SetBackgroundTextColorAsync(ConsoleColor color)
         {
-            string code = GetBackgroundColorCode(color);
+            string code = AnsiSgrEscapeCodes.GetBackgroundColorCode(color);
 
             if (code == null)
             {
                 return Task.CompletedTask;
             }
 
-            return WriteSgrAnciEscapeSequenceAsync(code);
+            return WriteAnsiSgrEscapeSequenceAsync(code);
         }
 
         public Task ResetFormattingAsync()
         {
-            return WriteSgrAnciEscapeSequenceAsync(string.Empty);
+            return WriteAnsiSgrEscapeSequenceAsync(string.Empty);
         }
 
-        private string GetForegroundColorCode(ConsoleColor color)
-        {
-            switch (color)
-            {
-                case ConsoleColor.Black:
-                    return "30";
-
-                case ConsoleColor.Red:
-                case ConsoleColor.DarkRed:
-                    return "31";
-
-                case ConsoleColor.Green:
-                case ConsoleColor.DarkGreen:
-                    return "32";
-
-                case ConsoleColor.Yellow:
-                case ConsoleColor.DarkYellow:
-                    return "33";
-
-                case ConsoleColor.Blue:
-                case ConsoleColor.DarkBlue:
-                    return "34";
-
-                case ConsoleColor.Magenta:
-                case ConsoleColor.DarkMagenta:
-                    return "35";
-
-                case ConsoleColor.Cyan:
-                case ConsoleColor.DarkCyan:
-                    return "36";
-
-                case ConsoleColor.White:
-                    return "37";
-
-                default:
-                    return null;
-            }
-        }
-
-        private string GetForegroundColorCode(int red, int green, int blue)
-        {
-            return $"38;2;{red};{green};{blue}";
-        }
-
-        private string GetBackgroundColorCode(ConsoleColor color)
-        {
-            switch (color)
-            {
-                case ConsoleColor.Black:
-                    return "40";
-
-                case ConsoleColor.Red:
-                case ConsoleColor.DarkRed:
-                    return "41";
-
-                case ConsoleColor.Green:
-                case ConsoleColor.DarkGreen:
-                    return "42";
-
-                case ConsoleColor.Yellow:
-                case ConsoleColor.DarkYellow:
-                    return "43";
-
-                case ConsoleColor.Blue:
-                case ConsoleColor.DarkBlue:
-                    return "44";
-
-                case ConsoleColor.Magenta:
-                case ConsoleColor.DarkMagenta:
-                    return "45";
-
-                case ConsoleColor.Cyan:
-                case ConsoleColor.DarkCyan:
-                    return "46";
-
-                case ConsoleColor.White:
-                    return "47";
-                
-                default:
-                    return null;
-                    
-            }
-        }
-
-        private void WriteSgrAnciEscapeSequence(string code)
+        private void WriteAnsiSgrEscapeSequence(string code)
         {
             Write($"\u001b[{code}m");
         }
 
-        private Task WriteSgrAnciEscapeSequenceAsync(string code)
+        private Task WriteAnsiSgrEscapeSequenceAsync(string code)
         {
             return WriteAsync($"\u001b[{code}m");
         }
