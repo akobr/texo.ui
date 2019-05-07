@@ -9,6 +9,7 @@
              FontFamily="Consolas"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+
         <Style TargetType="{x:Type Paragraph}">
             <Setter Property="FontSize" Value="12" />
         </Style>
@@ -58,13 +59,13 @@
         <Style TargetType="{x:Type Span}" x:Key="{x:Static markdig:Styles.MarkedStyleKey}">
             <Setter Property="Background" Value="#8099FF00" />
         </Style>
-        <Style TargetType="{x:Type Hyperlink}">
+        <Style TargetType="{x:Type Hyperlink}" x:Key="{x:Static markdig:Styles.HyperlinkStyleKey}">
             <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Foreground">
                         <Setter.Value>
-                            <SolidColorBrush Color="{DynamicResource SystemBaseHighColor}" Opacity="0.5" />
+                            <SolidColorBrush Color="White" Opacity="0.6" />
                         </Setter.Value>
                     </Setter>
                 </Trigger>

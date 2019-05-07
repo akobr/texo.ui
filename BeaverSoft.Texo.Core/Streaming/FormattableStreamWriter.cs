@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,6 +54,15 @@ namespace BeaverSoft.Texo.Core.Streaming
             : base(path, append, encoding, bufferSize)
         {
             // no operation
+        }
+
+        public void WriteLink(string text, string url)
+        {
+            WriteSgrAnciEscapeSequence("999");
+            Write(text);
+            Write("|");
+            Write(url);
+            WriteSgrAnciEscapeSequence("998");
         }
 
         public void SetBoldText()

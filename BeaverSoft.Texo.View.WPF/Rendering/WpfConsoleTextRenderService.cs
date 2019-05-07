@@ -1,5 +1,6 @@
 using BeaverSoft.Texo.Core.Streaming;
 using BeaverSoft.Texo.Core.View;
+using Markdig.Wpf;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +17,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
     public class WpfConsoleTextRenderService : IWpfRenderService
     {
         private static readonly int NewLineLenght = Environment.NewLine.Length;
-        private readonly Regex coloringRegex = new Regex(@"\u001b\[(?<code>\d*(;\d+)*)m", RegexOptions.Compiled);
+        private readonly Regex formattingRegex = new Regex(@"\u001b\[(?<code>\d*(;\d+)*)m", RegexOptions.Compiled);
 
         private delegate void RenderMethod(string text);
 
@@ -25,6 +26,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
         private FontStyle fontStyle = FontStyles.Normal;
         private FontWeight fontWeight = FontWeights.Normal;
         private TextDecorationCollection decorations = new TextDecorationCollection();
+        private bool isHyperlink;
 
         private Span streamedContainer;
         private bool renderIsRequested;
@@ -239,13 +241,13 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 line = line.Substring(carrierReturnIndex + 1);
             }
 
-            while ((match = coloringRegex.Match(line, index)).Success)
+            while ((match = formattingRegex.Match(line, index)).Success)
             {
                 if (index < match.Index)
                 {
                     int sectionLength = match.Index - index;
                     length += sectionLength;
-                    container.Inlines.Add(CreateRun(line.Substring(index, sectionLength)));
+                    container.Inlines.Add(CreateInline(line.Substring(index, sectionLength)));
                 }
 
                 UpdateFormatting(match.Groups["code"].Value);
@@ -256,7 +258,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
             {
                 int sectionLength = line.Length - index;
                 length += sectionLength;
-                container.Inlines.Add(CreateRun(line.Substring(index, sectionLength)));
+                container.Inlines.Add(CreateInline(line.Substring(index, sectionLength)));
             }
 
             if (!isLastLine)
@@ -399,6 +401,14 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 case "47":
                     backgroundBrush = Brushes.White;
                     break;
+
+                case "998":
+                    isHyperlink = false;
+                    break;
+
+                case "999":
+                    isHyperlink = true;
+                    break;
             }
         }
 
@@ -411,16 +421,41 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
             decorations.Clear();
         }
 
-        private Run CreateRun(string text)
+        private Inline CreateInline(string text)
         {
-            return new Run(text)
+            Inline result = new Run();
+
+            if (isHyperlink)
             {
-                Foreground = foregroundBrush,
-                Background = backgroundBrush,
-                FontStyle = fontStyle,
-                FontWeight = fontWeight,
-                TextDecorations = decorations.Clone()
-            };
+                string[] values = text.Split('|');
+                string title = values[0].Trim();
+                string url = values[1].Trim();
+
+                Hyperlink link = new Hyperlink()
+                {
+                    Command = Commands.Hyperlink,
+                    CommandParameter = url,
+                    TextDecorations = TextDecorations.Underline
+                };
+
+                link.SetResourceReference(FrameworkContentElement.StyleProperty, Styles.HyperlinkStyleKey);
+
+                link.Inlines.Add(title);
+                link.NavigateUri = new Uri(url);
+                result = link;
+            }
+            else
+            {
+                result = new Run(text);
+                result.TextDecorations = decorations.Clone();
+            }
+
+            result.Foreground = foregroundBrush;
+            result.Background = backgroundBrush;
+            result.FontStyle = fontStyle;
+            result.FontWeight = fontWeight;
+
+            return result;
         }
 
         private void TryFinishStreamRender(IReportableStream stream)
