@@ -12,8 +12,6 @@ namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 
         public string CommandKey { get; }
 
-        public bool IsDefault { get; set; }
-
         public string Representations { get; set; }
     }
 }
