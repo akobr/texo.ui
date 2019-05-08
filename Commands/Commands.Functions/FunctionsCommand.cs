@@ -22,22 +22,22 @@ namespace BeaverSoft.Texo.Commands.Functions
         public ICommandResult ColorFunction(CommandContext context)
         {
             StringBuilder result = new StringBuilder();
-            var evaluatedParms = context.GetParameterValues("color");
+            var parValues = context.GetParameterValues("color");
             Color color;
 
-            if (evaluatedParms.Count == 4 && evaluatedParms.All(par => int.TryParse(par, out _)))
+            if (parValues.Count == 4 && parValues.All(par => int.TryParse(par, out _)))
             {
-                color = Color.FromArgb(int.Parse(evaluatedParms[0]), int.Parse(evaluatedParms[1]), int.Parse(evaluatedParms[2]), int.Parse(evaluatedParms[3]));
+                color = Color.FromArgb(int.Parse(parValues[0]), int.Parse(parValues[1]), int.Parse(parValues[2]), int.Parse(parValues[3]));
                 result.AppendLine(BuildColorInfo(color));
             }
-            else if (evaluatedParms.Count == 3 && evaluatedParms.All(par => int.TryParse(par, out _)))
+            else if (parValues.Count == 3 && parValues.All(par => int.TryParse(par, out _)))
             {
-                color = Color.FromArgb(255, int.Parse(evaluatedParms[0]), int.Parse(evaluatedParms[1]), int.Parse(evaluatedParms[2]));
+                color = Color.FromArgb(255, int.Parse(parValues[0]), int.Parse(parValues[1]), int.Parse(parValues[2]));
                 result.AppendLine(BuildColorInfo(color));
             }
             else
             {
-                foreach (string textPar in evaluatedParms.Select(par => par.ToString()))
+                foreach (string textPar in parValues.Select(par => par.ToString()))
                 {
                     color = ReadColorFromText(textPar);
 
