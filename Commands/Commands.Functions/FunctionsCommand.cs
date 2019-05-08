@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Extensibility.Attributes;
 using BeaverSoft.Texo.Core.Result;
+using BeaverSoft.Texo.Core.Text;
 
 [assembly: CommandLibrary]
 
@@ -14,8 +15,24 @@ namespace BeaverSoft.Texo.Commands.Functions
 {
     [Command("functions", Representations = "functions func fn dev")]
     [Documentation("Developer functions", "Helpful functions for a developer.")]
-    public class FunctionsCommand
+    public class FunctionsCommand : InlineIntersectionCommand
     {
+        public FunctionsCommand()
+        {
+            RegisterQueryMethod("list", List);
+            RegisterQueryMethod("color", ColorFunction);
+            RegisterQueryMethod("number", Number);
+            RegisterQueryMethod("base64", Base64);
+            RegisterQueryMethod("guid", Guid);
+        }
+
+        [Query("list", Representations = "list", IsDefault = true)]
+        [Documentation("List of functions", "Shows all available help functions.")]
+        public ICommandResult List(CommandContext context)
+        {
+            return new TextResult("List of functions with description!");
+        }
+
         [Query("color", Representations = "color colour")]
         [Parameter("color", IsRepetable = true)]
         [Documentation("Color function", "Shows a color in multiple formats.")]
@@ -57,7 +74,7 @@ namespace BeaverSoft.Texo.Commands.Functions
 
         [Query("number", Representations = "number num")]
         [Parameter("number", IsRepetable = true)]
-        [Documentation("Number function", "Shows a in multiple formats.")]
+        [Documentation("Number function", "Shows a number in multiple numerical systems.")]
         public ICommandResult Number(CommandContext context)
         {
             StringBuilder result = new StringBuilder();
@@ -71,11 +88,11 @@ namespace BeaverSoft.Texo.Commands.Functions
         }
 
         [Query("base64", Representations = "base64 b64 64")]
-        [Parameter("input", IsRepetable = false)]
+        [Parameter("text", IsRepetable = false)]
         [Documentation("Base64 function", "Codes and decodes base64 string.")]
         public ICommandResult Base64(CommandContext context)
         {
-            string text = context.GetParameterValue("input");
+            string text = context.GetParameterValue("text");
 
             if (Regex.IsMatch(text, "^[A-Za-z0-9+\\/]+={0,2}$"))
             {
@@ -111,7 +128,40 @@ namespace BeaverSoft.Texo.Commands.Functions
         [Documentation("Guid generator", "Generates random GUID and show it in multiple formats.")]
         public ICommandResult Guid(CommandContext context)
         {
-            throw new NotImplementedException();
+            Guid guid = System.Guid.NewGuid();
+            AnsiStringBuilder builder = new AnsiStringBuilder();            
+            bool isLetter = false;
+
+            foreach (char character in guid.ToString("N").ToUpperInvariant())
+            {
+                if (char.IsDigit(character))
+                {
+                    if (isLetter)
+                    {
+                        builder.AppendFormattingReset();
+                        isLetter = false;
+                    }
+                }
+                else if (!isLetter)
+                {
+                    builder.AppendForegroundFormat(ConsoleColor.Yellow);
+                    isLetter = true;
+                }
+
+                builder.Append(character.ToString());
+            }
+
+            if (isLetter)
+            {
+                builder.AppendFormattingReset();
+            }
+
+            builder.AppendLine();
+            builder.AppendLine(guid.ToString());
+            builder.AppendLine(guid.ToString("B").ToUpperInvariant());
+            builder.AppendLine(guid.ToString("X"));
+
+            return new TextResult(builder.ToString());
         }
 
         [Query("random", Representations = "random rnd")]
@@ -151,15 +201,15 @@ namespace BeaverSoft.Texo.Commands.Functions
                 @decimal = Convert.ToString(number, 10);
                 hex = Convert.ToString(number, 16);
                 binary = Convert.ToString(number, 2);
-                return $"dec:{@decimal}; hex:{hex}; bin:{binary};";
+                return $"dec:{@decimal} hex:{hex} bin:{binary};";
             }
             catch (FormatException)
             {
-                return $"\"{value}\"; invalid format; [0|b|0b]0101; [x|0x]0A2F";
+                return $"\"{value}\": invalid format; [0|b|0b]0101; [x|0x]0A2F";
             }
             catch (Exception anyException)
             {
-                return $"\"{value}\"; {anyException.Message};";
+                return $"\"{value}\": {anyException.Message}";
             }
         }
 
@@ -170,16 +220,16 @@ namespace BeaverSoft.Texo.Commands.Functions
 
             if (textColor.Length == 8
                 && int.TryParse(textColor.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out a)
-                && int.TryParse(textColor.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out r)
-                && int.TryParse(textColor.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out g)
-                && int.TryParse(textColor.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out b))
+                && int.TryParse(textColor.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out r)
+                && int.TryParse(textColor.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out g)
+                && int.TryParse(textColor.Substring(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out b))
             {
                 return Color.FromArgb(a, r, g, b);
             }
             else if (textColor.Length == 6
                      && int.TryParse(textColor.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out r)
-                     && int.TryParse(textColor.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out g)
-                     && int.TryParse(textColor.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out b))
+                     && int.TryParse(textColor.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out g)
+                     && int.TryParse(textColor.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out b))
             {
                 return Color.FromArgb(r, g, b);
             }
@@ -191,12 +241,36 @@ namespace BeaverSoft.Texo.Commands.Functions
 
         private static string BuildColorInfo(Color color)
         {
+            Color blendedColor = color;
+
             if (color.A < 255)
             {
-                color = Blend(color, Color.Black, color.A / 255);
+                blendedColor = Blend(color, Color.Black, color.A / 255.0);
             }
 
-            return $"#{Convert.ToString(color.A, 16)}{Convert.ToString(color.R, 16)}{Convert.ToString(color.G, 16)}{Convert.ToString(color.B, 16)}; argb({color.A},{color.R},{color.G},{color.B}); \u001b[38;2;{color.R};{color.G};{color.B}m{(char)222}{new string((char)219, 3)}{(char)221}\u001b[m";
+            AnsiStringBuilder builder = new AnsiStringBuilder();
+            builder.AppendForegroundFormat(blendedColor.R, blendedColor.G, blendedColor.B);
+            builder.Append(new string('█', 7));
+            builder.AppendFormattingReset();
+            builder.Append(" ");
+            builder.Append($"#{GetHexColorPart(color.A)}{GetHexColorPart(color.R)}{GetHexColorPart(color.G)}{GetHexColorPart(color.B)} ");
+            builder.Append($"#{GetHexColorPart(blendedColor.R)}{GetHexColorPart(blendedColor.G)}{GetHexColorPart(blendedColor.B)} ");
+            builder.Append($"argb({color.A},{color.R},{color.G},{color.B}) ");
+            builder.Append($"rgb({blendedColor.R},{blendedColor.G},{blendedColor.B}) ");
+            builder.AppendLine();
+            return builder.ToString();
+        }
+
+        private static string GetHexColorPart(byte value)
+        {
+            string part = Convert.ToString(value, 16);
+
+            if (part.Length == 1)
+            {
+                part += "0";
+            }
+
+            return part;
         }
 
         /// <summary>Blends the specified colors together.</summary>
