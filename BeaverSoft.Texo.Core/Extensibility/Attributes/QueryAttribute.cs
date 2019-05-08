@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
     public class QueryAttribute : Attribute
     {
         public QueryAttribute(string queryKey)
@@ -11,5 +11,9 @@ namespace BeaverSoft.Texo.Core.Extensibility.Attributes
         }
 
         public string QueryKey { get; }
+
+        public string Representations { get; set; }
+
+        public string Path { get; set; }
     }
 }

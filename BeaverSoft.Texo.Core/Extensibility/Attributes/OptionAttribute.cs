@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 
 namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 {
     [AttributeUsage(
         AttributeTargets.Class | AttributeTargets.Method,
         Inherited = false,
-        AllowMultiple = false)]
+        AllowMultiple = true)]
     public class OptionAttribute : Attribute
     {
         public OptionAttribute(string optionKey)
@@ -14,5 +14,7 @@ namespace BeaverSoft.Texo.Core.Extensibility.Attributes
         }
 
         public string OptionKey { get; }
+
+        public string Representations { get; set; }
     }
 }

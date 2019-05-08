@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 {
@@ -11,5 +11,9 @@ namespace BeaverSoft.Texo.Core.Extensibility.Attributes
         }
 
         public string CommandKey { get; }
+
+        public bool IsDefault { get; set; }
+
+        public string Representations { get; set; }
     }
 }

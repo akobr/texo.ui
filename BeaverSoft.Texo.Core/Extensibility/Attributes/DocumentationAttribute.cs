@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 
 namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 {
     [AttributeUsage(
         AttributeTargets.Class | AttributeTargets.Method, 
         Inherited = false, 
-        AllowMultiple = false)]
+        AllowMultiple = true)]
     public class DocumentationAttribute : Attribute
     {
         public DocumentationAttribute(string title, string description)
@@ -18,6 +18,6 @@ namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 
         public string Description { get; }
 
-        public string SubjectPath { get; set; }
+        public string Path { get; set; }
     }
 }
