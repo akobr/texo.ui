@@ -13,14 +13,14 @@ namespace BeaverSoft.Texo.Core.Actions.Implementations
             this.executor = executor ?? throw new ArgumentNullException(nameof(executor));
         }
 
-        public void Execute(IDictionary<string, string> arguments)
+        public async void Execute(IDictionary<string, string> arguments)
         {
             if (!arguments.TryGetValue(ActionParameters.STATEMENT, out string statement))
             {
                 return;
             }
 
-            executor.Process(statement);
+            await executor.ProcessAsync(statement);
         }
     }
 }

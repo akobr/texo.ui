@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Configuration;
-using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Inputting;
 using StrongBeaver.Core.Messaging;
 using StrongBeaver.Core.Services;
 

@@ -1,4 +1,3 @@
-﻿using BeaverSoft.Texo.Core.View;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,6 +13,7 @@ namespace BeaverSoft.Texo.View.WPF
     public partial class TexoControl : UserControl
     {
         private bool skipNextTextChange;
+        private string prompt;
 
         public TexoControl()
         {
@@ -24,16 +24,20 @@ namespace BeaverSoft.Texo.View.WPF
         public event EventHandler<string> InputChanged;
         public event EventHandler<string> InputFinished;
         public event EventHandler<KeyScrollDirection> KeyScrolled;
-        public event EventHandler IntellisenceItemExecuted;
+        public event EventHandler IntellisenseItemExecuted;
 
         public FlowDocument OutputDocument => docOutput.Document;
 
-        public ListBox IntellisenceList => listIntellisence;
+        public ListBox IntellisenseList => listIntellisense;
 
         public string Prompt
         {
-            get => lbPrompt.Text;
-            set => lbPrompt.Text = value;
+            get => prompt;
+            set
+            {
+                prompt = value;
+                lbPrompt.Text = value;
+            }
         }
 
         public string Title
@@ -42,38 +46,56 @@ namespace BeaverSoft.Texo.View.WPF
             set => lbTitle.Text = value;
         }
 
-        public bool IsIntellisenceOpened => listIntellisence.Visibility == Visibility.Visible;
+        public bool IsIntellisenseOpened => listIntellisense.Visibility == Visibility.Visible;
 
         public void EnableInput()
         {
             tbInput.IsReadOnly = false;
+            CancelProgress();
         }
 
         public void DisableInput()
         {
+            progress.IsIndeterminate = true;
             tbInput.IsReadOnly = true;
         }
 
-        public void CloseIntellisence()
+        public void CloseIntellisense()
         {
-            listIntellisence.Visibility = Visibility.Collapsed;
+            listIntellisense.Visibility = Visibility.Collapsed;
         }
 
         public string GetInput()
         {
             return tbInput.Text;
+
             //TextRange range = new TextRange(tbInput.Document.ContentStart, tbInput.Document.ContentEnd);
             //return range.Text.Trim();
         }
 
         public void EmptyInput()
         {
+            skipNextTextChange = true;
             tbInput.Text = string.Empty;
+            CloseIntellisense();
 
             //TextRange range = new TextRange(
             //    tbInput.Document.ContentStart,
             //    tbInput.Document.ContentEnd);
             //range.Text = string.Empty;
+        }
+
+        public void TryFinishInput()
+        {
+            string input = GetInput();
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return;
+            }
+
+            EmptyInput();
+            InputFinished?.Invoke(this, input);
         }
 
         public void SetInput(string input)
@@ -92,6 +114,33 @@ namespace BeaverSoft.Texo.View.WPF
             tbInput.Focus();
         }
 
+        public void SetProgress(string progressName, int progressValue)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(() => SetProgress(progressName, progressValue));
+                return;
+            }
+
+            lbPrompt.Text = $"{progressName}>";
+
+            if (progressValue < 0)
+            {
+                progress.IsIndeterminate = true;
+                return;
+            }
+
+            progress.IsIndeterminate = false;
+            progress.Value = Math.Min(progressValue, 100);
+        }
+
+        public void CancelProgress()
+        {
+            progress.Value = 0;
+            progress.IsIndeterminate = false;
+            lbPrompt.Text = prompt;
+        }
+
         public void SetHistoryCount(int count)
         {
             lbHistoryCount.Text = $"History ({count})";
@@ -102,6 +151,19 @@ namespace BeaverSoft.Texo.View.WPF
             lbVariableCount.Text = $"Variables ({count})";
         }
 
+        public void CleanResults()
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.InvokeAsync(() => CleanResults());
+                return;
+            }
+
+            docOutput.Visibility = Visibility.Collapsed;
+            docOutput.Document.Blocks.Clear();
+            docOutput.Visibility = Visibility.Visible;
+        }
+
         private void HandleInputTextChanged(object sender, TextChangedEventArgs e)
         {
             if (skipNextTextChange)
@@ -110,7 +172,8 @@ namespace BeaverSoft.Texo.View.WPF
                 return;
             }
 
-            InputChanged?.Invoke(this, GetInput());
+            string input = GetInput();
+            InputChanged?.Invoke(this, input);
         }
 
         private void HandleInputKeyDown(object sender, KeyEventArgs e)
@@ -121,15 +184,7 @@ namespace BeaverSoft.Texo.View.WPF
             }
 
             e.Handled = true;
-            string input = GetInput();
-
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return;
-            }
-
-            tbInput.Text = string.Empty;
-            InputFinished?.Invoke(this, input);
+            TryFinishInput();
         }
 
         private void HandleInputKeyDownPreview(object sender, KeyEventArgs e)
@@ -142,19 +197,42 @@ namespace BeaverSoft.Texo.View.WPF
                 return;
             }
 
+            if (e.Key == Key.Tab)
+            {
+                e.Handled = true;
+                if (IsIntellisenseOpened)
+                {
+                    int selectedIndex = listIntellisense.SelectedIndex + 1;
+
+                    if (selectedIndex >= listIntellisense.Items.Count)
+                    {
+                        selectedIndex = 0;
+                    }
+
+                    listIntellisense.SelectedIndex = selectedIndex;
+                    listIntellisense.ScrollIntoView(listIntellisense.SelectedItem);
+                }
+                else
+                {
+                    InputChanged?.Invoke(this, GetInput());
+                }
+
+                return;
+            }
+
             if (e.Key == Key.Escape)
             {
                 e.Handled = true;
-                CloseIntellisence();
+                CloseIntellisense();
                 return;
             }
 
             if (e.Key == Key.Enter
-                && IsIntellisenceOpened
-                && listIntellisence.SelectedIndex >= 0)
+                && IsIntellisenseOpened
+                && listIntellisense.SelectedIndex >= 0)
             {
                 e.Handled = true;
-                IntellisenceItemExecuted?.Invoke(this, new EventArgs());
+                IntellisenseItemExecuted?.Invoke(this, new EventArgs());
                 return;
             }
 
@@ -162,18 +240,18 @@ namespace BeaverSoft.Texo.View.WPF
             {
                 e.Handled = true;
 
-                if (IsIntellisenceOpened)
+                if (IsIntellisenseOpened)
                 {
-                    if (listIntellisence.SelectedIndex > 0)
+                    if (listIntellisense.SelectedIndex > 0)
                     {
-                        listIntellisence.SelectedIndex--;
+                        listIntellisense.SelectedIndex--;
                     }
-                    else if(listIntellisence.SelectedIndex < 0)
+                    else if(listIntellisense.SelectedIndex < 0)
                     {
-                        listIntellisence.SelectedIndex = 0;
+                        listIntellisense.SelectedIndex = 0;
                     }
 
-                    listIntellisence.ScrollIntoView(listIntellisence.SelectedItem);
+                    listIntellisense.ScrollIntoView(listIntellisense.SelectedItem);
                 }
                 else
                 {
@@ -187,12 +265,12 @@ namespace BeaverSoft.Texo.View.WPF
             {
                 e.Handled = true;
 
-                if (IsIntellisenceOpened)
+                if (IsIntellisenseOpened)
                 {
-                    if (listIntellisence.SelectedIndex < listIntellisence.Items.Count - 1)
+                    if (listIntellisense.SelectedIndex < listIntellisense.Items.Count - 1)
                     {
-                        listIntellisence.SelectedIndex++;
-                        listIntellisence.ScrollIntoView(listIntellisence.SelectedItem);
+                        listIntellisense.SelectedIndex++;
+                        listIntellisense.ScrollIntoView(listIntellisense.SelectedItem);
                     }
                 }
                 else
@@ -214,15 +292,8 @@ namespace BeaverSoft.Texo.View.WPF
         {
             if (e.Key == Key.Enter)
             {
-                string input = GetInput();
-
-                if (string.IsNullOrWhiteSpace(input))
-                {
-                    return;
-                }
-
-                tbInput.Text = string.Empty;
-                InputFinished?.Invoke(this, input);
+                TryFinishInput();
+                return;
             }
 
             char character = KeyUtils.GetCharFromKey(e.Key);
@@ -273,7 +344,7 @@ namespace BeaverSoft.Texo.View.WPF
             }
             catch (Exception exception)
             {
-                // TODO: logging
+                // TODO: [P3] logging
             }
         }
 
@@ -300,14 +371,40 @@ namespace BeaverSoft.Texo.View.WPF
             return null;
         }
 
-        private void HandleIntellisenceMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void HandleIntellisenseMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (listIntellisence.SelectedItem == null)
+            
+        }
+
+        private void HandleInputGotFocus(object sender, RoutedEventArgs e)
+        {
+            bInput.BorderBrush = SystemParameters.WindowGlassBrush;
+            SwitchProgresForegroundAndBorderBrush();
+        }
+
+        private void HandleInputLostFocus(object sender, RoutedEventArgs e)
+        {
+            bInput.SetResourceReference(BorderBrushProperty, "SystemAltHighColorBrush");
+            SwitchProgresForegroundAndBorderBrush();
+            CloseIntellisense();
+        }
+
+        private void SwitchProgresForegroundAndBorderBrush()
+        {
+            var brush = progress.BorderBrush;
+            progress.BorderBrush = progress.Foreground;
+            progress.Foreground = brush;
+        }
+
+        private void ListIntellisense_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (!(e.Source is ListBoxItem clickedItem))
             {
                 return;
             }
 
-            IntellisenceItemExecuted?.Invoke(this, new EventArgs());
+            listIntellisense.SelectedItem = clickedItem;
+            IntellisenseItemExecuted?.Invoke(this, new EventArgs());
         }
     }
 }

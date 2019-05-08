@@ -80,7 +80,7 @@ namespace Commands.Clipboard
             var optionPath = Option.CreateBuilder();
             optionPath.Key = ClipboardConstants.OPTION_PATH;
             optionPath.Representations.AddRange(
-                new[] { ClipboardConstants.OPTION_PATH, "s" });
+                new[] { ClipboardConstants.OPTION_PATH, "p" });
             optionPath.Parameters.Add(parameterFlag.ToImmutable());
             optionPath.Documentation.Title = ClipboardConstants.OPTION_PATH;
             optionPath.Documentation.Description = "Enable or disable automatic file-to-path transfer in the clipboard.";

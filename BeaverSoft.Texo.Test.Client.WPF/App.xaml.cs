@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
@@ -8,6 +8,7 @@ using BeaverSoft.Texo.Test.Client.WPF.Actions;
 using BeaverSoft.Texo.Test.Client.WPF.Startup;
 using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Test.Client.WPF
 {
@@ -20,14 +21,17 @@ namespace BeaverSoft.Texo.Test.Client.WPF
 
         public static IServiceMessageBus ServiceMessageBus { get; private set; }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             SimpleIoc container = new SimpleIoc();
             container.RegisterServices();
 
-            TexoEngineBuilder engineBuilder = new TexoEngineBuilder();
+            TexoEngineBuilder engineBuilder =
+                new TexoEngineBuilder()
+                .WithLogService(new DebugLogService());
+
             container.RegisterEngineServices(engineBuilder);
 
             CommandFactory commandFactory = new CommandFactory();
@@ -36,12 +40,14 @@ namespace BeaverSoft.Texo.Test.Client.WPF
 
             engineBuilder.WithFallbackService(container.GetInstance<IFallbackService>());
             TexoEngine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
-            TexoEngine.InitialiseWithCommands();
             TexoEngine.RegisterAction(new PathOpenActionFactory(), ActionNames.PATH_OPEN, ActionNames.PATH);
-            TexoEngine.Start();
 
             ServiceMessageBus = container.GetInstance<IServiceMessageBus>();
             container.RegisterWithMessageBus();
+            container.RegisterIntellisense();
+
+            await TexoEngine.InitialiseWithCommandsAsync();        
+            TexoEngine.Start();
         }
 
         protected override void OnExit(ExitEventArgs e)

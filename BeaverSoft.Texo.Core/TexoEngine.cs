@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Runtime;
@@ -37,14 +38,29 @@ namespace BeaverSoft.Texo.Core
             setting.Configure(configuration);
         }
 
+        public Task InitialiseAsync(TextumConfiguration configuration)
+        {
+            return Task.Run(() => Initialise(configuration));
+        }
+
         public void Initialise(params Query[] commands)
         {
             Initialise((IEnumerable<Query>)commands);
         }
 
+        public Task InitialiseAsync(params Query[] commands)
+        {
+            return Task.Run(() => Initialise(commands));
+        }
+
         public void Initialise(IEnumerable<Query> commands)
         {
             Initialise(TextumConfiguration.CreateDefault().AddCommands(commands));
+        }
+
+        public Task InitialiseAsync(IEnumerable<Query> commands)
+        {
+            return Task.Run(() => Initialise(commands));
         }
 
         public void Recorfigure(TextumConfiguration configuration)
@@ -62,9 +78,9 @@ namespace BeaverSoft.Texo.Core
             runtime.Start();
         }
 
-        public void Process(string input)
+        public Task ProcessAsync(string input)
         {
-            runtime.Process(input);
+            return runtime.ProcessAsync(input);
         }
 
         public void Dispose()

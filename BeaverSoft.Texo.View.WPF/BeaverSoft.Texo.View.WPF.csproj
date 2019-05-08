@@ -32,11 +32,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Markdig, Version=0.15.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Markdig.0.15.4\lib\net40\Markdig.dll</HintPath>
+    <Reference Include="Markdig, Version=0.16.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Markdig.0.16.0\lib\net40\Markdig.dll</HintPath>
     </Reference>
-    <Reference Include="Markdig.Wpf, Version=0.2.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Markdig.Wpf.0.2.5\lib\net452\Markdig.Wpf.dll</HintPath>
+    <Reference Include="Markdig.Wpf, Version=0.2.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Markdig.Wpf.0.2.8\lib\net452\Markdig.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -79,9 +79,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Rendering\WpfConsoleTextRenderService.cs" />
     <Compile Include="TexoControl.xaml.cs">
       <DependentUpon>TexoControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Rendering\WpfPlainTextRenderService.cs" />
     <Compile Include="WpfViewService.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

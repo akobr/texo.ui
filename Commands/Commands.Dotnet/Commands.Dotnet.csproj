@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj" />
+    <ProjectReference Include="..\..\BeaverSoft.Texo.Fallback.PowerShell\BeaverSoft.Texo.Fallback.PowerShell.csproj" />
   </ItemGroup>
 
 </Project>

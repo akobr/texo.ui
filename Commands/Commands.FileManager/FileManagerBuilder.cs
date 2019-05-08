@@ -3,7 +3,7 @@ using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.FileManager.Stash;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
-using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Inputting;
 
 namespace BeaverSoft.Texo.Commands.FileManager
 {
@@ -147,11 +147,19 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryPush.Documentation.Description = "Adds a stash to the stack.";
             queryPush.Parameters.Add(parName.ToImmutable());
 
+            var optionAdd = Option.CreateBuilder();
+            optionAdd.Key = StashOptions.ADD;
+            optionAdd.Representations.AddRange(
+                new[] { StashOptions.ADD, "a" });
+            optionAdd.Documentation.Title = StashOptions.ADD;
+            optionAdd.Documentation.Description = "Adds the selected stash to staging without overriding. Lobby won't be changed.";
+
             var queryApply = Query.CreateBuilder();
             queryApply.Key = StashQueries.APPLY;
             queryApply.Representations.Add(StashQueries.APPLY);
             queryApply.Documentation.Title = "file-manager-stash-apply";
             queryApply.Documentation.Description = "Applies specific stash to the stage of file manager.";
+            queryApply.Options.Add(optionAdd.ToImmutable());
             queryApply.Parameters.Add(parIdentifier.ToImmutable());
 
             var queryPeek = Query.CreateBuilder();
@@ -159,12 +167,14 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryPeek.Representations.Add(StashQueries.PEEK);
             queryPeek.Documentation.Title = "file-manager-stash-peek";
             queryPeek.Documentation.Description = "Applies top stash to the stage of file manager. A stash won't be removed.";
+            queryPeek.Options.Add(optionAdd.ToImmutable());
 
             var queryPop = Query.CreateBuilder();
             queryPop.Key = StashQueries.POP;
             queryPop.Representations.Add(StashQueries.POP);
             queryPop.Documentation.Title = "file-manager-stash-pop";
             queryPop.Documentation.Description = "Applies and remove top stash to the stage of file manager.";
+            queryPop.Options.Add(optionAdd.ToImmutable());
 
             var queryDrop = Query.CreateBuilder();
             queryDrop.Key = StashQueries.DROP;

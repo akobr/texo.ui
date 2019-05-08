@@ -1,0 +1,5 @@
+Write-Output "Output message (echo)"
+Write-Error "Error message"
+Write-Debug "Debug message"
+Write-Warning "Warning message"
+Write-Information "Information message" -Tag "Information"

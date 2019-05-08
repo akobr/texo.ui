@@ -13,7 +13,7 @@ namespace BeaverSoft.Texo.Core.Commands.Actions
             this.executor = executor;
         }
 
-        public void Execute(IDictionary<string, string> arguments)
+        public async void Execute(IDictionary<string, string> arguments)
         {
             if (!arguments.TryGetValue(ActionParameters.INPUT, out string input)
                 || string.IsNullOrWhiteSpace(input))
@@ -21,7 +21,7 @@ namespace BeaverSoft.Texo.Core.Commands.Actions
                 return;
             }
 
-            executor.Process(input);
+            await executor.ProcessAsync(input);
         }
     }
 }

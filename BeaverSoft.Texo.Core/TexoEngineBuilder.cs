@@ -1,12 +1,13 @@
-﻿using System;
+using System;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Actions.Implementations;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
-using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.Input.History;
+using BeaverSoft.Texo.Core.Inputting;
+using BeaverSoft.Texo.Core.Inputting.History;
+using BeaverSoft.Texo.Core.Intellisense;
 using BeaverSoft.Texo.Core.Logging;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
@@ -33,7 +34,7 @@ namespace BeaverSoft.Texo.Core
         private ICommandManagementService commandManagement;
 
         private IFallbackService fallback;
-        private IIntellisenceService intellisence;
+        private IIntellisenseService intellisense;
         private IDidYouMeanService didYouMean;
         private IResultProcessingService resultProcessing;
         private IViewService usedView;
@@ -52,6 +53,7 @@ namespace BeaverSoft.Texo.Core
         {
             this.messageBus = messageBus;
             this.registerToMessageBus = registerToMessageBus;
+            actions = new ActionFactories();
         }
 
         public TexoEngineBuilder WithLogService(ILogService service)
@@ -108,9 +110,9 @@ namespace BeaverSoft.Texo.Core
             return this;
         }
 
-        public TexoEngineBuilder WithIntellisenceService(IIntellisenceService service)
+        public TexoEngineBuilder WithIntellisenseService(IIntellisenseService service)
         {
-            intellisence = service;
+            intellisense = service;
             return this;
         }
 
@@ -140,7 +142,7 @@ namespace BeaverSoft.Texo.Core
                 History = () => history,
                 CommandManagement = () => commandManagement,
                 ResultProcessing = () => resultProcessing,
-                Intellisence = () => intellisence,
+                Intellisense = () => intellisense,
                 DidYouMean = () => didYouMean,
                 Fallback = () => fallback,
                 View = () => usedView,
@@ -159,7 +161,7 @@ namespace BeaverSoft.Texo.Core
             runtime = new RuntimeCoordinatorService(
                 environment, evaluator, commandManagement,
                 resultProcessing, usedView, actionManagement,
-                history, intellisence, didYouMean, fallback);
+                history, intellisense, didYouMean, fallback, logger);
             InitialiseActions();
             return new TexoEngine(runtime, usedView, actions, setting);
         }
@@ -181,7 +183,7 @@ namespace BeaverSoft.Texo.Core
             commandManagement = commandManagement ?? new SingletonCommandManagementService(commandFactory);
             resultProcessing = resultProcessing ?? new ResultProcessingService(logger);
             actionManagement = actionManagement ?? new ActionManagementService(actions, logger);
-            intellisence = intellisence ?? CreateIntellisenceService();
+            intellisense = intellisense ?? CreateIntellisenseService();
             // didYouMean
         }
 
@@ -204,9 +206,9 @@ namespace BeaverSoft.Texo.Core
             return service;
         }
 
-        private IntellisenceService CreateIntellisenceService()
+        private IntellisenseService CreateIntellisenseService()
         {
-            var service = new IntellisenceService(environment, commandManagement);
+            var service = new IntellisenseService(environment, commandManagement);
             registerToMessageBus.Register<IInputTreeUpdatedMessage>(service);
             return service;
         }
@@ -222,6 +224,7 @@ namespace BeaverSoft.Texo.Core
             registerToMessageBus.Register<ISettingUpdatedMessage>(usedView);
             registerToMessageBus.Register<IVariableUpdatedMessage>(usedView);
             registerToMessageBus.Register<IClearViewOutputMessage>(usedView);
+            registerToMessageBus.Register<PromptUpdateMessage>(usedView);
         }
     }
 }

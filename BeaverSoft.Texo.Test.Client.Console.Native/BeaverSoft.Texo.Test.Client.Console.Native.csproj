@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8A3EAA62-AB20-4BE7-A864-7C3C7B229362}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>BeaverSoft.Texo.Test.Client.Console</RootNamespace>
+    <AssemblyName>BeaverSoft.Texo.Test.Client.Console.Native</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\BeaverSoft.Texo.Test.Client.Console\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BeaverSoft.Texo.Core.MarkDown\BeaverSoft.Texo.Core.Markdown.csproj">
+      <Project>{9d99b9d9-ed3a-430c-8233-68cb05cb7cca}</Project>
+      <Name>BeaverSoft.Texo.Core.Markdown</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj">
+      <Project>{588610d7-7d21-4df8-aad6-e88c83560d87}</Project>
+      <Name>BeaverSoft.Texo.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell.Markdown\BeaverSoft.Texo.Fallback.PowerShell.Markdown.csproj">
+      <Project>{6e8522a3-058b-47b9-b8c0-d9a14978647a}</Project>
+      <Name>BeaverSoft.Texo.Fallback.PowerShell.Markdown</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell\BeaverSoft.Texo.Fallback.PowerShell.csproj">
+      <Project>{a97a2edb-7ac3-4f23-963e-d9a924a87a11}</Project>
+      <Name>BeaverSoft.Texo.Fallback.PowerShell</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.View.Console.Markdown\BeaverSoft.Texo.View.Console.Markdown.csproj">
+      <Project>{74fa3293-4fc3-4b60-ba41-3670657ad3d3}</Project>
+      <Name>BeaverSoft.Texo.View.Console.Markdown</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Texo.View.Console\BeaverSoft.Texo.View.Console.csproj">
+      <Project>{c23ee235-084e-44fc-8238-d0ca0c5cc329}</Project>
+      <Name>BeaverSoft.Texo.View.Console</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.CommandLine\Commands.CommandLine.csproj">
+      <Project>{620b936c-b2a0-4b37-97da-11e32b858d7c}</Project>
+      <Name>Commands.CommandLine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.FileManager\Commands.FileManager.csproj">
+      <Project>{2afdfe71-d743-49df-9f47-61a94431cf00}</Project>
+      <Name>Commands.FileManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.NugetManager\Commands.NugetManager.csproj">
+      <Project>{6b1ba988-e9c1-46b7-86ee-1d0269d21906}</Project>
+      <Name>Commands.NugetManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.ReferenceCheck\Commands.ReferenceCheck.csproj">
+      <Project>{02d86f64-24cc-4728-8e3a-e269fa55c109}</Project>
+      <Name>Commands.ReferenceCheck</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BeaverSoft.StrongBeaver.Core">
+      <Version>0.9.8-alpha</Version>
+    </PackageReference>
+    <PackageReference Include="Markdig">
+      <Version>0.16.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Immutable">
+      <Version>1.5.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

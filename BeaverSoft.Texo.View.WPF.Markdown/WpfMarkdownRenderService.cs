@@ -1,18 +1,24 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Documents;
 using BeaverSoft.Texo.Core.Services;
+using BeaverSoft.Texo.Core.Streaming;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.View.WPF.Rendering;
 
 namespace BeaverSoft.Texo.View.WPF.Markdown
 {
     public class WpfMarkdownRenderService : IWpfRenderService
     {
         private readonly IMarkdownService markdown;
+        private readonly IWpfRenderService fallbackRenderService;
 
         public WpfMarkdownRenderService(IMarkdownService markdown)
         {
             this.markdown = markdown;
+            fallbackRenderService = new WpfPlainTextRenderService();
         }
 
         public Section Render(IItem item)
@@ -20,15 +26,27 @@ namespace BeaverSoft.Texo.View.WPF.Markdown
             if (item.Format != TextFormatEnum.Markdown
                 && item.Format != TextFormatEnum.Model)
             {
-                return BuildPlainItem(item);
+                return fallbackRenderService.Render(item);
             }
 
             return BuildItem(item);
         }
 
+        public Task<Section> StartStreamRenderAsync(IReportableStream stream, Action<Span> onAfterRender, Action onFinish)
+        {
+            return fallbackRenderService.StartStreamRenderAsync(stream, onAfterRender, onFinish);
+        }
+
         private Section BuildItem(IItem item)
         {
-            FlowDocument itemDocument = Markdig.Wpf.Markdown.ToFlowDocument(item.Text, markdown.Pipeline);
+            Section itemSection = BuildMarkdown(item.Text);
+            itemSection.Tag = item;
+            return itemSection;
+        }
+
+        private Section BuildMarkdown(string markdownText)
+        {
+            FlowDocument itemDocument = Markdig.Wpf.Markdown.ToFlowDocument(markdownText, markdown.Pipeline);
             Section itemSection = new Section();
             List<Block> blocks = itemDocument.Blocks.ToList();
 
@@ -37,14 +55,6 @@ namespace BeaverSoft.Texo.View.WPF.Markdown
                 itemSection.Blocks.Add(block);
             }
 
-            itemSection.Tag = item;
-            return itemSection;
-        }
-
-        private static Section BuildPlainItem(IItem item)
-        {
-            Section itemSection = new Section();
-            itemSection.Blocks.Add(new Paragraph(new Run(item.Text)));
             return itemSection;
         }
     }

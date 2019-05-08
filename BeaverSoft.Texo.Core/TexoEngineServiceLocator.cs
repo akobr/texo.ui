@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
-using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.Input.History;
+using BeaverSoft.Texo.Core.Inputting;
+using BeaverSoft.Texo.Core.Inputting.History;
+using BeaverSoft.Texo.Core.Intellisense;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services;
@@ -35,7 +36,7 @@ namespace BeaverSoft.Texo.Core
 
         public Func<IResultProcessingService> ResultProcessing { get; set; }
 
-        public Func<IIntellisenceService> Intellisence { get; set; }
+        public Func<IIntellisenseService> Intellisense { get; set; }
 
         public Func<IDidYouMeanService> DidYouMean { get; set; }
 

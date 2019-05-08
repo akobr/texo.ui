@@ -15,7 +15,7 @@ The main goal is to create a simple framework for text base UI which is usable o
 * Input is only plain text (*touch friendly* command line)
 * Minimalistic user interface
 * Usage of **immutable** view models
-* Build in support for intellisence, *"did you mean?"* correction system
+* Build in support for intellisense, *"did you mean?"* correction system
 * Integration of **markdown** language
 * Rich system of commands, actions and results
 
@@ -23,7 +23,7 @@ The main goal is to create a simple framework for text base UI which is usable o
 
 1. Command line
 2. Result view
-3. Layers? (intellisence, work in progress/background)
+3. Layers? (intellisense, work in progress/background)
 4. Tabs?
 
 > Prompts: **t>**, **tu>**, **to>**, **tm>**
@@ -32,7 +32,7 @@ The main goal is to create a simple framework for text base UI which is usable o
 
 * Markdown language / HTML
 * Command tree definition
-* Intellisence, help
+* Intellisense, help
 * *Did you mean?* correction system
 * Long-running / background commands
 

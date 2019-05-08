@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,8 +12,8 @@ using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
-using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.Input.History;
+using BeaverSoft.Texo.Core.Inputting;
+using BeaverSoft.Texo.Core.Inputting.History;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
@@ -24,7 +25,7 @@ namespace BeaverSoft.Texo.View.WPF
 {
     public class WpfViewService : IViewService, IPromptableViewService, IInitialisable<TexoControl>
     {
-        private const string DEFAULT_PROMPT = "tu>";
+        private const string DEFAULT_PROMPT = "initialising>";
         private const string DEFAULT_TITLE = "Texo UI";
 
         private readonly IWpfRenderService renderer;
@@ -83,7 +84,12 @@ namespace BeaverSoft.Texo.View.WPF
             throw new NotImplementedException();
         }
 
-        public void Render(Input input, IImmutableList<IItem> items)
+        public void ShowProgress(int id, string name, int progress)
+        {
+            control.SetProgress(name, progress);
+        }
+
+        public async void Render(Input input, IImmutableList<IItem> items)
         {
             // TODO: [P2] Solve this by result processing pipeline
             if (input.Context.Key == CommandKeys.CLEAR)
@@ -96,17 +102,58 @@ namespace BeaverSoft.Texo.View.WPF
             List<Section> sections = new List<Section>(items.Count);
             Item headerItem = BuildCommandHeaderItem(input);
             Section header = renderer.Render(headerItem);
-            header.Loaded += HandleLastSectionLoaded;
+            header.Loaded += HandleLastElementLoaded;
             sections.Add(header);
 
-            if (items != null
-                && items.Count > 0
-                && (items.Count != 1 || !string.IsNullOrWhiteSpace(items[0].Text)))
+            if (items != null && items.Count > 0)
             {
-                foreach (IItem item in items)
+                if (items.Count == 1)
                 {
-                    sections.Add(renderer.Render(item));
+                    IItem firstItem = items[0];
+
+                    if (firstItem is IStreamedItem steamItem)
+                    {
+                        sections.Add(await renderer.StartStreamRenderAsync(steamItem.Stream, 
+                            (renderedSpan) =>
+                            {
+                                if (renderedSpan.Inlines.Count < 1)
+                                {
+                                    return;
+                                }
+
+                                Inline lastLine = renderedSpan.Inlines.LastInline;
+                                if (lastLine.IsLoaded)
+                                {
+                                    lastLine.BringIntoView();
+                                }
+                                else
+                                {
+                                    lastLine.Loaded += HandleLastElementLoaded;
+                                }
+                            },
+                            () => {
+                                control.Dispatcher.Invoke(() =>
+                                {
+                                    control.EnableInput();
+                                    control.SetHistoryCount(history.Count);
+                                });
+                            }));
+
+                        control.OutputDocument.Blocks.AddRange(sections);
+                        return;
+                    }
+                    else if (!string.IsNullOrEmpty(firstItem.Text))
+                    {
+                        sections.Add(renderer.Render(firstItem));
+                    }
                 }
+                else
+                {
+                    foreach (IItem item in items)
+                    {
+                        sections.Add(renderer.Render(item));
+                    }
+                } 
             }
 
             control.OutputDocument.Blocks.AddRange(sections);
@@ -114,17 +161,23 @@ namespace BeaverSoft.Texo.View.WPF
             control.SetHistoryCount(history.Count);
         }
 
-        private void HandleLastSectionLoaded(object sender, RoutedEventArgs e)
+        private void HandleLastElementLoaded(object sender, RoutedEventArgs e)
         {
-            Section section = (Section)sender;
-            section.Loaded -= HandleLastSectionLoaded;
-            section.BringIntoView();
+            FrameworkContentElement element = (FrameworkContentElement)sender;
+            element.Loaded -= HandleLastElementLoaded;
+            element.BringIntoView();
         }
 
-        public void RenderIntellisence(Input input, IImmutableList<IItem> items)
+        public void RenderIntellisense(Input input, IImmutableList<IItem> items)
         {
-            control.IntellisenceList.Visibility = Visibility.Collapsed;
-            control.IntellisenceList.Items.Clear();
+            if (!control.Dispatcher.CheckAccess())
+            {
+                control.Dispatcher.Invoke(() => RenderIntellisense(input, items));
+                return;
+            }
+
+            control.IntellisenseList.Visibility = Visibility.Collapsed;
+            control.IntellisenseList.Items.Clear();
 
             if (items == null || items.Count < 1)
             {
@@ -148,10 +201,10 @@ namespace BeaverSoft.Texo.View.WPF
                 box.SetResourceReference(Control.ForegroundProperty, "SystemBaseHighColorBrush");
                 box.Document = new FlowDocument();
                 box.Document.Blocks.AddRange(itemSection.Blocks.ToList());
-                control.IntellisenceList.Items.Add(new ListBoxItem() { Content = box, Tag = item });
+                control.IntellisenseList.Items.Add(new ListBoxItem() { Content = box, Tag = item });
             }
 
-            control.IntellisenceList.Visibility = Visibility.Visible;
+            control.IntellisenseList.Visibility = Visibility.Visible;
         }
 
         public void RenderProgress(IProgress progress)
@@ -211,7 +264,7 @@ namespace BeaverSoft.Texo.View.WPF
             control.InputChanged += TexoInputChanged;
             control.InputFinished += TexoInputFinished;
             control.KeyScrolled += TexoCommandHistoryScrolled;
-            control.IntellisenceItemExecuted += TexoIntellisenceItemExecuted;
+            control.IntellisenseItemExecuted += TexoIntellisenseItemExecuted;
 
             CommandBinding linkCommandBinding = new CommandBinding(Commands.Hyperlink, OnLinkExecuted, OnLinkCanExecute);
             control.CommandBindings.Add(linkCommandBinding);
@@ -221,11 +274,11 @@ namespace BeaverSoft.Texo.View.WPF
             BuildInitialFlowDocument();
         }
 
-        private void TexoIntellisenceItemExecuted(object sender, EventArgs e)
+        private void TexoIntellisenseItemExecuted(object sender, EventArgs e)
         {
-            ListBoxItem viewItem = (ListBoxItem)control.IntellisenceList.SelectedItem;
+            ListBoxItem viewItem = (ListBoxItem)control.IntellisenseList.SelectedItem;
             IItem item = (IItem)viewItem.Tag;
-            control.CloseIntellisence();
+            control.CloseIntellisense();
 
             if (item.Actions.Count < 1)
             {
@@ -326,13 +379,13 @@ namespace BeaverSoft.Texo.View.WPF
             executor.PreProcess(input, input.Length);
         }
 
-        private void TexoInputFinished(object sender, string input)
+        private async void TexoInputFinished(object sender, string input)
         {
-            control.CloseIntellisence();
+            control.CloseIntellisense();
             control.DisableInput();
             lastWorkingDirectory = workingDirectory;
             historyItem = null;
-            executor.Process(input);
+            await executor.ProcessAsync(input);
         }
 
         private Item BuildCommandHeaderItem(Input input)
@@ -362,8 +415,14 @@ namespace BeaverSoft.Texo.View.WPF
             return Item.Markdown(headerBuilder.ToString());
         }
 
-        void IMessageBusRecipient<ISettingUpdatedMessage>.ProcessMessage(ISettingUpdatedMessage message)
+        public void ProcessMessage(ISettingUpdatedMessage message)
         {
+            if (control != null && !control.Dispatcher.CheckAccess())
+            {
+                control.Dispatcher.InvokeAsync(() => ProcessMessage(message));
+                return;
+            }
+
             showWorkingPathAsPrompt = message.Configuration.Ui.ShowWorkingPathAsPrompt;
             string currentDirectory = message.Configuration.Environment.Variables[VariableNames.CURRENT_DIRECTORY];
 
@@ -379,8 +438,25 @@ namespace BeaverSoft.Texo.View.WPF
             }
         }
 
-        void IMessageBusRecipient<IVariableUpdatedMessage>.ProcessMessage(IVariableUpdatedMessage message)
+        void IMessageBusRecipient<PromptUpdateMessage>.ProcessMessage(PromptUpdateMessage message)
         {
+            if (control != null && !control.Dispatcher.CheckAccess())
+            {
+                control.Dispatcher.InvokeAsync(() => SetPrompt(message.Prompt));
+                return;
+            }
+
+            SetPrompt(message.Prompt);
+        }
+
+        public void ProcessMessage(IVariableUpdatedMessage message)
+        {
+            if (control != null && !control.Dispatcher.CheckAccess())
+            {
+                control.Dispatcher.InvokeAsync(() => ProcessMessage(message));
+                return;
+            }
+
             control?.SetVariableCount(message.Environment.Count);
 
             if (message.Name != VariableNames.CURRENT_DIRECTORY)
@@ -397,12 +473,13 @@ namespace BeaverSoft.Texo.View.WPF
             else
             {
                 SetTitle(workingDirectory);
+                SetPrompt("tu");
             }
         }
 
         void IMessageBusRecipient<IClearViewOutputMessage>.ProcessMessage(IClearViewOutputMessage message)
         {
-            control.OutputDocument.Blocks.Clear();
+            control.CleanResults();
         }
 
         private void SetPrompt(string prompt)
@@ -429,14 +506,16 @@ namespace BeaverSoft.Texo.View.WPF
             control.Title = currentTitle;
         }
 
+        [Conditional("DEBUG")]
         private void BuildInitialFlowDocument()
         {
+            // TODO: [P3] Write down info and version
             control.OutputDocument.Blocks.Add(new Paragraph(new Run(DEFAULT_TITLE))
             {
                 FontSize = 14
             });
 
-            control.OutputDocument.Blocks.Add(new Paragraph(new Run("Welcome in smart command line..."))
+            control.OutputDocument.Blocks.Add(new Paragraph(new Run("Markdown and text-based command line powered by PowerShell."))
             {
                 FontSize = 12,
                 FontStyle = FontStyles.Italic,

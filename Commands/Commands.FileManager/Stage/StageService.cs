@@ -37,15 +37,19 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
         public void Add(IEnumerable<string> newPaths)
         {
+            var updatedPaths = paths.ToBuilder();
+
             foreach (string path in newPaths)
             {
                 string fullPath = path.GetFullPath();
 
-                if (!paths.Contains(fullPath))
+                if (!updatedPaths.Contains(fullPath))
                 {
-                    paths = paths.Add(fullPath);
+                    updatedPaths.Add(fullPath);
                 }
             }
+
+            paths = updatedPaths.ToImmutable();
         }
 
         public void Add(IStashEntry stash)
@@ -60,11 +64,30 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
 
         public void Remove(IEnumerable<string> newPaths)
         {
+            var updatedPaths = paths.ToBuilder();
+
             foreach (string path in newPaths)
             {
                 string fullPath = path.GetFullPath();
-                paths = paths.Remove(fullPath);
+                updatedPaths.Remove(fullPath);
             }
+
+            paths = updatedPaths.ToImmutable();
+        }
+
+        public void Remove(TexoPath toRemove)
+        {
+            var updatedPaths = paths.ToBuilder();
+
+            foreach (string path in paths)
+            {
+                if (toRemove.IsMatch(path))
+                {
+                    updatedPaths.Remove(path);
+                }
+            }
+
+            paths = updatedPaths.ToImmutable();
         }
 
         public string GetLobby()

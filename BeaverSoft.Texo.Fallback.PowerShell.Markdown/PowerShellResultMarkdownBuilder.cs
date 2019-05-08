@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell.Transforming;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
 {
@@ -11,7 +12,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
 
         public bool ContainError => containError;
 
-        public Item FinishItem()
+        public Item Finish()
         {
             Item result = Item.Markdown(markdown.ToString());
 
@@ -19,10 +20,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
             return result;
         }
 
-        public void StartItem()
+        public bool Start(InputModel inputModel)
         {
             containError = false;
             markdown = new MarkdownBuilder();
+            return false;
         }
 
         public void Write(string text)
@@ -50,6 +52,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
         public void WriteLine(string text)
         {
             markdown.WriteLine(text);
+        }
+
+        public void WriteLine()
+        {
+            markdown.WriteLine();
         }
 
         public void WriteVerboseLine(string text)

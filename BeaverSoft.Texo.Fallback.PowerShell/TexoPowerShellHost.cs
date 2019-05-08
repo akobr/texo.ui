@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -18,10 +18,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         private readonly IPromptableViewService view;
         private readonly ILogService logger;
 
+        private Runspace independentRunspace;
+        private object independentLocker = new object(); 
+
         private Runspace pushedRunspace;
         private Stack<Guid> applications;
         private Stack<Guid> prompts;
-        private StringBuilder appOutput;
 
         public TexoPowerShellHost(
             IPowerShellResultBuilder resultBuilder,
@@ -59,6 +61,23 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public Runspace Runspace { get; private set; }
 
+        public Runspace GetIndependentRunspace()
+        {
+            if (independentRunspace == null)
+            {
+                lock (independentLocker)
+                {
+                    if(independentRunspace == null)
+                    {
+                        independentRunspace = RunspaceFactory.CreateRunspace(this);
+                        independentRunspace.Open();
+                    }
+                }
+            }
+
+            return independentRunspace;
+        }
+
         public void Initialise()
         {
             Runspace = RunspaceFactory.CreateRunspace(this);
@@ -78,29 +97,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         public override void NotifyBeginApplication()
         {
             applications.Push(Guid.NewGuid());
-
-            if (applications.Count != 1)
-            {
-                return;
-            }
-
-            appOutput = new StringBuilder();
-            StringWriter writer = new StringWriter(appOutput);
-            Console.SetOut(writer);
         }
 
         public override void NotifyEndApplication()
         {
             applications.Pop();
-
-            if (applications.Count > 0)
-            {
-                return;
-            }
-
-            StreamWriter standardOutput = new StreamWriter(Console.OpenStandardOutput());
-            standardOutput.AutoFlush = true;
-            Console.SetOut(standardOutput);
         }
 
         public override void SetShouldExit(int exitCode)

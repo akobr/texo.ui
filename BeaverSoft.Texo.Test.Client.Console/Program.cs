@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.FileManager.Stash;
@@ -9,7 +10,7 @@ using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
-using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
@@ -43,16 +44,14 @@ namespace BeaverSoft.Texo.Test.Client.Console
             }
             else
             {
-                Run(args);
+                RunAsync(args).ContinueWith((_) => Shutdown());
             }
-
-            Shutdown();
         }
 
         private static void Startup()
         {
             SimpleIoc container = new SimpleIoc();
-
+            
             container.Register<ServiceMessageBus>();
             container.Register<IServiceMessageBus>(() => container.GetInstance<ServiceMessageBus>());
             container.Register<IServiceMessageBusRegister>(() => container.GetInstance<ServiceMessageBus>());
@@ -112,7 +111,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
 
             ServiceMessageBus messageBus = container.GetInstance<ServiceMessageBus>();
 
-            engine = new TexoEngineBuilder(messageBus, messageBus)
+            var engineBuilder = new TexoEngineBuilder(messageBus, messageBus)
                 .WithLogService(container.GetInstance<ILogService>())
                 .WithInputParseService(container.GetInstance<IInputParseService>())
                 .WithInputEvaluationService(container.GetInstance<IInputEvaluationService>())
@@ -120,8 +119,13 @@ namespace BeaverSoft.Texo.Test.Client.Console
                 .WithSettingService(container.GetInstance<ISettingService>())
                 .WithCommandManagementService(container.GetInstance<ICommandManagementService>())
                 .WithResultProcessingService(container.GetInstance<IResultProcessingService>())
-                .WithFallbackService(container.GetInstance<IFallbackService>())
-                .Build(commandFactory, container.GetInstance<IViewService>());
+                .WithFallbackService(container.GetInstance<IFallbackService>());
+
+            var locator = engineBuilder.GetServiceLocator();
+            container.Register(locator.ActionProvider);
+            container.Register(locator.ActionRegister);
+
+            engine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
 
             var config = TextumConfiguration.CreateDefault().ToBuilder();
             config.Runtime.Commands.Add(ReferenceCheckCommand.BuildConfiguration());
@@ -142,9 +146,9 @@ namespace BeaverSoft.Texo.Test.Client.Console
             engine.Start();
         }
 
-        private static void Run(string[] args)
+        private static Task RunAsync(string[] args)
         {
-            engine.Process(string.Join(' ', args));
+            return engine.ProcessAsync(string.Join(" ", args));
         }
 
         private static bool IsLongRunning(string[] args)

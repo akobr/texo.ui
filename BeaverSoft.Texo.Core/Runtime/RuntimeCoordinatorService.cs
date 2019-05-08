@@ -1,13 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
-using BeaverSoft.Texo.Core.Input;
-using BeaverSoft.Texo.Core.Input.History;
+using BeaverSoft.Texo.Core.Inputting;
+using BeaverSoft.Texo.Core.Inputting.History;
+using BeaverSoft.Texo.Core.Intellisense;
 using BeaverSoft.Texo.Core.View;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Core.Runtime
 {
@@ -17,12 +20,13 @@ namespace BeaverSoft.Texo.Core.Runtime
         private readonly IInputEvaluationService evaluator;
         private readonly ICommandManagementService commandManagement;
         private readonly IDidYouMeanService didYouMean;
-        private readonly IIntellisenceService intelisence;
+        private readonly IIntellisenseService intellisense;
         private readonly IResultProcessingService resultProcessing;
         private readonly IViewService view;
         private readonly IActionManagementService actionManagement;
         private readonly IInputHistoryService history;
         private readonly IFallbackService fallback;
+        private readonly ILogService logger;
 
         public RuntimeCoordinatorService(
             IEnvironmentService environment,
@@ -32,9 +36,10 @@ namespace BeaverSoft.Texo.Core.Runtime
             IViewService view,
             IActionManagementService actionManagement,
             IInputHistoryService history,
-            IIntellisenceService intelisence,
+            IIntellisenseService intellisense,
             IDidYouMeanService didYouMean,
-            IFallbackService fallback)
+            IFallbackService fallback,
+            ILogService logger)
         {
             this.environment = environment ?? throw new ArgumentNullException(nameof(environment));
             this.evaluator = evaluator ?? throw new ArgumentNullException(nameof(evaluator));
@@ -43,8 +48,9 @@ namespace BeaverSoft.Texo.Core.Runtime
             this.view = view ?? throw new ArgumentNullException(nameof(view));
             this.actionManagement = actionManagement ?? throw new ArgumentNullException(nameof(actionManagement));
 
+            this.logger = logger;
             this.history = history;
-            this.intelisence = intelisence;
+            this.intellisense = intellisense;
             this.didYouMean = didYouMean;
             this.fallback = fallback;
         }
@@ -62,17 +68,37 @@ namespace BeaverSoft.Texo.Core.Runtime
             view.Start();
         }
 
-        public Input.Input PreProcess(string input, int cursorPosition)
+        public Input PreProcess(string input, int cursorPosition)
         {
-            Input.Input inputModel = evaluator.Evaluate(input);
-            var items = intelisence?.Help(inputModel, cursorPosition) ?? ImmutableList<IItem>.Empty;
-            view.RenderIntellisence(inputModel, items);
+            Input inputModel = evaluator.Evaluate(input);
+            
+            if (intellisense == null)
+            {
+                return inputModel;
+            }
+
+            intellisense
+                .HelpAsync(inputModel, cursorPosition)
+                .ContinueWith((task) =>
+                    {
+                        if (task.Status == TaskStatus.Faulted)
+                        {
+                            logger.Error("Retrieving of intellisense failed.", task.Exception);
+                            return;
+                        }
+
+                        if (task.Result != null)
+                        {
+                            view.RenderIntellisense(inputModel, task.Result);
+                        }
+                    });
+
             return inputModel;
         }
 
-        public void Process(string input)
+        public async Task ProcessAsync(string input)
         {
-            Input.Input inputModel = evaluator.Evaluate(input);
+            Input inputModel = evaluator.Evaluate(input);
             history?.Enqueue(inputModel);
 
             if (!inputModel.Context.IsValid)
@@ -80,7 +106,7 @@ namespace BeaverSoft.Texo.Core.Runtime
                 if (fallback != null
                     && string.IsNullOrEmpty(inputModel.Context.Key))
                 {
-                    Render(inputModel, fallback.Fallback(inputModel));
+                    Render(inputModel, await fallback.FallbackAsync(inputModel));
                 }
                 else if (didYouMean != null)
                 {
@@ -99,7 +125,7 @@ namespace BeaverSoft.Texo.Core.Runtime
                 return;
             }
 
-            ProcessContext(inputModel, inputModel.Context);
+            await ProcessContextAsync(inputModel, inputModel.Context);
         }
 
         public void ExecuteAction(string actionUrl)
@@ -118,59 +144,70 @@ namespace BeaverSoft.Texo.Core.Runtime
             commandManagement.Dispose();
         }
 
-        private void ProcessContext(Input.Input input, CommandContext context)
+        private Task ProcessContextAsync(Input input, CommandContext context)
         {
             ICommand command = commandManagement.BuildCommand(context.Key);
 
             switch (command)
             {
                 case IAsyncCommand asyncCommand:
-                    ProcessAsyncCommand(asyncCommand, context, input);
-                    break;
+                    return ProcessAsyncCommand(asyncCommand, context, input);
 
                 default:
-                    ProcessCommand(command, context, input);
-                    break;
+                    return ProcessCommand(command, context, input);
             }
         }
 
-        private void ProcessCommand(ICommand command, CommandContext context, Input.Input input)
+        private async Task ProcessCommand(ICommand command, CommandContext context, Input input)
         {
-            //try
-            //{
-                ICommandResult result = command.Execute(context);
-                Render(input, result);
-            //}
-            //catch (Exception exception)
-            //{
-            //    RenderError(input, exception.Message);
-            //}
-        }
-
-        private async void ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input.Input input)
-        {
+#if !DEBUG
             try
             {
-                ICommandResult result = await command.ExecuteAsync(context);
-                Render(input, result);
+#endif
+                await ProcessCommandAsTask(command, context, input);
+#if !DEBUG
             }
             catch (Exception exception)
             {
                 RenderError(input, exception.Message);
             }
+#endif
         }
 
-        private void Render(Input.Input input, ICommandResult result)
+        private async Task ProcessCommandAsTask(ICommand command, CommandContext context, Input input)
+        {
+            ICommandResult result = await Task.Run(() => command.Execute(context)).ConfigureAwait(true);
+            Render(input, result);
+        }
+
+        private async Task ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input input)
+        {
+#if !DEBUG
+            try
+            {
+#endif
+                ICommandResult result = await command.ExecuteAsync(context);
+                Render(input, result);
+#if !DEBUG
+            }
+            catch (Exception exception)
+            {
+                RenderError(input, exception.Message);
+            }
+#endif
+        }
+
+        private void Render(Input input, ICommandResult result)
         {
             Render(input, resultProcessing.Transfort(result));
         }
 
-        private void Render(Input.Input input, IImmutableList<IItem> items)
+        private void Render(Input input, IImmutableList<IItem> items)
         {
             view.Render(input, items);
         }
 
-        private void RenderError(Input.Input input, string message)
+        private void RenderError(Input input, string message)
         {
             Render(input, ImmutableList<IItem>.Empty.Add(Item.Markdown($"> {message}")));
         }

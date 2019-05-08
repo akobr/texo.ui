@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
-using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Messaging;
@@ -20,6 +20,7 @@ namespace BeaverSoft.Texo.View.Console
         private IExecutor executor;
         private TextumConfiguration configuration;
         private string workingDir;
+        private string prompt;
         private bool disposed;
 
         public ConsoleViewService(IConsoleRenderService renderer)
@@ -48,7 +49,7 @@ namespace BeaverSoft.Texo.View.Console
             }
         }
 
-        private void WaitForInput()
+        private async void WaitForInput()
         {
             string input = SysConsole.ReadLine();
 
@@ -59,7 +60,7 @@ namespace BeaverSoft.Texo.View.Console
 
             using (new ConsoleStopwatch())
             {
-                executor.Process(input);
+                await executor.ProcessAsync(input);
             }
         }
 
@@ -71,7 +72,7 @@ namespace BeaverSoft.Texo.View.Console
             }
         }
 
-        public void RenderIntellisence(Input input, IImmutableList<IItem> items)
+        public void RenderIntellisense(Input input, IImmutableList<IItem> items)
         {
             // TODO
         }
@@ -102,6 +103,11 @@ namespace BeaverSoft.Texo.View.Console
             SysConsole.Write(" " + append.Trim());
         }
 
+        public void ShowProgress(int id, string name, int progress)
+        {
+            SysConsole.WriteLine($"{name}: {progress}%");
+        }
+
         public void Dispose()
         {
             disposed = true;
@@ -127,7 +133,7 @@ namespace BeaverSoft.Texo.View.Console
             }
             else
             {
-                TexoConsole.WritePrompt(configuration.Ui.Prompt);
+                TexoConsole.WritePrompt(prompt);
             }
         }
 
@@ -144,11 +150,17 @@ namespace BeaverSoft.Texo.View.Console
             }
 
             workingDir = message.NewValue;
+            prompt = configuration.Ui.Prompt;
         }
 
         void IMessageBusRecipient<IClearViewOutputMessage>.ProcessMessage(IClearViewOutputMessage message)
         {
             SysConsole.Clear();
+        }
+
+        void IMessageBusRecipient<PromptUpdateMessage>.ProcessMessage(PromptUpdateMessage message)
+        {
+            prompt = message.Prompt;
         }
     }
 }

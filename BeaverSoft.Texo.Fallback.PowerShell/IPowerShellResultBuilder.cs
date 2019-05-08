@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Fallback.PowerShell.Transforming;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
@@ -7,13 +8,15 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
     {
         bool ContainError { get; }
 
-        void StartItem();
+        bool Start(InputModel inputModel);
 
         void Write(string text);
 
         void Write(string text, ConsoleColor foreground, ConsoleColor background);
 
         void WriteLine(string text);
+
+        void WriteLine();
 
         void WriteVerboseLine(string text);
 
@@ -23,6 +26,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         void WriteErrorLine(string text);
 
-        Item FinishItem();
+        Item Finish();
     }
 }

@@ -5,7 +5,7 @@ using System.IO;
 using System.Xml.Linq;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
-using BeaverSoft.Texo.Core.Input;
+using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Result;
