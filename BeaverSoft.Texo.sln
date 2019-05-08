@@ -68,9 +68,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands.Clipboard", "Comma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Texo.Test.Client.Console.Native", "BeaverSoft.Texo.Test.Client.Console.Native\BeaverSoft.Texo.Test.Client.Console.Native.csproj", "{8A3EAA62-AB20-4BE7-A864-7C3C7B229362}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands.Functions", "Commands\Commands.Functions\Commands.Functions.csproj", "{33BCB6F8-8A55-44A9-910E-628A096E41E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.Functions", "Commands\Commands.Functions\Commands.Functions.csproj", "{33BCB6F8-8A55-44A9-910E-628A096E41E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands.TodoList", "Commands\Commands.TodoList\Commands.TodoList.csproj", "{97D0F39C-335B-4012-9DD1-514FC74C02CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands.TodoList", "Commands\Commands.TodoList\Commands.TodoList.csproj", "{97D0F39C-335B-4012-9DD1-514FC74C02CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeaverSoft.Text.Client", "BeaverSoft.Text.Client", "{061058FB-1E54-4BC5-9F15-1BFAA70DA966}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Text.Client.VisualStudio", "BeaverSoft.Text.Client.VisualStudio\BeaverSoft.Text.Client.VisualStudio.csproj", "{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -182,6 +186,10 @@ Global
 		{97D0F39C-335B-4012-9DD1-514FC74C02CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97D0F39C-335B-4012-9DD1-514FC74C02CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97D0F39C-335B-4012-9DD1-514FC74C02CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -211,6 +219,7 @@ Global
 		{8A3EAA62-AB20-4BE7-A864-7C3C7B229362} = {F5B87E3E-7729-46C9-8863-75ED2D5A2D51}
 		{33BCB6F8-8A55-44A9-910E-628A096E41E6} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 		{97D0F39C-335B-4012-9DD1-514FC74C02CC} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
+		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF} = {061058FB-1E54-4BC5-9F15-1BFAA70DA966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDFCCFD5-8669-4BBF-83FF-8DFCC3F39551}
