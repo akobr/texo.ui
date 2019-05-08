@@ -1,6 +1,7 @@
 using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.FileManager.Stash;
+using BeaverSoft.Texo.Commands.Functions;
 using BeaverSoft.Texo.Commands.NugetManager;
 using BeaverSoft.Texo.Commands.NugetManager.Services;
 using BeaverSoft.Texo.Core;
@@ -60,6 +61,9 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             // Clipboard
             container.Register<ClipboardMonitoringService>();
             container.Register<ClipboardCommand>();
+
+            // Developer Functions
+            container.Register<FunctionsCommand>();
 
             // View
             container.Register<IMarkdownService, MarkdownService>();

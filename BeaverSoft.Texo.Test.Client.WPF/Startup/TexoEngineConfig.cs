@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Commands.FileManager;
+using BeaverSoft.Texo.Commands.Functions;
 using BeaverSoft.Texo.Commands.NugetManager;
 using BeaverSoft.Texo.Core;
 using Commands.Calc;
@@ -19,8 +20,8 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
                 FileManagerBuilder.BuildCommand(),
                 NugetManagerBuilder.BuildCommand(),
                 CalcCommand.BuildConfiguration(),
-                ClipboardBuilder.BuildCommand()/*,
-                GitBuilder.BuildCommand()*/);
+                ClipboardBuilder.BuildCommand(),
+                FunctionsBuilder.BuildCommand());
         }
     }
 }
