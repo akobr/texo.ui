@@ -286,6 +286,17 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
 
         private void UpdateFormatting(string value)
         {
+            // TODO: [P3] needs refactoring
+            if (value.Length > 10)
+            {
+                if(value.StartsWith("38;2"))
+                {
+                    string[] values = value.Split(';');
+                    foregroundBrush = new SolidColorBrush(Color.FromArgb(255, byte.Parse(values[2]), byte.Parse(values[3]), byte.Parse(values[4])));
+                    return;
+                }
+            }
+
             switch (value)
             {
                 case "0":
@@ -473,12 +484,24 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 return;
             }
 
+            if (streamedContainer?.Inlines.Count < 1)
+            {
+                streamedContainer.Dispatcher.BeginInvoke(new SetEmptyStream(SetEmptyCommandStream), streamedContainer);
+            }
+
             streamedContainer = null;
             stream.Dispose();
             streamedOnAfterRender = null;
             streamedOnFinished?.Invoke();
             streamedOnFinished = null;
         }
+
+        private void SetEmptyCommandStream(Span target)
+        {
+            target.Inlines.Add(new Run("command is done") { Foreground = Brushes.Gray });
+        }
+
+        private delegate void SetEmptyStream(Span target);
 
         private struct LineInfo
         {

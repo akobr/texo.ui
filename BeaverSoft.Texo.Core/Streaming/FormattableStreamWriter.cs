@@ -98,7 +98,7 @@ namespace BeaverSoft.Texo.Core.Streaming
             WriteAnsiSgrEscapeSequence(code);
         }
 
-        public void SetForegroundTextColor(int red, int green, int blue)
+        public void SetForegroundTextColor(byte red, byte green, byte blue)
         {
             string code = AnsiSgrEscapeCodes.GetForegroundColorCode(red, green, blue);
             WriteAnsiSgrEscapeSequence(code);
@@ -153,7 +153,7 @@ namespace BeaverSoft.Texo.Core.Streaming
             return WriteAnsiSgrEscapeSequenceAsync(code);
         }
 
-        public Task SetForegroundTextColorAsync(int red, int green, int blue)
+        public Task SetForegroundTextColorAsync(byte red, byte green, byte blue)
         {
             string code = AnsiSgrEscapeCodes.GetForegroundColorCode(red, green, blue);
             return WriteAnsiSgrEscapeSequenceAsync(code);

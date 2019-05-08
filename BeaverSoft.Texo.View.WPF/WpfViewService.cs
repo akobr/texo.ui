@@ -155,6 +155,10 @@ namespace BeaverSoft.Texo.View.WPF
                     }
                 } 
             }
+            else
+            {
+                sections.Add(renderer.Render(Item.Markdown("> command is done")));
+            }
 
             control.OutputDocument.Blocks.AddRange(sections);
             control.EnableInput();

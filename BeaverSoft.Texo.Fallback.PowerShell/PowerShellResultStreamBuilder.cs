@@ -154,7 +154,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             writer.ResetFormatting();
         }
 
-        private void WriteColored(string text, int red, int green, int blue)
+        private void WriteColored(string text, byte red, byte green, byte blue)
         {
             if (string.IsNullOrEmpty(text))
             {

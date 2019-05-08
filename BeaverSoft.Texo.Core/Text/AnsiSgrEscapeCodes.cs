@@ -32,12 +32,12 @@ namespace BeaverSoft.Texo.Core.Text
         public const char LINK_SEPARATOR = '|';
         public const string LINK_END = "998";
 
-        public static string GetForegroundColorCode(int red, int green, int blue)
+        public static string GetForegroundColorCode(byte red, byte green, byte blue)
         {
             return $"38;2;{red};{green};{blue}";
         }
 
-        public static string GetBackgroundColorCode(int red, int green, int blue)
+        public static string GetBackgroundColorCode(byte red, byte green, byte blue)
         {
             return $"48;2;{red};{green};{blue}";
         }

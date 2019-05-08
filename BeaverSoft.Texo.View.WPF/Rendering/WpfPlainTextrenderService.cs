@@ -17,9 +17,13 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
 
         public Section Render(IItem item)
         {
-            Section itemSection = new Section();
-            itemSection.Blocks.Add(new Paragraph(new Run(item.Text)));
-            return itemSection;
+            // Plain text
+            // Section itemSection = new Section();
+            // itemSection.Blocks.Add(new Paragraph(new Run(item.Text)));
+            // return itemSection;
+
+            // Console like
+            return streamRenderService.Render(item);
         }
 
         public Task<Section> StartStreamRenderAsync(IReportableStream stream, Action<Span> onAfterRender, Action onFinish)

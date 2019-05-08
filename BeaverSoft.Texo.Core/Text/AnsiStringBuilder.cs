@@ -78,7 +78,7 @@ namespace BeaverSoft.Texo.Core.Text
             return AppendSgrAnsiEscapeSequence(code);
         }
 
-        public AnsiStringBuilder AppendForegroundFormat(int red, int green, int blue)
+        public AnsiStringBuilder AppendForegroundFormat(byte red, byte green, byte blue)
         {
             string code = AnsiSgrEscapeCodes.GetForegroundColorCode(red, green, blue);
             return AppendSgrAnsiEscapeSequence(code);
@@ -96,7 +96,7 @@ namespace BeaverSoft.Texo.Core.Text
             return AppendSgrAnsiEscapeSequence(code);
         }
 
-        public AnsiStringBuilder AppendBackgroundFormat(int red, int green, int blue)
+        public AnsiStringBuilder AppendBackgroundFormat(byte red, byte green, byte blue)
         {
             string code = AnsiSgrEscapeCodes.GetBackgroundColorCode(red, green, blue);
             return AppendSgrAnsiEscapeSequence(code);
