@@ -1,22 +1,19 @@
 using BeaverSoft.Texo.Core.Actions;
-using BeaverSoft.Texo.Core.Runtime;
 
 namespace BeaverSoft.Text.Client.VisualStudio.Actions
 {
     public class PathOpenActionFactory : IActionFactory
     {
-        private readonly EnvDTE80.DTE2 dte;
-        private readonly IExecutor executor;
+        private readonly ExtensionContext context;
 
-        public PathOpenActionFactory(EnvDTE80.DTE2 dte, IExecutor executor)
+        public PathOpenActionFactory(ExtensionContext context)
         {
-            this.dte = dte;
-            this.executor = executor;
+            this.context = context;
         }
 
         public IAction Build()
         {
-            return new PathOpenAction(dte, executor);
+            return new PathOpenAction(context);
         }
     }
 }

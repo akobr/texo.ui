@@ -60,7 +60,7 @@
       <DependentUpon>TexoControlWrapper.xaml</DependentUpon>
     </Compile>
     <Compile Include="TexoToolWindow.cs" />
-    <Compile Include="TexoToolWindowState.cs" />
+    <Compile Include="ExtensionContext.cs" />
     <Compile Include="VisualStudioPackage.cs" />
   </ItemGroup>
   <ItemGroup>

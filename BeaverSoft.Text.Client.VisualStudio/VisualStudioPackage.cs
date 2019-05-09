@@ -10,6 +10,7 @@ using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Text.Client.VisualStudio.Actions;
 using BeaverSoft.Text.Client.VisualStudio.Startup;
+using Microsoft.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using StrongBeaver.Core.Container;
@@ -82,40 +83,40 @@ namespace BeaverSoft.Text.Client.VisualStudio
         {
             // Perform as much work as possible in this method which is being run on a background thread.
             // The object returned from this method is passed into the constructor of the SampleToolWindow 
-            var dte = await GetServiceAsync(typeof(EnvDTE.DTE)) as EnvDTE80.DTE2;
+            var dteTask = GetServiceAsync(typeof(EnvDTE.DTE));
+            var threadingTask = GetServiceAsync(typeof(IProjectThreadingService));
 
-            SimpleIoc container = new SimpleIoc();
+            var container = new SimpleIoc();
             container.RegisterServices();
 
-            TexoEngineBuilder engineBuilder =
-                new TexoEngineBuilder()
-                .WithLogService(new DebugLogService());
+            var engineBuilder = new TexoEngineBuilder()
+                .WithLogService(new DebugLogService())
+                .WithFallbackService(container.GetInstance<IFallbackService>());
 
             container.RegisterEngineServices(engineBuilder);
-            ITexoEngineServiceLocator engineServiceLocator = engineBuilder.GetServiceLocator();
 
-            CommandFactory commandFactory = new CommandFactory();
+            var commandFactory = new CommandFactory();
             commandFactory.RegisterCommands(container);
             container.RegisterCommandFactory(commandFactory);
 
-            engineBuilder.WithFallbackService(container.GetInstance<IFallbackService>());
-            TexoEngine texoEngine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
-            texoEngine.RegisterAction(new PathOpenActionFactory(dte, engineServiceLocator.Runtime()), ActionNames.PATH_OPEN, ActionNames.PATH);
+            var texoEngine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
 
-            IServiceMessageBus messageBus = container.GetInstance<IServiceMessageBus>();
+            var messageBus = container.GetInstance<IServiceMessageBus>();
             container.RegisterWithMessageBus();
             container.RegisterIntellisense();
 
+            var context = new ExtensionContext(
+                (EnvDTE80.DTE2)await dteTask,
+                (IProjectThreadingService)await threadingTask,
+                texoEngine,
+                messageBus);
+
+            // Register of actions
+            texoEngine.RegisterAction(new PathOpenActionFactory(context), ActionNames.PATH_OPEN, ActionNames.PATH);
+
             await texoEngine.InitialiseWithCommandsAsync();
             texoEngine.Start();
-
-            return new TexoToolWindowState
-            {
-                DTE = dte,
-                TexoEngine = texoEngine,
-                View = (WpfViewService)texoEngine.View,
-                ServiceMessageBus = messageBus,
-            };
+            return context;
         }
 
         #endregion

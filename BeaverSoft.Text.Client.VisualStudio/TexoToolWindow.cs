@@ -17,10 +17,10 @@ namespace BeaverSoft.Text.Client.VisualStudio
         public const string MenuCommandGuidString = "6f375fee-28b1-4c82-9b0e-d7f973c68612";
         public const string Title = "Texo terminal";
 
-        private readonly TexoToolWindowState state;
+        private readonly ExtensionContext state;
 
         // "state" parameter is the object returned from MyPackage.InitializeToolWindowAsync
-        public TexoToolWindow(TexoToolWindowState state)
+        public TexoToolWindow(ExtensionContext state)
             : base()
         {
             this.state = state;

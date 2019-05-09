@@ -1,19 +1,20 @@
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Runtime;
+using StrongBeaver.Core.Services.Logging;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BeaverSoft.Text.Client.VisualStudio.Actions
 {
     public class PathOpenAction : IAction
     {
-        private readonly EnvDTE80.DTE2 dte;
-        private readonly IExecutor executor;
+        private readonly ExtensionContext context;
 
-        public PathOpenAction(EnvDTE80.DTE2 dte, IExecutor executor)
+        public PathOpenAction(ExtensionContext context)
         {
-            this.dte = dte;
-            this.executor = executor;
+            this.context = context;
         }
 
         public void Execute(IDictionary<string, string> arguments)
@@ -35,14 +36,33 @@ namespace BeaverSoft.Text.Client.VisualStudio.Actions
             }
         }
 
-        private void OpenDirectory(string path)
+        private async void OpenDirectory(string path)
         {
-            executor.ProcessAsync($"cd \"{path}\"");
+            try
+            {
+                if (path.Contains(' '))
+                {
+                    path = $"\"{path}\"";
+                }
+
+                await context.Executor.ProcessAsync($"cd {path}");
+                await context.Executor.ProcessAsync("dir");
+            }
+            catch (Exception exception)
+            {
+                context.Logger.Error("Error during openning directory.", exception);
+            }
         }
 
         private void OpenFile(string path, IDictionary<string, string> arguments)
         {
-            dte.ItemOperations.OpenFile(path);
+            if (!context.Threading.IsOnMainThread)
+            {
+                context.Threading.ExecuteSynchronously(async () => { OpenFile(path, arguments); });
+            }
+
+            // TODO: process line
+            _ = context.DTE.ItemOperations.OpenFile(path);
         }
     }
 }

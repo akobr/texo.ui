@@ -10,9 +10,9 @@ namespace BeaverSoft.Text.Client.VisualStudio
     /// </summary>
     public partial class EmptyControl : UserControl
     {
-        private readonly TexoToolWindowState state;
+        private readonly ExtensionContext state;
 
-        public EmptyControl(TexoToolWindowState state)
+        public EmptyControl(ExtensionContext state)
         {
             this.state = state;
             InitializeComponent();
