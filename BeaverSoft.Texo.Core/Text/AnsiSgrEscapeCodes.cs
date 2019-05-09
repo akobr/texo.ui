@@ -11,6 +11,7 @@ namespace BeaverSoft.Texo.Core.Text
         public const string CROSSED_OUT = "9";
 
         public const string FOREGROUND_BLACK = "30";
+        public const string FOREGROUND_GRAY = "30;1";
         public const string FOREGROUND_RED = "31";
         public const string FOREGROUND_GREEN = "32";
         public const string FOREGROUND_YELLOW = "33";
@@ -48,6 +49,9 @@ namespace BeaverSoft.Texo.Core.Text
             {
                 case ConsoleColor.Black:
                     return FOREGROUND_BLACK;
+
+                case ConsoleColor.Gray:
+                    return FOREGROUND_GRAY;
 
                 case ConsoleColor.Red:
                 case ConsoleColor.DarkRed:

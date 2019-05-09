@@ -7,10 +7,8 @@ using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
-using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Text.Client.VisualStudio.Actions;
 using BeaverSoft.Text.Client.VisualStudio.Startup;
-using Microsoft.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using StrongBeaver.Core.Container;
@@ -44,10 +42,8 @@ namespace BeaverSoft.Text.Client.VisualStudio
     [Guid(PackageGuidString)]
     public sealed class VisualStudioPackage : AsyncPackage
     {
-        /// <summary>
-        /// BeaverSoft.Text.Client.VisualStudioPackage GUID string.
-        /// </summary>
         public const string PackageGuidString = "2dc0bff1-fbaf-4c05-98a5-b1a2afc000cb";
+        public static bool IsMarkdownTypeLoaded;
 
         #region Package Members
 
@@ -62,10 +58,11 @@ namespace BeaverSoft.Text.Client.VisualStudio
         {
             // Hack: force load of Markdig.Wpf assembly 
             Type markdownType = typeof(Markdig.Wpf.Markdown);
+            IsMarkdownTypeLoaded = markdownType != null;
 
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
-            await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await TexoToolWindow.InitializeAsync(this);
         }
 
@@ -84,16 +81,15 @@ namespace BeaverSoft.Text.Client.VisualStudio
             // Perform as much work as possible in this method which is being run on a background thread.
             // The object returned from this method is passed into the constructor of the SampleToolWindow 
             var dteTask = GetServiceAsync(typeof(EnvDTE.DTE));
-            var threadingTask = GetServiceAsync(typeof(IProjectThreadingService));
-
+            
             var container = new SimpleIoc();
             container.RegisterServices();
 
             var engineBuilder = new TexoEngineBuilder()
-                .WithLogService(new DebugLogService())
-                .WithFallbackService(container.GetInstance<IFallbackService>());
+                .WithLogService(new DebugLogService());
 
             container.RegisterEngineServices(engineBuilder);
+            engineBuilder.WithFallbackService(container.GetInstance<IFallbackService>());
 
             var commandFactory = new CommandFactory();
             commandFactory.RegisterCommands(container);
@@ -107,7 +103,7 @@ namespace BeaverSoft.Text.Client.VisualStudio
 
             var context = new ExtensionContext(
                 (EnvDTE80.DTE2)await dteTask,
-                (IProjectThreadingService)await threadingTask,
+                JoinableTaskFactory,
                 texoEngine,
                 messageBus);
 

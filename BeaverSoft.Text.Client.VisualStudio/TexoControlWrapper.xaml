@@ -16,12 +16,17 @@
         <SolidColorBrush x:Key="OutputBackgroundBrush" Color="{DynamicResource {x:Static shell:EnvironmentColors.ToolWindowBackgroundColorKey}}" />
         <Visibility x:Key="InputShadowVisibility">Collapsed</Visibility>
 
+        <Style TargetType="{x:Type FlowDocumentScrollViewer}">
+            <Setter Property="SelectionOpacity" Value="0.5" />
+        </Style>
+        
         <Style TargetType="{x:Type FlowDocument}">
             <Setter Property="FontFamily" Value="Consolas, Calibri" />
             <Setter Property="FontSize" Value="11" />
             <Setter Property="TextAlignment" Value="Left" />
             <Setter Property="Foreground" Value="{DynamicResource {x:Static shell:EnvironmentColors.ToolWindowTextBrushKey}}" />
         </Style>
+
         <Style TargetType="{x:Type Paragraph}">
             <Setter Property="FontFamily" Value="Consolas, Calibri" />
             <Setter Property="FontSize" Value="11" />

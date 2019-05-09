@@ -12,6 +12,8 @@ namespace BeaverSoft.Texo.Core.Text
             builder = new StringBuilder();
         }
 
+        public int Length => builder.Length;
+
         public AnsiStringBuilder Append(string value)
         {
             builder.Append(value);
@@ -33,6 +35,12 @@ namespace BeaverSoft.Texo.Core.Text
         public AnsiStringBuilder Insert(int index, string value)
         {
             builder.Insert(index, value);
+            return this;
+        }
+
+        public AnsiStringBuilder Remove(int startIndex, int length)
+        {
+            builder.Remove(startIndex, length);
             return this;
         }
 
