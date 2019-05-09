@@ -1,4 +1,5 @@
-﻿using BeaverSoft.Texo.Commands.FileManager;
+using BeaverSoft.Texo.Commands.FileManager;
+using BeaverSoft.Texo.Commands.Functions;
 using BeaverSoft.Texo.Commands.NugetManager;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Commands;
@@ -27,6 +28,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             factory.Register("nuget-manager", container.GetInstance<NugetManagerCommand>);
             factory.Register("calculator", container.GetInstance<CalcCommand>);
             factory.Register(ClipboardConstants.COMMAND_NAME, container.GetInstance<ClipboardCommand>);
+            factory.Register("functions", container.GetInstance<FunctionsCommand>);
         }
     }
 }

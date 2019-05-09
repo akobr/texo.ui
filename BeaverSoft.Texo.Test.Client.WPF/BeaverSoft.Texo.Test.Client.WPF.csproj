@@ -186,6 +186,10 @@
       <Project>{2afdfe71-d743-49df-9f47-61a94431cf00}</Project>
       <Name>Commands.FileManager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.Functions\Commands.Functions.csproj">
+      <Project>{33bcb6f8-8a55-44a9-910e-628a096e41e6}</Project>
+      <Name>Commands.Functions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.Git\Commands.Git.csproj">
       <Project>{9df2658d-1ff8-48b7-9219-91a316a7c353}</Project>
       <Name>Commands.Git</Name>
