@@ -9,28 +9,35 @@
              FontFamily="Consolas"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <SolidColorBrush x:Key="InputBorderBrush" Color="Black" />
+        <Color x:Key="OutputForegroundColor">White</Color>
+        <SolidColorBrush x:Key="OutputForegroundBrush" Color="{DynamicResource OutputForegroundColor}" />
+        <Color x:Key="OutputBackgroundColor">Black</Color>
+        <SolidColorBrush x:Key="OutputBackgroundBrush" Color="{DynamicResource OutputBackgroundColor}" />
+        <Visibility x:Key="InputShadowVisibility">Collapsed</Visibility>
 
         <Style TargetType="{x:Type Paragraph}">
-            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="{DynamicResource OutputForegroundBrush}" />
         </Style>
         <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading1StyleKey}">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Foreground" Value="{DynamicResource OutputForegroundBrush}" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading2StyleKey}">
-            <Setter Property="FontSize" Value="15" />
-            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{DynamicResource OutputForegroundBrush}" />
             <Setter Property="FontWeight" Value="Light" />
         </Style>
         <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading3StyleKey}">
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{DynamicResource OutputForegroundBrush}" />
             <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading4StyleKey}">
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{DynamicResource OutputForegroundBrush}" />
             <Setter Property="FontWeight" Value="Light" />
             <Setter Property="TextDecorations" Value="Underline" />
         </Style>
@@ -40,7 +47,7 @@
                     <SolidColorBrush Color="{x:Static SystemParameters.WindowGlassColor}" Opacity="0.03" />
                 </Setter.Value>
             </Setter>
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontSize" Value="11" />
             <Setter Property="FontFamily" Value="Consolas, Lucida Sans Typewriter, Courier New" />
         </Style>
         <Style TargetType="{x:Type Run}" x:Key="{x:Static markdig:Styles.CodeStyleKey}">
@@ -49,7 +56,7 @@
                     <SolidColorBrush Color="{x:Static SystemParameters.WindowGlassColor}" Opacity="0.03" />
                 </Setter.Value>
             </Setter>
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontSize" Value="11" />
             <Setter Property="FontFamily" Value="Consolas, Lucida Sans Typewriter, Courier New" />
         </Style>
         <Style TargetType="{x:Type Line}" x:Key="{x:Static markdig:Styles.ThematicBreakStyleKey}">
@@ -60,12 +67,12 @@
             <Setter Property="Background" Value="#8099FF00" />
         </Style>
         <Style TargetType="{x:Type Hyperlink}" x:Key="{x:Static markdig:Styles.HyperlinkStyleKey}">
-            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColorBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource OutputForegroundBrush}" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Foreground">
                         <Setter.Value>
-                            <SolidColorBrush Color="White" Opacity="0.6" />
+                            <SolidColorBrush Color="{DynamicResource OutputForegroundColor}" Opacity="0.6" />
                         </Setter.Value>
                     </Setter>
                 </Trigger>
@@ -87,7 +94,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Name="lbTitle" Text="Texo UI" FontStyle="Italic" TextTrimming="CharacterEllipsis" />
+            <TextBlock Name="lbTitle" Text="Texo UI" Foreground="{DynamicResource OutputForegroundBrush}" FontStyle="Italic" TextTrimming="CharacterEllipsis" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <TextBlock Name="lbHistoryCount" Text="History (0)" FontSize="10" Foreground="{x:Static SystemParameters.WindowGlassBrush}" VerticalAlignment="Center" Margin="5,0" />
                 <TextBlock Name="lbVariableCount" Text="Variables (0)" FontSize="10" Foreground="{x:Static SystemParameters.WindowGlassBrush}" VerticalAlignment="Center" Margin="5,0" />
@@ -95,9 +102,9 @@
         </Grid>
 
         <!-- COMMAND LINE -->
-        <Border Name="bInput" Grid.Row="1" BorderBrush="{DynamicResource SystemAltHighColorBrush}" BorderThickness="0,1,0,0" Margin="0,3,0,0">
+        <Border Name="bInput" Grid.Row="1" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="0,1,0,0" Margin="0,3,0,0">
             <Border.Background>
-                <SolidColorBrush Color="{DynamicResource SystemAltHighColor}" Opacity="0.33" />
+                <SolidColorBrush Color="{DynamicResource OutputBackgroundColor}" Opacity="0.33" />
             </Border.Background>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -105,14 +112,14 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Name="lbPrompt" Text="tu&gt;" FontFamily="Consolas" FontSize="16" VerticalAlignment="Center" FontWeight="Bold" Padding="5,0,5,2" />
+                <TextBlock Name="lbPrompt" Text="tu&gt;" Foreground="{StaticResource OutputForegroundBrush}" FontFamily="Consolas" FontSize="16" VerticalAlignment="Center" FontWeight="Bold" Padding="5,0,5,2" />
                 <TextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16"  AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,6,0,8"
-                         Foreground="{DynamicResource SystemBaseHighColorBrush}" CaretBrush="{DynamicResource SystemBaseHighColorBrush}" AcceptsTab="False" IsReadOnlyCaretVisible="True"
+                         Foreground="{DynamicResource OutputForegroundBrush}" CaretBrush="{DynamicResource OutputForegroundBrush}" AcceptsTab="False" IsReadOnlyCaretVisible="True"
                          GotFocus="HandleInputGotFocus" LostFocus="HandleInputLostFocus" TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" />
                 <!--<RichTextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
                              TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" SelectionChanged="HandleInputSelectionChanged" />-->
                 <ProgressBar Name="progress" Grid.ColumnSpan="2" Height="1" Minimum="0" Maximum="100" IsTabStop="False" VerticalAlignment="Bottom"
-                     Foreground="{x:Static SystemParameters.WindowGlassBrush}" BorderBrush="{DynamicResource SystemAltHighColorBrush}" />
+                     Foreground="{x:Static SystemParameters.WindowGlassBrush}" BorderBrush="{DynamicResource InputBorderBrush}" />
             </Grid>
         </Border>
 
@@ -127,7 +134,7 @@
             </FlowDocument>
         </FlowDocumentScrollViewer>
 
-        <Border Grid.Row="2" Height="7" VerticalAlignment="Top">
+        <Border Grid.Row="2" Height="7" VerticalAlignment="Top" Visibility="{DynamicResource InputShadowVisibility}">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
                     <GradientStop Color="#C8000000" Offset="0.0" />
@@ -138,12 +145,12 @@
 
         <!-- INTELLISENSE -->
         <ListBox x:Name="listIntellisense" Grid.Row="2" BorderBrush="{x:Static SystemParameters.WindowGlassBrush}" BorderThickness="0,0,0,1"
-                 MaxHeight="265" VerticalAlignment="Top" Foreground="{DynamicResource SystemBaseHighColorBrush}" Focusable="False" IsTabStop="False"
+                 MaxHeight="265" VerticalAlignment="Top" Foreground="{DynamicResource OutputForegroundBrush}" Focusable="False" IsTabStop="False"
                  PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenseMouseDoubleClick" PreviewMouseDown="ListIntellisense_PreviewMouseDown"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
 
             <ListBox.Background>
-                <SolidColorBrush Color="{DynamicResource SystemAltHighColor}" Opacity="0.93" />
+                <SolidColorBrush Color="{DynamicResource OutputBackgroundColor}" Opacity="0.93" />
             </ListBox.Background>
 
             <!--<ListView.ItemsPanel>

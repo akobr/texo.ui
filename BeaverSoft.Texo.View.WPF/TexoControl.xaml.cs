@@ -384,7 +384,8 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void HandleInputLostFocus(object sender, RoutedEventArgs e)
         {
-            bInput.SetResourceReference(BorderBrushProperty, "SystemAltHighColorBrush");
+            bInput.SetResourceReference(BorderBrushProperty, "InputBorderBrush");
+            //bInput.BorderBrush = Brushes.Black;
             SwitchProgresForegroundAndBorderBrush();
             CloseIntellisense();
         }

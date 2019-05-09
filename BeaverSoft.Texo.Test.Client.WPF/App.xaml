@@ -10,6 +10,13 @@
                 <ResourceDictionary Source="pack://application:,,,/FluentWPF;component/Styles/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <SolidColorBrush x:Key="InputBorderBrush" Color="Black" />
+            <Color x:Key="OutputForegroundColor">White</Color>
+            <SolidColorBrush x:Key="OutputForegroundBrush" Color="{StaticResource OutputForegroundColor}" />
+            <Color x:Key="OutputBackgroundColor">Black</Color>
+            <SolidColorBrush x:Key="OutputBackgroundBrush" Color="{StaticResource OutputBackgroundColor}" />
+            <Visibility x:Key="InputShadowVisibility">Visible</Visibility>
+
             <Style TargetType="FlowDocument">
                 <Setter Property="FontFamily" Value="Consolas, Calibri" />
                 <Setter Property="TextAlignment" Value="Left" />
