@@ -38,7 +38,7 @@ namespace BeaverSoft.Texo.Commands.Functions
         [Documentation("Color function", "Shows a color in multiple formats.")]
         public ICommandResult ColorFunction(CommandContext context)
         {
-            StringBuilder result = new StringBuilder();
+            AnsiStringBuilder result = new AnsiStringBuilder();
             var parValues = context.GetParameterValues("color");
             Color color;
 
@@ -69,6 +69,7 @@ namespace BeaverSoft.Texo.Commands.Functions
                 }
             }
 
+            RemoveLastLineEnd(result);
             return new TextResult(result.ToString());
         }
 
@@ -77,13 +78,14 @@ namespace BeaverSoft.Texo.Commands.Functions
         [Documentation("Number function", "Shows a number in multiple numerical systems.")]
         public ICommandResult Number(CommandContext context)
         {
-            StringBuilder result = new StringBuilder();
+            AnsiStringBuilder result = new AnsiStringBuilder();
 
             foreach (string number in context.GetParameterValues("number"))
             {
                 result.AppendLine(BuildNumberInfo(number));
             }
 
+            RemoveLastLineEnd(result);
             return new TextResult(result.ToString());
         }
 
@@ -159,7 +161,7 @@ namespace BeaverSoft.Texo.Commands.Functions
             builder.AppendLine();
             builder.AppendLine(guid.ToString());
             builder.AppendLine(guid.ToString("B").ToUpperInvariant());
-            builder.AppendLine(guid.ToString("X"));
+            builder.Append(guid.ToString("X"));
 
             return new TextResult(builder.ToString());
         }
@@ -285,6 +287,16 @@ namespace BeaverSoft.Texo.Commands.Functions
             byte g = (byte)((color.G * amount) + backColor.G * (1 - amount));
             byte b = (byte)((color.B * amount) + backColor.B * (1 - amount));
             return Color.FromArgb(r, g, b);
+        }
+
+        private static void RemoveLastLineEnd(AnsiStringBuilder builder)
+        {
+            if (builder.Length < 1)
+            {
+                return;
+            }
+
+            builder.Remove(builder.Length - Environment.NewLine.Length, Environment.NewLine.Length);
         }
     }
 }

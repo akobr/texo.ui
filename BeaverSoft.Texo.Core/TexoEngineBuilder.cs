@@ -163,7 +163,7 @@ namespace BeaverSoft.Texo.Core
                 resultProcessing, usedView, actionManagement,
                 history, intellisense, didYouMean, fallback, logger);
             InitialiseActions();
-            return new TexoEngine(runtime, usedView, actions, setting);
+            return new TexoEngine(runtime, usedView, actions, setting, logger);
         }
 
         private void Initiliase()

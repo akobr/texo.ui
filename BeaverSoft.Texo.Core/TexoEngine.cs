@@ -6,6 +6,7 @@ using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Core
 {
@@ -15,22 +16,27 @@ namespace BeaverSoft.Texo.Core
         private readonly IViewService view;
         private readonly IActionFactoryRegister actionRegister;
         private readonly ISettingService setting;
+        private readonly ILogService logger;
 
         internal TexoEngine(
             IRuntimeCoordinatorService runtime,
             IViewService view,
             IActionFactoryRegister actionRegister,
-            ISettingService setting)
+            ISettingService setting,
+            ILogService logger)
         {
             this.runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
             this.setting = setting ?? throw new ArgumentNullException(nameof(setting));
             this.actionRegister = actionRegister ?? throw new ArgumentNullException(nameof(actionRegister));
             this.view = view;
+            this.logger = logger;
         }
 
         public IRuntimeCoordinatorService Runtime => runtime;
 
         public IViewService View => view;
+
+        public ILogService Logger => logger;
 
         public void Initialise(TextumConfiguration configuration)
         {
