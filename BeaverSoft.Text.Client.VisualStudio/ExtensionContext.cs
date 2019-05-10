@@ -21,6 +21,7 @@ namespace BeaverSoft.Text.Client.VisualStudio
             MessageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
             TexoEngine = texoEngine ?? throw new ArgumentNullException(nameof(texoEngine));
             View = (WpfViewService)texoEngine.View;
+            Executor = texoEngine.Runtime;
             Logger = texoEngine.Logger;
         }
 

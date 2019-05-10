@@ -11,7 +11,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF
     /// </summary>
     public partial class MainPage : Window
     {
-        private ClipboardMonitor clipboardMonitor;
+        private ClipboardMonitorControl clipboardMonitor;
 
         public MainPage()
         {
@@ -35,7 +35,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF
 
         private void InitilialiseClipboardControl()
         {
-            clipboardMonitor = new ClipboardMonitor(App.ServiceMessageBus);
+            clipboardMonitor = new ClipboardMonitorControl(App.ServiceMessageBus);
             FormsHost.Child = clipboardMonitor;
             clipboardMonitor.Initialise();
         }

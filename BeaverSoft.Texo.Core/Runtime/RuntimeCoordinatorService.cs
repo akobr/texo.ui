@@ -96,7 +96,40 @@ namespace BeaverSoft.Texo.Core.Runtime
             return inputModel;
         }
 
-        public async Task ProcessAsync(string input)
+        public Task ProcessAsync(string input)
+        {
+            try
+            {
+                return ProcessInputAsync(input);
+            }
+            catch (Exception exception)
+            {
+                logger.Error("Error during processing input (execution).", exception);
+#if !DEBUG
+                RenderError(input, exception.Message);
+#else
+                throw exception;
+#endif
+            }
+        }
+
+        public void ExecuteAction(string actionUrl)
+        {
+            actionManagement.Execute(actionUrl);
+        }
+
+        public void ExecuteAction(string actionName, IDictionary<string, string> arguments)
+        {
+            actionManagement.Execute(actionName, arguments);
+        }
+
+        public void Dispose()
+        {
+            view.Dispose();
+            commandManagement.Dispose();
+        }
+
+        private async Task ProcessInputAsync(string input)
         {
             Input inputModel = evaluator.Evaluate(input);
             history?.Enqueue(inputModel);
@@ -128,22 +161,6 @@ namespace BeaverSoft.Texo.Core.Runtime
             await ProcessContextAsync(inputModel, inputModel.Context);
         }
 
-        public void ExecuteAction(string actionUrl)
-        {
-            actionManagement.Execute(actionUrl);
-        }
-
-        public void ExecuteAction(string actionName, IDictionary<string, string> arguments)
-        {
-            actionManagement.Execute(actionName, arguments);
-        }
-
-        public void Dispose()
-        {
-            view.Dispose();
-            commandManagement.Dispose();
-        }
-
         private Task ProcessContextAsync(Input input, CommandContext context)
         {
             ICommand command = commandManagement.BuildCommand(context.Key);
@@ -154,24 +171,8 @@ namespace BeaverSoft.Texo.Core.Runtime
                     return ProcessAsyncCommand(asyncCommand, context, input);
 
                 default:
-                    return ProcessCommand(command, context, input);
+                    return ProcessCommandAsTask(command, context, input);
             }
-        }
-
-        private async Task ProcessCommand(ICommand command, CommandContext context, Input input)
-        {
-#if !DEBUG
-            try
-            {
-#endif
-                await ProcessCommandAsTask(command, context, input);
-#if !DEBUG
-            }
-            catch (Exception exception)
-            {
-                RenderError(input, exception.Message);
-            }
-#endif
         }
 
         private async Task ProcessCommandAsTask(ICommand command, CommandContext context, Input input)
@@ -182,19 +183,8 @@ namespace BeaverSoft.Texo.Core.Runtime
 
         private async Task ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input input)
         {
-#if !DEBUG
-            try
-            {
-#endif
-                ICommandResult result = await command.ExecuteAsync(context);
-                Render(input, result);
-#if !DEBUG
-            }
-            catch (Exception exception)
-            {
-                RenderError(input, exception.Message);
-            }
-#endif
+            ICommandResult result = await command.ExecuteAsync(context);
+            Render(input, result);
         }
 
         private void Render(Input input, ICommandResult result)

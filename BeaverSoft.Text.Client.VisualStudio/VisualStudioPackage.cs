@@ -42,8 +42,12 @@ namespace BeaverSoft.Text.Client.VisualStudio
     [Guid(PackageGuidString)]
     public sealed class VisualStudioPackage : AsyncPackage
     {
+        // Log from launch available at:
+        // c:\Users\[USER_NAME]\AppData\Roaming\Microsoft\VisualStudio\16.0_c3776c56Exp\ActivityLog.xml
+
         public const string PackageGuidString = "2dc0bff1-fbaf-4c05-98a5-b1a2afc000cb";
-        public static bool IsMarkdownTypeLoaded;
+        public static bool IsMarkdownAssemblyLoaded;
+        public static bool IsNewtonsoftJsonAssemblyLoaded;
 
         #region Package Members
 
@@ -58,7 +62,9 @@ namespace BeaverSoft.Text.Client.VisualStudio
         {
             // Hack: force load of Markdig.Wpf assembly 
             Type markdownType = typeof(Markdig.Wpf.Markdown);
-            IsMarkdownTypeLoaded = markdownType != null;
+            IsMarkdownAssemblyLoaded = markdownType != null;
+            Type jsonType = typeof(Newtonsoft.Json.JsonSerializer);
+            IsNewtonsoftJsonAssemblyLoaded = jsonType != null;
 
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.

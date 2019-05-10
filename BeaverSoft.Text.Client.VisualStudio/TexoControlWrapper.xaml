@@ -3,19 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:BeaverSoft.Text.Client.VisualStudio"
              xmlns:texo="clr-namespace:BeaverSoft.Texo.View.WPF;assembly=BeaverSoft.Texo.View.WPF"
              xmlns:shell="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="InputBorderBrush" Color="{DynamicResource {x:Static shell:EnvironmentColors.ControlOutlineColorKey}}" />
-        <Color x:Key="OutputForegroundColor">White</Color>
-        <SolidColorBrush x:Key="OutputForegroundBrush" Color="{DynamicResource {x:Static shell:EnvironmentColors.ToolWindowTextColorKey}}" />
-        <Color x:Key="OutputBackgroundColor">Black</Color>
-        <SolidColorBrush x:Key="OutputBackgroundBrush" Color="{DynamicResource {x:Static shell:EnvironmentColors.ToolWindowBackgroundColorKey}}" />
-        <Visibility x:Key="InputShadowVisibility">Collapsed</Visibility>
-
         <Style TargetType="{x:Type FlowDocumentScrollViewer}">
             <Setter Property="SelectionOpacity" Value="0.5" />
         </Style>
@@ -36,6 +28,10 @@
     </UserControl.Resources>
 
     <Grid>
-        <texo:TexoControl x:Name="texoControl" />
+        <texo:TexoControl x:Name="texoControl"
+                          TextBaseColor="{DynamicResource {x:Static shell:EnvironmentColors.ToolWindowTextColorKey}}"
+                          BackgroundBaseColor="{DynamicResource {x:Static shell:EnvironmentColors.ToolWindowBackgroundColorKey}}"
+                          BorderBaseColor="{DynamicResource {x:Static shell:EnvironmentColors.ControlOutlineColorKey}}"
+                          ShadowsVisibility="Collapsed" />
     </Grid>
 </UserControl>
