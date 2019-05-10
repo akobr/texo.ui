@@ -14,6 +14,27 @@ namespace BeaverSoft.Texo.View.WPF
     {
         private bool skipNextTextChange;
         private string prompt;
+        private bool isInputDisabled;
+
+        public static readonly DependencyProperty TextBaseColorProperty =
+            DependencyProperty.Register(nameof(TextBaseColor), typeof(Color), typeof(TexoControl));
+
+        public static readonly DependencyProperty BackgroundBaseColorProperty =
+            DependencyProperty.Register(nameof(BackgroundBaseColor), typeof(Color), typeof(TexoControl));
+
+        public static readonly DependencyProperty BorderBaseColorProperty =
+            DependencyProperty.Register(nameof(BorderBaseColor), typeof(Color), typeof(TexoControl));
+
+        public static readonly DependencyProperty AccentColorProperty =
+            DependencyProperty.Register(nameof(AccentColor), typeof(Color), typeof(TexoControl));
+
+        public static readonly DependencyProperty ShadowsVisibilityProperty =
+            DependencyProperty.Register(nameof(ShadowsVisibility), typeof(Visibility), typeof(TexoControl));
+
+        public event EventHandler<string> InputChanged;
+        public event EventHandler<string> InputFinished;
+        public event EventHandler<KeyScrollDirection> KeyScrolled;
+        public event EventHandler IntellisenseItemExecuted;
 
         public TexoControl()
         {
@@ -21,10 +42,35 @@ namespace BeaverSoft.Texo.View.WPF
             docOutput.Document = new FlowDocument();
         }
 
-        public event EventHandler<string> InputChanged;
-        public event EventHandler<string> InputFinished;
-        public event EventHandler<KeyScrollDirection> KeyScrolled;
-        public event EventHandler IntellisenseItemExecuted;
+        public Color TextBaseColor
+        {
+            get => (Color)GetValue(TextBaseColorProperty);
+            set => SetValue(TextBaseColorProperty, value);
+        }
+
+        public Color BackgroundBaseColor
+        {
+            get => (Color)GetValue(BackgroundBaseColorProperty);
+            set => SetValue(BackgroundBaseColorProperty, value);
+        }
+
+        public Color BorderBaseColor
+        {
+            get => (Color)GetValue(BorderBaseColorProperty);
+            set => SetValue(BorderBaseColorProperty, value);
+        }
+
+        public Color AccentColor
+        {
+            get => (Color)GetValue(AccentColorProperty);
+            set => SetValue(AccentColorProperty, value);
+        }
+
+        public Visibility ShadowsVisibility
+        {
+            get => (Visibility)GetValue(ShadowsVisibilityProperty);
+            set => SetValue(ShadowsVisibilityProperty, value);
+        }
 
         public FlowDocument OutputDocument => docOutput.Document;
 
@@ -50,14 +96,18 @@ namespace BeaverSoft.Texo.View.WPF
 
         public void EnableInput()
         {
-            tbInput.IsReadOnly = false;
             CancelProgress();
+            tbInput.Foreground = Brushes.White; // TODO [P2] this should be based on theme
+            //tbInput.IsReadOnly = false;
+            isInputDisabled = false;
         }
 
         public void DisableInput()
         {
+            isInputDisabled = true;
             progress.IsIndeterminate = true;
-            tbInput.IsReadOnly = true;
+            tbInput.Foreground = Brushes.DarkRed;
+            //tbInput.IsReadOnly = true;
         }
 
         public void CloseIntellisense()
@@ -87,13 +137,18 @@ namespace BeaverSoft.Texo.View.WPF
 
         public void TryFinishInput()
         {
+            if (isInputDisabled)
+            {
+                return;
+            }
+
             string input = GetInput();
 
             if (string.IsNullOrWhiteSpace(input))
             {
                 return;
             }
-
+                       
             EmptyInput();
             InputFinished?.Invoke(this, input);
         }
@@ -296,16 +351,25 @@ namespace BeaverSoft.Texo.View.WPF
                 return;
             }
 
-            char character = KeyUtils.GetCharFromKey(e.Key);
-
-            if (character < 32 || character > 126)
+            if (e.Key == Key.Back)
             {
-                return;
+                tbInput.Text = tbInput.Text.Substring(0, tbInput.Text.Length - 1);   
+            }
+            else if (e.Key != Key.Delete)
+            {
+                char character = KeyUtils.GetCharFromKey(e.Key);
+
+                if (character < 32 || character > 126)
+                {
+                    return;
+                }
+
+                tbInput.Text += char.ToLower(character);
+                tbInput.CaretIndex = tbInput.Text.Length;
             }
 
-            e.Handled = true;
-            tbInput.Text += char.ToLower(character);
             tbInput.CaretIndex = tbInput.Text.Length;
+            e.Handled = true;           
             FocusInput();
         }
 
