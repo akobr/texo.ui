@@ -72,7 +72,10 @@
     <Compile Include="ClipboardConfiguration.cs" />
     <Compile Include="ClipboardConstants.cs" />
     <Compile Include="ClipboardItem.cs" />
-    <Compile Include="ClipboardMonitor.cs">
+    <Compile Include="ClipboardMonitorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClipboardMonitorControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ClipboardMonitoringService.cs" />

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -7,12 +7,12 @@ using StrongBeaver.Core.Services;
 namespace Commands.Clipboard
 {
     [DefaultEvent("ClipboardChanged")]
-    public class ClipboardMonitor : Control, IClipboardMonitor
+    public class ClipboardMonitorControl : Control, IClipboardMonitor
     {
         private readonly IServiceMessageBus messageBus;
         private IntPtr nextClipboardViewer;
 
-        public ClipboardMonitor(IServiceMessageBus messageBus)
+        public ClipboardMonitorControl(IServiceMessageBus messageBus)
         {
             this.messageBus = messageBus;
         }
