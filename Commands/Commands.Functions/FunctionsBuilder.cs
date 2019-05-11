@@ -39,7 +39,7 @@ namespace BeaverSoft.Texo.Commands.Functions
 
             var varNumber = Parameter.CreateBuilder();
             varNumber.Key = "number";
-            varNumber.ArgumentTemplate = @"0?(b|x)?[0-9]+";
+            varNumber.ArgumentTemplate = @"0?(b|x)?[0-9a-fA-F]+";
             varNumber.IsRepeatable = true;
             queryNumber.Parameters.Add(varNumber.ToImmutable());
 

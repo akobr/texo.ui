@@ -27,7 +27,14 @@ namespace Commands.Clipboard
 
         protected override void Dispose(bool disposing)
         {
-            ChangeClipboardChain(Handle, nextClipboardViewer);
+            try
+            {
+                ChangeClipboardChain(Handle, nextClipboardViewer);
+            }
+            catch (Win32Exception)
+            {
+                // swallows error with non-existing window handler
+            }
         }
 
         [DllImport("User32.dll")]

@@ -96,17 +96,33 @@ namespace BeaverSoft.Texo.Core.Runtime
             return inputModel;
         }
 
-        public Task ProcessAsync(string input)
+        public async Task ProcessAsync(string input)
         {
+            Input inputModel;
+
             try
             {
-                return ProcessInputAsync(input);
+                inputModel = await EvaluateInputAsync(input);
+            }
+            catch (Exception exception)
+            {
+                logger.Error("Error during evaluating of input.", exception);
+#if !DEBUG
+                return;
+#else
+                throw exception;
+#endif
+            }
+
+            try
+            {
+                await ProcessInputAsync(inputModel);
             }
             catch (Exception exception)
             {
                 logger.Error("Error during processing input (execution).", exception);
 #if !DEBUG
-                RenderError(input, exception.Message);
+                RenderError(inputModel, exception.Message);
 #else
                 throw exception;
 #endif
@@ -129,11 +145,15 @@ namespace BeaverSoft.Texo.Core.Runtime
             commandManagement.Dispose();
         }
 
-        private async Task ProcessInputAsync(string input)
+        private async Task<Input> EvaluateInputAsync(string input)
         {
-            Input inputModel = evaluator.Evaluate(input);
+            Input inputModel = await Task.Run(() => evaluator.Evaluate(input));
             history?.Enqueue(inputModel);
+            return inputModel;
+        }
 
+        private async Task ProcessInputAsync(Input inputModel)
+        {
             if (!inputModel.Context.IsValid)
             {
                 if (fallback != null

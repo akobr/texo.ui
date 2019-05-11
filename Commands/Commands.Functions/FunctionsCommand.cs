@@ -189,10 +189,13 @@ namespace BeaverSoft.Texo.Commands.Functions
 
                 if (Regex.IsMatch(value, "^(0|b|0b)[01]+$"))
                 {
+                    value = value.Substring(value.IndexOf('b') + 1);
                     number = Convert.ToInt32(value, 2);
                 }
-                else if (Regex.IsMatch(value, "^(x|0x)[0-9A-Fa-f]+$"))
+                else if (Regex.IsMatch(value, "^(x|0x)[0-9A-Fa-f]+$")
+                         || Regex.IsMatch(value, "[A-Fa-f]+"))
                 {
+                    value = value.Substring(value.IndexOf('x') + 1);
                     number = Convert.ToInt32(value, 16);
                 }
                 else
@@ -200,10 +203,23 @@ namespace BeaverSoft.Texo.Commands.Functions
                     number = Convert.ToInt32(value);
                 }
 
+                AnsiStringBuilder builder = new AnsiStringBuilder();
                 @decimal = Convert.ToString(number, 10);
                 hex = Convert.ToString(number, 16);
                 binary = Convert.ToString(number, 2);
-                return $"dec:{@decimal} hex:{hex} bin:{binary};";
+                builder.AppendForegroundFormat(ConsoleColor.Gray);
+                builder.Append("dec:");
+                builder.AppendFormattingReset();
+                builder.Append($" {@decimal,-10} ");
+                builder.AppendForegroundFormat(ConsoleColor.Gray);
+                builder.Append("hex:");
+                builder.AppendFormattingReset();
+                builder.Append($" {hex,7} ");
+                builder.AppendForegroundFormat(ConsoleColor.Gray);
+                builder.Append("bin:");
+                builder.AppendFormattingReset();
+                builder.Append($" {binary,22}");
+                return builder.ToString();
             }
             catch (FormatException)
             {
@@ -257,8 +273,8 @@ namespace BeaverSoft.Texo.Commands.Functions
             builder.Append(" ");
             builder.Append($"#{GetHexColorPart(color.A)}{GetHexColorPart(color.R)}{GetHexColorPart(color.G)}{GetHexColorPart(color.B)} ");
             builder.Append($"#{GetHexColorPart(blendedColor.R)}{GetHexColorPart(blendedColor.G)}{GetHexColorPart(blendedColor.B)} ");
-            builder.Append($"argb({color.A},{color.R},{color.G},{color.B}) ");
-            builder.Append($"rgb({blendedColor.R},{blendedColor.G},{blendedColor.B}) ");
+            builder.Append(string.Format("{0,-22} ", $"argb({color.A},{color.R},{color.G},{color.B})"));
+            builder.Append(string.Format("{0,-17}", $"rgb({blendedColor.R},{blendedColor.G},{blendedColor.B})"));
             builder.AppendLine();
             return builder.ToString();
         }

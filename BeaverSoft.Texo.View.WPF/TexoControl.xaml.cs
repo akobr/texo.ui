@@ -17,19 +17,22 @@ namespace BeaverSoft.Texo.View.WPF
         private bool isInputDisabled;
 
         public static readonly DependencyProperty TextBaseColorProperty =
-            DependencyProperty.Register(nameof(TextBaseColor), typeof(Color), typeof(TexoControl));
+            DependencyProperty.Register(nameof(TextBaseColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Colors.White));
+
+        public static readonly DependencyProperty TextInfoColorProperty =
+            DependencyProperty.Register(nameof(TextInfoColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Color.FromRgb(153, 153, 153)));
 
         public static readonly DependencyProperty BackgroundBaseColorProperty =
-            DependencyProperty.Register(nameof(BackgroundBaseColor), typeof(Color), typeof(TexoControl));
+            DependencyProperty.Register(nameof(BackgroundBaseColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Colors.Black));
 
         public static readonly DependencyProperty BorderBaseColorProperty =
-            DependencyProperty.Register(nameof(BorderBaseColor), typeof(Color), typeof(TexoControl));
+            DependencyProperty.Register(nameof(BorderBaseColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Colors.Black));
 
         public static readonly DependencyProperty AccentColorProperty =
-            DependencyProperty.Register(nameof(AccentColor), typeof(Color), typeof(TexoControl));
+            DependencyProperty.Register(nameof(AccentColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Color.FromRgb(39, 124, 212)));
 
         public static readonly DependencyProperty ShadowsVisibilityProperty =
-            DependencyProperty.Register(nameof(ShadowsVisibility), typeof(Visibility), typeof(TexoControl));
+            DependencyProperty.Register(nameof(ShadowsVisibility), typeof(Visibility), typeof(TexoControl),new PropertyMetadata(Visibility.Visible));
 
         public event EventHandler<string> InputChanged;
         public event EventHandler<string> InputFinished;
@@ -40,12 +43,28 @@ namespace BeaverSoft.Texo.View.WPF
         {
             InitializeComponent();
             docOutput.Document = new FlowDocument();
+            InitiliaseColors();
+        }
+
+        private void InitiliaseColors()
+        {
+            SetResourceReference(TextBaseColorProperty, "SystemBaseHighColor");
+            SetResourceReference(TextInfoColorProperty, "SytemBaseMediumColor");
+            AccentColor = SystemParameters.WindowGlassColor; // SetResourceReference(AccentColorProperty, "ImmersiveSystemAccent");
+            SetResourceReference(BackgroundBaseColorProperty, "SystemAltHighColor");
+            SetResourceReference(BorderBaseColorProperty, "SystemAltHighColor");
         }
 
         public Color TextBaseColor
         {
             get => (Color)GetValue(TextBaseColorProperty);
             set => SetValue(TextBaseColorProperty, value);
+        }
+
+        public Color TextInfoColor
+        {
+            get => (Color)GetValue(TextInfoColorProperty);
+            set => SetValue(TextInfoColorProperty, value);
         }
 
         public Color BackgroundBaseColor
@@ -97,7 +116,7 @@ namespace BeaverSoft.Texo.View.WPF
         public void EnableInput()
         {
             CancelProgress();
-            tbInput.Foreground = Brushes.White; // TODO [P2] this should be based on theme
+            tbInput.SetResourceReference(ForegroundProperty, "OutputForegroundBrush");
             //tbInput.IsReadOnly = false;
             isInputDisabled = false;
         }
@@ -353,7 +372,10 @@ namespace BeaverSoft.Texo.View.WPF
 
             if (e.Key == Key.Back)
             {
-                tbInput.Text = tbInput.Text.Substring(0, tbInput.Text.Length - 1);   
+                if (tbInput.Text.Length > 0)
+                {
+                    tbInput.Text = tbInput.Text.Substring(0, tbInput.Text.Length - 1);
+                }
             }
             else if (e.Key != Key.Delete)
             {
@@ -442,7 +464,7 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void HandleInputGotFocus(object sender, RoutedEventArgs e)
         {
-            bInput.BorderBrush = SystemParameters.WindowGlassBrush;
+            bInput.SetResourceReference(BorderBrushProperty, "AccentBrush");
             SwitchProgresForegroundAndBorderBrush();
         }
 

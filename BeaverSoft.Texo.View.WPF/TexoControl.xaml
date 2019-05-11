@@ -8,6 +8,8 @@
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <SolidColorBrush x:Key="InputBorderBrush" Color="{Binding BorderBaseColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        <SolidColorBrush x:Key="InfoForegroundBrush" Color="{Binding TextInfoColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        <SolidColorBrush x:Key="AccentBrush" Color="{Binding AccentColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
         <SolidColorBrush x:Key="OutputForegroundBrush" Color="{Binding TextBaseColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
         <SolidColorBrush x:Key="OutputBackgroundBrush" Color="{Binding BackgroundBaseColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
@@ -39,7 +41,7 @@
         <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.CodeBlockStyleKey}">
             <Setter Property="Background">
                 <Setter.Value>
-                    <SolidColorBrush Color="{x:Static SystemParameters.WindowGlassColor}" Opacity="0.03" />
+                    <SolidColorBrush Color="{Binding AccentColor, RelativeSource={RelativeSource AncestorType=UserControl}}" Opacity="0.05" />
                 </Setter.Value>
             </Setter>
             <Setter Property="FontSize" Value="11" />
@@ -48,7 +50,7 @@
         <Style TargetType="{x:Type Run}" x:Key="{x:Static markdig:Styles.CodeStyleKey}">
             <Setter Property="Background">
                 <Setter.Value>
-                    <SolidColorBrush Color="{x:Static SystemParameters.WindowGlassColor}" Opacity="0.03" />
+                    <SolidColorBrush Color="{Binding AccentColor, RelativeSource={RelativeSource AncestorType=UserControl}}" Opacity="0.05" />
                 </Setter.Value>
             </Setter>
             <Setter Property="FontSize" Value="11" />
@@ -67,9 +69,11 @@
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Foreground">
                         <Setter.Value>
-                            <SolidColorBrush Color="{Binding TextBaseColor, RelativeSource={RelativeSource AncestorType=UserControl}}" Opacity="0.6" />
+                            <SolidColorBrush Color="{Binding TextBaseColor, RelativeSource={RelativeSource AncestorType=UserControl}}" Opacity="0.7642" />
                         </Setter.Value>
                     </Setter>
+                    <Setter Property="TextBlock.TextDecorations" Value="{x:Null}" />
+                    <Setter Property="TextBlock.FontWeight" Value="Bold" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -90,9 +94,9 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Name="lbTitle" Text="Texo UI" Foreground="{DynamicResource OutputForegroundBrush}" FontStyle="Italic" TextTrimming="CharacterEllipsis" />
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <TextBlock Name="lbHistoryCount" Text="History (0)" FontSize="10" Foreground="{x:Static SystemParameters.WindowGlassBrush}" VerticalAlignment="Center" Margin="5,0" />
-                <TextBlock Name="lbVariableCount" Text="Variables (0)" FontSize="10" Foreground="{x:Static SystemParameters.WindowGlassBrush}" VerticalAlignment="Center" Margin="5,0" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                <TextBlock Name="lbHistoryCount" Text="History (0)" FontSize="10" Foreground="{DynamicResource InfoForegroundBrush}" VerticalAlignment="Center" Margin="5,0" />
+                <TextBlock Name="lbVariableCount" Text="Variables (0)" FontSize="10" Foreground="{DynamicResource InfoForegroundBrush}" VerticalAlignment="Center" Margin="5,0" />
             </StackPanel>
         </Grid>
 
@@ -114,7 +118,7 @@
                 <!--<RichTextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
                              TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" SelectionChanged="HandleInputSelectionChanged" />-->
                 <ProgressBar Name="progress" Grid.ColumnSpan="2" Height="1" Minimum="0" Maximum="100" IsTabStop="False" VerticalAlignment="Bottom"
-                     Foreground="{x:Static SystemParameters.WindowGlassBrush}" BorderBrush="{DynamicResource InputBorderBrush}" />
+                     Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource InputBorderBrush}" />
             </Grid>
         </Border>
 
@@ -139,7 +143,7 @@
         </Border>
 
         <!-- INTELLISENSE -->
-        <ListBox x:Name="listIntellisense" Grid.Row="2" BorderBrush="{x:Static SystemParameters.WindowGlassBrush}" BorderThickness="0,0,0,1"
+        <ListBox x:Name="listIntellisense" Grid.Row="2" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0,0,0,1"
                  MaxHeight="265" VerticalAlignment="Top" Foreground="{DynamicResource OutputForegroundBrush}" Focusable="False" IsTabStop="False"
                  PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenseMouseDoubleClick" PreviewMouseDown="ListIntellisense_PreviewMouseDown"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">

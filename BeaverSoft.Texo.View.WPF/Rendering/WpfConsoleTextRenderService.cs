@@ -329,11 +329,8 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                     break;
 
                 case "31":
-                    foregroundBrush = Brushes.Red;
-                    break;
-
                 case "31;1":
-                    foregroundBrush = Brushes.DarkSalmon;                  
+                    foregroundBrush = Brushes.DarkSalmon;                    
                     break;
 
                 case "38;2;255;160;122": // #FFA07A
@@ -434,7 +431,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
 
         private Inline CreateInline(string text)
         {
-            Inline result = new Run();
+            Inline result;
 
             if (isHyperlink)
             {
@@ -446,7 +443,6 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 {
                     Command = Commands.Hyperlink,
                     CommandParameter = url,
-                    TextDecorations = TextDecorations.Underline
                 };
 
                 link.SetResourceReference(FrameworkContentElement.StyleProperty, Styles.HyperlinkStyleKey);
@@ -458,13 +454,13 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
             else
             {
                 result = new Run(text);
+                result.FontWeight = fontWeight;
                 result.TextDecorations = decorations.Clone();
             }
 
             result.Foreground = foregroundBrush;
             result.Background = backgroundBrush;
-            result.FontStyle = fontStyle;
-            result.FontWeight = fontWeight;
+            result.FontStyle = fontStyle;         
 
             return result;
         }
