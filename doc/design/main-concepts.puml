@@ -72,3 +72,44 @@ ICommandResult --> IResultItem
 IModel <|- IResultItem
 
 @enduml
+
+@startuml
+title code-base-search command
+
+enum SubjectTypeEnum {
+    File,
+    Type,
+    Member
+}
+
+interface ISearchable {
+    Name : String
+    Keywords : ImmutableList<string>
+}
+
+interface ISearchTreeNode {
+    Parent : ISubject
+    Children : ImmutableList<ISubject> 
+}
+
+interface ISubject {
+    Type : SubjectTypeEnum
+}
+
+interface ICategory {
+    Groups : IImmutableList<IGroup>
+}
+
+interface IGroup {
+    Items : IImmutableList<ISubject>
+}
+
+ISearchable <. ISubject
+ISearchable <.. ICategory
+ISearchable <.. IGroup
+
+ISubject .> ISearchTreeNode
+SubjectTypeEnum -- ISubject
+ICategory - IGroup
+
+@enduml

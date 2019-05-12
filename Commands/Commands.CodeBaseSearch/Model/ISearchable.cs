@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 
 namespace Commands.CodeBaseSearch.Model
 {
@@ -6,6 +6,6 @@ namespace Commands.CodeBaseSearch.Model
     {
         string Name { get; }
 
-        ImmutableList<string> Keywords { get; }
+        IImmutableList<string> Keywords { get; }
     }
 }

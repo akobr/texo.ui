@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 
 namespace Commands.CodeBaseSearch.Model
 {
@@ -6,6 +6,6 @@ namespace Commands.CodeBaseSearch.Model
     {
         ISubject Parent { get; }
 
-        ImmutableList<ISubject> Children { get; }
+        IImmutableList<ISubject> Children { get; }
     }
 }
