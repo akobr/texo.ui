@@ -101,7 +101,7 @@
         </Grid>
 
         <!-- COMMAND LINE -->
-        <Border Name="bInput" Grid.Row="1" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="0,1,0,0" Margin="0,3,0,0">
+        <Border Name="bInput" Grid.Row="1" BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="0,2" Margin="0,3,0,0">
             <Border.Background>
                 <SolidColorBrush Color="{Binding BackgroundBaseColor, RelativeSource={RelativeSource AncestorType=UserControl}}" Opacity="0.33" />
             </Border.Background>
@@ -111,14 +111,16 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
+                <ProgressBar Name="progress" Grid.ColumnSpan="2" Minimum="0" Maximum="100" IsTabStop="False"
+                             VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Opacity="0.3"
+                             Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Foreground="{DynamicResource AccentBrush}" />
                 <TextBlock Name="lbPrompt" Text="tu&gt;" Foreground="{StaticResource OutputForegroundBrush}" FontFamily="Consolas" FontSize="16" VerticalAlignment="Center" FontWeight="Bold" Padding="5,0,5,2" />
                 <TextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16"  AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,6,0,8"
                          Foreground="{DynamicResource OutputForegroundBrush}" CaretBrush="{DynamicResource OutputForegroundBrush}" AcceptsTab="False" IsReadOnlyCaretVisible="True"
                          GotFocus="HandleInputGotFocus" LostFocus="HandleInputLostFocus" TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" />
                 <!--<RichTextBox Name="tbInput" Grid.Column="1" Height="19" FontFamily="Consolas" FontSize="16" AcceptsReturn="False" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,3,0,5"
                              TextChanged="HandleInputTextChanged" KeyDown="HandleInputKeyDown" PreviewKeyDown="HandleInputKeyDownPreview" SelectionChanged="HandleInputSelectionChanged" />-->
-                <ProgressBar Name="progress" Grid.ColumnSpan="2" Height="1" Minimum="0" Maximum="100" IsTabStop="False" VerticalAlignment="Bottom"
-                     Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource InputBorderBrush}" />
+                
             </Grid>
         </Border>
 
@@ -143,7 +145,7 @@
         </Border>
 
         <!-- INTELLISENSE -->
-        <ListBox x:Name="listIntellisense" Grid.Row="2" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0,0,0,1"
+        <ListBox x:Name="listIntellisense" Grid.Row="2" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0,0,0,2"
                  MaxHeight="265" VerticalAlignment="Top" Foreground="{DynamicResource OutputForegroundBrush}" Focusable="False" IsTabStop="False"
                  PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenseMouseDoubleClick" PreviewMouseDown="ListIntellisense_PreviewMouseDown"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">

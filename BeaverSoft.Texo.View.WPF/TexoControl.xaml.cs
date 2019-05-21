@@ -125,7 +125,7 @@ namespace BeaverSoft.Texo.View.WPF
         {
             isInputDisabled = true;
             progress.IsIndeterminate = true;
-            tbInput.Foreground = Brushes.DarkRed;
+            tbInput.Foreground = Brushes.Salmon; // TODO: [P1] Make this a dependency property
             //tbInput.IsReadOnly = true;
         }
 
@@ -465,18 +465,18 @@ namespace BeaverSoft.Texo.View.WPF
         private void HandleInputGotFocus(object sender, RoutedEventArgs e)
         {
             bInput.SetResourceReference(BorderBrushProperty, "AccentBrush");
-            SwitchProgresForegroundAndBorderBrush();
+            //SwitchProgressForegroundAndBorderBrush();
         }
 
         private void HandleInputLostFocus(object sender, RoutedEventArgs e)
         {
             bInput.SetResourceReference(BorderBrushProperty, "InputBorderBrush");
             //bInput.BorderBrush = Brushes.Black;
-            SwitchProgresForegroundAndBorderBrush();
+            //SwitchProgressForegroundAndBorderBrush();
             CloseIntellisense();
         }
 
-        private void SwitchProgresForegroundAndBorderBrush()
+        private void SwitchProgressForegroundAndBorderBrush()
         {
             var brush = progress.BorderBrush;
             progress.BorderBrush = progress.Foreground;

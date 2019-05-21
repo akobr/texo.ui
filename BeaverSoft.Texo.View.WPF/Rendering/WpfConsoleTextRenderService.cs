@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace BeaverSoft.Texo.View.WPF.Rendering
 {
@@ -22,7 +23,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
         private delegate void RenderMethod(string text);
 
         private Brush backgroundBrush = Brushes.Transparent;
-        private Brush foregroundBrush = Brushes.White; // TODO: [P1] Solve this, should be base on theme!
+        private Brush foregroundBrush = Brushes.White; // TODO: [P1] Solve this, must be base on theme!
         private FontStyle fontStyle = FontStyles.Normal;
         private FontWeight fontWeight = FontWeights.Normal;
         private TextDecorationCollection decorations = new TextDecorationCollection();
@@ -465,7 +466,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
             return result;
         }
 
-        private void TryFinishStreamRender(IReportableStream stream)
+        private async void TryFinishStreamRender(IReportableStream stream)
         {
             if (!stream.IsCompleted)
             {
@@ -480,20 +481,31 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 return;
             }
 
-            if (streamedContainer?.Inlines.Count < 1)
-            {
-                streamedContainer.Dispatcher.BeginInvoke(new SetEmptyStream(SetEmptyCommandStream), streamedContainer);
-            }
+            await streamedContainer.Dispatcher.BeginInvoke(
+                    new SetEmptyStream(SetEmptyCommandStream),
+                    DispatcherPriority.ApplicationIdle,
+                    streamedContainer);
 
             streamedContainer = null;
             stream.Dispose();
             streamedOnAfterRender = null;
             streamedOnFinished?.Invoke();
             streamedOnFinished = null;
+            GC.Collect(3, GCCollectionMode.Forced, true);
         }
 
         private void SetEmptyCommandStream(Span target)
         {
+            if (target == null || !target.IsInitialized || target.Parent == null)
+            {
+                return;
+            }
+
+            if (target.Inlines.Count > 0)
+            {
+                return;
+            }
+
             target.Inlines.Add(new Run("command is done") { Foreground = Brushes.Gray });
         }
 
