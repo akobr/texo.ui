@@ -59,6 +59,29 @@ namespace BeaverSoft.Texo.Commands.Functions
             queryGuid.Documentation.Title = "Guid generator";
             queryGuid.Documentation.Description = "Generates random GUID and show it in multiple formats.";
 
+            var varSource = Parameter.CreateBuilder();
+            varSource.Key = "source";
+
+            var queryHashMd5 = Query.CreateBuilder();
+            queryHashMd5.Key = "hash-md5";
+            queryHashMd5.Representations.AddRange(new[] { "hash-md5", "md5" });
+            queryHashMd5.Documentation.Title = "Hash function (MD5)";
+            queryHashMd5.Documentation.Description = "Calculates MD5 hash from input text or a file.";         
+            queryHashMd5.Parameters.Add(varSource.ToImmutable());
+
+            var queryHashSha1 = Query.CreateBuilder();
+            queryHashSha1.Key = "hash-sha1";
+            queryHashSha1.Representations.AddRange(new[] { "hash-sha1", "sha1" });
+            queryHashSha1.Documentation.Title = "Hash function (SHA1)";
+            queryHashSha1.Documentation.Description = "Calculates SHA1 hash from input text or a file.";
+            queryHashSha1.Parameters.Add(varSource.ToImmutable());
+
+            var queryRandom = Query.CreateBuilder();
+            queryRandom.Key = "random";
+            queryRandom.Representations.AddRange(new[] { "random", "rnd" });
+            queryRandom.Documentation.Title = "Random generator";
+            queryRandom.Documentation.Description = "Generates random text, person information, address, GPS coordinates and numbers..";
+
             command.Queries.AddRange(new[]
             {
                 queryList.ToImmutable(),
@@ -66,6 +89,9 @@ namespace BeaverSoft.Texo.Commands.Functions
                 queryNumber.ToImmutable(),
                 queryBase64.ToImmutable(),
                 queryGuid.ToImmutable(),
+                queryHashMd5.ToImmutable(),
+                queryHashSha1.ToImmutable(),
+                queryRandom.ToImmutable(),
             });
 
             return command.ToImmutable();

@@ -83,6 +83,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Bogus">
+      <Version>27.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Markdig">
       <Version>0.16.0</Version>
     </PackageReference>
