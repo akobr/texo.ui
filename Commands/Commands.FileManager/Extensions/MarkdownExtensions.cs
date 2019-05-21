@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Markdown.Builder;
@@ -21,9 +21,9 @@ namespace BeaverSoft.Texo.Commands.FileManager.Extensions
         {
             LinksModel model = BuildLinks(paths, relatedTo);
 
-            WritePathsWithHeader(model.Directories, "Directories", builder);
-            WritePathsWithHeader(model.Files, "Files", builder);
-            WritePathsWithHeader(model.NonExists, "Non-Existing", builder);
+            WritePathsWithHeader(model.Directories, $"Directories ({model.Directories.Count})", builder);
+            WritePathsWithHeader(model.Files, $"Files ({model.Files.Count})", builder);
+            WritePathsWithHeader(model.NonExists, $"Non-Existing ({model.NonExists.Count})", builder);
         }
 
         public static void WriteRawPathList(this MarkdownBuilder builder, List<string> paths)
