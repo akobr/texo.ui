@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Extensions;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Result;
@@ -61,7 +61,7 @@ namespace Commands.Clipboard
             foreach (IClipboardItem item in service.GetHistory())
             {
                 MarkdownBuilder itemBuilder = new MarkdownBuilder();
-                itemBuilder.Header((index++).ToString(), 3);
+                itemBuilder.Header((++index).ToString(), 3);
                 itemBuilder.CodeBlock(string.Empty, item.Thumbnail);
                 builder.Add(ViewItem.Markdown(itemBuilder.ToString()));
             }
@@ -88,7 +88,7 @@ namespace Commands.Clipboard
                 return new ErrorTextResult("Invalid index.");
             }
 
-            IClipboardItem item = service.SetClipboardFromHistory(index);
+            IClipboardItem item = service.SetClipboardFromHistory(service.HistoryCount - index);
 
             if (item == null)
             {
