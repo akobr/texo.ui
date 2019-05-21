@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -55,7 +55,7 @@ namespace Commands.ReferenceCheck
                 new[] { ReferenceCheckConstants.REF_CHECK, "refcheck", "rcheck", "projcheck" });
             command.Parameters.Add(parameter.ToImmutable());
             command.Documentation.Title = "Project reference check";
-            command.Documentation.Description = "Check C# project for duplicate references.";
+            command.Documentation.Description = "Check OLD C# project for duplicate references.";
 
             return command.ToImmutable();
         }
