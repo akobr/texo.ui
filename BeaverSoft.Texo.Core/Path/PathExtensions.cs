@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -156,6 +156,11 @@ namespace BeaverSoft.Texo.Core.Path
 
         public static PathTypeEnum GetPathType(this string path)
         {
+            if (!path.IsValidPath())
+            {
+                return PathTypeEnum.InvalidPath;
+            }
+
             if (File.Exists(path))
             {
                 return PathTypeEnum.File;
