@@ -37,8 +37,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             pipelineOutput.AddPipe(new OutputAutoUrl());
             pipelineOutput.AddPipe(new GitOutput());
             pipelineOutput.AddPipe(new GitStatusOutput());
+            pipelineOutput.AddPipe(new GitBranchOutput());
+            pipelineOutput.AddPipe(new GitPushOutput());
             pipelineOutput.AddPipe(new GetChildItemOutput());
 
+            pipelineError.AddPipe(new GitPushOutput());
             pipelineError.AddPipe(new GitError());
         }
 
