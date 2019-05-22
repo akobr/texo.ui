@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 
 namespace BeaverSoft.Texo.Core.View.Actions
@@ -12,15 +13,15 @@ namespace BeaverSoft.Texo.Core.View.Actions
             this.view = view;
         }
 
-        public void Execute(IDictionary<string, string> arguments)
+        public Task ExecuteAsync(IDictionary<string, string> arguments)
         {
-            if (!arguments.TryGetValue(ActionParameters.INPUT, out string input)
-                || string.IsNullOrWhiteSpace(input))
+            if (arguments.TryGetValue(ActionParameters.INPUT, out string input)
+                && !string.IsNullOrWhiteSpace(input))
             {
-                return;
+                view.SetInput(input);
             }
 
-            view.SetInput(input);
+            return Task.CompletedTask;
         }
     }
 }

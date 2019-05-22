@@ -1,31 +1,34 @@
-﻿using BeaverSoft.Texo.Core.Actions;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Path;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Test.Client.WPF.Actions
 {
     public class PathOpenAction : IAction
     {
-        public void Execute(IDictionary<string, string> arguments)
+        public Task ExecuteAsync(IDictionary<string, string> arguments)
         {
             if (!arguments.TryGetValue(ActionParameters.PATH, out string path))
             {
-                return;
+                return Task.CompletedTask;
             }
 
             switch (path.GetPathType())
             {
                 case PathTypeEnum.File:
                     OpenFile(path, arguments);
-                    return;
+                    break;
 
                 case PathTypeEnum.Directory:
                     OpenDirectory(path);
-                    return;
+                    break;
             }
+
+            return Task.CompletedTask;
         }
 
         private void OpenDirectory(string path)

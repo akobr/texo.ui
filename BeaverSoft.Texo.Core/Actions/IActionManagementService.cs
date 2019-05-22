@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Core.Actions
 {
     public interface IActionManagementService
     {
-        void Execute(string actionUrl);
+        Task ExecuteAsync(string actionUrl);
 
-        void Execute(string actionName, IDictionary<string, string> arguments);
+        Task ExecuteAsync(string actionName, IDictionary<string, string> arguments);
     }
 }

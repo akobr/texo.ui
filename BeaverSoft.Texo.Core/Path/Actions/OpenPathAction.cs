@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 
 namespace BeaverSoft.Texo.Core.Path.Actions
@@ -22,22 +23,24 @@ namespace BeaverSoft.Texo.Core.Path.Actions
             this.directoryStrategy = directoryStrategy;
         }
 
-        public void Execute(IDictionary<string, string> arguments)
+        public Task ExecuteAsync(IDictionary<string, string> arguments)
         {
             if (!arguments.TryGetValue(ActionParameters.PATH, out string path)
                 || string.IsNullOrWhiteSpace(path))
             {
-                return;
+                return Task.CompletedTask;
             }
 
             if (File.Exists(path))
             {
-                fileStrategy.Open(path);
+                return fileStrategy.OpenAsync(path);
             }
             else if(Directory.Exists(path))
             {
-                directoryStrategy.Open(path);
+                return directoryStrategy.OpenAsync(path);
             }
+
+            return Task.CompletedTask;
         }
     }
 }

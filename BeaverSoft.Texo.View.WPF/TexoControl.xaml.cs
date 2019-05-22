@@ -177,7 +177,8 @@ namespace BeaverSoft.Texo.View.WPF
             skipNextTextChange = true;
             tbInput.Text = input;
             tbInput.CaretIndex = tbInput.Text.Length;
-            
+            tbInput.Focus();
+
             //TextRange range = new TextRange(control.InputBox.Document.ContentStart, control.InputBox.Document.ContentEnd);
             //range.Text = historyItem.Input.ParsedInput.RawInput;
             //control.InputBox.CaretPosition = control.InputBox.Document.ContentEnd;

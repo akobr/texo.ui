@@ -18,7 +18,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Actions
             this.context = context;
         }
 
-        public async void Execute(IDictionary<string, string> arguments)
+        public async Task ExecuteAsync(IDictionary<string, string> arguments)
         {
             if (!arguments.TryGetValue(ActionParameters.PATH, out string path))
             {

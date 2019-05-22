@@ -1,12 +1,14 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Core.Path.Actions
 {
     public class SystemOpenStrategy : IOpenFileStrategy, IOpenDirectoryStrategy
     {
-        public void Open(string path)
+        public Task OpenAsync(string path)
         {
             Process.Start(path);
+            return Task.CompletedTask;
         }
     }
 }

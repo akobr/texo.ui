@@ -1,6 +1,7 @@
-﻿using BeaverSoft.Texo.Core.Runtime;
+using BeaverSoft.Texo.Core.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Core.Actions.Implementations
 {
@@ -13,14 +14,14 @@ namespace BeaverSoft.Texo.Core.Actions.Implementations
             this.executor = executor ?? throw new ArgumentNullException(nameof(executor));
         }
 
-        public async void Execute(IDictionary<string, string> arguments)
+        public Task ExecuteAsync(IDictionary<string, string> arguments)
         {
             if (!arguments.TryGetValue(ActionParameters.STATEMENT, out string statement))
             {
-                return;
+                return Task.CompletedTask;
             }
 
-            await executor.ProcessAsync(statement);
+            return executor.ProcessAsync(statement);
         }
     }
 }

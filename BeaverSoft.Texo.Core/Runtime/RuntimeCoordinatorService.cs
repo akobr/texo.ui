@@ -129,14 +129,14 @@ namespace BeaverSoft.Texo.Core.Runtime
             }
         }
 
-        public void ExecuteAction(string actionUrl)
+        public Task ExecuteActionAsync(string actionUrl)
         {
-            actionManagement.Execute(actionUrl);
+            return actionManagement.ExecuteAsync(actionUrl);
         }
 
-        public void ExecuteAction(string actionName, IDictionary<string, string> arguments)
+        public Task ExecuteActionAsync(string actionName, IDictionary<string, string> arguments)
         {
-            actionManagement.Execute(actionName, arguments);
+            return actionManagement.ExecuteAsync(actionName, arguments);
         }
 
         public void Dispose()

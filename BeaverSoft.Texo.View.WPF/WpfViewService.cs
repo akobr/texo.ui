@@ -242,19 +242,20 @@ namespace BeaverSoft.Texo.View.WPF
             e.CanExecute = true;
         }
 
-        private void OnLinkExecuted(object sender, ExecutedRoutedEventArgs e)
+        private async void OnLinkExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             e.Handled = true;
             string url = e.Parameter.ToString();
+
             IActionContext actionContext = actionParser.Parse(url);
-            
+
             if (actionContext.Name == ActionNames.INPUT_UPDATE)
             {
                 UpdateInput(actionContext);
                 return;
             }
 
-            executor.ExecuteAction(url);
+            await executor.ExecuteActionAsync(url);
         }
 
         public void Initialise(TexoControl context)
@@ -303,7 +304,7 @@ namespace BeaverSoft.Texo.View.WPF
                 return;
             }
 
-            executor.ExecuteAction(actionLink.Address.AbsoluteUri);
+            executor.ExecuteActionAsync(actionLink.Address.AbsoluteUri);
         }
 
         private void UpdateInput(IActionContext actionContext)

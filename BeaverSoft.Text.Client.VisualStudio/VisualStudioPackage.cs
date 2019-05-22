@@ -4,9 +4,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Actions;
+using BeaverSoft.Texo.Core.Actions.Implementations;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Core.View.Actions;
 using BeaverSoft.Text.Client.VisualStudio.Actions;
 using BeaverSoft.Text.Client.VisualStudio.Startup;
 using Microsoft.VisualStudio.Shell;
@@ -114,7 +116,9 @@ namespace BeaverSoft.Text.Client.VisualStudio
                 messageBus);
 
             // Register of actions
+            texoEngine.RegisterAction(new SimpleActionFactory<UriOpenAction>(), ActionNames.URI);
             texoEngine.RegisterAction(new PathOpenActionFactory(context), ActionNames.PATH_OPEN, ActionNames.PATH);
+            texoEngine.RegisterAction(new InputSetActionFactory(container.GetInstance<IViewService>()), ActionNames.INPUT_SET, ActionNames.INPUT);
 
             await texoEngine.InitialiseWithCommandsAsync();
             texoEngine.Start();

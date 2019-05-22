@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace BeaverSoft.Texo.Core.Actions
@@ -12,7 +12,15 @@ namespace BeaverSoft.Texo.Core.Actions
             if (!uri.IsAbsoluteUri
                 || !string.Equals(uri.Scheme, ActionConstants.ACTION_SCHEMA, StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException("Invalid Action URL.", nameof(actionUrl));
+                return new ActionContext()
+                {
+                    Name = ActionNames.URI,
+                    Arguments = new Dictionary<string, string>()
+                    {
+                        { ActionParameters.ACTION_NAME, ActionNames.URI },
+                        { ActionParameters.URI, actionUrl }
+                    }
+                };
             }
 
             string actionName = uri.Host;
