@@ -47,6 +47,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
 
             Group fileGroup = match.Groups["path"];
             string path = fileGroup.Value;
+
+            if (!path.IsValidPath())
+            {
+                return Task.FromResult(data);
+            }
+
             Func<string, bool> pathCheckFunc = path.EndsWith("/") ? (Func<string, bool>)Directory.Exists : File.Exists;
             string fullPath = Path.Combine(PathConstants.RELATIVE_CURRENT_DIRECTORY, path);
 

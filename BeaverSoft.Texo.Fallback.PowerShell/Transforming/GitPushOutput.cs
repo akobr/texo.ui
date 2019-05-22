@@ -1,4 +1,4 @@
-using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Text;
@@ -8,6 +8,8 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
 {
     public class GitPushOutput : ITransformation<OutputModel>
     {
+        private readonly Regex helpRegex = new Regex("git push[^\\u001b\\r\\n]*", RegexOptions.Compiled);
+
         public Task<OutputModel> ProcessAsync(OutputModel data)
         {
             if (!data.Flags.Contains(TransformationFlags.GIT)
@@ -17,19 +19,21 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
             }
 
             string text = data.Output;
-            int index = text.IndexOf("git push");
 
-            if (index < 0)
+            if (text.IndexOf("git push") > 0)
             {
-                return Task.FromResult(data);
+                data.Output = helpRegex.Replace(text, ReplaceHelpCommand);
             }
 
-            string help = text.Substring(index).TrimEnd();
-            AnsiStringBuilder builder = new AnsiStringBuilder();
-            builder.Append(text.Substring(0, index));
-            builder.AppendLink(help, ActionBuilder.InputSetUri(help));
-            data.Output = builder.ToString();
             return Task.FromResult(data);
+        }
+
+        private string ReplaceHelpCommand(Match match)
+        {
+            string help = match.Value.TrimEnd();
+            AnsiStringBuilder builder = new AnsiStringBuilder();
+            builder.AppendLink(help, ActionBuilder.InputSetUri(help));
+            return builder.ToString();
         }
     }
 }

@@ -277,9 +277,19 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
         {
             StringBuilder builder = new StringBuilder();
 
-            foreach (Run child in span.Inlines)
+            foreach (Inline child in span.Inlines)
             {
-                builder.Append(child.Text);
+                switch (child)
+                {
+                    case Run run:
+                        builder.Append(run.Text);
+                        break;
+
+                    case Hyperlink link:
+                        builder.Append(((Run)link.Inlines.FirstInline).Text);
+                        break;
+
+                }
             }
 
             return builder.ToString();
