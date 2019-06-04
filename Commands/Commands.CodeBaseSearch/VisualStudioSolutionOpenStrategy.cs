@@ -15,7 +15,7 @@ namespace Commands.CodeBaseSearch
 
         public Task<Workspace> OpenAsync()
         {
-            return workspace;
+            return Task.FromResult<Workspace>(workspace);
         }
     }
 }
