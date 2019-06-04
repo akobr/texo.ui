@@ -11,5 +11,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
         public const string GIT_UNTRACKED = "git-unt";
         public const string GIT_UPDATE_MODE = "git-um";
         public const string AUTO_URL = "auto-url";
+        public const string ERROR = "error";
     }
 }

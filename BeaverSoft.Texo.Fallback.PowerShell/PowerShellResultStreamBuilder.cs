@@ -16,7 +16,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         private readonly ILogService logger;
         private readonly IPipeline<OutputModel> pipelineOutput;
-        private readonly IPipeline<OutputModel> pipelineError;
 
         private ReportableStream stream;
         private FormattableStreamWriter writer;
@@ -27,7 +26,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             this.logger = logger;
             pipelineOutput = new Pipeline<OutputModel>(logger);
-            pipelineError = new Pipeline<OutputModel>(logger);
 
             InitialisePipeline();
         }
@@ -35,14 +33,8 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         private void InitialisePipeline()
         {
             pipelineOutput.AddPipe(new OutputAutoUrl());
-            pipelineOutput.AddPipe(new GitOutput());
-            pipelineOutput.AddPipe(new GitStatusOutput());
-            pipelineOutput.AddPipe(new GitBranchOutput());
-            pipelineOutput.AddPipe(new GitPushOutput());
+            pipelineOutput.AddPipe(new GitOutput(logger));
             pipelineOutput.AddPipe(new GetChildItemOutput());
-
-            pipelineError.AddPipe(new GitPushOutput());
-            pipelineError.AddPipe(new GitError());
         }
 
         public bool ContainError => containError;
@@ -102,9 +94,11 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         public async void WriteErrorLine(string text)
         {
             containError = true;
-            OutputModel output = await pipelineError.ProcessAsync(new OutputModel(text, input));
 
-            // WriteColored(text, 255, 160, 122);
+            OutputModel output = new OutputModel(text, input);
+            output.Flags.Add(TransformationFlags.ERROR);
+            output = await pipelineOutput.ProcessAsync(output);
+
             writer.SetForegroundTextColor(ConsoleColor.Red);
             writer.Write(output.Output);
             writer.ResetFormatting();

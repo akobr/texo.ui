@@ -13,8 +13,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
 
         public Task<OutputModel> ProcessAsync(OutputModel data)
         {
-            if (!data.Flags.Contains(TransformationFlags.GIT)
-                || !data.Flags.Contains(TransformationFlags.GIT_BRANCH))
+            if (!data.Flags.Contains(TransformationFlags.GIT_BRANCH))
             {
                 return Task.FromResult(data);
             }

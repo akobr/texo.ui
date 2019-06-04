@@ -12,8 +12,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
 
         public Task<OutputModel> ProcessAsync(OutputModel data)
         {
-            if (!data.Flags.Contains(TransformationFlags.GIT)
-                || !data.Flags.Contains(TransformationFlags.GIT_PUSH))
+            if (!data.Flags.Contains(TransformationFlags.GIT_PUSH))
             {
                 return Task.FromResult(data);
             }
