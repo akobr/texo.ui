@@ -1,29 +1,34 @@
 using System;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.MSBuild;
 
 namespace Commands.CodeBaseSearch.Model
 {
-    public class SolutionIndex
+    public class SolutionIndex : IIndex
     {
-        private readonly string solutionPath;
-        private ISubject root;
+        private readonly ISolutionOpenStrategy openStrategy;
+        private Workspace workspace;
+        private Subject root;
 
-        public SolutionIndex(string solutionPath)
+        public SolutionIndex(ISolutionOpenStrategy openStrategy)
         {
-            this.solutionPath = solutionPath;
+            this.openStrategy = openStrategy;
         }
 
         public async Task PreLoadAsync()
         {
-            var solutionSubject = new Subject(Path.GetFileNameWithoutExtension(solutionPath), SubjectTypeEnum.Solution);
-            root = solutionSubject;
+            workspace = await openStrategy.OpenAsync();
+            Solution solution = workspace.CurrentSolution;
 
-            MSBuildWorkspace msWorkspace = MSBuildWorkspace.Create();
-            Solution solution = await msWorkspace.OpenSolutionAsync(solutionPath);
+            if (solution?.FilePath == null)
+            {
+                return;
+            }
+
+            root = new Subject(Path.GetFileNameWithoutExtension(solution.FilePath), SubjectTypeEnum.Solution);
             var projectListBuilder = ImmutableList<ISubject>.Empty.ToBuilder();
 
             foreach (Project project in solution.Projects)
@@ -36,7 +41,7 @@ namespace Commands.CodeBaseSearch.Model
                 }
 
                 var projectSubject = new Subject(project.Name, SubjectTypeEnum.Project);
-                projectSubject.SetParent(solutionSubject);
+                projectSubject.SetParent(root);
                 projectListBuilder.Add(projectSubject);
 
                 foreach (Document document in project.Documents)
@@ -51,7 +56,7 @@ namespace Commands.CodeBaseSearch.Model
                 }
             }
 
-            solutionSubject.SetChildren(projectListBuilder.ToImmutable());
+            root.SetChildren(projectListBuilder.ToImmutable());
         }
 
         public async Task LoadAsync()
@@ -65,9 +70,29 @@ namespace Commands.CodeBaseSearch.Model
             }
         }
 
-        public IImmutableList<ISubject> SearchAsync(SearchContext context)
+        public Task<IImmutableList<ISubject>> SearchAsync(SearchContext context)
         {
-            throw new NotImplementedException();
+            var builder = ImmutableList<ISubject>.Empty.ToBuilder();
+
+            foreach (ISubject child in root.Children)
+            {
+                SearchSubject(child, context, builder);
+            }
+
+            return Task.FromResult<IImmutableList<ISubject>>(builder.ToImmutable());
+        }
+
+        private void SearchSubject(ISubject subject, SearchContext context, ImmutableList<ISubject>.Builder builder)
+        {
+            if (subject.Keywords.Contains(context.SearchTerm))
+            {
+                builder.Add(subject);
+            }
+
+            foreach (ISubject child in subject.Children)
+            {
+                SearchSubject(child, context, builder);
+            }
         }
     }
 }

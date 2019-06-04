@@ -1,10 +1,9 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
-using Commands.CodeBaseSearch.Model;
 
-namespace Commands.CodeBaseSearch
+namespace Commands.CodeBaseSearch.Model
 {
-    public interface ICodeBaseSearchService
+    public interface IIndex
     {
         Task LoadAsync();
 
