@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Configuration;
@@ -53,9 +53,14 @@ namespace BeaverSoft.Texo.Core.Environment
 
         public string GetVariable(string variable)
         {
+            return GetVariable(variable, string.Empty);
+        }
+
+        public string GetVariable(string variable, string defaultValue)
+        {
             if (!variables.TryGetValue(variable, out string value))
             {
-                return string.Empty;
+                return defaultValue;
             }
 
             return value;
