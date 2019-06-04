@@ -33,7 +33,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 return new TextResult("The stage is empty.");
             }
 
-            SearchContext copyContext = new SearchContext
+            SearchContext searchContext = new SearchContext
             {
                 SearchTerm = context.GetParameterValue(ApplyParameters.SEARCH_TERM),
                 Items = paths,
@@ -42,7 +42,12 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 IsCaseSensitive = context.HasOption(ApplyOptions.CASE_SENSITIVE)
             };
 
-            return Search(copyContext);
+            if (string.IsNullOrEmpty(searchContext.SearchTerm))
+            {
+                return new TextResult("Empty search term.");
+            }
+
+            return Search(searchContext);
         }
 
         private ICommandResult Search(SearchContext context)
