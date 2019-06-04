@@ -43,7 +43,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF
             engineBuilder.WithFallbackService(container.GetInstance<IFallbackService>());
             TexoEngine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
             TexoEngine.RegisterAction(new SimpleActionFactory<UriOpenAction>(), ActionNames.URI);
-            TexoEngine.RegisterAction(new PathOpenActionFactory(), ActionNames.PATH_OPEN, ActionNames.PATH);
+            TexoEngine.RegisterAction(new PathOpenActionFactory(container.GetInstance<IExecutor>()), ActionNames.PATH_OPEN, ActionNames.PATH);
             TexoEngine.RegisterAction(new InputSetActionFactory(container.GetInstance<IViewService>()), ActionNames.INPUT_SET, ActionNames.INPUT);
 
             ServiceMessageBus = container.GetInstance<IServiceMessageBus>();
