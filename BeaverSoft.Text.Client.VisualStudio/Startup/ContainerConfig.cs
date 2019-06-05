@@ -96,7 +96,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
         public static void RegisterCommandFactory(this SimpleIoc container, CommandFactory factory)
         {
             container.Register<CommandFactory>(() => factory);
-            container.Register<ITexoFactory<ICommand, string>>(() => factory);
+            container.Register<ITexoFactory<object, string>>(() => factory);
         }
     }
 }

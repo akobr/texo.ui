@@ -30,7 +30,7 @@ namespace BeaverSoft.Texo.Core
         private IInputEvaluationService evaluator;
         private IInputHistoryService history;
 
-        private ITexoFactory<ICommand, string> commandFactory;
+        private ITexoFactory<object, string> commandFactory;
         private ICommandManagementService commandManagement;
 
         private IFallbackService fallback;
@@ -153,7 +153,7 @@ namespace BeaverSoft.Texo.Core
             };
         }
 
-        public TexoEngine Build(ITexoFactory<ICommand, string> factory, IViewService view)
+        public TexoEngine Build(ITexoFactory<object, string> factory, IViewService view)
         {
             commandFactory = factory ?? throw new ArgumentNullException(nameof(factory));
             Initiliase();

@@ -177,6 +177,10 @@
       <Project>{694220f2-5d6e-4543-8c3c-0ac6acabc957}</Project>
       <Name>Commands.Clipboard</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.CodeBaseSearch\Commands.CodeBaseSearch.csproj">
+      <Project>{15AFB5D0-4D42-4077-9F04-0D83E8D70D79}</Project>
+      <Name>Commands.CodeBaseSearch</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.CommandLine\Commands.CommandLine.csproj">
       <Project>{620b936c-b2a0-4b37-97da-11e32b858d7c}</Project>
       <Name>Commands.CommandLine</Name>

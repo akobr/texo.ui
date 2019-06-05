@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Reflection;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
@@ -183,21 +184,51 @@ namespace BeaverSoft.Texo.Core.Runtime
 
         private Task ProcessContextAsync(Input input, CommandContext context)
         {
-            ICommand command = commandManagement.BuildCommand(context.Key);
+            object command = commandManagement.BuildCommand(context.Key);
 
             switch (command)
             {
                 case IAsyncCommand asyncCommand:
                     return ProcessAsyncCommand(asyncCommand, context, input);
 
+                case ICommand syncCommand:
+                    return ProcessCommandAsTask(syncCommand.Execute, context, input);
+
                 default:
-                    return ProcessCommandAsTask(command, context, input);
+                    return ProcessUnknownCommandAsync(command, context, input);
             }
         }
 
-        private async Task ProcessCommandAsTask(ICommand command, CommandContext context, Input input)
+        private Task ProcessUnknownCommandAsync(object command, CommandContext context, Input input)
         {
-            ICommandResult result = await Task.Run(() => command.Execute(context)).ConfigureAwait(true);
+            Type commandType = command.GetType();
+            Type resultBaseType = typeof(ICommandResult);
+
+            MethodInfo executionMethod = commandType.GetMethod(nameof(ICommand.Execute), BindingFlags.Public);
+            ParameterInfo[] parameters = executionMethod?.GetParameters();
+
+            if (executionMethod == null
+                || parameters.Length > 1
+                || (parameters.Length == 1 && parameters[0].ParameterType != typeof(CommandContext))
+                || !resultBaseType.IsAssignableFrom(executionMethod.ReturnType))
+            {
+                logger.Error(
+                    "Invalid command type, at least public method ICommandResult Execute(CommandContext) needs to be presented.",
+                    context.Key, command.GetType().FullName, input.ParsedInput.RawInput);
+                return Task.CompletedTask;
+            }
+
+            if (executionMethod.IsStatic)
+            {
+                return ProcessCommandAsTask((c) => (ICommandResult)executionMethod.Invoke(null, new object[] { c }), context, input);
+            }
+
+            return ProcessCommandAsTask((c) => (ICommandResult)executionMethod.Invoke(command, new object[] { c }), context, input);
+        }
+
+        private async Task ProcessCommandAsTask(Func<CommandContext, ICommandResult> commandExecution, CommandContext context, Input input)
+        {
+            ICommandResult result = await Task.Run(() => commandExecution(context)).ConfigureAwait(true);
             Render(input, result);
         }
 

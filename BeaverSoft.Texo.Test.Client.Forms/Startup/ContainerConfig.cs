@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Commands.FileManager;
+using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.FileManager.Stash;
 using BeaverSoft.Texo.Commands.NugetManager;
@@ -76,7 +76,7 @@ namespace BeaverSoft.Texo.Test.Client.Forms.Startup
         public static void RegisterCommandFactory(this SimpleIoc container, CommandFactory factory)
         {
             container.Register<CommandFactory>(() => factory);
-            container.Register<ITexoFactory<ICommand, string>>(() => factory);
+            container.Register<ITexoFactory<object, string>>(() => factory);
         }
     }
 }

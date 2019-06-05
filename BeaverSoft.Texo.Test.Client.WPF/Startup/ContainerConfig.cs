@@ -17,6 +17,7 @@ using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
 using Commands.Calc;
 using Commands.Clipboard;
+using Commands.CodeBaseSearch;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
 using StrongBeaver.Core;
@@ -65,6 +66,10 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             // Developer Functions
             container.Register<FunctionsCommand>();
 
+            // Code-base-search
+            container.Register<ICodeBaseSearchService, CodeBaseSearchService>();
+            container.Register<CodeBaseSearchCommand>();
+
             // View
             container.Register<IMarkdownService, MarkdownService>();
             container.Register<IWpfRenderService, WpfMarkdownRenderService>();
@@ -97,7 +102,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
         public static void RegisterCommandFactory(this SimpleIoc container, CommandFactory factory)
         {
             container.Register<CommandFactory>(() => factory);
-            container.Register<ITexoFactory<ICommand, string>>(() => factory);
+            container.Register<ITexoFactory<object, string>>(() => factory);
         }
     }
 }

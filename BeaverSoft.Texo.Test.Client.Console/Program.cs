@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
@@ -99,7 +99,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<NugetManagerCommand>();
 
             CommandFactory commandFactory = new CommandFactory();
-            container.Register<ITexoFactory<ICommand, string>>(() => commandFactory);
+            container.Register<ITexoFactory<object, string>>(() => commandFactory);
             commandFactory.Register(CommandKeys.CURRENT_DIRECTORY, () => container.GetInstance<CurrentDirectoryCommand>());
             commandFactory.Register(CommandKeys.TEXO, () => container.GetInstance<TexoCommand>());
             commandFactory.Register(CommandKeys.HELP, container.GetInstance<HelpCommand>);

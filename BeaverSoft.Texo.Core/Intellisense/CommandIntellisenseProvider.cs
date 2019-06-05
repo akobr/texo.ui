@@ -21,7 +21,7 @@ namespace BeaverSoft.Texo.Core.Intellisense
         public async Task<IEnumerable<IItem>> GetHelpAsync(Input input)
         {
             IEnumerable<IItem> helpItems = Enumerable.Empty<IItem>();
-            ICommand command = commandManagement.BuildCommand(input.Context.Key);
+            object command = commandManagement.BuildCommand(input.Context.Key);
 
             if (command == null)
             {
