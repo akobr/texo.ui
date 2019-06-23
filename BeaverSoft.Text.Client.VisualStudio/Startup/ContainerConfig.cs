@@ -17,8 +17,10 @@ using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
 using Commands.Calc;
 using Commands.Clipboard;
+using Commands.CodeBaseSearch;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
+using Commands.SpinSport;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services.Serialisation;
@@ -64,6 +66,14 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
 
             // Developer Functions
             container.Register<FunctionsCommand>();
+
+            // Code-base-search
+            container.Register<ICodeBaseSearchService, CodeBaseSearchService>();
+            container.Register<CodeBaseSearchCommand>();
+
+            // SpinSport
+            container.Register<ISolutionDirectoryProvider, SolutionDirectoryProvider>();
+            container.Register<SpinSportCommand>();
 
             // View
             container.Register<IMarkdownService, MarkdownService>();

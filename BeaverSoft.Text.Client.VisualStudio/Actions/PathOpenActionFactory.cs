@@ -1,3 +1,4 @@
+using System;
 using BeaverSoft.Texo.Core.Actions;
 
 namespace BeaverSoft.Text.Client.VisualStudio.Actions
@@ -8,7 +9,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Actions
 
         public PathOpenActionFactory(ExtensionContext context)
         {
-            this.context = context;
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public IAction Build()

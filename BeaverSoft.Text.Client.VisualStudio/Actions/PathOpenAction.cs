@@ -15,7 +15,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Actions
 
         public PathOpenAction(ExtensionContext context)
         {
-            this.context = context;
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task ExecuteAsync(IDictionary<string, string> arguments)
