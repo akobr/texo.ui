@@ -298,7 +298,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
         private void UpdateFormatting(string value)
         {
             // TODO: [P3] needs refactoring
-            if (value.Length > 10)
+            if (value.Length > 9)
             {
                 if(value.StartsWith("38;2"))
                 {
@@ -342,10 +342,6 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 case "31":
                 case "31;1":
                     foregroundBrush = Brushes.DarkSalmon;                    
-                    break;
-
-                case "38;2;255;160;122": // #FFA07A
-                    foregroundBrush = Brushes.LightSalmon;
                     break;
 
                 case "32":
