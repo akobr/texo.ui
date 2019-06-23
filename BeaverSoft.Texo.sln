@@ -76,6 +76,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeaverSoft.Text.Client", "B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Text.Client.VisualStudio", "BeaverSoft.Text.Client.VisualStudio\BeaverSoft.Text.Client.VisualStudio.csproj", "{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands.SpinSport", "Commands\Commands.SpinSport\Commands.SpinSport.csproj", "{636E7983-C0D3-49D1-B83A-A1DE7887F182}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -190,6 +192,10 @@ Global
 		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{636E7983-C0D3-49D1-B83A-A1DE7887F182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{636E7983-C0D3-49D1-B83A-A1DE7887F182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{636E7983-C0D3-49D1-B83A-A1DE7887F182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{636E7983-C0D3-49D1-B83A-A1DE7887F182}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -220,6 +226,7 @@ Global
 		{33BCB6F8-8A55-44A9-910E-628A096E41E6} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 		{97D0F39C-335B-4012-9DD1-514FC74C02CC} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF} = {061058FB-1E54-4BC5-9F15-1BFAA70DA966}
+		{636E7983-C0D3-49D1-B83A-A1DE7887F182} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDFCCFD5-8669-4BBF-83FF-8DFCC3F39551}
