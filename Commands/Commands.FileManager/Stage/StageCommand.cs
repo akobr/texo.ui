@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -27,6 +27,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
             RegisterQueryMethod(StageQueries.REMOVE, Remove);
             RegisterQueryMethod(StageQueries.LOBBY, Lobby);
             RegisterQueryMethod(StageQueries.REMOVE_LOBBY, RemoveLobby);
+            RegisterQueryMethod(StageQueries.CLEAR, Clear);
         }
 
         private ICommandResult Status(CommandContext context)
@@ -117,6 +118,12 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
         {
             stage.RemoveLobby();
             return new TextResult("Lobby has been removed from the stage.");
+        }
+
+        private ICommandResult Clear(CommandContext arg)
+        {
+            stage.Clear();
+            return new TextResult("The stage has been cleared.");
         }
 
         private static Item BuildStageItem(string lobbyPath, IEnumerable<string> paths, string header)

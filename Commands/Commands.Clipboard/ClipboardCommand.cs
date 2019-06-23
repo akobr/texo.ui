@@ -124,7 +124,7 @@ namespace Commands.Clipboard
 
             MarkdownBuilder itemBuilder = new MarkdownBuilder();
             itemBuilder.WriteLine($"- Text simplification is {EnabledOrDisabled(service.Configuration.SimplifyText)}.");
-            itemBuilder.WriteLine($"- File-to-path transfer is {EnabledOrDisabled(service.Configuration.ConvertFilesToPaths)}.");
+            itemBuilder.WriteLine($"- File-to-path transformation is {EnabledOrDisabled(service.Configuration.ConvertFilesToPaths)}.");
             return new ItemsResult(ViewItem.Markdown(itemBuilder.ToString()));
         }
 

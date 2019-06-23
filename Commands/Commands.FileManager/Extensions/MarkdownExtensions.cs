@@ -26,6 +26,15 @@ namespace BeaverSoft.Texo.Commands.FileManager.Extensions
             WritePathsWithHeader(model.NonExists, $"Non-Existing ({model.NonExists.Count})", builder);
         }
 
+        public static void WritePathOverview(this MarkdownBuilder builder, IEnumerable<string> paths, string relatedTo)
+        {
+            LinksModel model = BuildLinks(paths, relatedTo);
+
+            builder.WriteLine($"Directories ({model.Directories.Count})");
+            builder.WriteLine($"Files ({model.Files.Count})");
+            builder.WriteLine($"Non-Existing ({model.NonExists.Count})");
+        }
+
         public static void WriteRawPathList(this MarkdownBuilder builder, List<string> paths)
         {
             paths.Sort(StringComparer.OrdinalIgnoreCase);
