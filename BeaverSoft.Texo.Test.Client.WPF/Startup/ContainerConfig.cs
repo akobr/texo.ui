@@ -20,6 +20,7 @@ using Commands.Clipboard;
 using Commands.CodeBaseSearch;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
+using Commands.SpinSport;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services.Serialisation;
@@ -69,6 +70,10 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             // Code-base-search
             container.Register<ICodeBaseSearchService, CodeBaseSearchService>();
             container.Register<CodeBaseSearchCommand>();
+
+            // SpinSport
+            container.Register<ISolutionDirectoryProvider, TestSolutionDirectoryProvider>();
+            container.Register<SpinSportCommand>();
 
             // View
             container.Register<IMarkdownService, MarkdownService>();

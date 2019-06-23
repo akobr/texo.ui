@@ -11,6 +11,7 @@ using Commands.Clipboard;
 using Commands.CodeBaseSearch;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
+using Commands.SpinSport;
 using StrongBeaver.Core.Container;
 
 namespace BeaverSoft.Texo.Test.Client.WPF.Startup
@@ -30,7 +31,8 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             factory.Register("calculator", container.GetInstance<CalcCommand>);
             factory.Register(ClipboardConstants.COMMAND_NAME, container.GetInstance<ClipboardCommand>);
             factory.Register("functions", container.GetInstance<FunctionsCommand>);
-            factory.Register(CodeBaseSearchConstants.COMMAND_NAME, container.GetInstance<CodeBaseSearchCommand>);
+            //factory.Register(CodeBaseSearchConstants.COMMAND_NAME, container.GetInstance<CodeBaseSearchCommand>);
+            factory.Register(SpinSportConstants.COMMAND_NAME, container.GetInstance<SpinSportCommand>);
         }
     }
 }

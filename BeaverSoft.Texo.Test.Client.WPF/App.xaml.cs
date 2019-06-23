@@ -8,6 +8,7 @@ using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Core.View.Actions;
 using BeaverSoft.Texo.Test.Client.WPF.Actions;
 using BeaverSoft.Texo.Test.Client.WPF.Startup;
+using Commands.CodeBaseSearch;
 using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
@@ -52,6 +53,10 @@ namespace BeaverSoft.Texo.Test.Client.WPF
 
             await TexoEngine.InitialiseWithCommandsAsync();        
             TexoEngine.Start();
+
+            //var searchService = container.GetInstance<ICodeBaseSearchService>();
+            //await searchService.PreLoadAsync();
+            //await searchService.LoadAsync();
         }
 
         protected override void OnExit(ExitEventArgs e)

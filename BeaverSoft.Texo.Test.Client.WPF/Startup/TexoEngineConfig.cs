@@ -8,6 +8,7 @@ using Commands.Clipboard;
 using Commands.CodeBaseSearch;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
+using Commands.SpinSport;
 
 namespace BeaverSoft.Texo.Test.Client.WPF.Startup
 {
@@ -23,7 +24,8 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
                 CalcCommand.BuildConfiguration(),
                 ClipboardBuilder.BuildCommand(),
                 FunctionsBuilder.BuildCommand(),
-                CodeBaseSearchBuilder.BuildCommand());
+                CodeBaseSearchBuilder.BuildCommand(),
+                SpinSportBuilder.BuildCommand());
         }
     }
 }
