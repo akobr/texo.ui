@@ -41,6 +41,7 @@ namespace Commands.CodeBaseSearch.Model
                 }
 
                 var projectSubject = new Subject(project.Name, SubjectTypeEnum.Project);
+                var documentListBuilder = ImmutableList<ISubject>.Empty.ToBuilder();
                 projectSubject.SetParent(root);
                 projectListBuilder.Add(projectSubject);
 
@@ -53,7 +54,10 @@ namespace Commands.CodeBaseSearch.Model
 
                     var documentSubject = new DocumentSubject(document);
                     documentSubject.SetParent(projectSubject);
+                    documentListBuilder.Add(documentSubject);
                 }
+
+                projectSubject.SetChildren(documentListBuilder.ToImmutable());
             }
 
             root.SetChildren(projectListBuilder.ToImmutable());
@@ -66,6 +70,7 @@ namespace Commands.CodeBaseSearch.Model
                 foreach (DocumentSubject document in project.Children)
                 {
                     await document.LoadAsync();
+                    await Task.Delay(5); // TODO: check CPU usage
                 }
             }
         }
@@ -87,6 +92,11 @@ namespace Commands.CodeBaseSearch.Model
             if (subject.Keywords.Contains(context.SearchTerm))
             {
                 builder.Add(subject);
+            }
+
+            if (subject.Children == null)
+            {
+                return;
             }
 
             foreach (ISubject child in subject.Children)

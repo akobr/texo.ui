@@ -21,6 +21,14 @@ namespace Commands.CodeBaseSearch
             search.Documentation.Title = "code-base-search";
             search.Documentation.Description = "Process a search in code-base.";
 
+            var parTerm = Parameter.CreateBuilder();
+            parTerm.Key = CodeBaseSearchConstants.PARAMETER_TERM;
+            parTerm.ArgumentTemplate = ".+";
+            parTerm.IsRepeatable = true;
+            parTerm.Documentation.Title = "search-term";
+            parTerm.Documentation.Description = "Term of search.";
+            search.Parameters.Add(parTerm.ToImmutable());
+
             var categories = Query.CreateBuilder();
             categories.Key = CodeBaseSearchConstants.QUERY_CATEGORIES;
             categories.Representations.AddRange(

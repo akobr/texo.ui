@@ -11,14 +11,14 @@ namespace Commands.CodeBaseSearch.Model
     public class TypeAndMembersWalker : CSharpSyntaxWalker
     {
         private readonly ImmutableList<ISubject>.Builder typesList;
-        private readonly Stack<ISubject> typeStack;
+        private readonly Stack<Subject> typeStack;
         private readonly ISubject fileSubject;
 
         public TypeAndMembersWalker(ISubject fileSubject)
         {
             this.fileSubject = fileSubject;
             typesList = ImmutableList<ISubject>.Empty.ToBuilder();
-            typeStack = new Stack<ISubject>();
+            typeStack = new Stack<Subject>();
         }
 
         public IImmutableList<ISubject> GetTypeSubjects()
@@ -44,6 +44,7 @@ namespace Commands.CodeBaseSearch.Model
         {
             var typeSubject = new Subject(node.Identifier.ValueText, SubjectTypeEnum.Type);
             typeSubject.SetParent(fileSubject);
+            typeSubject.SetChildren(ImmutableList<ISubject>.Empty);
             typeStack.Push(typeSubject);
 
             base.VisitClassDeclaration(node);
@@ -54,7 +55,10 @@ namespace Commands.CodeBaseSearch.Model
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             var methodSubject = new Subject(node.Identifier.ValueText, SubjectTypeEnum.Member);
-            methodSubject.SetParent(typeStack.Peek());
+            var parentType = typeStack.Peek();
+            parentType.SetChildren(parentType.Children.Add(methodSubject));
+            methodSubject.SetParent(parentType);
+
             // base.VisitMethodDeclaration(node);
         }
     }

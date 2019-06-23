@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Commands.CodeBaseSearch.Model;
@@ -6,26 +7,37 @@ namespace Commands.CodeBaseSearch
 {
     public class CodeBaseSearchService : ICodeBaseSearchService
     {
-        private const string solutionPath = @"C:\Working\textum.ui\BeaverSoft.Texo.sln";
-        private readonly IIndex index;
+        private readonly ISolutionOpenStrategy openStrategy;
+        private IIndex index;
 
-        public CodeBaseSearchService()
+        public CodeBaseSearchService(ISolutionOpenStrategy openStrategy)
         {
-            index = new SolutionIndex(new MsBuildSolutionOpenStrategy(solutionPath));
+            this.openStrategy = openStrategy ?? throw new ArgumentNullException(nameof(openStrategy));
         }
 
         public Task LoadAsync()
         {
+            if (index == null)
+            {
+                return Task.CompletedTask;
+            }
+
             return index.LoadAsync();
         }
 
         public Task PreLoadAsync()
         {
+            index = new SolutionIndex(openStrategy);
             return index.PreLoadAsync();
         }
 
         public Task<IImmutableList<ISubject>> SearchAsync(SearchContext context)
         {
+            if (index == null)
+            {
+                return Task.FromResult<IImmutableList<ISubject>>(ImmutableList<ISubject>.Empty);
+            }
+
             return index.SearchAsync(context);
         }
     }
