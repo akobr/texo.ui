@@ -15,5 +15,7 @@ namespace BeaverSoft.Texo.Core.Environment
         string GetVariable(string variable, string defaultValue);
 
         IImmutableDictionary<string, string> GetVariables();
+
+        void RegisterVariableStrategy(string variable, IVariableStrategy strategy);
     }
 }

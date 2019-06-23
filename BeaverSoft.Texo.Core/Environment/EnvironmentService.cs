@@ -8,7 +8,7 @@ using StrongBeaver.Core.Services;
 
 namespace BeaverSoft.Texo.Core.Environment
 {
-    public class EnvironmentService : IEnvironmentService, IMessageBusService<ISettingUpdatedMessage>
+    public class EnvironmentService : IEnvironmentService, IMessageBusService<ISettingUpdatedMessage>, IMessageBusService<ISetVariableMessage>
     {
         private readonly IServiceMessageBus messageBus;
         private readonly Dictionary<string, string> variables;
@@ -73,6 +73,16 @@ namespace BeaverSoft.Texo.Core.Environment
             return builder.ToImmutable();
         }
 
+        public void RegisterVariableStrategy(string variable, IVariableStrategy strategy)
+        {
+            if (string.IsNullOrEmpty(variable))
+            {
+                throw new ArgumentNullException(nameof(variable));
+            }
+
+            strategies[variable] = strategy ?? throw new ArgumentNullException(nameof(strategy));
+        }
+
         public void Dispose()
         {
             // TODO: save
@@ -133,6 +143,11 @@ namespace BeaverSoft.Texo.Core.Environment
                     SetVariable(variable.Key, variable.Value);
                 }
             }
+        }
+
+        void IMessageBusRecipient<ISetVariableMessage>.ProcessMessage(ISetVariableMessage message)
+        {
+            SetVariable(message.Name, message.Value);
         }
     }
 }
