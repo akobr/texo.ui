@@ -1,8 +1,9 @@
 using System.Collections.Immutable;
+using System.IO;
 using Humanizer;
 using Microsoft.CodeAnalysis;
 
-namespace Commands.CodeBaseSearch.Model
+namespace Commands.CodeBaseSearch.Model.KeywordBuilders
 {
     class DocumentKeywordBuilder : IKeywordBuilder
     {
@@ -15,8 +16,10 @@ namespace Commands.CodeBaseSearch.Model
 
         public IImmutableList<string> Build()
         {
+            string simpleName = /*Path.GetFileNameWithoutExtension(*/file.Name/*)*/;
             var keywordBuilder = ImmutableList<string>.Empty.ToBuilder();
-            keywordBuilder.AddRange(file.Name.Humanize(LetterCasing.LowerCase).Split(' '));
+            //keywordBuilder.Add(simpleName);
+            keywordBuilder.AddRange(simpleName.Humanize(LetterCasing.LowerCase).Split(' '));
             keywordBuilder.AddRange(file.Folders);
             return keywordBuilder.ToImmutable();
         }

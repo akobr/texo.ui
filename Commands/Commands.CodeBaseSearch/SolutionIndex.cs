@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Commands.CodeBaseSearch.Model.KeywordBuilders;
+using Commands.CodeBaseSearch.Model.Subjects;
 using Microsoft.CodeAnalysis;
 
 namespace Commands.CodeBaseSearch.Model
@@ -10,6 +13,13 @@ namespace Commands.CodeBaseSearch.Model
     public class SolutionIndex : IIndex
     {
         private readonly ISolutionOpenStrategy openStrategy;
+
+        private IImmutableDictionary<string, Category> categories;
+        private Category projectsCategory;
+        private Category filesCategory;
+        private Category typesCategory;
+        private Category membersCategory;
+
         private Workspace workspace;
         private Subject root;
 
@@ -28,8 +38,8 @@ namespace Commands.CodeBaseSearch.Model
                 return;
             }
 
-            root = new Subject(Path.GetFileNameWithoutExtension(solution.FilePath), SubjectTypeEnum.Solution);
-            var projectListBuilder = ImmutableList<ISubject>.Empty.ToBuilder();
+            BuildCategories();
+            root = new SolutionSubject(Path.GetFileNameWithoutExtension(solution.FilePath));
 
             foreach (Project project in solution.Projects)
             {
@@ -40,10 +50,8 @@ namespace Commands.CodeBaseSearch.Model
                     continue;
                 }
 
-                var projectSubject = new Subject(project.Name, SubjectTypeEnum.Project);
-                var documentListBuilder = ImmutableList<ISubject>.Empty.ToBuilder();
+                var projectSubject = new ProjectSubject(project);
                 projectSubject.SetParent(root);
-                projectListBuilder.Add(projectSubject);
 
                 foreach (Document document in project.Documents)
                 {
@@ -54,13 +62,13 @@ namespace Commands.CodeBaseSearch.Model
 
                     var documentSubject = new DocumentSubject(document);
                     documentSubject.SetParent(projectSubject);
-                    documentListBuilder.Add(documentSubject);
+                    filesCategory.AddSubject(documentSubject);
+                    projectSubject.SetChildren(projectSubject.Children.Add(documentSubject));
                 }
 
-                projectSubject.SetChildren(documentListBuilder.ToImmutable());
+                projectsCategory.AddSubject(projectSubject);
+                root.SetChildren(root.Children.Add(projectSubject));
             }
-
-            root.SetChildren(projectListBuilder.ToImmutable());
         }
 
         public async Task LoadAsync()
@@ -69,39 +77,144 @@ namespace Commands.CodeBaseSearch.Model
             {
                 foreach (DocumentSubject document in project.Children)
                 {
+                    if (document.IsLoaded)
+                    {
+                        continue;
+                    }
+
                     await document.LoadAsync();
+                    CategoriseDocument(document);
                     await Task.Delay(5); // TODO: check CPU usage
                 }
             }
         }
 
+        // TODO: refactor this mess
         public Task<IImmutableList<ISubject>> SearchAsync(SearchContext context)
-        {
-            var builder = ImmutableList<ISubject>.Empty.ToBuilder();
-
-            foreach (ISubject child in root.Children)
+        {         
+            var searchKeywords = new NameKeywordBuilder(context.SearchTerm).Build();
+            Dictionary<ISubject, int> hitMap = new Dictionary<ISubject, int>();
+            
+            foreach (Category category in GetCategoriesToSearch(context))
             {
-                SearchSubject(child, context, builder);
+                foreach (string keyword in searchKeywords)
+                {
+                    if (category.Map.TryGetValue(keyword, out var subjects))
+                    {
+                        foreach (ISubject subject in subjects.Take(50))
+                        {
+                            hitMap.TryGetValue(subject, out int hit);
+                            hitMap[subject] = ++hit;
+                        }
+                    }
+
+                    if (hitMap.Count > 200)
+                    {
+                        break;
+                    }
+                }
+
+                if (hitMap.Count > 200)
+                {
+                    break;
+                }
             }
 
+            var builder = ImmutableList<ISubject>.Empty.ToBuilder();
+            List<KeyValuePair<ISubject, int>> list = new List<KeyValuePair<ISubject, int>>(hitMap);
+            list.Sort((x, y) => y.Value.CompareTo(x.Value));
+            builder.AddRange(list.Select(item => item.Key));
             return Task.FromResult<IImmutableList<ISubject>>(builder.ToImmutable());
         }
 
-        private void SearchSubject(ISubject subject, SearchContext context, ImmutableList<ISubject>.Builder builder)
+        public IEnumerable<ICategory> GetCategories()
         {
-            if (subject.Keywords.Contains(context.SearchTerm))
+            yield return typesCategory;
+            yield return membersCategory;
+            yield return filesCategory;
+            yield return projectsCategory;
+
+            foreach (ICategory category in categories.Values)
             {
-                builder.Add(subject);
+                yield return category;
+            }
+        }
+
+        private void BuildCategories()
+        {
+            projectsCategory = new Category("projects", 'p');
+            filesCategory = new Category("files", 'f');
+            typesCategory = new Category("types", 't');
+            membersCategory = new Category("members", 'm');
+
+            var userCategories = ImmutableDictionary<string, Category>.Empty.ToBuilder();
+
+            foreach (IRule rule in RulesBuilder.Build())
+            {
+                Category category = new Category(rule.CategoryName, rule.CategoryCharacter);
+                category.LinkCondition(rule.Condition);
+                userCategories.Add(category.Name, category);
             }
 
-            if (subject.Children == null)
+            categories = userCategories.ToImmutable();
+        }
+
+        private IEnumerable<Category> GetCategoriesToSearch(SearchContext context)
+        {
+            if (context.Categories.Count < 1
+                || context.Categories.Contains("types"))
+            {
+                yield return typesCategory;
+            }
+
+            if (context.Categories.Contains("members"))
+            {
+                yield return membersCategory;
+            }
+
+            if (context.Categories.Contains("files"))
+            {
+                yield return filesCategory;
+            }
+
+            if (context.Categories.Contains("projects"))
+            {
+                yield return projectsCategory;
+            }
+
+            foreach (Category category in categories.Values)
+            {
+                if (context.Categories.Contains(category.Name)
+                    || context.Categories.Contains(category.Character.ToString()))
+                {
+                    yield return category;
+                }
+            }
+        }
+
+        private void CategoriseDocument(DocumentSubject document)
+        {
+            if (!document.IsLoaded)
             {
                 return;
             }
 
-            foreach (ISubject child in subject.Children)
+            foreach (ISubject type in document.Children)
             {
-                SearchSubject(child, context, builder);
+                typesCategory.AddSubject(type);
+
+                foreach (Category category in categories.Values)
+                {
+                    if (category.Condition.IsMet(type))
+                    {
+                        category.AddSubject(type);
+                    }
+                }
+
+                foreach (ISubject member in type.Children)
+                {
+                    membersCategory.AddSubject(member);
+                }
             }
         }
     }

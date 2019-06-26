@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using Commands.CodeBaseSearch.Model;
 
@@ -39,6 +41,16 @@ namespace Commands.CodeBaseSearch
             }
 
             return index.SearchAsync(context);
+        }
+
+        public IEnumerable<ICategory> GetCategories()
+        {
+            if (index == null)
+            {
+                return Enumerable.Empty<ICategory>();
+            }
+
+            return index.GetCategories();
         }
     }
 }

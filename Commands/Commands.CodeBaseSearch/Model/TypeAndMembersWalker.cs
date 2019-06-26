@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Text;
+using Commands.CodeBaseSearch.Model.Subjects;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -26,13 +25,17 @@ namespace Commands.CodeBaseSearch.Model
             return typesList.ToImmutable();
         }
 
+        // TODO: Make configuration how detailed the search is going to be (only types or members as well)
         public override void Visit(SyntaxNode node)
         {
             switch (node.Kind())
             {
                 // case SyntaxKind.Attribute:
                 case SyntaxKind.ClassDeclaration:
-                case SyntaxKind.MethodDeclaration:
+                case SyntaxKind.InterfaceDeclaration:
+                case SyntaxKind.StructDeclaration:
+                case SyntaxKind.MethodDeclaration: 
+                case SyntaxKind.PropertyDeclaration:
                 case SyntaxKind.CompilationUnit:
                 case SyntaxKind.NamespaceDeclaration:
                     base.Visit(node);
@@ -42,24 +45,49 @@ namespace Commands.CodeBaseSearch.Model
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var typeSubject = new Subject(node.Identifier.ValueText, SubjectTypeEnum.Type);
+            var typeSubject = new TypeSubject(node);
             typeSubject.SetParent(fileSubject);
-            typeSubject.SetChildren(ImmutableList<ISubject>.Empty);
+
             typeStack.Push(typeSubject);
-
             base.VisitClassDeclaration(node);
+            typesList.Add(typeStack.Pop());
+        }
 
+        public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
+        {
+            var typeSubject = new TypeSubject(node);
+            typeSubject.SetParent(fileSubject);
+
+            typeStack.Push(typeSubject);
+            base.VisitInterfaceDeclaration(node);
+            typesList.Add(typeStack.Pop());
+            
+        }
+
+        public override void VisitStructDeclaration(StructDeclarationSyntax node)
+        {
+            var typeSubject = new TypeSubject(node);
+            typeSubject.SetParent(fileSubject);
+
+            typeStack.Push(typeSubject);
+            base.VisitStructDeclaration(node);
             typesList.Add(typeStack.Pop());
         }
 
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            var methodSubject = new Subject(node.Identifier.ValueText, SubjectTypeEnum.Member);
+            var methodSubject = new MemberSubject(node, node.Identifier.ValueText);
             var parentType = typeStack.Peek();
             parentType.SetChildren(parentType.Children.Add(methodSubject));
             methodSubject.SetParent(parentType);
+        }
 
-            // base.VisitMethodDeclaration(node);
+        public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            var propertySubject = new MemberSubject(node, node.Identifier.ValueText);
+            var parentType = typeStack.Peek();
+            parentType.SetChildren(parentType.Children.Add(propertySubject));
+            propertySubject.SetParent(parentType);
         }
     }
 }

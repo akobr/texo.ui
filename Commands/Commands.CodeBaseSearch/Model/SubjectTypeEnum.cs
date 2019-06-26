@@ -5,7 +5,8 @@ namespace Commands.CodeBaseSearch.Model
         Unknown = 0,
         Solution,
         Project,
-        File,
+        Group,
+        Document,
         Type,
         Member
     }

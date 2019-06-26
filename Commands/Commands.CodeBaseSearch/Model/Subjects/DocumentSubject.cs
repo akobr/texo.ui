@@ -1,25 +1,37 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
+using BeaverSoft.Texo.Core.Actions;
+using BeaverSoft.Texo.Core.Markdown.Builder;
+using Commands.CodeBaseSearch.Model.KeywordBuilders;
 using Microsoft.CodeAnalysis;
 
-namespace Commands.CodeBaseSearch.Model
+namespace Commands.CodeBaseSearch.Model.Subjects
 {
     public class DocumentSubject : Subject
     {
-        private readonly Document file;
+        private readonly Document file;       
 
         public DocumentSubject(Document file)
+            : base(SubjectTypeEnum.Document, file.Name, new DocumentKeywordBuilder(file))
         {
             this.file = file;
-            Name = file.Name;
-            Keywords = new DocumentKeywordBuilder(file).Build();
-            PreLoad();
         }
+
+        public bool IsLoaded { get; private set; }
 
         public async Task LoadAsync()
         {
+            IsLoaded = true;
             SyntaxNode root = await file.GetSyntaxRootAsync();
             SetChildren(LoadTypes(root));
+        }
+
+        public override void WriteToMarkdown(MarkdownBuilder builder)
+        {
+            builder.Bullet();
+            builder.Write("**");
+            builder.Link(Name, ActionBuilder.PathOpenUri(file.FilePath));
+            builder.Write("**");
         }
 
         private void PreLoad()

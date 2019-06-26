@@ -1,18 +1,20 @@
 using System.Collections.Immutable;
+using Commands.CodeBaseSearch.Model.KeywordBuilders;
 
 namespace Commands.CodeBaseSearch.Model
 {
     public abstract class Searchable : ISearchable
     {
-        public Searchable()
+        public Searchable(string name)
+            : this(name, new NameKeywordBuilder(name))
         {
             // no operation
         }
 
-        public Searchable(string name)
+        public Searchable(string name, IKeywordBuilder keywordBuilder)
         {
             Name = name;
-            Keywords = new NameKeywordBuilder(name).Build();
+            Keywords = keywordBuilder.Build();
         }
 
         public string Name { get; protected set; }
