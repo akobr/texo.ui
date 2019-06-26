@@ -12,7 +12,7 @@ namespace Commands.SpinSport
 {
     public class ColourCommand : BaseSolutionCommand
     {
-        private const string CONFIG_PATH = @"Config\ColourMapping.xml";
+        private const string CONFIG_PATH = @"SpinSport.Client\SpinSport.Config\Config\ColourMapping.xml";
         private static readonly Regex rgbRegex = new Regex(@"rgb\(\s*(?<r>\d{1,3})\s*,\s*(?<g>\d{1,3})\s*,\s*(?<b>\d{1,3})\s*\)");
         private static readonly Regex rgbaRegex = new Regex(@"rgba\(\s*(?<r>\d{1,3})\s*,\s*(?<g>\d{1,3})\s*,\s*(?<b>\d{1,3})\s*,\s*(?<a>[\d.]+)\s*\)");
 

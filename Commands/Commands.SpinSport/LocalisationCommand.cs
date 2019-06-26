@@ -12,7 +12,7 @@ namespace Commands.SpinSport
 {
     public class LocalisationCommand : BaseSolutionCommand
     {
-        private const string CONFIG_PATH = @"Config\Localisation.xml";
+        private const string CONFIG_PATH = @"SpinSport.Client\SpinSport.Config\Config\Localisation.xml";
 
         public LocalisationCommand(ISolutionDirectoryProvider solutionProvider)
             : base(solutionProvider)
