@@ -172,8 +172,8 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
         {
             MarkdownBuilder builder = new MarkdownBuilder();
             builder.Header(GetStashHeader(stash, index));
+            builder.Bullet();
             builder.Italic(GetStashLobbyTitle(stash));
-            builder.WriteLine();
             builder.WritePathOverview(stash.Paths, stash.LobbyPath);
             return Item.Markdown(builder.ToString());
         }

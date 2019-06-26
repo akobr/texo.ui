@@ -30,9 +30,20 @@ namespace BeaverSoft.Texo.Commands.FileManager.Extensions
         {
             LinksModel model = BuildLinks(paths, relatedTo);
 
-            builder.WriteLine($"Directories ({model.Directories.Count})");
-            builder.WriteLine($"Files ({model.Files.Count})");
-            builder.WriteLine($"Non-Existing ({model.NonExists.Count})");
+            if (model.Directories.Count > 0)
+            {
+                builder.Bullet($"Directories ({model.Directories.Count})");
+            }
+
+            if (model.Files.Count > 0)
+            {
+                builder.Bullet($"Files ({model.Files.Count})");
+            }
+
+            if (model.NonExists.Count > 0)
+            {
+                builder.Bullet($"Non-Existing ({model.NonExists.Count})");
+            }
         }
 
         public static void WriteRawPathList(this MarkdownBuilder builder, List<string> paths)
