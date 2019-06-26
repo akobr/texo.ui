@@ -15,5 +15,10 @@ namespace Commands.CodeBaseSearch.Model.Subjects
             builder.Bullet();
             builder.Bold($"GROUP: {Name}");
         }
+
+        public void AddChild(ISubject child)
+        {
+            SetChildren(Children.Add(child));
+        }
     }
 }

@@ -194,7 +194,7 @@ namespace BeaverSoft.Texo.Commands.Functions
             builder.Append("text");
             builder.AppendFormattingReset();
             builder.AppendLine();
-            builder.AppendLine(faker.Lorem.Paragraph(4));
+            builder.AppendLine(faker.Lorem.Paragraph(6));
 
             // Numbers
             builder.AppendLine();

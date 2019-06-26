@@ -29,7 +29,7 @@ namespace Commands.CodeBaseSearch.Model.GroupingStrategies
                 return match.Value;
             }
 
-            return string.Empty;
+            return null;
         }
     }
 }

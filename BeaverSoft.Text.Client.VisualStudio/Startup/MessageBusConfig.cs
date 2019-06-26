@@ -1,3 +1,5 @@
+using BeaverSoft.Texo.Commands.NugetManager.Stage;
+using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Fallback.PowerShell;
 using Commands.Clipboard;
 using StrongBeaver.Core.Container;
@@ -13,6 +15,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
 
             register.Register(container.GetInstance<PowerShellFallbackService>());
             register.Register(container.GetInstance<ClipboardMonitoringService>());
+            register.Register(container.GetInstance<StageService>());
         }
     }
 }

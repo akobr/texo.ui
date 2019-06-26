@@ -153,6 +153,7 @@ namespace Commands.CodeBaseSearch.Model
             {
                 Category category = new Category(rule.CategoryName, rule.CategoryCharacter);
                 category.LinkCondition(rule.Condition);
+                category.LinkGrouping(rule.Grouping);
                 userCategories.Add(category.Name, category);
             }
 

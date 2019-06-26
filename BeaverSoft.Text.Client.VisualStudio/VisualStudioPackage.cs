@@ -107,10 +107,30 @@ namespace BeaverSoft.Text.Client.VisualStudio
                 return;
             }
 
-            codeSearch.PreLoadAsync().ContinueWith((t) => codeSearch.LoadAsync());
-
+            TriggerCodeBaseSearchLoad();
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             Context.TexoEnvironment.SetVariable(VsVariableNames.SOLUTION_DIRECTORY, Path.GetDirectoryName(DTE.Solution.FileName));
+        }
+
+        private void TriggerCodeBaseSearchLoad()
+        {
+            _ = codeSearch.PreLoadAsync().ContinueWith(async (preLoadTask) =>
+            {
+                if (preLoadTask.IsFaulted)
+                {
+                    Context.Logger.Error("Preload of code-search failed.", preLoadTask.Exception);
+                    return;
+                }
+
+                try
+                {
+                    await codeSearch.LoadAsync();
+                }
+                catch (Exception exception)
+                {
+                    Context.Logger.Error("Load of code-search failed.", exception);
+                }
+            }, TaskScheduler.Default);
         }
 
         public override IVsAsyncToolWindowFactory GetAsyncToolWindowFactory(Guid toolWindowType)

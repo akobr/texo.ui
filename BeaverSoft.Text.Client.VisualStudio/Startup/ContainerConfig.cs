@@ -54,7 +54,8 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
             container.Register<IConfigManagementService, ConfigManagementService>();
             container.Register<ISourceManagementService, SourceManagementService>();
             container.Register<IManagementService, ManagementService>();
-            container.Register<Texo.Commands.NugetManager.Stage.IStageService, Texo.Commands.NugetManager.Stage.StageService>();
+            container.Register<Texo.Commands.NugetManager.Stage.StageService>();
+            container.Register<Texo.Commands.NugetManager.Stage.IStageService>(container.GetInstance<Texo.Commands.NugetManager.Stage.StageService>);
             container.Register<NugetManagerCommand>();
 
             // Calculator

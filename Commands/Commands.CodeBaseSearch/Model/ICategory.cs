@@ -9,6 +9,8 @@ namespace Commands.CodeBaseSearch.Model
 
         ICondition<ISubject> Condition { get; }
 
+        IGroupingStrategy Grouping { get; }
+
         IImmutableList<ISubject> Subjects { get; }
     }
 }
