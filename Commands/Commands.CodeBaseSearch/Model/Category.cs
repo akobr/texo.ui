@@ -48,11 +48,12 @@ namespace Commands.CodeBaseSearch.Model
                     {
                         group = new GroupSubject(groupName);
                         group.AddChild(subject);
+
                         groups[groupName] = group;
                         subjects = subjects.Add(group);
+                        AddToKeywordMap(group);
                     }
 
-                    AddToKeywordMap(group);
                     return;
                 }
 
