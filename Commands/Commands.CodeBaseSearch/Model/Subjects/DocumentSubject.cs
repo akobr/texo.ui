@@ -26,9 +26,9 @@ namespace Commands.CodeBaseSearch.Model.Subjects
             SetChildren(LoadTypes(root));
         }
 
-        public override void WriteToMarkdown(MarkdownBuilder builder)
+        public override void WriteToMarkdown(MarkdownBuilder builder, int intent)
         {
-            builder.Bullet();
+            builder.Bullet(intent);
             builder.Write("**");
             builder.Link(Name, ActionBuilder.PathOpenUri(file.FilePath));
             builder.Write("** *(file)*");

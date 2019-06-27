@@ -51,8 +51,13 @@
       <DependentUpon>EmptyControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Environment\SolutionDirectoryStrategy.cs" />
+    <Compile Include="Environment\SolutionFileStrategy.cs" />
     <Compile Include="Environment\VsVariableNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\DteProvider.cs" />
+    <Compile Include="Providers\DteSolutionPathProvider.cs" />
+    <Compile Include="Providers\IDteProvider.cs" />
+    <Compile Include="Providers\ISolutionPathProvider.cs" />
     <Compile Include="Search\CurrentSolutionOpenStrategy.cs" />
     <Compile Include="Startup\CommandConfig.cs" />
     <Compile Include="Startup\ContainerConfig.cs" />

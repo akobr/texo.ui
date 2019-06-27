@@ -14,7 +14,6 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
 
             register.Register(container.GetInstance<PowerShellFallbackService>());
             register.Register(container.GetInstance<ClipboardMonitoringService>());
-            register.Register(container.GetInstance<StageService>());
         }
     }
 }

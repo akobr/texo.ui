@@ -15,6 +15,7 @@ using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Fallback.PowerShell;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
+using BeaverSoft.Text.Client.VisualStudio.Providers;
 using Commands.Calc;
 using Commands.Clipboard;
 using Commands.CodeBaseSearch;
@@ -32,6 +33,9 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
     {
         public static void RegisterServices(this SimpleIoc container)
         {
+            // Visual Studio
+            container.Register<ISolutionPathProvider, DteSolutionPathProvider>();
+
             // Core commands (should be in engine)
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
@@ -54,8 +58,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
             container.Register<IConfigManagementService, ConfigManagementService>();
             container.Register<ISourceManagementService, SourceManagementService>();
             container.Register<IManagementService, ManagementService>();
-            container.Register<Texo.Commands.NugetManager.Stage.StageService>();
-            container.Register<Texo.Commands.NugetManager.Stage.IStageService>(container.GetInstance<Texo.Commands.NugetManager.Stage.StageService>);
+            container.Register<Texo.Commands.NugetManager.Stage.IStageService, Texo.Commands.NugetManager.Stage.StageService>();
             container.Register<NugetManagerCommand>();
 
             // Calculator

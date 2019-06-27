@@ -22,9 +22,9 @@ namespace Commands.CodeBaseSearch.Model.Subjects
             this.syntaxNode = syntaxNode;
         }
 
-        public override void WriteToMarkdown(MarkdownBuilder builder)
+        public override void WriteToMarkdown(MarkdownBuilder builder, int intent)
         {
-            builder.Bullet();
+            builder.Bullet(intent);
             builder.Link(Name, GetLinkUrl());
         }
 

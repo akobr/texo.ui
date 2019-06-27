@@ -9,7 +9,7 @@ namespace Commands.CodeBaseSearch.Conditions
 
         public BaseTemplateCondition()
         {
-            regex = new Lazy<Regex>(() => new Regex(Template), false);
+            regex = new Lazy<Regex>(() => new Regex(Template, RegexOptions.Compiled), true);
         }
 
         public string Template { get; set; }

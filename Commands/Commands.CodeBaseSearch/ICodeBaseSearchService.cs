@@ -9,7 +9,7 @@ namespace Commands.CodeBaseSearch
     {
         Task LoadAsync();
 
-        Task PreLoadAsync();
+        Task LoadAsync(IReporter reporter);
 
         Task<IImmutableList<ISubject>> SearchAsync(SearchContext context);
 

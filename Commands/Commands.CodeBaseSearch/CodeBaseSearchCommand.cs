@@ -21,6 +21,14 @@ namespace Commands.CodeBaseSearch
 
             RegisterQueryMethod(CodeBaseSearchConstants.QUERY_SEARCH, Search);
             RegisterQueryMethod(CodeBaseSearchConstants.QUERY_CATEGORIES, Categories);
+            RegisterQueryMethod(CodeBaseSearchConstants.QUERY_INIT, Init);
+        }
+
+        private Task<ICommandResult> Init(CommandContext context)
+        {
+            InitialisationReporter reporter = new InitialisationReporter();
+            search.LoadAsync(reporter);
+            return Task.FromResult<ICommandResult>(new TextStreamResult(reporter.Stream));
         }
 
         // TODO: refactor this mess

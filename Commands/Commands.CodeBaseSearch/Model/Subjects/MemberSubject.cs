@@ -11,9 +11,9 @@ namespace Commands.CodeBaseSearch.Model.Subjects
             // no operation
         }
 
-        public override void WriteToMarkdown(MarkdownBuilder builder)
+        public override void WriteToMarkdown(MarkdownBuilder builder, int intent)
         {
-            builder.Bullet();
+            builder.Bullet(intent);
             builder.Link($"{Parent.Name}.{Name}", GetLinkUrl());
             builder.Write(" ");
 

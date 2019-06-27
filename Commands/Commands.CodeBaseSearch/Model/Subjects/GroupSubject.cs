@@ -10,10 +10,19 @@ namespace Commands.CodeBaseSearch.Model.Subjects
             // no operation
         }
 
-        public override void WriteToMarkdown(MarkdownBuilder builder)
+        public override void WriteToMarkdown(MarkdownBuilder builder, int intent)
         {
-            builder.Bullet();
-            builder.Bold($"GROUP: {Name}");
+            builder.Bullet(intent);
+            builder.Bold($"{Name}");
+            builder.Write(" ");
+            builder.Italic($"(group)");
+
+            int intentForChild = intent + 1;
+
+            foreach (ISubject child in Children)
+            {
+                child.WriteToMarkdown(builder, intentForChild);
+            }
         }
 
         public void AddChild(ISubject child)

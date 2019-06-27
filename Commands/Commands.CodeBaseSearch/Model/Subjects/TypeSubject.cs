@@ -17,9 +17,9 @@ namespace Commands.CodeBaseSearch.Model.Subjects
 
         public virtual bool IsStruct => false;
 
-        public override void WriteToMarkdown(MarkdownBuilder builder)
+        public override void WriteToMarkdown(MarkdownBuilder builder, int intent)
         {
-            base.WriteToMarkdown(builder);
+            base.WriteToMarkdown(builder, intent);
             builder.Write(" ");
 
             if (IsClass)

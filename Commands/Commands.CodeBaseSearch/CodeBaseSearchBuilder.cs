@@ -14,6 +14,13 @@ namespace Commands.CodeBaseSearch
             command.Documentation.Title = "Code-base search";
             command.Documentation.Description = "Cobe-base search with context and rule definitions.";
 
+            var init = Query.CreateBuilder();
+            init.Key = CodeBaseSearchConstants.QUERY_INIT;
+            init.Representations.AddRange(
+                new[] { CodeBaseSearchConstants.QUERY_INIT, "load", "build" });
+            init.Documentation.Title = "code-base-init";
+            init.Documentation.Description = "Initialises the search index.";
+
             var search = Query.CreateBuilder();
             search.Key = CodeBaseSearchConstants.QUERY_SEARCH;
             search.Representations.AddRange(
@@ -39,6 +46,7 @@ namespace Commands.CodeBaseSearch
             command.Queries.AddRange(
                 new[]
                 {
+                    init.ToImmutable(),
                     search.ToImmutable(),
                     categories.ToImmutable(),
                 });

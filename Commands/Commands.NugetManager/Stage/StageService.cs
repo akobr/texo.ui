@@ -5,14 +5,11 @@ using System.IO;
 using BeaverSoft.Texo.Commands.NugetManager.Model;
 using BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies;
 using BeaverSoft.Texo.Commands.NugetManager.Services;
-using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Path;
-using StrongBeaver.Core.Messaging;
-using StrongBeaver.Core.Services;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 {
-    public class StageService : IStageService, IMessageBusService<IVariableUpdatedMessage>
+    public class StageService : IStageService
     {
         private const string FILE_EXTENSION_SOLUTION = ".sln";
         private const string FILE_EXTENSION_PROJECT = ".csproj";
@@ -147,17 +144,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
             {
                 ProcessProjectFile(projectPath, projectAction, visitedFiles);
             }
-        }
-
-        void IMessageBusRecipient<IVariableUpdatedMessage>.ProcessMessage(IVariableUpdatedMessage message)
-        {
-            if (message.Name != "SOLUTION_FILE")
-            {
-                return;
-            }
-
-            Clear();
-            Add(new[] { message.NewValue });
         }
     }
 }

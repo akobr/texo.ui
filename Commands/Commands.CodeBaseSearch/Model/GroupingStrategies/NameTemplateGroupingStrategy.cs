@@ -9,7 +9,7 @@ namespace Commands.CodeBaseSearch.Model.GroupingStrategies
 
         public NameTemplateGroupingStrategy()
         {
-            regex = new Lazy<Regex>(() => new Regex(Template), false);
+            regex = new Lazy<Regex>(() => new Regex(Template), true);
         }
 
         public string Template { get; set; }
@@ -18,22 +18,15 @@ namespace Commands.CodeBaseSearch.Model.GroupingStrategies
         {
             Match match = regex.Value.Match(subject.Name);
 
-            if (match.Success)
+            if (!match.Success)
             {
                 return null;
             }
 
             Group group = match.Groups["group"];
-            string groupName;
-
-            if (group.Success)
-            {
-                groupName = group.Value;
-            }
-            else
-            {
-                groupName = match.Value;
-            }
+            string groupName = group.Success
+                ? group.Value
+                : match.Value;
 
             if (groupName.Length > 1
                 && groupName[0] == 'I'

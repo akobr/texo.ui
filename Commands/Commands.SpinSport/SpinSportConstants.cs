@@ -24,9 +24,11 @@ namespace Commands.SpinSport
         public const string OPTION_NL = "nl";
 
         public const string OPTION_SHOWCASE = "showcase";
-        public const string OPTION_BETWAY = "betway";
+        public const string OPTION_BETWAY = "betway";        
         public const string OPTION_BETWAY_DARK = "betway-dark";
+        public const string OPTION_BETWAY_NEW = "betway-new";
         public const string OPTION_BETWAY_AFRICA = "betway-africa";
+        public const string OPTION_BETWAY_AFRICA_MOBILE = "betway-africa-mobile";
 
         public const string PARAMETER_FILTER = "filter";
         public const string PARAMETER_NAME = "name";

@@ -25,7 +25,7 @@ namespace Commands.CodeBaseSearch.Model.Subjects
 
         public IImmutableList<ISubject> Children { get; protected set; }
 
-        public abstract void WriteToMarkdown(MarkdownBuilder builder);
+        public abstract void WriteToMarkdown(MarkdownBuilder builder, int intent);
 
         internal void SetParent(ISubject parent)
         {

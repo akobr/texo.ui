@@ -6,6 +6,7 @@ namespace Commands.CodeBaseSearch
 
         public const string QUERY_SEARCH = "search";
         public const string QUERY_CATEGORIES = "categories";
+        public const string QUERY_INIT = "init";
 
         public const string PARAMETER_TERM = "search-term";
     }

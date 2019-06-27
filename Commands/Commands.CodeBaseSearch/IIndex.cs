@@ -6,9 +6,7 @@ namespace Commands.CodeBaseSearch.Model
 {
     public interface IIndex
     {
-        Task LoadAsync();
-
-        Task PreLoadAsync();
+        Task LoadAsync(IReporter reporter);
 
         Task<IImmutableList<ISubject>> SearchAsync(SearchContext context);
 

@@ -6,6 +6,6 @@ namespace Commands.CodeBaseSearch.Model
     {
         SubjectTypeEnum Type { get; }
 
-        void WriteToMarkdown(MarkdownBuilder builder);
+        void WriteToMarkdown(MarkdownBuilder builder, int intent = 0);
     }
 }

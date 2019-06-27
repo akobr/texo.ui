@@ -19,7 +19,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Search
         public Task<Workspace> OpenAsync()
         {
             var workspace = vsComponentModel.GetService<Microsoft.VisualStudio.LanguageServices.VisualStudioWorkspace>();
-            return new VisualStudioSolutionOpenStrategy(workspace).OpenAsync();
+            return Task.FromResult<Workspace>(workspace);
         }
     }
 }

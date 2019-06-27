@@ -31,14 +31,13 @@ namespace Commands.CodeBaseSearch.Model
 
         public IImmutableDictionary<string, IImmutableSet<ISubject>> Map => map;
 
-        // TODO: refactor
         public void AddSubject(ISubject subject)
         {
+            string groupName = Grouping?.GetGroup(subject);
+
             lock (writeLock)
             {
-                string groupName;
-
-                if (Grouping != null && (groupName = Grouping.GetGroup(subject)) != null)
+                if (groupName != null)
                 {
                     if (groups.TryGetValue(groupName, out GroupSubject group))
                     {
@@ -49,21 +48,21 @@ namespace Commands.CodeBaseSearch.Model
                         group = new GroupSubject(groupName);
                         group.AddChild(subject);
 
-                        groups[groupName] = group;
-                        subjects = subjects.Add(group);
-                        AddToKeywordMap(group);
+                        groups[groupName] = group;                        
+                        AddSubjectUnderCategory(group);
                     }
-
-                    return;
                 }
-
-                subjects = subjects.Add(subject);
-                AddToKeywordMap(subject);
+                else
+                {
+                    AddSubjectUnderCategory(subject);
+                }              
             }
         }
 
-        private void AddToKeywordMap(ISubject subject)
+        private void AddSubjectUnderCategory(ISubject subject)
         {
+            subjects = subjects.Add(subject);
+
             foreach (string keyword in subject.Keywords)
             {
                 if (map.TryGetValue(keyword, out var keywordSet))

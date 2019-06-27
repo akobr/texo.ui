@@ -19,18 +19,13 @@ namespace Commands.CodeBaseSearch
 
         public Task LoadAsync()
         {
-            if (index == null)
-            {
-                return Task.CompletedTask;
-            }
-
-            return index.LoadAsync();
+            return LoadAsync(null);
         }
 
-        public Task PreLoadAsync()
+        public Task LoadAsync(IReporter reporter)
         {
             index = new SolutionIndex(openStrategy);
-            return index.PreLoadAsync();
+            return index.LoadAsync(reporter);
         }
 
         public Task<IImmutableList<ISubject>> SearchAsync(SearchContext context)

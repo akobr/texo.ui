@@ -14,7 +14,7 @@ namespace Commands.SpinSport
     class ColourUsageCommand : BaseSolutionCommand
     {
         private const string CONFIG_PATH = @"SpinSport.Client\SpinSport.Config\Config\Theme.xml";
-        private static readonly string[] brands = new[] { "showcase", "betway", "betway-dark", "betway-africa" };
+        private static readonly string[] brands = new[] { "showcase", "betway", "betway-dark", "betway-new", "betway-africa", "betway-africa-mobile" };
 
         public ColourUsageCommand(ISolutionDirectoryProvider solutionProvider)
             : base(solutionProvider)
@@ -109,7 +109,9 @@ namespace Commands.SpinSport
                 context.GetParameterFromOption(SpinSportConstants.OPTION_SHOWCASE) ?? string.Empty,
                 context.GetParameterFromOption(SpinSportConstants.OPTION_BETWAY) ?? string.Empty,
                 context.GetParameterFromOption(SpinSportConstants.OPTION_BETWAY_DARK) ?? string.Empty,
-                //context.GetParameterFromOption(SpinSportConstants.OPTION_BETWAY_AFRICA) ?? string.Empty
+                context.GetParameterFromOption(SpinSportConstants.OPTION_BETWAY_NEW) ?? string.Empty,
+                context.GetParameterFromOption(SpinSportConstants.OPTION_BETWAY_AFRICA) ?? string.Empty,
+                context.GetParameterFromOption(SpinSportConstants.OPTION_BETWAY_AFRICA_MOBILE) ?? string.Empty
             };
 
             XDocument doc;
@@ -212,6 +214,12 @@ namespace Commands.SpinSport
             int index = 0;
             foreach (var cell in cells.Skip(1))
             {
+                var attributeIndex = cell.Attribute(nsSS + "Index");
+                if (attributeIndex != null && int.TryParse(attributeIndex.Value, out int excelIndex))
+                {
+                    index = excelIndex - 2;
+                }
+
                 if (index >= brands.Length)
                 {
                     break;

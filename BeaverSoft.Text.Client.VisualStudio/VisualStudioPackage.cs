@@ -13,6 +13,7 @@ using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Core.View.Actions;
 using BeaverSoft.Text.Client.VisualStudio.Actions;
 using BeaverSoft.Text.Client.VisualStudio.Environment;
+using BeaverSoft.Text.Client.VisualStudio.Providers;
 using BeaverSoft.Text.Client.VisualStudio.Search;
 using BeaverSoft.Text.Client.VisualStudio.Startup;
 using Commands.CodeBaseSearch;
@@ -59,7 +60,6 @@ namespace BeaverSoft.Text.Client.VisualStudio
         public static bool IsMarkdownAssemblyLoaded;
         public static bool IsNewtonsoftJsonAssemblyLoaded;
 
-        private ICodeBaseSearchService codeSearch;
         private SolutionEvents solutionEvents;
         private _dispSolutionEvents_OpenedEventHandler solutionOpenedEventHandler;
 
@@ -107,32 +107,8 @@ namespace BeaverSoft.Text.Client.VisualStudio
                 return;
             }
 
-            TriggerCodeBaseSearchLoad();
             await JoinableTaskFactory.SwitchToMainThreadAsync();
-            Context.TexoEnvironment.SetVariable(VsVariableNames.SOLUTION_DIRECTORY, Path.GetDirectoryName(DTE.Solution.FileName));
             Context.TexoEnvironment.SetVariable(VsVariableNames.SOLUTION_FILE, DTE.Solution.FileName);
-        }
-
-        private async void TriggerCodeBaseSearchLoad()
-        {
-            await Task.Delay(15000);
-            _ = codeSearch.PreLoadAsync().ContinueWith(async (preLoadTask) =>
-            {
-                if (preLoadTask.IsFaulted)
-                {
-                    Context.Logger.Error("Preload of code-search failed.", preLoadTask.Exception);
-                    return;
-                }
-
-                try
-                {
-                    await codeSearch.LoadAsync();
-                }
-                catch (Exception exception)
-                {
-                    Context.Logger.Error("Load of code-search failed.", exception);
-                }
-            }, TaskScheduler.Default);
         }
 
         public override IVsAsyncToolWindowFactory GetAsyncToolWindowFactory(Guid toolWindowType)
@@ -152,6 +128,8 @@ namespace BeaverSoft.Text.Client.VisualStudio
             var container = new SimpleIoc();
             container.RegisterServices();
 
+            container.Register<IDteProvider>(() => new DteProvider(DTE));
+
             var engineBuilder = new TexoEngineBuilder()
                 .WithLogService(new DebugLogService());
 
@@ -170,7 +148,6 @@ namespace BeaverSoft.Text.Client.VisualStudio
 
             var environment = container.GetInstance<IEnvironmentService>();
             container.Register<ISolutionOpenStrategy>(() => new CurrentSolutionOpenStrategy(ComponentModel));
-            codeSearch = container.GetInstance<ICodeBaseSearchService>();
 
             Context = new ExtensionContext(
                 DTE,
@@ -180,6 +157,7 @@ namespace BeaverSoft.Text.Client.VisualStudio
                 messageBus);
 
             // Register of variable strategies
+            environment.RegisterVariableStrategy(VsVariableNames.SOLUTION_FILE, new SolutionFileStrategy(environment));
             environment.RegisterVariableStrategy(VsVariableNames.SOLUTION_DIRECTORY, new SolutionDirectoryStrategy(environment));
 
             // Register of actions
@@ -187,7 +165,7 @@ namespace BeaverSoft.Text.Client.VisualStudio
             texoEngine.RegisterAction(new PathOpenActionFactory(Context), ActionNames.PATH_OPEN, ActionNames.PATH);
             texoEngine.RegisterAction(new InputSetActionFactory(container.GetInstance<IViewService>()), ActionNames.INPUT_SET, ActionNames.INPUT);
 
-            await texoEngine.InitialiseWithCommandsAsync();
+            await texoEngine.InitialiseWithCommandsAsync(container);
             texoEngine.Start();
             return Context;
         }
