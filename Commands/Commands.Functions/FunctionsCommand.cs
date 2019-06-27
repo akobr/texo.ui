@@ -217,6 +217,7 @@ namespace BeaverSoft.Texo.Commands.Functions
             builder.AppendLine($"{person.FullName} ({person.UserName})");
             builder.AppendLine($"DOB: {person.DateOfBirth.ToShortDateString()}");
             builder.AppendLine($"Phone: {person.Phone}");
+            builder.AppendLine($"Email: {person.Email}");
             builder.AppendLine($"Website: {person.Website}");
 
             // Address

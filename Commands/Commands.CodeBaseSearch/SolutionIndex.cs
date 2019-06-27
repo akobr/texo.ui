@@ -38,6 +38,7 @@ namespace Commands.CodeBaseSearch.Model
             if (solution?.FilePath == null)
             {
                 reporter.Report("No solution file.");
+                await Task.Delay(242);
                 reporter.Finish();
                 return;
             }
@@ -57,6 +58,7 @@ namespace Commands.CodeBaseSearch.Model
             await Task.WhenAll(parallelTasks);
 
             reporter.Report($"Loaded projects {root.Children.Count}/{projects.Count}, done.");
+            await Task.Delay(242);
             reporter.Finish();
         }
 

@@ -160,14 +160,32 @@ namespace Commands.SpinSport
             optionBetwayDark.Documentation.Description = "Colour usage definition for betway-dark brand.";
             set.Options.Add(optionBetwayDark.ToImmutable());
 
-            //var optionBetwayAfrica = Option.CreateBuilder();
-            //optionBetwayAfrica.Key = SpinSportConstants.OPTION_BETWAY_AFRICA;
-            //optionBetwayAfrica.Representations.AddRange(
-            //    new[] { SpinSportConstants.OPTION_BETWAY_AFRICA, "a" });
-            //optionBetwayAfrica.Parameters.Add(parameterValue.ToImmutable());
-            //optionBetwayAfrica.Documentation.Title = SpinSportConstants.OPTION_BETWAY_AFRICA;
-            //optionBetwayAfrica.Documentation.Description = "Colour usage definition for betway-africa brand.";
-            //set.Options.Add(optionBetwayAfrica.ToImmutable());
+            var optionBetwayNew = Option.CreateBuilder();
+            optionBetwayNew.Key = SpinSportConstants.OPTION_BETWAY_NEW;
+            optionBetwayNew.Representations.AddRange(
+                new[] { SpinSportConstants.OPTION_BETWAY_NEW, "n" });
+            optionBetwayNew.Parameters.Add(parameterValue.ToImmutable());
+            optionBetwayNew.Documentation.Title = SpinSportConstants.OPTION_BETWAY_NEW;
+            optionBetwayNew.Documentation.Description = "Colour usage definition for betway-new brand.";
+            set.Options.Add(optionBetwayNew.ToImmutable());
+
+            var optionBetwayAfrica = Option.CreateBuilder();
+            optionBetwayAfrica.Key = SpinSportConstants.OPTION_BETWAY_AFRICA;
+            optionBetwayAfrica.Representations.AddRange(
+                new[] { SpinSportConstants.OPTION_BETWAY_AFRICA, "a" });
+            optionBetwayAfrica.Parameters.Add(parameterValue.ToImmutable());
+            optionBetwayAfrica.Documentation.Title = SpinSportConstants.OPTION_BETWAY_AFRICA;
+            optionBetwayAfrica.Documentation.Description = "Colour usage definition for betway-africa brand.";
+            set.Options.Add(optionBetwayAfrica.ToImmutable());
+
+            var optionBetwayAfricaMobile = Option.CreateBuilder();
+            optionBetwayAfricaMobile.Key = SpinSportConstants.OPTION_BETWAY_AFRICA_MOBILE;
+            optionBetwayAfricaMobile.Representations.AddRange(
+                new[] { SpinSportConstants.OPTION_BETWAY_AFRICA_MOBILE, "m" });
+            optionBetwayAfricaMobile.Parameters.Add(parameterValue.ToImmutable());
+            optionBetwayAfricaMobile.Documentation.Title = SpinSportConstants.OPTION_BETWAY_AFRICA_MOBILE;
+            optionBetwayAfricaMobile.Documentation.Description = "Colour usage definition for betway-africa-mobile brand.";
+            set.Options.Add(optionBetwayAfricaMobile.ToImmutable());
 
             colourUsage.Queries.AddRange(
                 new[]

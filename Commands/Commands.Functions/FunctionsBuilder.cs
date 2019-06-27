@@ -80,7 +80,7 @@ namespace BeaverSoft.Texo.Commands.Functions
             queryRandom.Key = "random";
             queryRandom.Representations.AddRange(new[] { "random", "rnd" });
             queryRandom.Documentation.Title = "Random generator";
-            queryRandom.Documentation.Description = "Generates random text, person information, address, GPS coordinates and numbers..";
+            queryRandom.Documentation.Description = "Generates random text, person information, address, GPS coordinates and numbers.";
 
             command.Queries.AddRange(new[]
             {
