@@ -1,8 +1,9 @@
+using BeaverSoft.Texo.Core.Markdown.Builder;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Commands.CodeBaseSearch.Model.Subjects
 {
-    public class TypeSubject : SyntaxNodeSubject
+    public abstract class TypeSubject : SyntaxNodeSubject
     {
         public TypeSubject(TypeDeclarationSyntax type)
             : base(SubjectTypeEnum.Type, type, type.Identifier.ValueText)
@@ -15,6 +16,25 @@ namespace Commands.CodeBaseSearch.Model.Subjects
         public virtual bool IsInterface => false;
 
         public virtual bool IsStruct => false;
+
+        public override void WriteToMarkdown(MarkdownBuilder builder)
+        {
+            base.WriteToMarkdown(builder);
+            builder.Write(" ");
+
+            if (IsClass)
+            {
+                builder.Italic("(class)");
+            }
+            else if (IsInterface)
+            {
+                builder.Italic("(interface)");
+            }
+            else if (IsStruct)
+            {
+                builder.Italic("(struct)");
+            }
+        }
     }
 
     public class ClassTypeSubject : TypeSubject

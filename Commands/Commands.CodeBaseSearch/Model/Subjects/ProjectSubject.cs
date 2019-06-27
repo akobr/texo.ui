@@ -19,7 +19,8 @@ namespace Commands.CodeBaseSearch.Model.Subjects
             builder.Bullet();
             builder.Write("*");
             builder.Link(Name, ActionBuilder.PathOpenUri(project.FilePath));
-            builder.Write("*");
+            builder.Write("* ");
+            builder.Italic($"(project)");
         }
     }
 }

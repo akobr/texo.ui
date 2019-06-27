@@ -110,6 +110,7 @@ namespace BeaverSoft.Text.Client.VisualStudio
             TriggerCodeBaseSearchLoad();
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             Context.TexoEnvironment.SetVariable(VsVariableNames.SOLUTION_DIRECTORY, Path.GetDirectoryName(DTE.Solution.FileName));
+            Context.TexoEnvironment.SetVariable(VsVariableNames.SOLUTION_FILE, DTE.Solution.FileName);
         }
 
         private void TriggerCodeBaseSearchLoad()

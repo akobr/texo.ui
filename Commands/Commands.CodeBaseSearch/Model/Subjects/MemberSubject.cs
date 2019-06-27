@@ -15,6 +15,16 @@ namespace Commands.CodeBaseSearch.Model.Subjects
         {
             builder.Bullet();
             builder.Link($"{Parent.Name}.{Name}", GetLinkUrl());
+            builder.Write(" ");
+
+            if (syntaxNode is PropertyDeclarationSyntax)
+            {
+                builder.Italic("(property)");
+            }
+            else
+            {
+                builder.Italic("(method)");
+            }
         }
     }
 }

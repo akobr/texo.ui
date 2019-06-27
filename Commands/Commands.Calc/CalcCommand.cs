@@ -40,7 +40,7 @@ namespace Commands.Calc
 
             var variableName = Parameter.CreateBuilder();
             variableName.Key = "variableName";
-            variableName.ArgumentTemplate = @"[a-zA-z_][a-zA-Z0-9_]*";
+            variableName.ArgumentTemplate = @"^[a-zA-z_][a-zA-Z0-9_]*$";
             variableName.IsRepeatable = false;
             variableName.Documentation.Title = "Variable name";
             variableName.Documentation.Description = "Name of target variable.";
@@ -49,7 +49,7 @@ namespace Commands.Calc
 
             var expression = Parameter.CreateBuilder();
             expression.Key = "expression";
-            expression.ArgumentTemplate = @".+";
+            expression.ArgumentTemplate = @"^.+$";
             expression.IsRepeatable = true;
             expression.Documentation.Title = "Expression";
             expression.Documentation.Description = "Expression which will be executed in calculator.";

@@ -31,7 +31,7 @@ namespace Commands.CodeBaseSearch.Model.Subjects
             builder.Bullet();
             builder.Write("**");
             builder.Link(Name, ActionBuilder.PathOpenUri(file.FilePath));
-            builder.Write("**");
+            builder.Write("** *(file)*");
         }
 
         private void PreLoad()
@@ -41,6 +41,7 @@ namespace Commands.CodeBaseSearch.Model.Subjects
                 return;
             }
 
+            IsLoaded = true;
             SetChildren(LoadTypes(root));
         }
 

@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core;
 
 namespace BeaverSoft.Texo.Core.Markdown.Builder
@@ -24,6 +24,8 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
         IMarkdownBuilder Italic(string text);
 
         IMarkdownBuilder Bold(string text);
+
+        IMarkdownBuilder Marked(string text);
 
         IMarkdownBuilder CodeBlock(string language, string code);
 

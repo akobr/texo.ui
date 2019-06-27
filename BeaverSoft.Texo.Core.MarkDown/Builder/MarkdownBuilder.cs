@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using BeaverSoft.Texo.Core.View;
@@ -116,6 +116,12 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
         public IMarkdownBuilder Bold(string text)
         {
             stringBuilder.AppendFormat("**{0}**", text);
+            return this;
+        }
+
+        public IMarkdownBuilder Marked(string text)
+        {
+            stringBuilder.AppendFormat("=={0}==", text);
             return this;
         }
 

@@ -8,7 +8,7 @@ namespace Commands.CodeBaseSearch.Model.Subjects
 {
     public abstract class SyntaxNodeSubject : Subject
     {
-        private readonly CSharpSyntaxNode syntaxNode;
+        protected readonly CSharpSyntaxNode syntaxNode;
 
         public SyntaxNodeSubject(SubjectTypeEnum type, CSharpSyntaxNode syntaxNode, string name, IKeywordBuilder keywordBuilder)
             : base(type, name, keywordBuilder)
@@ -43,7 +43,7 @@ namespace Commands.CodeBaseSearch.Model.Subjects
                     new Dictionary<string, string>
                     {
                         { ActionParameters.PATH, filePath },
-                        { "line", location.GetLineSpan().StartLinePosition.Line.ToString() }
+                        { "line", (location.GetLineSpan().StartLinePosition.Line + 1).ToString() }
                     });
         }
     }

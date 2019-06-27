@@ -32,6 +32,11 @@ namespace Commands.CodeBaseSearch.Conditions
 
         private bool CheckBaseType(BaseListSyntax baseTypeList)
         {
+            if (baseTypeList == null)
+            {
+                return false;
+            }
+
             foreach (BaseTypeSyntax baseType in baseTypeList.Types)
             {
                 if (baseType.Type is NameSyntax nameSyntax &&

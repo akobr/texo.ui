@@ -45,7 +45,7 @@ namespace Commands.SpinSport
             var parameterFilter = Parameter.CreateBuilder();
             parameterFilter.Key = SpinSportConstants.PARAMETER_FILTER;
             parameterFilter.IsOptional = true;
-            parameterFilter.ArgumentTemplate = @"[A-Za-z\d_\*]+";
+            parameterFilter.ArgumentTemplate = @"^[A-Za-z\d_\*]+$";
             parameterFilter.Documentation.Title = SpinSportConstants.PARAMETER_FILTER;
             parameterFilter.Documentation.Description = "Filter for a list.";
             list.Parameters.Add(parameterFilter.ToImmutable());
@@ -59,7 +59,7 @@ namespace Commands.SpinSport
 
             var parameterName = Parameter.CreateBuilder();
             parameterName.Key = SpinSportConstants.PARAMETER_NAME;
-            parameterName.ArgumentTemplate = @"[A-Za-z\d_]+";
+            parameterName.ArgumentTemplate = @"^[A-Za-z\d_]+$";
             parameterName.Documentation.Title = "colour-name";
             parameterName.Documentation.Description = "Name of the colour.";
             set.Parameters.Add(parameterName.ToImmutable());
@@ -93,7 +93,7 @@ namespace Commands.SpinSport
             var parameterFilter = Parameter.CreateBuilder();
             parameterFilter.Key = SpinSportConstants.PARAMETER_FILTER;
             parameterFilter.IsOptional = true;
-            parameterFilter.ArgumentTemplate = @"[A-Za-z\d_\*]+";
+            parameterFilter.ArgumentTemplate = @"^[A-Za-z\d_\*]+$";
             parameterFilter.Documentation.Title = SpinSportConstants.PARAMETER_FILTER;
             parameterFilter.Documentation.Description = "Filter for a list.";
 
@@ -122,14 +122,14 @@ namespace Commands.SpinSport
 
             var parameterName = Parameter.CreateBuilder();
             parameterName.Key = SpinSportConstants.PARAMETER_NAME;
-            parameterName.ArgumentTemplate = @"[A-Za-z\d_-.]+";
+            parameterName.ArgumentTemplate = @"^[A-Za-z\d_-.]+$";
             parameterName.Documentation.Title = "colour-usage-name";
             parameterName.Documentation.Description = "Name of the colour usage.";
             set.Parameters.Add(parameterName.ToImmutable());
 
             var parameterValue = Parameter.CreateBuilder();
             parameterValue.Key = SpinSportConstants.PARAMETER_VALUE;
-            parameterValue.ArgumentTemplate = @"(\$|\£)[A-Za-z\d_]+";
+            parameterValue.ArgumentTemplate = @"^(\$|\£)[A-Za-z\d_]+$";
             parameterValue.Documentation.Title = "colour-usage-value";
             parameterValue.Documentation.Description = "Definition of the color usage.";
 
@@ -193,7 +193,7 @@ namespace Commands.SpinSport
             var parameterFilter = Parameter.CreateBuilder();
             parameterFilter.Key = SpinSportConstants.PARAMETER_FILTER;
             parameterFilter.IsOptional = true;
-            parameterFilter.ArgumentTemplate = @"[A-Za-z\d_\*]+";
+            parameterFilter.ArgumentTemplate = @"^[A-Za-z\d_\*]+$";
             parameterFilter.Documentation.Title = SpinSportConstants.PARAMETER_FILTER;
             parameterFilter.Documentation.Description = "Filter for a list.";
 
@@ -222,7 +222,7 @@ namespace Commands.SpinSport
 
             var parameterName = Parameter.CreateBuilder();
             parameterName.Key = SpinSportConstants.PARAMETER_NAME;
-            parameterName.ArgumentTemplate = @"[A-Za-z\d_-.]+";
+            parameterName.ArgumentTemplate = @"^[A-Za-z\d_-.]+$";
             parameterName.Documentation.Title = "localisation-name";
             parameterName.Documentation.Description = "Name of the localisation variable.";
             set.Parameters.Add(parameterName.ToImmutable());

@@ -45,7 +45,7 @@ namespace Commands.CodeBaseSearch.Model
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var typeSubject = new TypeSubject(node);
+            var typeSubject = new ClassTypeSubject(node);
             typeSubject.SetParent(fileSubject);
 
             typeStack.Push(typeSubject);
@@ -55,7 +55,7 @@ namespace Commands.CodeBaseSearch.Model
 
         public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
-            var typeSubject = new TypeSubject(node);
+            var typeSubject = new InterfaceTypeSubject(node);
             typeSubject.SetParent(fileSubject);
 
             typeStack.Push(typeSubject);
@@ -66,7 +66,7 @@ namespace Commands.CodeBaseSearch.Model
 
         public override void VisitStructDeclaration(StructDeclarationSyntax node)
         {
-            var typeSubject = new TypeSubject(node);
+            var typeSubject = new StructTypeSubject(node);
             typeSubject.SetParent(fileSubject);
 
             typeStack.Push(typeSubject);

@@ -32,7 +32,7 @@ namespace Commands.CodeBaseSearch
             var categories = Query.CreateBuilder();
             categories.Key = CodeBaseSearchConstants.QUERY_CATEGORIES;
             categories.Representations.AddRange(
-                new[] { CodeBaseSearchConstants.QUERY_CATEGORIES, "category", "cat", "c" });
+                new[] { CodeBaseSearchConstants.QUERY_CATEGORIES, "category", "cat" });
             categories.Documentation.Title = "code-base-categories";
             categories.Documentation.Description = "Shows a list of all registered categories.";
 

@@ -64,7 +64,7 @@ namespace Commands.Clipboard
             var parameterFlag = Parameter.CreateBuilder();
             parameterFlag.Key = ClipboardConstants.PARAMETER_FLAG;
             parameterFlag.IsOptional = true;
-            parameterFlag.ArgumentTemplate = "(true|false|t|f|0|1)";
+            parameterFlag.ArgumentTemplate = "^(true|false|t|f|0|1)$";
             parameterFlag.Documentation.Title = ClipboardConstants.PARAMETER_FLAG;
             parameterFlag.Documentation.Description = "The value of a flag.";
 
