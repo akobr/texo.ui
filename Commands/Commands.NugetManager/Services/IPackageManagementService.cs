@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using BeaverSoft.Texo.Commands.NugetManager.Model;
 using BeaverSoft.Texo.Commands.NugetManager.Processing;
 
@@ -6,11 +6,15 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {
     public interface IPackageManagementService : IPackageSource
     {
-        IEnumerable<IPackageInfo> GetAllPackages();
+        IEnumerable<IPackageInfo> GetAll();
+
+        bool TryGet(string packageId, out IPackageInfo package);
 
         IPackageInfo GetOrFetch(string packageId);
 
-        IEnumerable<IPackageInfo> SearchPackages(string searchTerm);
+        IPackageInfo Fetch(string packageId);
+
+        IEnumerable<IPackageInfo> Search(string searchTerm);
 
         void Clear();
     }

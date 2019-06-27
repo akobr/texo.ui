@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -45,26 +45,17 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         public void AddOrUpdate(string projectPath)
         {
-            IProject project = BuildProject(projectPath);
-
-            if (project == null)
-            {
-                return;
-            }
-
-            string key = projectPath.GetFullConsolidatedPath();
-            projects = projects.SetItem(key, project);
+            SetProject(projectPath, false);
         }
 
         public void ReloadAll()
         {
-            ResetProjects();
+            ReloadAll(false);
+        }
 
-            var currentProjects = projects;
-            foreach (IProject project in currentProjects.Values)
-            {
-                AddOrUpdate(project.Path);
-            }
+        public void Fetch()
+        {
+            ReloadAll(true);
         }
 
         public void Clear()
@@ -73,7 +64,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             DeletePersistentStageProjects();
         }
 
-        public IImmutableList<IProject> FindProjects(string searchTerm)
+        public IImmutableList<IProject> Find(string searchTerm)
         {
             var currentProjects = projects;
             var result = ImmutableList<IProject>.Empty.ToBuilder();
@@ -89,7 +80,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             return result.ToImmutable();
         }
 
-        public IImmutableList<IProject> FindProjectsByPackage(string packageId)
+        public IImmutableList<IProject> FindByPackage(string packageId)
         {
             var currentProjects = projects;
             var result = ImmutableList<IProject>.Empty.ToBuilder();
@@ -111,7 +102,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             return result;
         }
 
-        public IEnumerable<IProject> GetAllProjects()
+        public IEnumerable<IProject> GetAll()
         {
             return projects.Values;
         }
@@ -127,9 +118,35 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             projects = projects.Remove(key);
         }
 
-        private IProject BuildProject(string filePath)
+        private void SetProject(string projectPath, bool fetch)
         {
-            IProjectProcessingStrategy projectStrategy = new CsharpProjectProcessingStrategy(packages, logger);
+            IProject project = BuildProject(projectPath, fetch);
+
+            if (project == null)
+            {
+                return;
+            }
+
+            string key = projectPath.GetFullConsolidatedPath();
+            projects = projects.SetItem(key, project);
+        }
+
+        private void ReloadAll(bool fetch)
+        {
+            var currentProjects = projects;
+            ResetProjects();
+
+            foreach (IProject project in currentProjects.Values)
+            {
+                SetProject(project.Path, fetch);
+            }
+        }
+
+        private IProject BuildProject(string filePath, bool fetch)
+        {
+            IProjectProcessingStrategy projectStrategy = fetch
+                ? new CsharpProjectProcessingStrategy(packages, logger)
+                : new CsharpProjectProcessingStrategy(new OnlyFetchedPackageSourceStrategy(packages), logger);
             IProject project = projectStrategy.Process(filePath);
 
             if (project == null)

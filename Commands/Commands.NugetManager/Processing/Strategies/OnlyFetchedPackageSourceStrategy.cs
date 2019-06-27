@@ -14,7 +14,8 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 
         public IPackageInfo GetPackage(string packageId)
         {
-            return packages.GetPackage(packageId);
+            packages.TryGet(packageId, out IPackageInfo package);
+            return package;
         }
     }
 }

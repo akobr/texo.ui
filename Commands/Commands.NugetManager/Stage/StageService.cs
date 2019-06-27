@@ -26,7 +26,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
         public IImmutableList<IProject> GetProjects()
         {
-            return management.Projects.GetAllProjects().ToImmutableList();
+            return management.Projects.GetAll().ToImmutableList();
         }
 
         public IImmutableList<IConfig> GetConfigs()
@@ -51,7 +51,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
         public void Fetch()
         {
-            management.Projects.ReloadAll();
+            management.Projects.Fetch();
         }
 
         public void Clear()
@@ -90,7 +90,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
         private static void ProcessDirectories(TexoPath path, Action<string> projectAction, ISet<string> visitedFiles)
         {
-            foreach (string directory in path.GetTopDirectories())
+            foreach (string directory in path.GetDirectories())
             {
                 foreach (string solutionFile in TexoDirectory.GetFiles(directory, PathConstants.ANY_PATH_WILDCARD + FILE_EXTENSION_SOLUTION, SearchOption.AllDirectories))
                 {
@@ -151,7 +151,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 
         void IMessageBusRecipient<IVariableUpdatedMessage>.ProcessMessage(IVariableUpdatedMessage message)
         {
-            if (message.Name != "SOLUTION_DIRECTORY")
+            if (message.Name != "SOLUTION_FILE")
             {
                 return;
             }

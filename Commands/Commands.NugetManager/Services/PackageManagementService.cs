@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Commands.NugetManager.Model;
@@ -17,7 +17,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             ResetPackages();
         }
 
-        public IEnumerable<IPackageInfo> GetAllPackages()
+        public IEnumerable<IPackageInfo> GetAll()
         {
             return packages.Values;
         }
@@ -34,7 +34,17 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
                 return package;
             }
 
-            package = sources.FetchPackage(packageId);
+            return Fetch(packageId);
+        }
+
+        public bool TryGet(string packageId, out IPackageInfo package)
+        {
+            return packages.TryGetValue(packageId, out package);
+        }
+
+        public IPackageInfo Fetch(string packageId)
+        {
+            IPackageInfo package = sources.FetchPackage(packageId);
 
             if (package == null)
             {
@@ -45,7 +55,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             return package;
         }
 
-        public IEnumerable<IPackageInfo> SearchPackages(string searchTerm)
+        public IEnumerable<IPackageInfo> Search(string searchTerm)
         {
             return sources.SearchPackages(searchTerm).Values;
         }
@@ -59,5 +69,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
         {
             packages = ImmutableSortedDictionary.Create<string, IPackageInfo>(new InsensitiveStringComparer());
         }
+
+        
     }
 }

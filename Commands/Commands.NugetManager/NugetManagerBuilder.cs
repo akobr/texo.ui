@@ -1,4 +1,5 @@
-﻿using BeaverSoft.Texo.Commands.FileManager.Stage;
+using BeaverSoft.Texo.Commands.NugetManager.Manage;
+using BeaverSoft.Texo.Commands.NugetManager.Stage;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Inputting;
@@ -19,6 +20,8 @@ namespace BeaverSoft.Texo.Commands.NugetManager
             command.Documentation.Description = "Naive command line Nuget package manager.";
 
             command.Queries.Add(CreateStageQuery());
+            command.Queries.Add(CreateProjectQuery());
+            command.Queries.Add(CreatePackageQuery());
 
             return command.ToImmutable();
         }
@@ -42,6 +45,29 @@ namespace BeaverSoft.Texo.Commands.NugetManager
             queryStatus.Representations.AddRange(
                 new[] { StageQueries.STATUS, "show" });
 
+            var optionProjects = Option.CreateBuilder();
+            optionProjects.Key = StageOptions.PROJECTS;
+            optionProjects.Representations.AddRange(
+                new[] { StageOptions.PROJECTS, "p" });
+            queryStatus.Options.Add(optionProjects.ToImmutable());
+
+            var optionConfigs = Option.CreateBuilder();
+            optionConfigs.Key = StageOptions.CONFIGS;
+            optionConfigs.Representations.AddRange(
+                new[] { StageOptions.CONFIGS, "c" });
+            queryStatus.Options.Add(optionConfigs.ToImmutable());
+
+            var optionSources = Option.CreateBuilder();
+            optionSources.Key = StageOptions.SOURCES;
+            optionSources.Representations.AddRange(
+                new[] { StageOptions.SOURCES, "s" });
+            queryStatus.Options.Add(optionSources.ToImmutable());
+
+            var queryFetch = Query.CreateBuilder();
+            queryFetch.Key = StageQueries.FETCH;
+            queryFetch.Representations.AddRange(
+                new[] { StageQueries.FETCH, "update" });
+
             var queryAdd = Query.CreateBuilder();
             queryAdd.Key = StageQueries.ADD;
             queryAdd.Representations.Add(StageQueries.ADD);
@@ -53,13 +79,52 @@ namespace BeaverSoft.Texo.Commands.NugetManager
                 new[] { StageQueries.REMOVE, "rm" });
             queryRemove.Parameters.Add(parPath.ToImmutable());
 
+            var queryClear = Query.CreateBuilder();
+            queryClear.Key = StageQueries.CLEAR;
+            queryClear.Representations.AddRange(
+                new[] { StageQueries.CLEAR, "clean", "cls" });
+
             query.Queries.AddRange(
                 new[]
                 {
                     queryStatus.ToImmutable(),
+                    queryFetch.ToImmutable(),
                     queryAdd.ToImmutable(),
                     queryRemove.ToImmutable(),
+                    queryClear.ToImmutable(),
                 });
+
+            return query.ToImmutable();
+        }
+
+        private static Query CreatePackageQuery()
+        {
+            var query = Query.CreateBuilder();
+            query.Key = ManageQueries.PACKAGE;
+            query.Representations.Add(ManageQueries.PACKAGE);
+
+            var parTerm = Parameter.CreateBuilder();
+            parTerm.Key = NugetManagerParameters.SEARCH_TERM;
+            parTerm.ArgumentTemplate = @"^[A-Za-z0-9._\-]*$";
+            parTerm.Documentation.Title = "Package id or a search term";
+            parTerm.Documentation.Description = "Specify a package id or a search term.";
+            query.Parameters.Add(parTerm.ToImmutable());
+
+            return query.ToImmutable();
+        }
+
+        private static Query CreateProjectQuery()
+        {
+            var query = Query.CreateBuilder();
+            query.Key = ManageQueries.PROJECT;
+            query.Representations.Add(ManageQueries.PROJECT);
+
+            var parTerm = Parameter.CreateBuilder();
+            parTerm.Key = NugetManagerParameters.SEARCH_TERM;
+            parTerm.ArgumentTemplate = @"^[A-Za-z0-9._\-]*$";
+            parTerm.Documentation.Title = "Project name or a search term";
+            parTerm.Documentation.Description = "Specify a project name or a search term.";
+            query.Parameters.Add(parTerm.ToImmutable());
 
             return query.ToImmutable();
         }

@@ -136,13 +136,13 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
             return value;
         }
 
-        private bool CanBeUpdated(string packageId, string version)
+        private bool? CanBeUpdated(string packageId, string version)
         {
             IPackageInfo info = packageSource?.GetPackage(packageId);
 
             if (info == null)
             {
-                return false;
+                return null;
             }
 
             return info.Versions.Min != version;

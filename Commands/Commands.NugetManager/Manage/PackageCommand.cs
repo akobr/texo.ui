@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using BeaverSoft.Texo.Commands.NugetManager.Model;
@@ -28,13 +27,19 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
         public ICommandResult Execute(CommandContext context)
         {
             var items = ImmutableList<Item>.Empty.ToBuilder();
-            bool allVersions = context.HasOption(ManageOptions.ALL_VERSIONS);
 
             foreach (string packageTerm in context.GetParameterValues(NugetManagerParameters.SEARCH_TERM))
             {
-                foreach (IPackageInfo package in packages.SearchPackages(packageTerm))
+                foreach (IPackageInfo package in packages.Search(packageTerm))
                 {
-                    items.Add(BuildPackageResult(package, allVersions));
+                    if (string.Equals(package.Id, packageTerm, StringComparison.OrdinalIgnoreCase))
+                    {
+                        items.Add(BuildPackageResult(packages.Fetch(package.Id)));
+                    }
+                    else
+                    {
+                        items.Add(BuildPackageResult(package));
+                    }
                 }
             }
 
@@ -46,24 +51,28 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
             return new ItemsResult(items.ToImmutable());
         }
 
-        private Item BuildPackageResult(IPackageInfo package, bool allVersions)
+        private Item BuildPackageResult(IPackageInfo package)
         {
             MarkdownBuilder builder = new MarkdownBuilder();
             builder.Header(package.Id);
-            AddVersionsToResult(package, builder, allVersions);
+            builder.Italic("Newest version:");
+            builder.Write(" ");
+            builder.Write(package.Versions.Min);
+            AddVersionsToResult(package, builder);
             AddProjectsToResult(package, builder);
             return Item.Markdown(builder.ToString());
         }
 
-        private void AddVersionsToResult(IPackageInfo package, MarkdownBuilder builder, bool allVersions)
+        private void AddVersionsToResult(IPackageInfo package, MarkdownBuilder builder)
         {
+            if (package.Versions.Count < 2)
+            {
+                return;
+            }
+
             builder.Header($"Available in {package.Versions.Count} version(s)", 2);
 
-            IEnumerable<string> versionsToShow = allVersions
-                ? package.Versions.Take(10)
-                : package.Versions;
-
-            foreach (string version in versionsToShow)
+            foreach (string version in package.Versions.Take(50))
             {
                 builder.Bullet(version);
             }
@@ -71,7 +80,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
 
         private void AddProjectsToResult(IPackageInfo package, MarkdownBuilder builder)
         {
-            IImmutableList<IProject> usedInProjects = projects.FindProjectsByPackage(package.Id);
+            IImmutableList<IProject> usedInProjects = projects.FindByPackage(package.Id);
 
             if (usedInProjects.IsNullOrEmpty())
             {
@@ -82,7 +91,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
 
             foreach (IProject project in usedInProjects)
             {
-                builder.Bullet($"{project.Name} ({project.Packages[package.Id].Id})");
+                builder.Bullet($"{project.Name} ({project.Packages[package.Id].Version})");
             }
         }
     }

@@ -1,27 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System;
+using System.Collections.Immutable;
 using BeaverSoft.Texo.Commands.NugetManager.Services;
+using BeaverSoft.Texo.Commands.NugetManager.Stage;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Result;
+using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Manage
 {
     public class ProjectCommand : ICommand
     {
-        private readonly IProjectManagementService projects;
-        private readonly IPackageManagementService packages;        
+        private readonly IProjectManagementService projects;        
 
-        public ProjectCommand(
-            IProjectManagementService projects,
-            IPackageManagementService packages)
+        public ProjectCommand(IProjectManagementService projects)
         {
             this.projects = projects ?? throw new ArgumentNullException(nameof(projects));
-            this.packages = packages ?? throw new ArgumentNullException(nameof(packages));
         }
 
         public ICommandResult Execute(CommandContext context)
         {
-            throw new NotImplementedException();
+            var items = ImmutableList<Item>.Empty.ToBuilder();
+
+            foreach (string projectTerm in context.GetParameterValues(NugetManagerParameters.SEARCH_TERM))
+            {
+                StageCommand.BuildProjectItems(projects.Find(projectTerm));
+            }
+
+            if (items.Count < 1)
+            {
+                return new TextResult("No package found.");
+            }
+
+            return new ItemsResult(items.ToImmutable());
         }
     }
 }
