@@ -52,21 +52,26 @@ namespace Commands.CodeBaseSearch.Model
                         subjects = subjects.Add(group);
                     }
 
+                    AddToKeywordMap(group);
                     return;
                 }
 
                 subjects = subjects.Add(subject);
+                AddToKeywordMap(subject);
+            }
+        }
 
-                foreach (string keyword in subject.Keywords)
+        private void AddToKeywordMap(ISubject subject)
+        {
+            foreach (string keyword in subject.Keywords)
+            {
+                if (map.TryGetValue(keyword, out var keywordSet))
                 {
-                    if (map.TryGetValue(keyword, out var keywordSet))
-                    {
-                        map = map.SetItem(keyword, keywordSet.Add(subject));
-                    }
-                    else
-                    {
-                        map = map.SetItem(keyword, ImmutableHashSet<ISubject>.Empty.Add(subject));
-                    }
+                    map = map.SetItem(keyword, keywordSet.Add(subject));
+                }
+                else
+                {
+                    map = map.SetItem(keyword, ImmutableHashSet<ISubject>.Empty.Add(subject));
                 }
             }
         }

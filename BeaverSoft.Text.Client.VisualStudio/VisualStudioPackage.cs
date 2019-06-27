@@ -113,8 +113,9 @@ namespace BeaverSoft.Text.Client.VisualStudio
             Context.TexoEnvironment.SetVariable(VsVariableNames.SOLUTION_FILE, DTE.Solution.FileName);
         }
 
-        private void TriggerCodeBaseSearchLoad()
+        private async void TriggerCodeBaseSearchLoad()
         {
+            await Task.Delay(15000);
             _ = codeSearch.PreLoadAsync().ContinueWith(async (preLoadTask) =>
             {
                 if (preLoadTask.IsFaulted)

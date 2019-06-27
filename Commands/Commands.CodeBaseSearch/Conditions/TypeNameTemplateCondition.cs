@@ -6,7 +6,7 @@ namespace Commands.CodeBaseSearch.Conditions
     {
         public override bool IsMet(ISubject value)
         {
-            if (value.Type == SubjectTypeEnum.Type)
+            if (value.Type != SubjectTypeEnum.Type)
             {
                 return false;
             }

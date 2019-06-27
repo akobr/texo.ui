@@ -84,7 +84,7 @@ namespace Commands.CodeBaseSearch.Model
 
                     await document.LoadAsync();
                     CategoriseDocument(document);
-                    await Task.Delay(5); // TODO: check CPU usage
+                    await Task.Delay(7); // TODO: check CPU usage
                 }
             }
         }

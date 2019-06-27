@@ -20,16 +20,29 @@ namespace Commands.CodeBaseSearch.Model.GroupingStrategies
 
             if (match.Success)
             {
-                Group group = match.Groups["group"];
-                if (group.Success)
-                {
-                    return group.Value;
-                }
-
-                return match.Value;
+                return null;
             }
 
-            return null;
+            Group group = match.Groups["group"];
+            string groupName;
+
+            if (group.Success)
+            {
+                groupName = group.Value;
+            }
+            else
+            {
+                groupName = match.Value;
+            }
+
+            if (groupName.Length > 1
+                && groupName[0] == 'I'
+                && char.IsUpper(groupName[1]))
+            {
+                groupName = groupName.Substring(1);
+            }
+
+            return groupName;
         }
     }
 }

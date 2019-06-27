@@ -38,8 +38,8 @@ namespace Commands.CodeBaseSearch
                     Grouping = new NameTemplateGroupingStrategy() { Template = "(?<group>.+)Widget" },
                     Condition = new OrCondition<ISubject>(
                         new TypeNameTemplateCondition() { Template = ".+WidgetMediator" },
-                        new TypeNameTemplateCondition() { Template = ".+WidgetState" },
-                        new TypeNameTemplateCondition() { Template = ".+WidgetConfiguration" },
+                        new TypeNameTemplateCondition() { Template = ".+Widget(State|Model)" },
+                        new TypeNameTemplateCondition() { Template = ".+WidgetConfiguration(Model)?" },
                         new TypeNameTemplateCondition() { Template = ".+WidgetPresenter" })
                 },
                 new Rule()
