@@ -1,3 +1,4 @@
+using BeaverSoft.Text.Client.VisualStudio.Core.Providers;
 using EnvDTE80;
 
 namespace BeaverSoft.Text.Client.VisualStudio.Providers

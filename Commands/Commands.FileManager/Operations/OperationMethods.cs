@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Immutable;
 using System.IO;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
+using BeaverSoft.Texo.Commands.FileManager.Stash;
 using BeaverSoft.Texo.Core.Commands;
 
 namespace BeaverSoft.Texo.Commands.FileManager.Operations
@@ -38,6 +39,26 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
         internal static bool HasLobby(this IStageService stage)
         {
             return !string.IsNullOrEmpty(stage.GetLobby());
+        }
+
+        internal static IImmutableList<string> GetPaths(this CommandContext context, IStageService stage, IStashService stashes)
+        {
+            OptionContext optionStash = context.GetOption(ApplyOptions.STASH);
+
+            if (optionStash == null)
+            {
+                stage.TryGetPaths(out var paths);
+                return paths;
+            }
+
+            string id = optionStash.GetParameterValue(StashParameters.IDENTIFIER);
+            IStashEntry stash = int.TryParse(id, out int index)
+                ? stashes.GetStash(index)
+                : stashes.GetStash(id);
+
+            return stash == null
+                ? ImmutableList<string>.Empty
+                : stash.Paths;
         }
 
         internal static bool TryGetPaths(this IStageService stage, out IImmutableList<string> paths)

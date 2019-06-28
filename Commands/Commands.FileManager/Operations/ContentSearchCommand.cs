@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Text.RegularExpressions;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
+using BeaverSoft.Texo.Commands.FileManager.Stash;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Markdown;
@@ -18,17 +19,21 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
     public class ContentSearchCommand : ICommand
     {
         private readonly IStageService stage;
+        private readonly IStashService stashes;
         private readonly ILogService logger;
 
-        public ContentSearchCommand(IStageService stage, ILogService logger)
+        public ContentSearchCommand(IStageService stage, IStashService stashes, ILogService logger)
         {
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
+            this.stashes = stashes ?? throw new ArgumentNullException(nameof(stashes));
             this.logger = logger;
         }
 
         public ICommandResult Execute(CommandContext context)
         {
-            if (!stage.TryGetPaths(out var paths))
+            var paths = context.GetPaths(stage, stashes);
+
+            if (paths.Count < 1)
             {
                 return new TextResult("The stage is empty.");
             }

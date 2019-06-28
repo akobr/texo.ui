@@ -1,4 +1,4 @@
-namespace BeaverSoft.Text.Client.VisualStudio.Environment
+namespace BeaverSoft.Text.Client.VisualStudio.Core.Environment
 {
     public static class VsVariableNames
     {

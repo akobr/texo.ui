@@ -32,6 +32,8 @@ namespace BeaverSoft.Texo.Core
             this.logger = logger;
         }
 
+        public static Version Version => new Version(0, 9, 8);
+
         public IRuntimeCoordinatorService Runtime => runtime;
 
         public IViewService View => view;

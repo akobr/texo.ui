@@ -233,6 +233,12 @@ namespace BeaverSoft.Texo.Commands.FileManager
             query.Documentation.Title = "file-manager-apply";
             query.Documentation.Description = "Perform an operation in file manager.";
 
+            var parStash = Parameter.CreateBuilder();
+            parStash.Key = StashParameters.IDENTIFIER;
+            parStash.ArgumentTemplate = InputRegex.VARIABLE_NAME;
+            parStash.Documentation.Title = "Stash identifier";
+            parStash.Documentation.Description = "Specify stash identifier, index or name.";
+
             var parDestinationPath = Parameter.CreateBuilder();
             parDestinationPath.Key = FileManagerParameters.SIMPLE_PATH;
             parDestinationPath.ArgumentTemplate = InputRegex.PATH;
@@ -243,6 +249,14 @@ namespace BeaverSoft.Texo.Commands.FileManager
             parSearchTerm.Key = ApplyParameters.SEARCH_TERM;
             parSearchTerm.Documentation.Title = "Search term";
             parSearchTerm.Documentation.Description = "Search term or regular expression.";
+
+            var optionStash = Option.CreateBuilder();
+            optionStash.Key = ApplyOptions.STASH;
+            optionStash.Representations.AddRange(
+                new[] { ApplyOptions.STASH, "s" });
+            optionStash.Parameters.Add(parStash.ToImmutable());
+            optionStash.Documentation.Title = ApplyOptions.STASH;
+            optionStash.Documentation.Description = "An operation will use a stash instead of the stage.";
 
             var optionPreview = Option.CreateBuilder();
             optionPreview.Key = ApplyOptions.PREVIEW;
@@ -293,6 +307,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryCopy.Documentation.Title = "file-manager-copy";
             queryCopy.Documentation.Description = "A copy operation.";
             queryCopy.Parameters.Add(parDestinationPath.ToImmutable());
+            queryCopy.Options.Add(optionStash.ToImmutable());
             queryCopy.Options.Add(optionPreview.ToImmutable());
             queryCopy.Options.Add(optionOverwrite.ToImmutable());
             queryCopy.Options.Add(optionFlatten.ToImmutable());
@@ -304,6 +319,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryMove.Documentation.Title = "file-manager-move";
             queryMove.Documentation.Description = "A move operation.";
             queryMove.Parameters.Add(parDestinationPath.ToImmutable());
+            queryMove.Options.Add(optionStash.ToImmutable());
             queryMove.Options.Add(optionPreview.ToImmutable());
             queryMove.Options.Add(optionOverwrite.ToImmutable());
             queryMove.Options.Add(optionFlatten.ToImmutable());
@@ -314,6 +330,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
                 new[] { ApplyQueries.DELETE, "remove", "rm", "del", "dl" });
             queryDelete.Documentation.Title = "file-manager-delete";
             queryDelete.Documentation.Description = "A delete operation.";
+            queryDelete.Options.Add(optionStash.ToImmutable());
             queryDelete.Options.Add(optionPreview.ToImmutable());
 
             var querySearch = Query.CreateBuilder();
@@ -323,6 +340,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             querySearch.Documentation.Title = "file-manager-search";
             querySearch.Documentation.Description = "A content search operation.";
             querySearch.Parameters.Add(parSearchTerm.ToImmutable());
+            querySearch.Options.Add(optionStash.ToImmutable());
             querySearch.Options.Add(optionRegex.ToImmutable());
             querySearch.Options.Add(optionCaseSensitive.ToImmutable());
 
@@ -333,6 +351,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryArchive.Documentation.Title = "file-manager-archive";
             queryArchive.Documentation.Description = "An archive (zip) operation.";
             queryArchive.Parameters.Add(parDestinationPath.ToImmutable());
+            queryArchive.Options.Add(optionStash.ToImmutable());
             queryArchive.Options.Add(optionFlatten.ToImmutable());
             queryArchive.Options.Add(optionAdd.ToImmutable());
             queryArchive.Options.Add(optionOverwrite.ToImmutable());

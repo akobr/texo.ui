@@ -1,4 +1,5 @@
 using BeaverSoft.Texo.Core.Environment;
+using BeaverSoft.Text.Client.VisualStudio.Core.Environment;
 using System.IO;
 
 namespace BeaverSoft.Text.Client.VisualStudio.Environment

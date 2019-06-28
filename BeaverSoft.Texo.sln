@@ -78,6 +78,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Text.Client.Visu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands.SpinSport", "Commands\Commands.SpinSport\Commands.SpinSport.csproj", "{636E7983-C0D3-49D1-B83A-A1DE7887F182}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Text.Client.VisualStudio.Core", "BeaverSoft.Text.Client.VisualStudio.Core\BeaverSoft.Text.Client.VisualStudio.Core.csproj", "{3D71844C-8591-426E-8CEE-40DE11AAE1C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,10 @@ Global
 		{636E7983-C0D3-49D1-B83A-A1DE7887F182}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{636E7983-C0D3-49D1-B83A-A1DE7887F182}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{636E7983-C0D3-49D1-B83A-A1DE7887F182}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D71844C-8591-426E-8CEE-40DE11AAE1C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D71844C-8591-426E-8CEE-40DE11AAE1C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D71844C-8591-426E-8CEE-40DE11AAE1C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D71844C-8591-426E-8CEE-40DE11AAE1C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -227,6 +233,7 @@ Global
 		{97D0F39C-335B-4012-9DD1-514FC74C02CC} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF} = {061058FB-1E54-4BC5-9F15-1BFAA70DA966}
 		{636E7983-C0D3-49D1-B83A-A1DE7887F182} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
+		{3D71844C-8591-426E-8CEE-40DE11AAE1C4} = {061058FB-1E54-4BC5-9F15-1BFAA70DA966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDFCCFD5-8669-4BBF-83FF-8DFCC3F39551}

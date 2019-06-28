@@ -1,4 +1,4 @@
-namespace BeaverSoft.Text.Client.VisualStudio.Providers
+namespace BeaverSoft.Text.Client.VisualStudio.Core.Providers
 {
     public interface ISolutionPathProvider
     {

@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using BeaverSoft.Texo.Commands.FileManager.Extensions;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
+using BeaverSoft.Texo.Commands.FileManager.Stash;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Path;
@@ -15,17 +16,21 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
     public class DeleteCommand : ICommand
     {
         private readonly IStageService stage;
+        private readonly IStashService stashes;
         private readonly ILogService logger;
 
-        public DeleteCommand(IStageService stage, ILogService logger)
+        public DeleteCommand(IStageService stage, IStashService stashes, ILogService logger)
         {
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
+            this.stashes = stashes ?? throw new ArgumentNullException(nameof(stashes));
             this.logger = logger;
         }
 
         public ICommandResult Execute(CommandContext context)
         {
-            if (!stage.TryGetPaths(out var paths))
+            var paths = context.GetPaths(stage, stashes);
+
+            if (paths.Count < 1)
             {
                 return new TextResult("The stage is empty.");
             }

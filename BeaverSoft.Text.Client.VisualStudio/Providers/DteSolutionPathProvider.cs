@@ -1,3 +1,5 @@
+using BeaverSoft.Text.Client.VisualStudio.Core.Providers;
+
 namespace BeaverSoft.Text.Client.VisualStudio.Providers
 {
     public class DteSolutionPathProvider : ISolutionPathProvider
