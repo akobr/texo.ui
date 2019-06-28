@@ -12,7 +12,7 @@ namespace Commands.SpinSport
 {
     public class LocalisationCommand : BaseSolutionCommand
     {
-        private const string CONFIG_PATH = @"SpinSport.Config\Config\Localisation.xml";
+        private const string CONFIG_PATH = @"SpinSport.Client.Localisation\Localisation.xml";
 
         public LocalisationCommand(ISolutionDirectoryProvider solutionProvider)
             : base(solutionProvider)
@@ -69,7 +69,7 @@ namespace Commands.SpinSport
 
             Regex filter = context.GetFilterRegex();
             AnsiStringBuilder builder = new AnsiStringBuilder();
-            string[] languages = new[] { "en", "sv", "de", "lv", "no", "fi", "fr", "nl" };
+            string[] languages = new[] { "en", "sv", "de", "lv", "no", "fi", "fr", "nl", "cs", "da", "es", "it", "pl", "pt", "ru", "es-mx", "en-in", "hi" };
 
             using (FileStream configFile = File.OpenRead(configPath))
             {
@@ -104,6 +104,7 @@ namespace Commands.SpinSport
             return builder.ToString();
         }
 
+        // TODO: [P3] Refarctor this and make it generic
         private TextResult Set(CommandContext context)
         {
             string configPath = CombineWithSolutionPath(CONFIG_PATH);

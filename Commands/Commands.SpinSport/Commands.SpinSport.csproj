@@ -61,7 +61,6 @@
     <Compile Include="SpinSportBuilder.cs" />
     <Compile Include="SpinSportCommand.cs" />
     <Compile Include="SpinSportConstants.cs" />
-    <Compile Include="TestSolutionDirectoryProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj">

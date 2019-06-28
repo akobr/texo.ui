@@ -231,103 +231,11 @@ namespace Commands.SpinSport
             get.Documentation.Description = "Gets a detail of localisation variable(s).";
             get.Parameters.Add(parameterFilter.ToImmutable());
 
-            var set = Query.CreateBuilder();
-            set.Key = SpinSportConstants.QUERY_SET;
-            set.Representations.AddRange(
-                new[] { SpinSportConstants.QUERY_SET });
-            set.Documentation.Title = "config-localisation-set";
-            set.Documentation.Description = "Sets or updates a localisation variable.";
-
-            var parameterName = Parameter.CreateBuilder();
-            parameterName.Key = SpinSportConstants.PARAMETER_NAME;
-            parameterName.ArgumentTemplate = @"^[A-Za-z\d_-.]+$";
-            parameterName.Documentation.Title = "localisation-name";
-            parameterName.Documentation.Description = "Name of the localisation variable.";
-            set.Parameters.Add(parameterName.ToImmutable());
-
-            var parameterValue = Parameter.CreateBuilder();
-            parameterValue.Key = SpinSportConstants.PARAMETER_VALUE;
-            parameterValue.Documentation.Title = "localisation-value";
-            parameterValue.Documentation.Description = "Definition of localisation variable.";
-
-            var optionEn = Option.CreateBuilder();
-            optionEn.Key = SpinSportConstants.OPTION_EN;
-            optionEn.Representations.AddRange(
-                new[] { SpinSportConstants.OPTION_EN });
-            optionEn.Parameters.Add(parameterValue.ToImmutable());
-            optionEn.Documentation.Title = SpinSportConstants.OPTION_EN;
-            optionEn.Documentation.Description = "English";
-            set.Options.Add(optionEn.ToImmutable());
-
-            var optionSv = Option.CreateBuilder();
-            optionSv.Key = SpinSportConstants.OPTION_SV;
-            optionSv.Representations.AddRange(
-                new[] { SpinSportConstants.OPTION_SV });
-            optionSv.Parameters.Add(parameterValue.ToImmutable());
-            optionSv.Documentation.Title = SpinSportConstants.OPTION_SV;
-            optionSv.Documentation.Description = "Swedish";
-            set.Options.Add(optionSv.ToImmutable());
-
-            var optionDe = Option.CreateBuilder();
-            optionDe.Key = SpinSportConstants.OPTION_DE;
-            optionDe.Representations.AddRange(
-                new[] { SpinSportConstants.OPTION_DE });
-            optionDe.Parameters.Add(parameterValue.ToImmutable());
-            optionDe.Documentation.Title = SpinSportConstants.OPTION_DE;
-            optionDe.Documentation.Description = "German";
-            set.Options.Add(optionDe.ToImmutable());
-
-            var optionLv = Option.CreateBuilder();
-            optionLv.Key = SpinSportConstants.OPTION_LV;
-            optionLv.Representations.AddRange(
-                new[] { SpinSportConstants.OPTION_LV });
-            optionLv.Parameters.Add(parameterValue.ToImmutable());
-            optionLv.Documentation.Title = SpinSportConstants.OPTION_LV;
-            optionLv.Documentation.Description = "Latvian";
-            set.Options.Add(optionLv.ToImmutable());
-
-            var optionNo = Option.CreateBuilder();
-            optionNo.Key = SpinSportConstants.OPTION_NO;
-            optionNo.Representations.AddRange(
-                new[] { SpinSportConstants.OPTION_NO });
-            optionNo.Parameters.Add(parameterValue.ToImmutable());
-            optionNo.Documentation.Title = SpinSportConstants.OPTION_NO;
-            optionNo.Documentation.Description = "Norwegian";
-            set.Options.Add(optionNo.ToImmutable());
-
-            var optionFi = Option.CreateBuilder();
-            optionFi.Key = SpinSportConstants.OPTION_FI;
-            optionFi.Representations.AddRange(
-                new[] { SpinSportConstants.OPTION_FI });
-            optionFi.Parameters.Add(parameterValue.ToImmutable());
-            optionFi.Documentation.Title = SpinSportConstants.OPTION_FI;
-            optionFi.Documentation.Description = "Finnish";
-            set.Options.Add(optionFi.ToImmutable());
-
-            var optionFr = Option.CreateBuilder();
-            optionFr.Key = SpinSportConstants.OPTION_FR;
-            optionFr.Representations.AddRange(
-                new[] { SpinSportConstants.OPTION_FR });
-            optionFr.Parameters.Add(parameterValue.ToImmutable());
-            optionFr.Documentation.Title = SpinSportConstants.OPTION_FR;
-            optionFr.Documentation.Description = "French";
-            set.Options.Add(optionFr.ToImmutable());
-
-            var optionNl = Option.CreateBuilder();
-            optionNl.Key = SpinSportConstants.OPTION_NL;
-            optionNl.Representations.AddRange(
-                new[] { SpinSportConstants.OPTION_NL });
-            optionNl.Parameters.Add(parameterValue.ToImmutable());
-            optionNl.Documentation.Title = SpinSportConstants.OPTION_NL;
-            optionNl.Documentation.Description = "Dutch";
-            set.Options.Add(optionNl.ToImmutable());
-
             colourUsage.Queries.AddRange(
                 new[]
                 {
                     list.ToImmutable(),
-                    get.ToImmutable(),
-                    set.ToImmutable(),
+                    get.ToImmutable()
                 });
 
             return colourUsage.ToImmutable();
