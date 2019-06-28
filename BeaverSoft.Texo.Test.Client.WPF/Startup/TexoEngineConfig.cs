@@ -24,7 +24,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
                 CalcCommand.BuildConfiguration(),
                 ClipboardBuilder.BuildCommand(),
                 FunctionsBuilder.BuildCommand(),
-                CodeBaseSearchBuilder.BuildCommand(),
+                //CodeBaseSearchBuilder.BuildCommand(),
                 SpinSportBuilder.BuildCommand());
         }
     }

@@ -15,6 +15,7 @@ using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Fallback.PowerShell;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
+using BeaverSoft.Text.Client.VisualStudio.Core.Providers;
 using BeaverSoft.Text.Client.VisualStudio.Providers;
 using Commands.Calc;
 using Commands.Clipboard;

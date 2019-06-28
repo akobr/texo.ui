@@ -5,6 +5,8 @@ using BeaverSoft.Texo.Commands.Functions;
 using BeaverSoft.Texo.Commands.NugetManager;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Text.Client.VisualStudio.Core.Environment;
+using BeaverSoft.Text.Client.VisualStudio.Core.Providers;
 using BeaverSoft.Text.Client.VisualStudio.Environment;
 using BeaverSoft.Text.Client.VisualStudio.Providers;
 using Commands.Calc;

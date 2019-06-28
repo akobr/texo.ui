@@ -68,11 +68,11 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             container.Register<FunctionsCommand>();
 
             // Code-base-search
-            container.Register<ICodeBaseSearchService, CodeBaseSearchService>();
-            container.Register<CodeBaseSearchCommand>();
+            // container.Register<ICodeBaseSearchService, CodeBaseSearchService>();
+            // container.Register<CodeBaseSearchCommand>();
 
             // SpinSport
-            container.Register<ISolutionDirectoryProvider, TestSolutionDirectoryProvider>();
+            container.Register<ISolutionDirectoryProvider, SolutionDirectoryProvider>();
             container.Register<SpinSportCommand>();
 
             // View

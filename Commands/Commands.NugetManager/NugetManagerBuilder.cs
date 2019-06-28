@@ -14,7 +14,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager
 
             command.Key = NugetManagerQueries.NUGET;
             command.Representations.AddRange(
-                new[] { NugetManagerQueries.NUGET, "nman", "nm", "nuget" });
+                new[] { NugetManagerQueries.NUGET, "nman", "nm" });
             command.DefaultQueryKey = StageQueries.STAGE;
             command.Documentation.Title = "Nuget manager";
             command.Documentation.Description = "Naive command line Nuget package manager.";

@@ -71,7 +71,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
             foreach (string projectKey in currentProjects.Keys)
             {
-                if (projectKey.Contains(searchTerm))
+                if (projectKey.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     result.Add(currentProjects[projectKey]);
                 }

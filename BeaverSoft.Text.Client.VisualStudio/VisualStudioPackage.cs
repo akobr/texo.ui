@@ -12,6 +12,8 @@ using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Core.View.Actions;
 using BeaverSoft.Text.Client.VisualStudio.Actions;
+using BeaverSoft.Text.Client.VisualStudio.Core.Environment;
+using BeaverSoft.Text.Client.VisualStudio.Core.Providers;
 using BeaverSoft.Text.Client.VisualStudio.Environment;
 using BeaverSoft.Text.Client.VisualStudio.Providers;
 using BeaverSoft.Text.Client.VisualStudio.Search;

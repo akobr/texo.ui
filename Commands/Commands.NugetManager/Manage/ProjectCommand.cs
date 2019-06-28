@@ -28,7 +28,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
 
             if (items.Count < 1)
             {
-                return new TextResult("No package found.");
+                return new TextResult("No project found.");
             }
 
             return new ItemsResult(items.ToImmutable());
