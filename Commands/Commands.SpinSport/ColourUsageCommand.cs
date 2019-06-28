@@ -13,7 +13,7 @@ namespace Commands.SpinSport
 {
     class ColourUsageCommand : BaseSolutionCommand
     {
-        private const string CONFIG_PATH = @"SpinSport.Client\SpinSport.Config\Config\Theme.xml";
+        private const string CONFIG_PATH = @"SpinSport.Config\Config\Theme.xml";
         private static readonly string[] brands = new[] { "showcase", "betway", "betway-dark", "betway-new", "betway-africa", "betway-africa-mobile" };
 
         public ColourUsageCommand(ISolutionDirectoryProvider solutionProvider)
