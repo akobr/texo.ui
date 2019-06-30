@@ -472,6 +472,13 @@ namespace BeaverSoft.Texo.View.WPF
 
             workingDirectory = message.NewValue;
 
+            if (workingDirectory.Length > 3
+                && (workingDirectory[workingDirectory.Length - 1] == System.IO.Path.AltDirectorySeparatorChar
+                    || workingDirectory[workingDirectory.Length - 1] == System.IO.Path.DirectorySeparatorChar))
+            {
+                workingDirectory = workingDirectory.Substring(0, workingDirectory.Length - 1);
+            }
+
             if (showWorkingPathAsPrompt)
             {
                 SetPrompt(workingDirectory);

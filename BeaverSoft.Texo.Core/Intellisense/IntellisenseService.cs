@@ -56,29 +56,34 @@ namespace BeaverSoft.Texo.Core.Intellisense
             }
 
             var resultBuilder = ImmutableList<IItem>.Empty.ToBuilder();
-            string activeInput = cursorPosition > input.ParsedInput.RawInput.Length
+            string activeInputPart = cursorPosition > input.ParsedInput.RawInput.Length
                 ? string.Empty : input.ParsedInput.Tokens[input.ParsedInput.Tokens.Count - 1];
 
-            if (input.ParsedInput.Tokens.Count == 1 && !string.IsNullOrEmpty(activeInput))
+            if (input.ParsedInput.Tokens.Count == 1
+                && !string.IsNullOrEmpty(activeInputPart))
             {
                 resultBuilder.AddRange(commandList.GetHelp(input));
             }
 
-            if (externalProviders.TryGetValue(input.ParsedInput.Tokens[0], out var provider))
+            if (input.ParsedInput.Tokens.Count > 1
+                || string.IsNullOrEmpty(activeInputPart))
             {
-                resultBuilder.AddRange(await provider.GetHelpAsync(input));
+                if (externalProviders.TryGetValue(input.ParsedInput.Tokens[0], out var provider))
+                {
+                    resultBuilder.AddRange(await provider.GetHelpAsync(input));
+                }
+
+                if (!string.IsNullOrEmpty(input.Context.Key))
+                {
+                    resultBuilder.AddRange(commandDefinition.GetHelp(input));
+                    resultBuilder.AddRange(await command.GetHelpAsync(input));
+                }
             }
 
-            if (!string.IsNullOrEmpty(input.Context.Key))
+            if (input.ParsedInput.Tokens.Count > 0)
             {
-                resultBuilder.AddRange(commandDefinition.GetHelp(input));
-                resultBuilder.AddRange(await command.GetHelpAsync(input));
-            }
-
-            if (input.Tokens.Count > 0)
-            {
-                resultBuilder.AddRange(variable.Help(activeInput).Take(MAXIMUM_ITEMS_PER_TYPE));
-                resultBuilder.AddRange(path.Help(activeInput).Take(MAXIMUM_ITEMS_PER_TYPE));
+                resultBuilder.AddRange(variable.Help(activeInputPart).Take(MAXIMUM_ITEMS_PER_TYPE));
+                resultBuilder.AddRange(path.Help(activeInputPart).Take(MAXIMUM_ITEMS_PER_TYPE));
             }
 
             return resultBuilder.ToImmutable();

@@ -23,7 +23,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
         private delegate void RenderMethod(string text);
 
         private Brush backgroundBrush = Brushes.Transparent;
-        private Brush foregroundBrush = Brushes.White; // TODO: [P1] Solve this, must be base on theme!
+        private Brush foregroundBrush = Brushes.Transparent;
         private FontStyle fontStyle = FontStyles.Normal;
         private FontWeight fontWeight = FontWeights.Normal;
         private TextDecorationCollection decorations = new TextDecorationCollection();
@@ -430,7 +430,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
         private void ResetFormatting()
         {
             backgroundBrush = Brushes.Transparent;
-            foregroundBrush = Brushes.White; // TODO: [P1] Solve this, should be base on theme!
+            foregroundBrush = Brushes.Transparent;
             fontStyle = FontStyles.Normal;
             fontWeight = FontWeights.Normal;
             decorations.Clear();
@@ -465,7 +465,11 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 result.TextDecorations = decorations.Clone();
             }
 
-            result.Foreground = foregroundBrush;
+            if (foregroundBrush != Brushes.Transparent)
+            {
+                result.Foreground = foregroundBrush;
+            }
+            
             result.Background = backgroundBrush;
             result.FontStyle = fontStyle;         
 

@@ -108,7 +108,11 @@ namespace BeaverSoft.Texo.View.WPF
         public string Title
         {
             get => lbTitle.Text;
-            set => lbTitle.Text = value;
+            set
+            {
+                lbTitle.Text = value;
+                lbTitle.ToolTip = value;
+            }
         }
 
         public bool IsIntellisenseOpened => listIntellisense.Visibility == Visibility.Visible;
@@ -218,12 +222,12 @@ namespace BeaverSoft.Texo.View.WPF
 
         public void SetHistoryCount(int count)
         {
-            lbHistoryCount.Text = $"History ({count})";
+            lbHistoryCount.Text = $"H ({count})";
         }
 
         public void SetVariableCount(int count)
         {
-            lbVariableCount.Text = $"Variables ({count})";
+            lbVariableCount.Text = $"V ({count})";
         }
 
         public void CleanResults()
@@ -458,11 +462,6 @@ namespace BeaverSoft.Texo.View.WPF
             return null;
         }
 
-        private void HandleIntellisenseMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            
-        }
-
         private void HandleInputGotFocus(object sender, RoutedEventArgs e)
         {
             bInput.SetResourceReference(BorderBrushProperty, "AccentBrush");
@@ -493,6 +492,13 @@ namespace BeaverSoft.Texo.View.WPF
 
             listIntellisense.SelectedItem = clickedItem;
             IntellisenseItemExecuted?.Invoke(this, new EventArgs());
+        }
+
+        private void HeaderGridSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            lbTitle.HorizontalAlignment = (pHeaderInfo.ActualWidth + lbTitle.ActualWidth) > gHeader.ActualWidth
+                    ? HorizontalAlignment.Right
+                    : HorizontalAlignment.Left;
         }
     }
 }

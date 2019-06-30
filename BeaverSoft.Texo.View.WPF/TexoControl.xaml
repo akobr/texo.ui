@@ -4,9 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             xmlns:converters="clr-namespace:BeaverSoft.Texo.View.WPF.Converters"
              FontFamily="Consolas"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <converters:ColorAlphaConverter x:Key="AlphaConverter" />
+
         <SolidColorBrush x:Key="InputBorderBrush" Color="{Binding BorderBaseColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
         <SolidColorBrush x:Key="InfoForegroundBrush" Color="{Binding TextInfoColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
         <SolidColorBrush x:Key="AccentBrush" Color="{Binding AccentColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
@@ -87,16 +90,16 @@
         </Grid.RowDefinitions>
 
         <!-- HEADER -->
-        <Grid Margin="5,4">
+        <Grid x:Name="gHeader" Margin="5,4" SizeChanged="HeaderGridSizeChanged">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Name="lbTitle" Text="Texo UI" Foreground="{DynamicResource OutputForegroundBrush}" FontStyle="Italic" TextTrimming="CharacterEllipsis" />
-            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
-                <TextBlock Name="lbHistoryCount" Text="History (0)" FontSize="10" Foreground="{DynamicResource InfoForegroundBrush}" VerticalAlignment="Center" Margin="5,0" />
-                <TextBlock Name="lbVariableCount" Text="Variables (0)" FontSize="10" Foreground="{DynamicResource InfoForegroundBrush}" VerticalAlignment="Center" Margin="5,0" />
+            <TextBlock Name="lbTitle" Text="Texo UI" Foreground="{DynamicResource OutputForegroundBrush}" FontStyle="Italic" VerticalAlignment="Center" HorizontalAlignment="Left" SizeChanged="HeaderGridSizeChanged" />
+            <StackPanel Name="pHeaderInfo" Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal">
+                <TextBlock Name="lbHistoryCount" Text="H (0)" FontSize="10" Foreground="{DynamicResource InfoForegroundBrush}" VerticalAlignment="Center" Margin="10,0,5,0" ToolTip="History" />
+                <TextBlock Name="lbVariableCount" Text="V (0)" FontSize="10" Foreground="{DynamicResource InfoForegroundBrush}" VerticalAlignment="Center" Margin="5,0" ToolTip="Variables" />
             </StackPanel>
         </Grid>
 
@@ -138,8 +141,8 @@
         <Border Grid.Row="2" Height="7" VerticalAlignment="Top" Visibility="{Binding ShadowsVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                    <GradientStop Color="#C8000000" Offset="0.0" />
-                    <GradientStop Color="#00000000" Offset="1.0" />
+                    <GradientStop Color="{Binding BackgroundBaseColor, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource AlphaConverter}, ConverterParameter=200}" Offset="0.0" />
+                    <GradientStop Color="{Binding BackgroundBaseColor, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource AlphaConverter}, ConverterParameter=0}" Offset="1.0" />
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
@@ -147,7 +150,7 @@
         <!-- INTELLISENSE -->
         <ListBox x:Name="listIntellisense" Grid.Row="2" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0,0,0,2"
                  MaxHeight="265" VerticalAlignment="Top" Foreground="{DynamicResource OutputForegroundBrush}" Focusable="False" IsTabStop="False"
-                 PreviewKeyDown="HandleOutputPreviewKeyDown" MouseDoubleClick="HandleIntellisenseMouseDoubleClick" PreviewMouseDown="ListIntellisense_PreviewMouseDown"
+                 PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseDown="ListIntellisense_PreviewMouseDown"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
 
             <ListBox.Background>

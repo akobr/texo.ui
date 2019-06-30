@@ -66,6 +66,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\ColorAlphaConverter.cs" />
     <Compile Include="KeyScrollDirection.cs" />
     <Compile Include="IWpfRenderService.cs" />
     <Compile Include="KeyUtils.cs" />
