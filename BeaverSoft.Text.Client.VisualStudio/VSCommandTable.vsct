@@ -13,7 +13,7 @@
         <Icon guid="ImageCatalogGuid" id="ImageIcon"/>
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Texo terminal</ButtonText>
+          <ButtonText>Texo Terminal</ButtonText>
         </Strings>
       </Button>
     </Buttons>

@@ -16,7 +16,7 @@ namespace BeaverSoft.Text.Client.VisualStudio
     {
         public const string WindowGuidString = "ca179975-59a3-4af6-b516-47017165b291";
         public const string MenuCommandGuidString = "6f375fee-28b1-4c82-9b0e-d7f973c68612";
-        public const string Title = "Texo terminal";
+        public const string Title = "Texo Terminal";
 
         private readonly ExtensionContext state;
         private ClipboardMonitorForm clipboardMonitor;
