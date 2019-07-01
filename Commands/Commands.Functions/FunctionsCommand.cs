@@ -1,13 +1,17 @@
 using System;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Extensibility.Attributes;
+using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.Text;
+using Bogus;
 
 [assembly: CommandLibrary]
 
@@ -24,19 +28,30 @@ namespace BeaverSoft.Texo.Commands.Functions
             RegisterQueryMethod("number", Number);
             RegisterQueryMethod("base64", Base64);
             RegisterQueryMethod("guid", Guid);
+            RegisterQueryMethod("hash-md5", HashMd5);
+            RegisterQueryMethod("hash-sha1", HashSha1);
+            RegisterQueryMethod("random", Random);
         }
 
         [Query("list", Representations = "list", IsDefault = true)]
         [Documentation("List of functions", "Shows all available help functions.")]
-        public ICommandResult List(CommandContext context)
+        public TextResult List(CommandContext context)
         {
-            return new TextResult("List of functions with description!");
+            AnsiStringBuilder builder = new AnsiStringBuilder();
+            AddFunctionToList(builder, "base64", "Codes and decodes base64 string from input or a file.");
+            AddFunctionToList(builder, "color", "Shows a colour(s) in multiple formats. Supported inputs: #[AA]RRGGBB; int[] { [AAA], RRR, GGG, BBB }.");
+            AddFunctionToList(builder, "guid", "Generates random GUID and shows it in multiple formats.");
+            AddFunctionToList(builder, "md5", "Calculates MD5 hash from input text or a file.");
+            AddFunctionToList(builder, "number", "Shows a number in multiple numerical systems (dec, hex, bin). Supported inputs: 42; [0]b101010; [0]x2A.");
+            AddFunctionToList(builder, "random", "Generates random text, person information, address, GPS coordinates and numbers.");
+            AddFunctionToList(builder, "sha1", "Calculates SHA1 hash from input text or a file.");
+            return builder.ToString();
         }
 
         [Query("color", Representations = "color colour")]
         [Parameter("color", IsRepetable = true)]
-        [Documentation("Color function", "Shows a color in multiple formats.")]
-        public ICommandResult ColorFunction(CommandContext context)
+        [Documentation("Color function", "Shows a colour(s) in multiple formats. Supported inputs: #[AA]RRGGBB; int[] { [AAA], RRR, GGG, BBB }.")]
+        public TextResult ColorFunction(CommandContext context)
         {
             AnsiStringBuilder result = new AnsiStringBuilder();
             var parValues = context.GetParameterValues("color");
@@ -70,13 +85,13 @@ namespace BeaverSoft.Texo.Commands.Functions
             }
 
             RemoveLastLineEnd(result);
-            return new TextResult(result.ToString());
+            return result.ToString();
         }
 
         [Query("number", Representations = "number num")]
         [Parameter("number", IsRepetable = true)]
-        [Documentation("Number function", "Shows a number in multiple numerical systems.")]
-        public ICommandResult Number(CommandContext context)
+        [Documentation("Number function", "Shows a number in multiple numerical systems (dec, hex, bin). Supported inputs: 42; [0]b101010; [0]x2A.")]
+        public TextResult Number(CommandContext context)
         {
             AnsiStringBuilder result = new AnsiStringBuilder();
 
@@ -86,49 +101,50 @@ namespace BeaverSoft.Texo.Commands.Functions
             }
 
             RemoveLastLineEnd(result);
-            return new TextResult(result.ToString());
+            return result.ToString();
         }
 
         [Query("base64", Representations = "base64 b64 64")]
         [Parameter("text", IsRepetable = false)]
-        [Documentation("Base64 function", "Codes and decodes base64 string.")]
-        public ICommandResult Base64(CommandContext context)
+        [Documentation("Base64 function", "Codes and decodes base64 string from input or a file.")]
+        public TextResult Base64(CommandContext context)
         {
             string text = context.GetParameterValue("text");
 
+            if (text.GetPathType() == PathTypeEnum.File)
+            {
+                text = File.ReadAllText(text);
+            }
+
             if (Regex.IsMatch(text, "^[A-Za-z0-9+\\/]+={0,2}$"))
             {
-                byte[] data = Convert.FromBase64String(text);
-                string decoded = Encoding.UTF8.GetString(data);
-                return new TextResult(decoded);
+                return DecodeBase64(text);
             }
             else
             {
-                byte[] data = Encoding.UTF8.GetBytes(text);
-                string encoded = Convert.ToBase64String(data);
-                return new TextResult(encoded);
+                return EncodeBase64(text);
             }
         }
 
         [Query("hash-md5", Representations = "hash-md5 md5")]
         [Parameter("source", IsRepetable = false)]
         [Documentation("Hash function (MD5)", "Calculates MD5 hash from input text or a file.")]
-        public ICommandResult HashMd5(CommandContext context)
+        public TextResult HashMd5(CommandContext context)
         {
-            throw new NotImplementedException();
+            return ComputeHash(context, new MD5CryptoServiceProvider());
         }
 
         [Query("hash-sha1", Representations = "hash-sha1 sha1")]
         [Parameter("source", IsRepetable = false)]
         [Documentation("Hash function (SHA1)", "Calculates SHA1 hash from input text or a file.")]
-        public ICommandResult HashSha1(CommandContext context)
+        public TextResult HashSha1(CommandContext context)
         {
-            throw new NotImplementedException();
+            return ComputeHash(context, new SHA1CryptoServiceProvider());
         }
 
         [Query("guid", Representations = "guid")]
-        [Documentation("Guid generator", "Generates random GUID and show it in multiple formats.")]
-        public ICommandResult Guid(CommandContext context)
+        [Documentation("Guid generator", "Generates random GUID and shows it in multiple formats.")]
+        public TextResult Guid(CommandContext context)
         {
             Guid guid = System.Guid.NewGuid();
             AnsiStringBuilder builder = new AnsiStringBuilder();            
@@ -163,19 +179,96 @@ namespace BeaverSoft.Texo.Commands.Functions
             builder.AppendLine(guid.ToString("B").ToUpperInvariant());
             builder.Append(guid.ToString("X"));
 
-            return new TextResult(builder.ToString());
+            return builder.ToString();
         }
 
         [Query("random", Representations = "random rnd")]
-        [Option("text", Representations = "text txt t")]
-        [Option("number", Representations = "number n")]
-        [Option("person", Representations = "person p")]
-        [Option("address", Representations = "address a")]
-        [Option("gps", Representations = "gps g")]
         [Documentation("Random generator", "Generates random text, person information, address, GPS coordinates and numbers.")]
-        public ICommandResult Random(CommandContext context)
+        public TextResult Random(CommandContext context)
         {
-            throw new NotImplementedException();
+            AnsiStringBuilder builder = new AnsiStringBuilder();
+            Faker faker = new Faker("en");
+
+            // Text
+            builder.AppendForegroundFormat(ConsoleColor.Gray);
+            builder.Append("text");
+            builder.AppendFormattingReset();
+            builder.AppendLine();
+            builder.AppendLine(faker.Lorem.Paragraph(6));
+
+            // Numbers
+            builder.AppendLine();
+            builder.AppendForegroundFormat(ConsoleColor.Gray);
+            builder.Append("numbers");
+            builder.AppendFormattingReset();
+            builder.AppendLine();
+            int integer = faker.Random.Int(0, int.MaxValue);
+            double fractional = faker.Random.Double();
+            double @decimal = integer + fractional;
+            builder.AppendLine($"integer: {integer}    fractional: {fractional}    decimal: {@decimal}");
+
+            // Person
+            builder.AppendLine();
+            builder.AppendForegroundFormat(ConsoleColor.Gray);
+            builder.Append("person");
+            builder.AppendFormattingReset();
+            builder.AppendLine();
+            Person person = faker.Person;
+            builder.AppendLine($"{person.FullName} ({person.UserName})");
+            builder.AppendLine($"DOB: {person.DateOfBirth.ToShortDateString()}");
+            builder.AppendLine($"Phone: {person.Phone}");
+            builder.AppendLine($"Email: {person.Email}");
+            builder.AppendLine($"Website: {person.Website}");
+
+            // Address
+            builder.AppendLine();
+            builder.AppendForegroundFormat(ConsoleColor.Gray);
+            builder.Append("address");
+            builder.AppendFormattingReset();
+            builder.AppendLine();
+            builder.AppendLine(faker.Address.FullAddress());
+
+            // GPS
+            builder.AppendLine();
+            builder.AppendForegroundFormat(ConsoleColor.Gray);
+            builder.Append("gps");
+            builder.AppendFormattingReset();
+            builder.AppendLine();
+            double latittude = faker.Address.Latitude();
+            double longitude = faker.Address.Longitude();
+            builder.Append($"{latittude}, {longitude}");
+
+            return builder.ToString();
+        }
+
+        private static string EncodeBase64(string text)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(text);
+            return Convert.ToBase64String(data);
+        }
+
+        private static string DecodeBase64(string text)
+        {
+            byte[] data = Convert.FromBase64String(text);
+            return Encoding.UTF8.GetString(data);
+        }
+
+        private static string ComputeHash(CommandContext context, HashAlgorithm algorithm)
+        {
+            string source = context.GetParameterValue("source");
+            byte[] bytes;
+
+            if (source.GetPathType() == PathTypeEnum.File)
+            {
+                bytes = File.ReadAllBytes(source);
+            }
+            else
+            {
+                bytes = Encoding.UTF8.GetBytes(source);
+            }
+
+            byte[] md5 = algorithm.ComputeHash(bytes);
+            return BitConverter.ToString(md5);
         }
 
         private static string BuildNumberInfo(string value)
@@ -189,10 +282,13 @@ namespace BeaverSoft.Texo.Commands.Functions
 
                 if (Regex.IsMatch(value, "^(0|b|0b)[01]+$"))
                 {
+                    value = value.Substring(value.IndexOf('b') + 1);
                     number = Convert.ToInt32(value, 2);
                 }
-                else if (Regex.IsMatch(value, "^(x|0x)[0-9A-Fa-f]+$"))
+                else if (Regex.IsMatch(value, "^(x|0x)[0-9A-Fa-f]+$")
+                         || Regex.IsMatch(value, "[A-Fa-f]+"))
                 {
+                    value = value.Substring(value.IndexOf('x') + 1);
                     number = Convert.ToInt32(value, 16);
                 }
                 else
@@ -200,10 +296,23 @@ namespace BeaverSoft.Texo.Commands.Functions
                     number = Convert.ToInt32(value);
                 }
 
+                AnsiStringBuilder builder = new AnsiStringBuilder();
                 @decimal = Convert.ToString(number, 10);
                 hex = Convert.ToString(number, 16);
                 binary = Convert.ToString(number, 2);
-                return $"dec:{@decimal} hex:{hex} bin:{binary};";
+                builder.AppendForegroundFormat(ConsoleColor.Gray);
+                builder.Append("dec:");
+                builder.AppendFormattingReset();
+                builder.Append($" {@decimal,-10} ");
+                builder.AppendForegroundFormat(ConsoleColor.Gray);
+                builder.Append("hex:");
+                builder.AppendFormattingReset();
+                builder.Append($" {hex,7} ");
+                builder.AppendForegroundFormat(ConsoleColor.Gray);
+                builder.Append("bin:");
+                builder.AppendFormattingReset();
+                builder.Append($" {binary,22}");
+                return builder.ToString();
             }
             catch (FormatException)
             {
@@ -257,8 +366,8 @@ namespace BeaverSoft.Texo.Commands.Functions
             builder.Append(" ");
             builder.Append($"#{GetHexColorPart(color.A)}{GetHexColorPart(color.R)}{GetHexColorPart(color.G)}{GetHexColorPart(color.B)} ");
             builder.Append($"#{GetHexColorPart(blendedColor.R)}{GetHexColorPart(blendedColor.G)}{GetHexColorPart(blendedColor.B)} ");
-            builder.Append($"argb({color.A},{color.R},{color.G},{color.B}) ");
-            builder.Append($"rgb({blendedColor.R},{blendedColor.G},{blendedColor.B}) ");
+            builder.Append(string.Format("{0,-22} ", $"argb({color.A},{color.R},{color.G},{color.B})"));
+            builder.Append(string.Format("{0,-17}", $"rgb({blendedColor.R},{blendedColor.G},{blendedColor.B})"));
             builder.AppendLine();
             return builder.ToString();
         }
@@ -287,6 +396,15 @@ namespace BeaverSoft.Texo.Commands.Functions
             byte g = (byte)((color.G * amount) + backColor.G * (1 - amount));
             byte b = (byte)((color.B * amount) + backColor.B * (1 - amount));
             return Color.FromArgb(r, g, b);
+        }
+
+        private static void AddFunctionToList(AnsiStringBuilder builder, string function, string description)
+        {
+            builder.AppendBoldFormat();
+            builder.Append(function);
+            builder.AppendFormattingReset();
+            builder.Append(": ");
+            builder.AppendLine(description);
         }
 
         private static void RemoveLastLineEnd(AnsiStringBuilder builder)

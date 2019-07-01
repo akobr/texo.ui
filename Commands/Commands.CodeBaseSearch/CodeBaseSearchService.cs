@@ -1,43 +1,51 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.MSBuild;
-using Microsoft.VisualStudio.LanguageServices;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading.Tasks;
+using Commands.CodeBaseSearch.Model;
 
 namespace Commands.CodeBaseSearch
 {
-    public class CodeBaseSearchService
+    public class CodeBaseSearchService : ICodeBaseSearchService
     {
-        private const string solutionPath = @"C:\Working\textum.ui\BeaverSoft.Texo.sln";
+        private readonly ISolutionOpenStrategy openStrategy;
+        private IIndex index;
 
-        public CodeBaseSearchService()
+        public CodeBaseSearchService(ISolutionOpenStrategy openStrategy)
         {
-            MSBuildWorkspace msWorkspace = MSBuildWorkspace.Create();
-            Solution solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
+            this.openStrategy = openStrategy ?? throw new ArgumentNullException(nameof(openStrategy));
+        }
 
-            foreach (Project project in solution.Projects)
+        public Task LoadAsync()
+        {
+            return LoadAsync(null);
+        }
+
+        public Task LoadAsync(IReporter reporter)
+        {
+            index = new SolutionIndex(openStrategy);
+            return index.LoadAsync(reporter);
+        }
+
+        public Task<IImmutableList<ISubject>> SearchAsync(SearchContext context)
+        {
+            if (index == null)
             {
-                if (string.IsNullOrEmpty(project.FilePath)
-                    || (!string.Equals(project.Language, "csharp", StringComparison.OrdinalIgnoreCase)
-                        && !string.Equals(project.Language, "c#", StringComparison.OrdinalIgnoreCase)))
-                {
-                    continue;
-                }
-
-                foreach (Document document in project.Documents)
-                {
-                    if (document.SourceCodeKind != SourceCodeKind.Regular)
-                    {
-                        continue;
-                    }
-
-                    //document.TryGetSyntaxTree();
-                    //document.GetSyntaxTreeAsync();
-                    //document.GetSyntaxVersionAsync();
-                }
+                return Task.FromResult<IImmutableList<ISubject>>(ImmutableList<ISubject>.Empty);
             }
 
+            return index.SearchAsync(context);
+        }
+
+        public IEnumerable<ICategory> GetCategories()
+        {
+            if (index == null)
+            {
+                return Enumerable.Empty<ICategory>();
+            }
+
+            return index.GetCategories();
         }
     }
 }

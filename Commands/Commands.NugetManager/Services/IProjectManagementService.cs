@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Commands.NugetManager.Model;
@@ -8,7 +8,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {
     public interface IProjectManagementService : IInitialisable, IDisposable
     {
-        IEnumerable<IProject> GetAllProjects();
+        IEnumerable<IProject> GetAll();
 
         IProject Get(string projectPath);
 
@@ -16,11 +16,13 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         void Remove(string projectPath);
 
-        IImmutableList<IProject> FindProjects(string searchTerm);
+        IImmutableList<IProject> Find(string searchTerm);
 
-        IImmutableList<IProject> FindProjectsByPackage(string packageId);
+        IImmutableList<IProject> FindByPackage(string packageId);
 
         void ReloadAll();
+
+        void Fetch();
 
         void Clear();
     }

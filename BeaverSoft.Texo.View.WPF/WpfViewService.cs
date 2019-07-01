@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Configuration;
@@ -242,19 +243,20 @@ namespace BeaverSoft.Texo.View.WPF
             e.CanExecute = true;
         }
 
-        private void OnLinkExecuted(object sender, ExecutedRoutedEventArgs e)
+        private async void OnLinkExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             e.Handled = true;
             string url = e.Parameter.ToString();
+
             IActionContext actionContext = actionParser.Parse(url);
-            
+
             if (actionContext.Name == ActionNames.INPUT_UPDATE)
             {
                 UpdateInput(actionContext);
                 return;
             }
 
-            executor.ExecuteAction(url);
+            await executor.ExecuteActionAsync(url);
         }
 
         public void Initialise(TexoControl context)
@@ -303,7 +305,7 @@ namespace BeaverSoft.Texo.View.WPF
                 return;
             }
 
-            executor.ExecuteAction(actionLink.Address.AbsoluteUri);
+            executor.ExecuteActionAsync(actionLink.Address.AbsoluteUri);
         }
 
         private void UpdateInput(IActionContext actionContext)
@@ -470,6 +472,13 @@ namespace BeaverSoft.Texo.View.WPF
 
             workingDirectory = message.NewValue;
 
+            if (workingDirectory.Length > 3
+                && (workingDirectory[workingDirectory.Length - 1] == System.IO.Path.AltDirectorySeparatorChar
+                    || workingDirectory[workingDirectory.Length - 1] == System.IO.Path.DirectorySeparatorChar))
+            {
+                workingDirectory = workingDirectory.Substring(0, workingDirectory.Length - 1);
+            }
+
             if (showWorkingPathAsPrompt)
             {
                 SetPrompt(workingDirectory);
@@ -510,16 +519,10 @@ namespace BeaverSoft.Texo.View.WPF
             control.Title = currentTitle;
         }
 
-        [Conditional("DEBUG")]
+        //[Conditional("DEBUG")]
         private void BuildInitialFlowDocument()
         {
-            // TODO: [P3] Write down info and version
-            control.OutputDocument.Blocks.Add(new Paragraph(new Run(DEFAULT_TITLE))
-            {
-                FontSize = 14
-            });
-
-            control.OutputDocument.Blocks.Add(new Paragraph(new Run("Markdown and text-based command line powered by PowerShell."))
+            control.OutputDocument.Blocks.Add(new Paragraph(new Run($"Terminal powered by Texo UI: v.{TexoEngine.Version}"))
             {
                 FontSize = 12,
                 FontStyle = FontStyles.Italic,

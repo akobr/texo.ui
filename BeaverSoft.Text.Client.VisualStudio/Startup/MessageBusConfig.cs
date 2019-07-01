@@ -1,3 +1,4 @@
+using BeaverSoft.Texo.Commands.NugetManager.Stage;
 using BeaverSoft.Texo.Fallback.PowerShell;
 using Commands.Clipboard;
 using StrongBeaver.Core.Container;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -128,7 +128,18 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override void WriteInformation(InformationRecord record)
         {
-            base.WriteInformation(record);
+            if (!(record?.MessageData is HostInformationMessage message) || message.NoNewLine != true)
+            {
+                base.WriteInformation(record);
+                return;
+            }
+
+            // When the script contains 'Write-Host -NoNewLine [MESSAGE]',
+            // we are expecting update message which will override current line.
+            resultBuilder.Write(
+                    '\r' + message.Message,
+                    message.ForegroundColor ?? ConsoleColor.White,
+                    message.BackgroundColor ?? ConsoleColor.Black);
         }
 
         public override void WriteProgress(long sourceId, ProgressRecord record)

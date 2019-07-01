@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace BeaverSoft.Texo.View.WPF.Rendering
 {
@@ -22,7 +23,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
         private delegate void RenderMethod(string text);
 
         private Brush backgroundBrush = Brushes.Transparent;
-        private Brush foregroundBrush = Brushes.White; // TODO: [P1] Solve this, should be base on theme!
+        private Brush foregroundBrush = Brushes.Transparent;
         private FontStyle fontStyle = FontStyles.Normal;
         private FontWeight fontWeight = FontWeights.Normal;
         private TextDecorationCollection decorations = new TextDecorationCollection();
@@ -276,9 +277,19 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
         {
             StringBuilder builder = new StringBuilder();
 
-            foreach (Run child in span.Inlines)
+            foreach (Inline child in span.Inlines)
             {
-                builder.Append(child.Text);
+                switch (child)
+                {
+                    case Run run:
+                        builder.Append(run.Text);
+                        break;
+
+                    case Hyperlink link:
+                        builder.Append(((Run)link.Inlines.FirstInline).Text);
+                        break;
+
+                }
             }
 
             return builder.ToString();
@@ -287,7 +298,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
         private void UpdateFormatting(string value)
         {
             // TODO: [P3] needs refactoring
-            if (value.Length > 10)
+            if (value.Length > 9)
             {
                 if(value.StartsWith("38;2"))
                 {
@@ -329,15 +340,8 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                     break;
 
                 case "31":
-                    foregroundBrush = Brushes.Red;
-                    break;
-
                 case "31;1":
-                    foregroundBrush = Brushes.DarkSalmon;                  
-                    break;
-
-                case "38;2;255;160;122": // #FFA07A
-                    foregroundBrush = Brushes.LightSalmon;
+                    foregroundBrush = Brushes.DarkSalmon;                    
                     break;
 
                 case "32":
@@ -426,7 +430,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
         private void ResetFormatting()
         {
             backgroundBrush = Brushes.Transparent;
-            foregroundBrush = Brushes.White; // TODO: [P1] Solve this, should be base on theme!
+            foregroundBrush = Brushes.Transparent;
             fontStyle = FontStyles.Normal;
             fontWeight = FontWeights.Normal;
             decorations.Clear();
@@ -434,7 +438,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
 
         private Inline CreateInline(string text)
         {
-            Inline result = new Run();
+            Inline result;
 
             if (isHyperlink)
             {
@@ -446,7 +450,6 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 {
                     Command = Commands.Hyperlink,
                     CommandParameter = url,
-                    TextDecorations = TextDecorations.Underline
                 };
 
                 link.SetResourceReference(FrameworkContentElement.StyleProperty, Styles.HyperlinkStyleKey);
@@ -458,18 +461,22 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
             else
             {
                 result = new Run(text);
+                result.FontWeight = fontWeight;
                 result.TextDecorations = decorations.Clone();
             }
 
-            result.Foreground = foregroundBrush;
+            if (foregroundBrush != Brushes.Transparent)
+            {
+                result.Foreground = foregroundBrush;
+            }
+            
             result.Background = backgroundBrush;
-            result.FontStyle = fontStyle;
-            result.FontWeight = fontWeight;
+            result.FontStyle = fontStyle;         
 
             return result;
         }
 
-        private void TryFinishStreamRender(IReportableStream stream)
+        private async void TryFinishStreamRender(IReportableStream stream)
         {
             if (!stream.IsCompleted)
             {
@@ -484,20 +491,31 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 return;
             }
 
-            if (streamedContainer?.Inlines.Count < 1)
-            {
-                streamedContainer.Dispatcher.BeginInvoke(new SetEmptyStream(SetEmptyCommandStream), streamedContainer);
-            }
+            await streamedContainer.Dispatcher.BeginInvoke(
+                    new SetEmptyStream(SetEmptyCommandStream),
+                    DispatcherPriority.ApplicationIdle,
+                    streamedContainer);
 
             streamedContainer = null;
             stream.Dispose();
             streamedOnAfterRender = null;
             streamedOnFinished?.Invoke();
             streamedOnFinished = null;
+            GC.Collect(3, GCCollectionMode.Forced, true);
         }
 
         private void SetEmptyCommandStream(Span target)
         {
+            if (target == null || !target.IsInitialized || target.Parent == null)
+            {
+                return;
+            }
+
+            if (target.Inlines.Count > 0)
+            {
+                return;
+            }
+
             target.Inlines.Add(new Run("command is done") { Foreground = Brushes.Gray });
         }
 

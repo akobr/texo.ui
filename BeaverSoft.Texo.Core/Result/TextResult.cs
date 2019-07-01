@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Commands;
 
 namespace BeaverSoft.Texo.Core.Result
 {
@@ -21,5 +21,10 @@ namespace BeaverSoft.Texo.Core.Result
         dynamic ICommandResult.Content => Content;
 
         public string Content { get; }
+
+        public static implicit operator TextResult(string result)
+        {
+            return new TextResult(result);
+        }
     }
 }

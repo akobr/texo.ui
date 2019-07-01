@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Model
 {
@@ -9,7 +9,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model
             // no operation
         }
 
-        public Package(string id, string version, bool canBeUpdated)
+        public Package(string id, string version, bool? canBeUpdated)
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));
             Version = version ?? throw new ArgumentNullException(nameof(version));
@@ -20,6 +20,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Model
 
         public string Version { get; set; }
 
-        public bool CanBeUpdated { get; set; }
+        public bool? CanBeUpdated { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Immutable;
 using StrongBeaver.Core;
 
@@ -12,6 +12,10 @@ namespace BeaverSoft.Texo.Core.Environment
 
         string GetVariable(string variable);
 
+        string GetVariable(string variable, string defaultValue);
+
         IImmutableDictionary<string, string> GetVariables();
+
+        void RegisterVariableStrategy(string variable, IVariableStrategy strategy);
     }
 }

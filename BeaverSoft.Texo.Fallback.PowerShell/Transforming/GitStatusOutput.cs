@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
@@ -47,6 +46,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
 
             Group fileGroup = match.Groups["path"];
             string path = fileGroup.Value;
+
+            if (!path.IsValidPath())
+            {
+                return Task.FromResult(data);
+            }
+
             Func<string, bool> pathCheckFunc = path.EndsWith("/") ? (Func<string, bool>)Directory.Exists : File.Exists;
             string fullPath = Path.Combine(PathConstants.RELATIVE_CURRENT_DIRECTORY, path);
 

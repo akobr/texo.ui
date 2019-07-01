@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
@@ -8,6 +8,7 @@ using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Services
 {
@@ -15,10 +16,12 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
     {
         private const string OFFICIAL_PACKAGE_REPOSITORY_URL = "https://packages.nuget.org/api/v2";
 
+        private readonly ILogService texoLogger;
         private ImmutableHashSet<string> sources;
 
-        public SourceManagementService()
+        public SourceManagementService(ILogService texoLogger)
         {
+            this.texoLogger = texoLogger;
             ResetSources();
         }
 
@@ -65,8 +68,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
                 {
                     if (result.TryGetValue(package.Id, out IPackageInfo existingPackage))
                     {
-                        result[package.Id] =
-                            new PackageInfo(package.Id, existingPackage.Versions.Union(package.Versions));
+                        result[package.Id] = new PackageInfo(package.Id, existingPackage.Versions.Union(package.Versions));
                     }
                     else
                     {
@@ -85,32 +87,6 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         private IEnumerable<IPackageInfo> GetPackagesFromRepository(string searchTerm, string repositoryUrl)
         {
-            //IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(repositoryUrl);
-            //var versions = new Dictionary<string, ImmutableSortedSet<string>.Builder>(new InsensitiveStringComparer());
-            //var previousPackageVersions = ImmutableSortedSet.CreateBuilder<string>(new InsensitiveOpositeStringComparer());
-            //string previousPackageId = string.Empty;
-
-            //foreach (NuGet.IPackage nugetPackage in repo.Search(searchTerm, true))
-            //{
-            //    if (!string.Equals(previousPackageId, nugetPackage.Id, StringComparison.OrdinalIgnoreCase))
-            //    {
-            //        previousPackageId = nugetPackage.Id;
-
-            //        if (!versions.TryGetValue(previousPackageId, out previousPackageVersions))
-            //        {
-            //            previousPackageVersions = ImmutableSortedSet.CreateBuilder<string>(new InsensitiveOpositeStringComparer());
-            //            versions[previousPackageId] = previousPackageVersions;
-            //        }
-            //    }
-
-            //    previousPackageVersions.Add(nugetPackage.Version.ToNormalizedString());
-            //}
-
-            //foreach (var packagePair in versions)
-            //{
-            //    yield return new PackageInfo(packagePair.Key, packagePair.Value.ToImmutable());
-            //}
-
             var packages = new Dictionary<string, ImmutableSortedSet<string>.Builder>(new InsensitiveStringComparer());
             var previousPackageVersions =
                 ImmutableSortedSet.CreateBuilder<string>(new InsensitiveOpositeStringComparer());
@@ -118,8 +94,9 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
             PackageSearchResource resource = BuildSearchResource(repositoryUrl);
             var searchResult = resource.SearchAsync(
-                searchTerm, new SearchFilter(true), 0, 10,
-                new Logger(), CancellationToken.None).Result;
+                searchTerm, new SearchFilter(true, null) { OrderBy = null }, 0, 10,
+                new Logger(texoLogger), CancellationToken.None).Result;
+
 
             foreach (IPackageSearchMetadata metadata in searchResult)
             {
@@ -147,25 +124,8 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             }
         }
 
-        private static IPackageInfo GetPackageFromRepository(string packageId, string repositoryUrl)
+        private IPackageInfo GetPackageFromRepository(string packageId, string repositoryUrl)
         {
-            //IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(repositoryUrl);
-            //var versions = ImmutableSortedSet.CreateBuilder<string>(new InsensitiveOpositeStringComparer());
-            //NuGet.IPackage lastNugetPackage = null;
-
-            //foreach (NuGet.IPackage nugetPackage in repo.FindPackagesById(packageId))
-            //{
-            //    lastNugetPackage = nugetPackage;
-            //    versions.Add(nugetPackage.Version.ToNormalizedString());
-            //}
-
-            //if (lastNugetPackage == null)
-            //{
-            //    return null;
-            //}
-
-            //return new PackageInfo(lastNugetPackage.Id, versions.ToImmutable());
-
             PackageMetadataResource resourse = BuildPackageResource(repositoryUrl);
             string resultPackageId = packageId;
             var versions = ImmutableSortedSet.CreateBuilder<string>(new InsensitiveOpositeStringComparer());
@@ -173,7 +133,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
             var metadataResult = resourse.GetMetadataAsync(
                 packageId,
                 true, true,
-                null, new Logger(),
+                null, new Logger(texoLogger),
                 CancellationToken.None).Result;
 
             foreach (IPackageSearchMetadata metadata in metadataResult)
@@ -218,6 +178,13 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
         public class Logger : ILogger
         {
+            private readonly ILogService texoLogger;
+
+            public Logger(ILogService texoLogger)
+            {
+                this.texoLogger = texoLogger;
+            }
+
             public void LogDebug(string data)
             {
             }
@@ -236,10 +203,12 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
             public void LogWarning(string data)
             {
+                texoLogger.Warn(data);
             }
 
             public void LogError(string data)
             {
+                texoLogger.Error(data);
             }
 
             public void LogInformationSummary(string data)
@@ -248,20 +217,62 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Services
 
             public void Log(LogLevel level, string data)
             {
+                switch (level)
+                {
+                    case LogLevel.Warning:
+                        LogWarning(data);
+                        break;
+
+                    case LogLevel.Error:
+                        LogError(data);
+                        break;
+                }
             }
 
             public Task LogAsync(LogLevel level, string data)
             {
-                return Task.FromResult(0);
+                switch (level)
+                {
+                    case LogLevel.Warning:
+                        LogWarning(data);
+                        break;
+
+                    case LogLevel.Error:
+                        LogError(data);
+                        break;
+                }
+
+                return Task.CompletedTask;
             }
 
-            public void Log(ILogMessage message)
+            public void Log(NuGet.Common.ILogMessage message)
             {
+                switch (message.Level)
+                {
+                    case LogLevel.Warning:
+                        LogWarning(message.Message);
+                        break;
+
+                    case LogLevel.Error:
+                        LogError(message.Message);
+                        break;
+                }
             }
 
-            public Task LogAsync(ILogMessage message)
+            public Task LogAsync(NuGet.Common.ILogMessage message)
             {
-                return Task.FromResult(0);
+                switch(message.Level)
+                {
+                    case LogLevel.Warning:
+                        LogWarning(message.Message);
+                        break;
+
+                    case LogLevel.Error:
+                        LogError(message.Message);
+                        break;
+                }
+
+                return Task.CompletedTask;
             }
         }
     }

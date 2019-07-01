@@ -1,7 +1,9 @@
-﻿namespace BeaverSoft.Texo.Core.Path.Actions
+using System.Threading.Tasks;
+
+namespace BeaverSoft.Texo.Core.Path.Actions
 {
     public interface IOpenFileStrategy
     {
-        void Open(string fileDirectory);
+        Task OpenAsync(string fileDirectory);
     }
 }

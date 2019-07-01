@@ -1,5 +1,4 @@
-﻿using System;
-using BeaverSoft.Texo.Commands.FileManager.Stage;
+using System;
 using BeaverSoft.Texo.Commands.NugetManager.Manage;
 using BeaverSoft.Texo.Commands.NugetManager.Operations;
 using BeaverSoft.Texo.Commands.NugetManager.Services;
@@ -23,7 +22,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager
             RegisterCommand(StageQueries.STAGE, new StageCommand(stage));
 
             // Management
-            RegisterCommand(ManageQueries.PROJECT, new ProjectCommand(management.Projects, management.Packages));
+            RegisterCommand(ManageQueries.PROJECT, new ProjectCommand(management.Projects));
             RegisterCommand(ManageQueries.PACKAGE, new PackageCommand(management.Packages, management.Projects));
 
             // Operations

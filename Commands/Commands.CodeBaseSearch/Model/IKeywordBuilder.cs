@@ -2,8 +2,8 @@
 
 namespace Commands.CodeBaseSearch.Model
 {
-    public interface IGroup : ISearchable
+    public interface IKeywordBuilder
     {
-        IImmutableList<ISubject> Items { get; }
+        IImmutableList<string> Build();
     }
 }

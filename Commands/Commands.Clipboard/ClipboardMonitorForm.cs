@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -6,28 +6,40 @@ using StrongBeaver.Core.Services;
 
 namespace Commands.Clipboard
 {
-    [DefaultEvent("ClipboardChanged")]
-    public class ClipboardMonitor : Control, IClipboardMonitor
+    public class ClipboardMonitorForm : Form, IClipboardMonitor
     {
         private readonly IServiceMessageBus messageBus;
         private IntPtr nextClipboardViewer;
 
-        public ClipboardMonitor(IServiceMessageBus messageBus)
-        {
-            this.messageBus = messageBus;
-        }
-
         public event EventHandler<EventArgs> ClipboardChanged;
 
-        public void Initialise()
+        public ClipboardMonitorForm(IServiceMessageBus messageBus)
         {
+            this.messageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
+
+            WindowState = FormWindowState.Minimized;
+            ShowInTaskbar = false;
+            Opacity = 0.0;
+            SetVisibleCore(false);
+        }
+
+        public void Initialise(IWin32Window window)
+        {
+            Show(window);
             nextClipboardViewer = (IntPtr)SetClipboardViewer((int)Handle);
             messageBus.Send(new ClipboardMonitorReadyMessage(this));
         }
 
         protected override void Dispose(bool disposing)
         {
-            ChangeClipboardChain(Handle, nextClipboardViewer);
+            try
+            {
+                ChangeClipboardChain(Handle, nextClipboardViewer);
+            }
+            catch (Win32Exception)
+            {
+                // swallows error with non-existing window handler
+            }
         }
 
         [DllImport("User32.dll")]

@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using BeaverSoft.Texo.Commands.FileManager.Extensions;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
+using BeaverSoft.Texo.Commands.FileManager.Stash;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Markdown.Builder;
@@ -16,27 +17,31 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
     public class CopyCommand : ICommand
     {
         private readonly IStageService stage;
+        private readonly IStashService stashes;
         private readonly ILogService logger;
 
-        public CopyCommand(IStageService stage, ILogService logger)
+        public CopyCommand(IStageService stage, IStashService stashes, ILogService logger)
         {
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
+            this.stashes = stashes ?? throw new ArgumentNullException(nameof(stashes));
             this.logger = logger;
         }
 
         public ICommandResult Execute(CommandContext context)
         {
-            if (!stage.TryGetPaths(out var paths))
+            IOperationSource source = context.GetOperationSource(stage, stashes);
+
+            if (source.IsNullOrEmpty())
             {
                 return new TextResult("The stage is empty.");
             }
 
             CopyContext copyContext = new CopyContext
             {
-                Items = paths,
+                Items = source.GetPaths(),
                 Destination = context.GetTargetDirectory(),
-                SourceLobby = stage.GetLobby(),
-                Flat = context.HasOption(ApplyOptions.FLATTEN) || !stage.HasLobby(),
+                SourceLobby = source.GetLobby(),
+                Flat = context.HasOption(ApplyOptions.FLATTEN) || !source.HasLobby(),
                 Overwrite = context.HasOption(ApplyOptions.OVERWRITE),
                 Preview = context.HasOption(ApplyOptions.PREVIEW)
             };

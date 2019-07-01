@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Core.Actions
 {
     public interface IAction
     {
-        void Execute(IDictionary<string, string> arguments);
+        Task ExecuteAsync(IDictionary<string, string> arguments);
     }
 }

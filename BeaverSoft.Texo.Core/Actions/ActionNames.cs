@@ -1,4 +1,4 @@
-﻿namespace BeaverSoft.Texo.Core.Actions
+namespace BeaverSoft.Texo.Core.Actions
 {
     public static class ActionNames
     {
@@ -12,5 +12,7 @@
 
         public const string COMMAND = "command";
         public const string COMMAND_RUN = "command-run";
+
+        public const string URI = "uri";
     }
 }

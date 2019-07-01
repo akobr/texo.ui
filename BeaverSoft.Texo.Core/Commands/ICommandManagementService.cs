@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace BeaverSoft.Texo.Core.Commands
 {
@@ -6,6 +6,6 @@ namespace BeaverSoft.Texo.Core.Commands
     {
         bool HasCommand(string commandKey);
 
-        ICommand BuildCommand(string commandKey);
+        object BuildCommand(string commandKey);
     }
 }

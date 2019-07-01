@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
@@ -30,6 +30,8 @@ namespace BeaverSoft.Texo.Core.Model.Text
         }
 
         public IInline Content => null;
+
+        public IImmutableList<IListItem> Items => items;
 
         public List AddItem(IListItem itemToAdd)
         {

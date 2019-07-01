@@ -1,4 +1,4 @@
-﻿namespace BeaverSoft.Texo.Core.Actions
+namespace BeaverSoft.Texo.Core.Actions
 {
     public static class ActionParameters
     {
@@ -9,5 +9,7 @@
         
         public const string ACTION_NAME = "action-name";
         public const string ACTION_ARGS = "action-args";
+
+        public const string URI = "uri";
     }
 }

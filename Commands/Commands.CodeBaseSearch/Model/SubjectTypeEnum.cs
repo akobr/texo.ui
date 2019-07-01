@@ -1,8 +1,12 @@
-﻿namespace Commands.CodeBaseSearch.Model
+namespace Commands.CodeBaseSearch.Model
 {
     public enum SubjectTypeEnum
     {
-        File,
+        Unknown = 0,
+        Solution,
+        Project,
+        Group,
+        Document,
         Type,
         Member
     }

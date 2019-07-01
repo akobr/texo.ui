@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.NugetManager.Model;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Extensions;
@@ -21,8 +20,10 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
 
             RegisterQueryMethod(StageQueries.STATUS, Status);
+            RegisterQueryMethod(StageQueries.FETCH, Fetch);
             RegisterQueryMethod(StageQueries.ADD, Add);
             RegisterQueryMethod(StageQueries.REMOVE, Remove);
+            RegisterQueryMethod(StageQueries.CLEAR, Clear);
         }
 
         private ICommandResult Status(CommandContext context)
@@ -54,6 +55,12 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
             return new ItemsResult(items.ToImmutable());
         }
 
+        private ICommandResult Fetch(CommandContext context)
+        {
+            stage.Fetch();
+            return Status(context);
+        }
+
         private ICommandResult Add(CommandContext context)
         {
             var beforeProjects = stage.GetProjects();
@@ -82,6 +89,12 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
             }
 
             return new ItemsResult(removedProjects.Select(p => Item.Plain(p.Name)).ToImmutableList());
+        }
+
+        private ICommandResult Clear(CommandContext arg)
+        {
+            stage.Clear();
+            return new TextResult("The stage has been cleared.");
         }
 
         private IEnumerable<Item> BuildConfigs()
@@ -117,7 +130,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
             return Item.Markdown(builder.ToString());
         }
 
-        private static IEnumerable<Item> BuildProjectItems(IEnumerable<IProject> projects)
+        internal static IEnumerable<Item> BuildProjectItems(IEnumerable<IProject> projects)
         {
             List<Item> result = new List<Item>();
 
@@ -144,9 +157,9 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
         {
             builder.Bullet();
 
-            if (package.CanBeUpdated)
+            if (package.CanBeUpdated != null && package.CanBeUpdated.Value)
             {
-                builder.Bold(package.Id);
+                builder.Marked(package.Id);
             }
             else
             {

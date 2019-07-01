@@ -1,8 +1,6 @@
-﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.MSBuild;
+using Microsoft.Build.Construction;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 {
@@ -20,19 +18,21 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
                 yield break;
             }
 
-            MSBuildWorkspace msWorkspace = MSBuildWorkspace.Create();
-            Solution solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
+            // This is too heavy!
+            // MSBuildWorkspace msWorkspace = MSBuildWorkspace.Create();
+            // Solution solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
 
-            foreach (var project in solution.Projects)
+            SolutionFile solution = SolutionFile.Parse(solutionPath);
+
+            foreach (var project in solution.ProjectsInOrder)
             {
-                if (string.IsNullOrEmpty(project.FilePath)
-                    || (!string.Equals(project.Language, "csharp", StringComparison.OrdinalIgnoreCase)
-                        && !string.Equals(project.Language, "c#", StringComparison.OrdinalIgnoreCase)))
+                if (project.ProjectType != SolutionProjectType.KnownToBeMSBuildFormat
+                    || string.IsNullOrEmpty(project.AbsolutePath))
                 {
                     continue;
                 }
 
-                yield return project.FilePath;
+                yield return project.AbsolutePath;
             }
         }
     }

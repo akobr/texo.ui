@@ -1,11 +1,14 @@
 using System.Windows;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Actions;
+using BeaverSoft.Texo.Core.Actions.Implementations;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Core.View.Actions;
 using BeaverSoft.Texo.Test.Client.WPF.Actions;
 using BeaverSoft.Texo.Test.Client.WPF.Startup;
+using Commands.CodeBaseSearch;
 using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services;
 using StrongBeaver.Core.Services.Logging;
@@ -40,7 +43,9 @@ namespace BeaverSoft.Texo.Test.Client.WPF
 
             engineBuilder.WithFallbackService(container.GetInstance<IFallbackService>());
             TexoEngine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
-            TexoEngine.RegisterAction(new PathOpenActionFactory(), ActionNames.PATH_OPEN, ActionNames.PATH);
+            TexoEngine.RegisterAction(new SimpleActionFactory<UriOpenAction>(), ActionNames.URI);
+            TexoEngine.RegisterAction(new PathOpenActionFactory(container.GetInstance<IExecutor>()), ActionNames.PATH_OPEN, ActionNames.PATH);
+            TexoEngine.RegisterAction(new InputSetActionFactory(container.GetInstance<IViewService>()), ActionNames.INPUT_SET, ActionNames.INPUT);
 
             ServiceMessageBus = container.GetInstance<IServiceMessageBus>();
             container.RegisterWithMessageBus();
@@ -48,6 +53,10 @@ namespace BeaverSoft.Texo.Test.Client.WPF
 
             await TexoEngine.InitialiseWithCommandsAsync();        
             TexoEngine.Start();
+
+            //var searchService = container.GetInstance<ICodeBaseSearchService>();
+            //await searchService.PreLoadAsync();
+            //await searchService.LoadAsync();
         }
 
         protected override void OnExit(ExitEventArgs e)

@@ -15,10 +15,10 @@ namespace BeaverSoft.Text.Client.VisualStudio.Actions
 
         public PathOpenAction(ExtensionContext context)
         {
-            this.context = context;
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async void Execute(IDictionary<string, string> arguments)
+        public async Task ExecuteAsync(IDictionary<string, string> arguments)
         {
             if (!arguments.TryGetValue(ActionParameters.PATH, out string path))
             {

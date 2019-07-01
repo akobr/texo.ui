@@ -1,4 +1,4 @@
-﻿using StrongBeaver.Core.Messaging;
+using StrongBeaver.Core.Messaging;
 using StrongBeaver.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,8 @@ namespace Commands.Clipboard
             historySet = new HashSet<IClipboardItem>();
             history = new List<IClipboardItem>();
         }
+
+        public int HistoryCount => history.Count;
 
         public ClipboardConfiguration Configuration { get; }
 

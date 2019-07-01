@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>BeaverSoft.Texo.Test.Client.WPF</RootNamespace>
     <AssemblyName>BeaverSoft.Texo.Test.Client.WPF</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -28,6 +28,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -52,11 +53,14 @@
     <ApplicationIcon>icon-purple.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bogus, Version=27.0.1.0, Culture=neutral, PublicKeyToken=fa1bb3f3f218129a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bogus.27.0.1\lib\net40\Bogus.dll</HintPath>
+    </Reference>
     <Reference Include="CalcEngine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\CalcEngine.1.0.0\lib\netstandard2.0\CalcEngine.dll</HintPath>
     </Reference>
-    <Reference Include="FluentWPF, Version=0.6.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentWPF.0.6.1\lib\net45\FluentWPF.dll</HintPath>
+    <Reference Include="FluentWPF, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentWPF.0.7.0\lib\net45\FluentWPF.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -174,6 +178,10 @@
       <Project>{694220f2-5d6e-4543-8c3c-0ac6acabc957}</Project>
       <Name>Commands.Clipboard</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.CodeBaseSearch\Commands.CodeBaseSearch.csproj">
+      <Project>{15AFB5D0-4D42-4077-9F04-0D83E8D70D79}</Project>
+      <Name>Commands.CodeBaseSearch</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.CommandLine\Commands.CommandLine.csproj">
       <Project>{620b936c-b2a0-4b37-97da-11e32b858d7c}</Project>
       <Name>Commands.CommandLine</Name>
@@ -201,6 +209,10 @@
     <ProjectReference Include="..\Commands\Commands.ReferenceCheck\Commands.ReferenceCheck.csproj">
       <Project>{02d86f64-24cc-4728-8e3a-e269fa55c109}</Project>
       <Name>Commands.ReferenceCheck</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.SpinSport\Commands.SpinSport.csproj">
+      <Project>{636e7983-c0d3-49d1-b83a-a1de7887f182}</Project>
+      <Name>Commands.SpinSport</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

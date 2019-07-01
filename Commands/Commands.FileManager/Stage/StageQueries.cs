@@ -1,4 +1,4 @@
-﻿namespace BeaverSoft.Texo.Commands.FileManager.Stage
+namespace BeaverSoft.Texo.Commands.FileManager.Stage
 {
     public static class StageQueries
     {
@@ -9,5 +9,6 @@
         public const string REMOVE = "remove";
         public const string LOBBY = "lobby";
         public const string REMOVE_LOBBY = "remove-lobby";
+        public const string CLEAR = "clear";
     }
 }

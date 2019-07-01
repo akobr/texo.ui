@@ -40,6 +40,15 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
                 {
                     data.Command += " --progress";
                 }
+
+                if (string.Equals(command, "push", StringComparison.OrdinalIgnoreCase))
+                {
+                    data.Flags.Add(TransformationFlags.GIT_PUSH);
+                }
+                else if(string.Equals(command, "branch", StringComparison.OrdinalIgnoreCase))
+                {
+                    data.Flags.Add(TransformationFlags.GIT_BRANCH);
+                }
             }
 
             data.Flags.Add(TransformationFlags.GIT);

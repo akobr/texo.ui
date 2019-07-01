@@ -50,7 +50,12 @@
     <Compile Include="EmptyControl.xaml.cs">
       <DependentUpon>EmptyControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Environment\SolutionDirectoryStrategy.cs" />
+    <Compile Include="Environment\SolutionFileStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\DteProvider.cs" />
+    <Compile Include="Providers\DteSolutionPathProvider.cs" />
+    <Compile Include="Search\CurrentSolutionOpenStrategy.cs" />
     <Compile Include="Startup\CommandConfig.cs" />
     <Compile Include="Startup\ContainerConfig.cs" />
     <Compile Include="Startup\IntellisenseConfig.cs" />
@@ -83,6 +88,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Bogus">
+      <Version>27.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Markdig">
       <Version>0.16.0</Version>
     </PackageReference>
@@ -91,6 +99,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="15.9.3" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.0.2264" />
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>11.0.2</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="EmptyControl.xaml">
@@ -127,6 +138,10 @@
       <Project>{415687a3-acd3-463a-9d86-8202ef06071f}</Project>
       <Name>BeaverSoft.Texo.View.WPF</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BeaverSoft.Text.Client.VisualStudio.Core\BeaverSoft.Text.Client.VisualStudio.Core.csproj">
+      <Project>{3d71844c-8591-426e-8cee-40de11aae1c4}</Project>
+      <Name>BeaverSoft.Text.Client.VisualStudio.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.Calc\Commands.Calc.csproj">
       <Project>{ee949f35-15bd-47d3-bc1e-01c18847cf6b}</Project>
       <Name>Commands.Calc</Name>
@@ -134,6 +149,10 @@
     <ProjectReference Include="..\Commands\Commands.Clipboard\Commands.Clipboard.csproj">
       <Project>{694220f2-5d6e-4543-8c3c-0ac6acabc957}</Project>
       <Name>Commands.Clipboard</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.CodeBaseSearch\Commands.CodeBaseSearch.csproj">
+      <Project>{15afb5d0-4d42-4077-9f04-0d83e8d70d79}</Project>
+      <Name>Commands.CodeBaseSearch</Name>
     </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.CommandLine\Commands.CommandLine.csproj">
       <Project>{620b936c-b2a0-4b37-97da-11e32b858d7c}</Project>
@@ -159,6 +178,16 @@
       <Project>{02d86f64-24cc-4728-8e3a-e269fa55c109}</Project>
       <Name>Commands.ReferenceCheck</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.SpinSport\Commands.SpinSport.csproj">
+      <Project>{636e7983-c0d3-49d1-b83a-a1de7887f182}</Project>
+      <Name>Commands.SpinSport</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Newtonsoft.Json.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

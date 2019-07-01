@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Configuration;
+using BeaverSoft.Texo.Core.Configuration;
 
 namespace Commands.Clipboard
 {
@@ -19,7 +19,7 @@ namespace Commands.Clipboard
             history.Representations.AddRange(
                 new[] { ClipboardConstants.QUERY_HISTORY, "list" });
             history.Documentation.Title = "clipboard-history";
-            history.Documentation.Description = "Show entire history of the clipboard (maximum of 40 items).";
+            history.Documentation.Description = "Show entire history of the clipboard (maximum of 42 items).";
 
             var optionClear = Option.CreateBuilder();
             optionClear.Key = ClipboardConstants.OPTION_CLEAR;
@@ -64,7 +64,7 @@ namespace Commands.Clipboard
             var parameterFlag = Parameter.CreateBuilder();
             parameterFlag.Key = ClipboardConstants.PARAMETER_FLAG;
             parameterFlag.IsOptional = true;
-            parameterFlag.ArgumentTemplate = "(true|false|t|f|0|1)";
+            parameterFlag.ArgumentTemplate = "^(true|false|t|f|0|1)$";
             parameterFlag.Documentation.Title = ClipboardConstants.PARAMETER_FLAG;
             parameterFlag.Documentation.Description = "The value of a flag.";
 

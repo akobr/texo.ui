@@ -13,11 +13,20 @@ namespace Commands.Dotnet
     {
         private readonly IFallbackService fallback;
         private readonly IIntellisenseCache cache;
+        private readonly HashSet<string> commandsToCache;
 
         public DotnetIntellisenseProvider(IFallbackService fallback)
         {
             this.fallback = fallback ?? throw new ArgumentNullException(nameof(fallback));
             cache = new IntellisenseCache();
+
+            commandsToCache = new HashSet<string>(
+                new string[] {
+                    "dotnet ", "dotnet clean ", "dotnet restore ", "dotnet build ",
+                    "dotnet msbuild ", "dotnet build-server ", "dotnet run ",
+                    "dotnet test ", "dotnet vstest ",
+                    "dotnet pack ", "dotnet publish " },
+                StringComparer.OrdinalIgnoreCase);
         }
 
         public async Task<IEnumerable<IItem>> GetHelpAsync(Input input)
@@ -45,7 +54,12 @@ namespace Commands.Dotnet
             }
 
             var newItems = commandResults.Select<string, IItem>(item => Item.Intellisense(item, item.StartsWith("-") ? "option" : "command", null));
-            cache.Set(dotnetInput, newItems);
+
+            if (commandsToCache.Contains(dotnetInput))
+            {
+                cache.Set(dotnetInput, newItems);
+            }
+
             return newItems;
         }
     }

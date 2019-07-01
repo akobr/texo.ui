@@ -14,17 +14,82 @@ namespace BeaverSoft.Texo.View.WPF
     {
         private bool skipNextTextChange;
         private string prompt;
+        private bool isInputDisabled;
 
-        public TexoControl()
-        {
-            InitializeComponent();
-            docOutput.Document = new FlowDocument();
-        }
+        public static readonly DependencyProperty TextBaseColorProperty =
+            DependencyProperty.Register(nameof(TextBaseColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Colors.White));
+
+        public static readonly DependencyProperty TextInfoColorProperty =
+            DependencyProperty.Register(nameof(TextInfoColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Color.FromRgb(153, 153, 153)));
+
+        public static readonly DependencyProperty BackgroundBaseColorProperty =
+            DependencyProperty.Register(nameof(BackgroundBaseColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Colors.Black));
+
+        public static readonly DependencyProperty BorderBaseColorProperty =
+            DependencyProperty.Register(nameof(BorderBaseColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Colors.Black));
+
+        public static readonly DependencyProperty AccentColorProperty =
+            DependencyProperty.Register(nameof(AccentColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Color.FromRgb(39, 124, 212)));
+
+        public static readonly DependencyProperty ShadowsVisibilityProperty =
+            DependencyProperty.Register(nameof(ShadowsVisibility), typeof(Visibility), typeof(TexoControl),new PropertyMetadata(Visibility.Visible));
 
         public event EventHandler<string> InputChanged;
         public event EventHandler<string> InputFinished;
         public event EventHandler<KeyScrollDirection> KeyScrolled;
         public event EventHandler IntellisenseItemExecuted;
+
+        public TexoControl()
+        {
+            InitializeComponent();
+            docOutput.Document = new FlowDocument();
+            InitiliaseColors();
+        }
+
+        private void InitiliaseColors()
+        {
+            SetResourceReference(TextBaseColorProperty, "SystemBaseHighColor");
+            SetResourceReference(TextInfoColorProperty, "SytemBaseMediumColor");
+            AccentColor = SystemParameters.WindowGlassColor; // SetResourceReference(AccentColorProperty, "ImmersiveSystemAccent");
+            SetResourceReference(BackgroundBaseColorProperty, "SystemAltHighColor");
+            SetResourceReference(BorderBaseColorProperty, "SystemAltHighColor");
+        }
+
+        public Color TextBaseColor
+        {
+            get => (Color)GetValue(TextBaseColorProperty);
+            set => SetValue(TextBaseColorProperty, value);
+        }
+
+        public Color TextInfoColor
+        {
+            get => (Color)GetValue(TextInfoColorProperty);
+            set => SetValue(TextInfoColorProperty, value);
+        }
+
+        public Color BackgroundBaseColor
+        {
+            get => (Color)GetValue(BackgroundBaseColorProperty);
+            set => SetValue(BackgroundBaseColorProperty, value);
+        }
+
+        public Color BorderBaseColor
+        {
+            get => (Color)GetValue(BorderBaseColorProperty);
+            set => SetValue(BorderBaseColorProperty, value);
+        }
+
+        public Color AccentColor
+        {
+            get => (Color)GetValue(AccentColorProperty);
+            set => SetValue(AccentColorProperty, value);
+        }
+
+        public Visibility ShadowsVisibility
+        {
+            get => (Visibility)GetValue(ShadowsVisibilityProperty);
+            set => SetValue(ShadowsVisibilityProperty, value);
+        }
 
         public FlowDocument OutputDocument => docOutput.Document;
 
@@ -43,21 +108,29 @@ namespace BeaverSoft.Texo.View.WPF
         public string Title
         {
             get => lbTitle.Text;
-            set => lbTitle.Text = value;
+            set
+            {
+                lbTitle.Text = value;
+                lbTitle.ToolTip = value;
+            }
         }
 
         public bool IsIntellisenseOpened => listIntellisense.Visibility == Visibility.Visible;
 
         public void EnableInput()
         {
-            tbInput.IsReadOnly = false;
             CancelProgress();
+            tbInput.SetResourceReference(ForegroundProperty, "OutputForegroundBrush");
+            //tbInput.IsReadOnly = false;
+            isInputDisabled = false;
         }
 
         public void DisableInput()
         {
+            isInputDisabled = true;
             progress.IsIndeterminate = true;
-            tbInput.IsReadOnly = true;
+            tbInput.Foreground = Brushes.Salmon; // TODO: [P1] Make this a dependency property
+            //tbInput.IsReadOnly = true;
         }
 
         public void CloseIntellisense()
@@ -87,13 +160,18 @@ namespace BeaverSoft.Texo.View.WPF
 
         public void TryFinishInput()
         {
+            if (isInputDisabled)
+            {
+                return;
+            }
+
             string input = GetInput();
 
             if (string.IsNullOrWhiteSpace(input))
             {
                 return;
             }
-
+                       
             EmptyInput();
             InputFinished?.Invoke(this, input);
         }
@@ -103,7 +181,8 @@ namespace BeaverSoft.Texo.View.WPF
             skipNextTextChange = true;
             tbInput.Text = input;
             tbInput.CaretIndex = tbInput.Text.Length;
-            
+            tbInput.Focus();
+
             //TextRange range = new TextRange(control.InputBox.Document.ContentStart, control.InputBox.Document.ContentEnd);
             //range.Text = historyItem.Input.ParsedInput.RawInput;
             //control.InputBox.CaretPosition = control.InputBox.Document.ContentEnd;
@@ -143,12 +222,12 @@ namespace BeaverSoft.Texo.View.WPF
 
         public void SetHistoryCount(int count)
         {
-            lbHistoryCount.Text = $"History ({count})";
+            lbHistoryCount.Text = $"H ({count})";
         }
 
         public void SetVariableCount(int count)
         {
-            lbVariableCount.Text = $"Variables ({count})";
+            lbVariableCount.Text = $"V ({count})";
         }
 
         public void CleanResults()
@@ -296,16 +375,28 @@ namespace BeaverSoft.Texo.View.WPF
                 return;
             }
 
-            char character = KeyUtils.GetCharFromKey(e.Key);
-
-            if (character < 32 || character > 126)
+            if (e.Key == Key.Back)
             {
-                return;
+                if (tbInput.Text.Length > 0)
+                {
+                    tbInput.Text = tbInput.Text.Substring(0, tbInput.Text.Length - 1);
+                }
+            }
+            else if (e.Key != Key.Delete)
+            {
+                char character = KeyUtils.GetCharFromKey(e.Key);
+
+                if (character < 32 || character > 126)
+                {
+                    return;
+                }
+
+                tbInput.Text += char.ToLower(character);
+                tbInput.CaretIndex = tbInput.Text.Length;
             }
 
-            e.Handled = true;
-            tbInput.Text += char.ToLower(character);
             tbInput.CaretIndex = tbInput.Text.Length;
+            e.Handled = true;           
             FocusInput();
         }
 
@@ -371,26 +462,21 @@ namespace BeaverSoft.Texo.View.WPF
             return null;
         }
 
-        private void HandleIntellisenseMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            
-        }
-
         private void HandleInputGotFocus(object sender, RoutedEventArgs e)
         {
-            bInput.BorderBrush = SystemParameters.WindowGlassBrush;
-            SwitchProgresForegroundAndBorderBrush();
+            bInput.SetResourceReference(BorderBrushProperty, "AccentBrush");
+            //SwitchProgressForegroundAndBorderBrush();
         }
 
         private void HandleInputLostFocus(object sender, RoutedEventArgs e)
         {
             bInput.SetResourceReference(BorderBrushProperty, "InputBorderBrush");
             //bInput.BorderBrush = Brushes.Black;
-            SwitchProgresForegroundAndBorderBrush();
+            //SwitchProgressForegroundAndBorderBrush();
             CloseIntellisense();
         }
 
-        private void SwitchProgresForegroundAndBorderBrush()
+        private void SwitchProgressForegroundAndBorderBrush()
         {
             var brush = progress.BorderBrush;
             progress.BorderBrush = progress.Foreground;
@@ -406,6 +492,13 @@ namespace BeaverSoft.Texo.View.WPF
 
             listIntellisense.SelectedItem = clickedItem;
             IntellisenseItemExecuted?.Invoke(this, new EventArgs());
+        }
+
+        private void HeaderGridSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            lbTitle.HorizontalAlignment = (pHeaderInfo.ActualWidth + lbTitle.ActualWidth) > gHeader.ActualWidth
+                    ? HorizontalAlignment.Right
+                    : HorizontalAlignment.Left;
         }
     }
 }

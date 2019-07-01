@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace BeaverSoft.Texo.Core.Inputting.History
 {
     public class InputHistoryService : IInputHistoryService
     {
-        private const int HISTORY_CAPACITY = 30;
+        private const int HISTORY_CAPACITY = 42;
         private readonly LinkedList<HistoryItem> history;
 
         public InputHistoryService()

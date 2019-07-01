@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Linq;
@@ -60,8 +60,8 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
 
             foreach (XElement elementReference in root.Descendants(xmlNamespace + "PackageReference"))
             {
-                string packageId = (string)elementReference.Attribute("Include");
-                string version = (string)elementReference.Attribute("Version");
+                string packageId = GetValueFromElement(elementReference, "Include", xmlNamespace);
+                string version = GetValueFromElement(elementReference, "Version", xmlNamespace);
 
                 if (string.IsNullOrWhiteSpace(packageId)
                     || string.IsNullOrWhiteSpace(version))
@@ -106,7 +106,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
             foreach (XElement elementPackage in root.Elements(xmlNamespace + "package"))
             {
                 string packageId = (string)elementPackage.Attribute("id");
-                string version = (string)elementPackage.Attribute("version");
+                string version = GetValueFromElement(elementPackage, "version", xmlNamespace);
 
                 if (string.IsNullOrWhiteSpace(packageId)
                     || string.IsNullOrWhiteSpace(version))
@@ -119,13 +119,30 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Processing.Strategies
             }
         }
 
-        private bool CanBeUpdated(string packageId, string version)
+        private string GetValueFromElement(XElement element, string valueName, XNamespace xmlNamespace)
+        {
+            string value = (string)element.Attribute(valueName);
+
+            if (value == null)
+            {
+                var elementValue = element.Element(xmlNamespace + valueName);
+
+                if (elementValue != null)
+                {
+                    value = elementValue.Value;
+                }
+            }
+
+            return value;
+        }
+
+        private bool? CanBeUpdated(string packageId, string version)
         {
             IPackageInfo info = packageSource?.GetPackage(packageId);
 
             if (info == null)
             {
-                return false;
+                return null;
             }
 
             return info.Versions.Min != version;

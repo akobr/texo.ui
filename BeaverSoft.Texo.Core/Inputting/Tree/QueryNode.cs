@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using BeaverSoft.Texo.Core.Configuration;
 
 namespace BeaverSoft.Texo.Core.Inputting.Tree
@@ -9,8 +10,8 @@ namespace BeaverSoft.Texo.Core.Inputting.Tree
         {
             Query = query;
 
-            Queries = new Dictionary<string, QueryNode>();
-            Options = new Dictionary<string, OptionNode>();
+            Queries = new Dictionary<string, QueryNode>(StringComparer.OrdinalIgnoreCase);
+            Options = new Dictionary<string, OptionNode>(StringComparer.OrdinalIgnoreCase);
             OptionList = new Dictionary<char, OptionNode>();
         }
 

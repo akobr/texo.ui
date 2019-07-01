@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Reflection;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
@@ -98,9 +99,62 @@ namespace BeaverSoft.Texo.Core.Runtime
 
         public async Task ProcessAsync(string input)
         {
-            Input inputModel = evaluator.Evaluate(input);
-            history?.Enqueue(inputModel);
+            Input inputModel;
 
+            try
+            {
+                inputModel = await EvaluateInputAsync(input);
+            }
+            catch (Exception exception)
+            {
+                logger.Error("Error during evaluating of input.", exception);
+#if !DEBUG
+                return;
+#else
+                throw exception;
+#endif
+            }
+
+            try
+            {
+                await ProcessInputAsync(inputModel);
+            }
+            catch (Exception exception)
+            {
+                logger.Error("Error during processing input (execution).", exception);
+#if !DEBUG
+                RenderError(inputModel, exception.Message);
+#else
+                throw exception;
+#endif
+            }
+        }
+
+        public Task ExecuteActionAsync(string actionUrl)
+        {
+            return actionManagement.ExecuteAsync(actionUrl);
+        }
+
+        public Task ExecuteActionAsync(string actionName, IDictionary<string, string> arguments)
+        {
+            return actionManagement.ExecuteAsync(actionName, arguments);
+        }
+
+        public void Dispose()
+        {
+            view.Dispose();
+            commandManagement.Dispose();
+        }
+
+        private async Task<Input> EvaluateInputAsync(string input)
+        {
+            Input inputModel = await Task.Run(() => evaluator.Evaluate(input));
+            history?.Enqueue(inputModel);
+            return inputModel;
+        }
+
+        private async Task ProcessInputAsync(Input inputModel)
+        {
             if (!inputModel.Context.IsValid)
             {
                 if (fallback != null
@@ -128,73 +182,60 @@ namespace BeaverSoft.Texo.Core.Runtime
             await ProcessContextAsync(inputModel, inputModel.Context);
         }
 
-        public void ExecuteAction(string actionUrl)
-        {
-            actionManagement.Execute(actionUrl);
-        }
-
-        public void ExecuteAction(string actionName, IDictionary<string, string> arguments)
-        {
-            actionManagement.Execute(actionName, arguments);
-        }
-
-        public void Dispose()
-        {
-            view.Dispose();
-            commandManagement.Dispose();
-        }
-
         private Task ProcessContextAsync(Input input, CommandContext context)
         {
-            ICommand command = commandManagement.BuildCommand(context.Key);
+            object command = commandManagement.BuildCommand(context.Key);
 
             switch (command)
             {
                 case IAsyncCommand asyncCommand:
                     return ProcessAsyncCommand(asyncCommand, context, input);
 
+                case ICommand syncCommand:
+                    return ProcessCommandAsTask(syncCommand.Execute, context, input);
+
                 default:
-                    return ProcessCommand(command, context, input);
+                    return ProcessUnknownCommandAsync(command, context, input);
             }
         }
 
-        private async Task ProcessCommand(ICommand command, CommandContext context, Input input)
+        private Task ProcessUnknownCommandAsync(object command, CommandContext context, Input input)
         {
-#if !DEBUG
-            try
+            Type commandType = command.GetType();
+            Type resultBaseType = typeof(ICommandResult);
+
+            MethodInfo executionMethod = commandType.GetMethod(nameof(ICommand.Execute), BindingFlags.Public);
+            ParameterInfo[] parameters = executionMethod?.GetParameters();
+
+            if (executionMethod == null
+                || parameters.Length > 1
+                || (parameters.Length == 1 && parameters[0].ParameterType != typeof(CommandContext))
+                || !resultBaseType.IsAssignableFrom(executionMethod.ReturnType))
             {
-#endif
-                await ProcessCommandAsTask(command, context, input);
-#if !DEBUG
+                logger.Error(
+                    "Invalid command type, at least public method ICommandResult Execute(CommandContext) needs to be presented.",
+                    context.Key, command.GetType().FullName, input.ParsedInput.RawInput);
+                return Task.CompletedTask;
             }
-            catch (Exception exception)
+
+            if (executionMethod.IsStatic)
             {
-                RenderError(input, exception.Message);
+                return ProcessCommandAsTask((c) => (ICommandResult)executionMethod.Invoke(null, new object[] { c }), context, input);
             }
-#endif
+
+            return ProcessCommandAsTask((c) => (ICommandResult)executionMethod.Invoke(command, new object[] { c }), context, input);
         }
 
-        private async Task ProcessCommandAsTask(ICommand command, CommandContext context, Input input)
+        private async Task ProcessCommandAsTask(Func<CommandContext, ICommandResult> commandExecution, CommandContext context, Input input)
         {
-            ICommandResult result = await Task.Run(() => command.Execute(context)).ConfigureAwait(true);
+            ICommandResult result = await Task.Run(() => commandExecution(context)).ConfigureAwait(true);
             Render(input, result);
         }
 
         private async Task ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input input)
         {
-#if !DEBUG
-            try
-            {
-#endif
-                ICommandResult result = await command.ExecuteAsync(context);
-                Render(input, result);
-#if !DEBUG
-            }
-            catch (Exception exception)
-            {
-                RenderError(input, exception.Message);
-            }
-#endif
+            ICommandResult result = await command.ExecuteAsync(context);
+            Render(input, result);
         }
 
         private void Render(Input input, ICommandResult result)

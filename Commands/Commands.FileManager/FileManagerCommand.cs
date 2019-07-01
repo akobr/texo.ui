@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using BeaverSoft.Texo.Commands.FileManager.Operations;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.FileManager.Stash;
@@ -21,7 +21,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
 
             RegisterCommand(StageQueries.STAGE, new StageCommand(stageService));
             RegisterCommand(StashQueries.STASH, new StashCommand(stashService, stageService));
-            RegisterCommand(ApplyQueries.APPLY, new ApplyCommand(stageService, logger));
+            RegisterCommand(ApplyQueries.APPLY, new ApplyCommand(stageService, stashService, logger));
         }
     }
 }

@@ -98,7 +98,7 @@ namespace BeaverSoft.Texo.Core.Inputting.Tree
         {
             isParameter = true;
             string varName = match.Groups[InputRegex.GROUP_NAME].Value;
-            return environment.GetVariable(varName);
+            return environment.GetVariable(varName, null) ?? match.Value;
         }
 
         private static bool IsComplexParameterToken(string token)

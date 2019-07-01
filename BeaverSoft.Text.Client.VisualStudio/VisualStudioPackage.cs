@@ -1,14 +1,27 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Actions;
+using BeaverSoft.Texo.Core.Actions.Implementations;
 using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
+using BeaverSoft.Texo.Core.View.Actions;
 using BeaverSoft.Text.Client.VisualStudio.Actions;
+using BeaverSoft.Text.Client.VisualStudio.Core.Environment;
+using BeaverSoft.Text.Client.VisualStudio.Core.Providers;
+using BeaverSoft.Text.Client.VisualStudio.Environment;
+using BeaverSoft.Text.Client.VisualStudio.Providers;
+using BeaverSoft.Text.Client.VisualStudio.Search;
 using BeaverSoft.Text.Client.VisualStudio.Startup;
+using Commands.CodeBaseSearch;
+using EnvDTE;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using StrongBeaver.Core.Container;
@@ -42,8 +55,21 @@ namespace BeaverSoft.Text.Client.VisualStudio
     [Guid(PackageGuidString)]
     public sealed class VisualStudioPackage : AsyncPackage
     {
+        // Log from launch available at:
+        // c:\Users\[USER_NAME]\AppData\Roaming\Microsoft\VisualStudio\16.0_c3776c56Exp\ActivityLog.xml
+
         public const string PackageGuidString = "2dc0bff1-fbaf-4c05-98a5-b1a2afc000cb";
-        public static bool IsMarkdownTypeLoaded;
+        public static bool IsMarkdownAssemblyLoaded;
+        public static bool IsNewtonsoftJsonAssemblyLoaded;
+
+        private SolutionEvents solutionEvents;
+        private _dispSolutionEvents_OpenedEventHandler solutionOpenedEventHandler;
+
+        public EnvDTE80.DTE2 DTE { get; private set; }
+
+        public IComponentModel ComponentModel { get; private set; }
+
+        public ExtensionContext Context { get; private set; }
 
         #region Package Members
 
@@ -58,12 +84,33 @@ namespace BeaverSoft.Text.Client.VisualStudio
         {
             // Hack: force load of Markdig.Wpf assembly 
             Type markdownType = typeof(Markdig.Wpf.Markdown);
-            IsMarkdownTypeLoaded = markdownType != null;
+            IsMarkdownAssemblyLoaded = markdownType != null;
+            Type jsonType = typeof(Newtonsoft.Json.JsonSerializer);
+            IsNewtonsoftJsonAssemblyLoaded = jsonType != null;
+
+            DTE = (EnvDTE80.DTE2)await GetServiceAsync(typeof(DTE));
+            ComponentModel = (IComponentModel)await GetServiceAsync(typeof(SComponentModel));
 
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            solutionEvents = DTE.Events.SolutionEvents;
+            solutionOpenedEventHandler = new _dispSolutionEvents_OpenedEventHandler(HandleSolutionOpened);
+            solutionEvents.Opened += solutionOpenedEventHandler;
+
             await TexoToolWindow.InitializeAsync(this);
+        }
+
+        private async void HandleSolutionOpened()
+        {
+            if (Context == null)
+            {
+                return;
+            }
+
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            Context.TexoEnvironment.SetVariable(VsVariableNames.SOLUTION_FILE, DTE.Solution.FileName);
         }
 
         public override IVsAsyncToolWindowFactory GetAsyncToolWindowFactory(Guid toolWindowType)
@@ -80,10 +127,10 @@ namespace BeaverSoft.Text.Client.VisualStudio
         {
             // Perform as much work as possible in this method which is being run on a background thread.
             // The object returned from this method is passed into the constructor of the SampleToolWindow 
-            var dteTask = GetServiceAsync(typeof(EnvDTE.DTE));
-            
             var container = new SimpleIoc();
             container.RegisterServices();
+
+            container.Register<IDteProvider>(() => new DteProvider(DTE));
 
             var engineBuilder = new TexoEngineBuilder()
                 .WithLogService(new DebugLogService());
@@ -101,18 +148,28 @@ namespace BeaverSoft.Text.Client.VisualStudio
             container.RegisterWithMessageBus();
             container.RegisterIntellisense();
 
-            var context = new ExtensionContext(
-                (EnvDTE80.DTE2)await dteTask,
+            var environment = container.GetInstance<IEnvironmentService>();
+            container.Register<ISolutionOpenStrategy>(() => new CurrentSolutionOpenStrategy(ComponentModel));
+
+            Context = new ExtensionContext(
+                DTE,
                 JoinableTaskFactory,
                 texoEngine,
+                environment,
                 messageBus);
 
-            // Register of actions
-            texoEngine.RegisterAction(new PathOpenActionFactory(context), ActionNames.PATH_OPEN, ActionNames.PATH);
+            // Register of variable strategies
+            environment.RegisterVariableStrategy(VsVariableNames.SOLUTION_FILE, new SolutionFileStrategy(environment));
+            environment.RegisterVariableStrategy(VsVariableNames.SOLUTION_DIRECTORY, new SolutionDirectoryStrategy(environment));
 
-            await texoEngine.InitialiseWithCommandsAsync();
+            // Register of actions
+            texoEngine.RegisterAction(new SimpleActionFactory<UriOpenAction>(), ActionNames.URI);
+            texoEngine.RegisterAction(new PathOpenActionFactory(Context), ActionNames.PATH_OPEN, ActionNames.PATH);
+            texoEngine.RegisterAction(new InputSetActionFactory(container.GetInstance<IViewService>()), ActionNames.INPUT_SET, ActionNames.INPUT);
+
+            await texoEngine.InitialiseWithCommandsAsync(container);
             texoEngine.Start();
-            return context;
+            return Context;
         }
 
         #endregion

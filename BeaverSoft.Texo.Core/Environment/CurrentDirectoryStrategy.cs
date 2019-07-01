@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 
 namespace BeaverSoft.Texo.Core.Environment
@@ -7,13 +7,7 @@ namespace BeaverSoft.Texo.Core.Environment
     {
         public bool IsValueValid(string newValue, string currentValue)
         {
-            if (Directory.Exists(newValue))
-            {
-                return true;
-            }
-
-            throw new ArgumentException("Variable " + VariableNames.CURRENT_DIRECTORY + " can't be removed.",
-                nameof(newValue));
+            return Directory.Exists(newValue);
         }
 
         public bool CanBeRemoved(string currentValue)

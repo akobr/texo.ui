@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Core.Actions
@@ -20,26 +21,26 @@ namespace BeaverSoft.Texo.Core.Actions
             this.logger = logger;
         }
 
-        public void Execute(string actionUrl)
+        public Task ExecuteAsync(string actionUrl)
         {
             IActionContext context = parser.Parse(actionUrl);
 
             if (context == null)
             {
-                return;
+                return Task.CompletedTask;
             }
 
-            Execute(context.Name, context.Arguments);
+            return ExecuteAsync(context.Name, context.Arguments);
         }
 
-        public void Execute(string actionName, IDictionary<string, string> arguments)
+        public Task ExecuteAsync(string actionName, IDictionary<string, string> arguments)
         {
             IActionFactory factory = provider?.GetActionFactory(actionName);
 
             if (factory == null)
             {
                 logger.Warn($"No action factory for action: {actionName}.", arguments);
-                return;
+                return Task.CompletedTask;
             }
 
             IAction action = CreateActionInstance(factory);
@@ -47,17 +48,17 @@ namespace BeaverSoft.Texo.Core.Actions
             if (action == null)
             {
                 logger.Warn($"No action created for action: {actionName}.", factory, arguments);
-                return;
+                return Task.CompletedTask;
             }
 
-            ExecuteAction(action, arguments);
+            return ExecuteActionAsync(action, arguments);
         }
 
-        private void ExecuteAction(IAction action, IDictionary<string, string> arguments)
+        private async Task ExecuteActionAsync(IAction action, IDictionary<string, string> arguments)
         {
             try
             {
-                action.Execute(arguments);
+                await action.ExecuteAsync(arguments);
             }
             catch (Exception)
             {

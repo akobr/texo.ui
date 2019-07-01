@@ -1,20 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace BeaverSoft.Texo.Core.Commands
 {
-    public class CommandFactory : ITexoFactory<ICommand, string>
+    public class CommandFactory : ITexoFactory<object, string>
     {
-        private readonly Dictionary<string, Func<ICommand>> factories;
+        private readonly Dictionary<string, Func<object>> factories;
 
         public CommandFactory()
         {
-            factories = new Dictionary<string, Func<ICommand>>();
+            factories = new Dictionary<string, Func<object>>();
         }
 
-        public ICommand Create(string commandKey)
+        public object Create(string commandKey)
         {
-            if (!factories.TryGetValue(commandKey, out Func<ICommand> factory))
+            if (!factories.TryGetValue(commandKey, out Func<object> factory))
             {
                 return null;
             }
@@ -22,12 +22,12 @@ namespace BeaverSoft.Texo.Core.Commands
             return factory.Invoke();
         }
 
-        public void Release(ICommand item)
+        public void Release(object item)
         {
             (item as IDisposable)?.Dispose();
         }
 
-        public void Register(string commandKey, Func<ICommand> factory)
+        public void Register(string commandKey, Func<object> factory)
         {
             factories[commandKey] = factory;
         }

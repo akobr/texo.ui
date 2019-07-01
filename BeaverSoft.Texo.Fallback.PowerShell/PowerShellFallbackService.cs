@@ -207,7 +207,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             shell.Streams.Warning.DataAdded += Warning_DataAdded;
             shell.Streams.Verbose.DataAdded += Verbose_DataAdded;
             shell.Streams.Debug.DataAdded += Debug_DataAdded;
-            shell.Streams.Information.DataAdded += Information_DataAdded;
+            //shell.Streams.Information.DataAdded += Information_DataAdded;
 
             return Task.Factory.FromAsync(shell.BeginInvoke(), (result) => 
             {
@@ -219,7 +219,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 shell.Streams.Warning.DataAdded -= Warning_DataAdded;
                 shell.Streams.Verbose.DataAdded -= Verbose_DataAdded;
                 shell.Streams.Debug.DataAdded -= Debug_DataAdded;
-                shell.Streams.Information.DataAdded -= Information_DataAdded;
+                //shell.Streams.Information.DataAdded -= Information_DataAdded;
                 ReleaseShell();
             });
         }

@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace BeaverSoft.Texo.Core.Commands
 {
     public class SingletonCommandManagementService : ICommandManagementService
     {
-        private readonly ITexoFactory<ICommand, string> factory;
-        private readonly Dictionary<string, ICommand> commands;
+        private readonly ITexoFactory<object, string> factory;
+        private readonly Dictionary<string, object> commands;
 
-        public SingletonCommandManagementService(ITexoFactory<ICommand, string> factory)
+        public SingletonCommandManagementService(ITexoFactory<object, string> factory)
         {
             this.factory = factory;
-            commands = new Dictionary<string, ICommand>();
+            commands = new Dictionary<string, object>();
         }
 
         public bool HasCommand(string commandKey)
@@ -23,9 +23,9 @@ namespace BeaverSoft.Texo.Core.Commands
             return CreateCommand(commandKey) != null;
         }
 
-        public ICommand BuildCommand(string commandKey)
+        public object BuildCommand(string commandKey)
         {
-            if (commands.TryGetValue(commandKey, out ICommand command))
+            if (commands.TryGetValue(commandKey, out object command))
             {
                 return command;
             }
@@ -35,7 +35,7 @@ namespace BeaverSoft.Texo.Core.Commands
 
         public void Dispose()
         {
-            foreach (ICommand command in commands.Values)
+            foreach (object command in commands.Values)
             {
                 factory.Release(command);
             }
@@ -43,9 +43,9 @@ namespace BeaverSoft.Texo.Core.Commands
             commands.Clear();
         }
 
-        private ICommand CreateCommand(string commandKey)
+        private object CreateCommand(string commandKey)
         {
-            ICommand command = factory.Create(commandKey);
+            object command = factory.Create(commandKey);
 
             if (command == null)
             {

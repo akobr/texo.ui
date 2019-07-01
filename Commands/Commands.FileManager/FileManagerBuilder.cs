@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Commands.FileManager.Operations;
+using BeaverSoft.Texo.Commands.FileManager.Operations;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
 using BeaverSoft.Texo.Commands.FileManager.Stash;
 using BeaverSoft.Texo.Core.Commands;
@@ -94,7 +94,13 @@ namespace BeaverSoft.Texo.Commands.FileManager
                 new[] { StageQueries.REMOVE_LOBBY, "rm-lobby", "rml" });
             queryRemoveLobby.Documentation.Title = "file-manager-stage-remove-lobby";
             queryRemoveLobby.Documentation.Description = "Removes a lobby from the stage of file manager.";
-            queryRemoveLobby.Parameters.Add(parLobbyPath.ToImmutable());
+
+            var queryClear = Query.CreateBuilder();
+            queryClear.Key = StageQueries.CLEAR;
+            queryClear.Representations.AddRange(
+                new[] { StageQueries.CLEAR, "clean", "cls" });
+            queryClear.Documentation.Title = "file-manager-stage-clear";
+            queryClear.Documentation.Description = "Clears the stage from all content.";
 
             query.Queries.AddRange(
                 new[]
@@ -104,7 +110,8 @@ namespace BeaverSoft.Texo.Commands.FileManager
                     queryAdd.ToImmutable(),
                     queryRemove.ToImmutable(),
                     queryLobby.ToImmutable(),
-                    queryRemoveLobby.ToImmutable()
+                    queryRemoveLobby.ToImmutable(),
+                    queryClear.ToImmutable()
                 });
 
             return query.ToImmutable();
@@ -122,7 +129,6 @@ namespace BeaverSoft.Texo.Commands.FileManager
             var parIdentifier = Parameter.CreateBuilder();
             parIdentifier.Key = StashParameters.IDENTIFIER;
             parIdentifier.ArgumentTemplate = InputRegex.VARIABLE_NAME;
-            parIdentifier.IsOptional = true;
             parIdentifier.Documentation.Title = "Stash identifier";
             parIdentifier.Documentation.Description = "Specify stash identifier, index or name.";
 
@@ -136,9 +142,18 @@ namespace BeaverSoft.Texo.Commands.FileManager
             var queryList = Query.CreateBuilder();
             queryList.Key = StashQueries.LIST;
             queryList.Representations.AddRange(
-                new[] { StashQueries.LIST, "show" });
+                new[] { StashQueries.LIST });
             queryList.Documentation.Title = "file-manager-stash-list";
             queryList.Documentation.Description = "List of available stashes in the stack.";
+
+            var queryShow = Query.CreateBuilder();
+            queryShow.Key = StashQueries.SHOW;
+            queryShow.Representations.AddRange(
+                new[] { StashQueries.SHOW, "detail" });
+            queryShow.Documentation.Title = "file-manager-stash-show";
+            queryShow.Documentation.Description = "Shows a detail about the specified stash.";
+            parIdentifier.IsOptional = false;
+            queryShow.Parameters.Add(parIdentifier.ToImmutable());
 
             var queryPush = Query.CreateBuilder();
             queryPush.Key = StashQueries.PUSH;
@@ -160,6 +175,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryApply.Documentation.Title = "file-manager-stash-apply";
             queryApply.Documentation.Description = "Applies specific stash to the stage of file manager.";
             queryApply.Options.Add(optionAdd.ToImmutable());
+            parIdentifier.IsOptional = true;
             queryApply.Parameters.Add(parIdentifier.ToImmutable());
 
             var queryPeek = Query.CreateBuilder();
@@ -188,7 +204,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             var queryClear = Query.CreateBuilder();
             queryClear.Key = StashQueries.CLEAR;
             queryClear.Representations.AddRange(
-                new[] { StashQueries.CLEAR, "cls" });
+                new[] { StashQueries.CLEAR, "clean", "cls" });
             queryClear.Documentation.Title = "file-manager-stash-clear";
             queryClear.Documentation.Description = "Removes all stashes from the stack of file manager.";
 
@@ -196,6 +212,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
                 new[]
                 {
                     queryList.ToImmutable(),
+                    queryShow.ToImmutable(),
                     queryPush.ToImmutable(),
                     queryApply.ToImmutable(),
                     queryPeek.ToImmutable(),
@@ -216,6 +233,12 @@ namespace BeaverSoft.Texo.Commands.FileManager
             query.Documentation.Title = "file-manager-apply";
             query.Documentation.Description = "Perform an operation in file manager.";
 
+            var parStash = Parameter.CreateBuilder();
+            parStash.Key = StashParameters.IDENTIFIER;
+            parStash.ArgumentTemplate = InputRegex.VARIABLE_NAME;
+            parStash.Documentation.Title = "Stash identifier";
+            parStash.Documentation.Description = "Specify stash identifier, index or name.";
+
             var parDestinationPath = Parameter.CreateBuilder();
             parDestinationPath.Key = FileManagerParameters.SIMPLE_PATH;
             parDestinationPath.ArgumentTemplate = InputRegex.PATH;
@@ -226,6 +249,14 @@ namespace BeaverSoft.Texo.Commands.FileManager
             parSearchTerm.Key = ApplyParameters.SEARCH_TERM;
             parSearchTerm.Documentation.Title = "Search term";
             parSearchTerm.Documentation.Description = "Search term or regular expression.";
+
+            var optionStash = Option.CreateBuilder();
+            optionStash.Key = ApplyOptions.STASH;
+            optionStash.Representations.AddRange(
+                new[] { ApplyOptions.STASH, "s" });
+            optionStash.Parameters.Add(parStash.ToImmutable());
+            optionStash.Documentation.Title = ApplyOptions.STASH;
+            optionStash.Documentation.Description = "An operation will use a stash instead of the stage.";
 
             var optionPreview = Option.CreateBuilder();
             optionPreview.Key = ApplyOptions.PREVIEW;
@@ -276,6 +307,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryCopy.Documentation.Title = "file-manager-copy";
             queryCopy.Documentation.Description = "A copy operation.";
             queryCopy.Parameters.Add(parDestinationPath.ToImmutable());
+            queryCopy.Options.Add(optionStash.ToImmutable());
             queryCopy.Options.Add(optionPreview.ToImmutable());
             queryCopy.Options.Add(optionOverwrite.ToImmutable());
             queryCopy.Options.Add(optionFlatten.ToImmutable());
@@ -287,6 +319,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryMove.Documentation.Title = "file-manager-move";
             queryMove.Documentation.Description = "A move operation.";
             queryMove.Parameters.Add(parDestinationPath.ToImmutable());
+            queryMove.Options.Add(optionStash.ToImmutable());
             queryMove.Options.Add(optionPreview.ToImmutable());
             queryMove.Options.Add(optionOverwrite.ToImmutable());
             queryMove.Options.Add(optionFlatten.ToImmutable());
@@ -297,6 +330,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
                 new[] { ApplyQueries.DELETE, "remove", "rm", "del", "dl" });
             queryDelete.Documentation.Title = "file-manager-delete";
             queryDelete.Documentation.Description = "A delete operation.";
+            queryDelete.Options.Add(optionStash.ToImmutable());
             queryDelete.Options.Add(optionPreview.ToImmutable());
 
             var querySearch = Query.CreateBuilder();
@@ -306,6 +340,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             querySearch.Documentation.Title = "file-manager-search";
             querySearch.Documentation.Description = "A content search operation.";
             querySearch.Parameters.Add(parSearchTerm.ToImmutable());
+            querySearch.Options.Add(optionStash.ToImmutable());
             querySearch.Options.Add(optionRegex.ToImmutable());
             querySearch.Options.Add(optionCaseSensitive.ToImmutable());
 
@@ -316,6 +351,7 @@ namespace BeaverSoft.Texo.Commands.FileManager
             queryArchive.Documentation.Title = "file-manager-archive";
             queryArchive.Documentation.Description = "An archive (zip) operation.";
             queryArchive.Parameters.Add(parDestinationPath.ToImmutable());
+            queryArchive.Options.Add(optionStash.ToImmutable());
             queryArchive.Options.Add(optionFlatten.ToImmutable());
             queryArchive.Options.Add(optionAdd.ToImmutable());
             queryArchive.Options.Add(optionOverwrite.ToImmutable());

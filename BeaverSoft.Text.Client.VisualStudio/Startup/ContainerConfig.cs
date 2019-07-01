@@ -15,10 +15,14 @@ using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Fallback.PowerShell;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
+using BeaverSoft.Text.Client.VisualStudio.Core.Providers;
+using BeaverSoft.Text.Client.VisualStudio.Providers;
 using Commands.Calc;
 using Commands.Clipboard;
+using Commands.CodeBaseSearch;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
+using Commands.SpinSport;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Container;
 using StrongBeaver.Core.Services.Serialisation;
@@ -30,6 +34,9 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
     {
         public static void RegisterServices(this SimpleIoc container)
         {
+            // Visual Studio
+            container.Register<ISolutionPathProvider, DteSolutionPathProvider>();
+
             // Core commands (should be in engine)
             container.Register<CurrentDirectoryCommand>();
             container.Register<TexoCommand>();
@@ -65,6 +72,14 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
             // Developer Functions
             container.Register<FunctionsCommand>();
 
+            // Code-base-search
+            container.Register<ICodeBaseSearchService, CodeBaseSearchService>();
+            container.Register<CodeBaseSearchCommand>();
+
+            // SpinSport
+            container.Register<ISolutionDirectoryProvider, SolutionDirectoryProvider>();
+            container.Register<SpinSportCommand>();
+
             // View
             container.Register<IMarkdownService, MarkdownService>();
             container.Register<IWpfRenderService, WpfMarkdownRenderService>();
@@ -96,7 +111,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
         public static void RegisterCommandFactory(this SimpleIoc container, CommandFactory factory)
         {
             container.Register<CommandFactory>(() => factory);
-            container.Register<ITexoFactory<ICommand, string>>(() => factory);
+            container.Register<ITexoFactory<object, string>>(() => factory);
         }
     }
 }

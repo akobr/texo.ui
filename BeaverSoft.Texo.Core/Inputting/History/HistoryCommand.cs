@@ -1,6 +1,7 @@
-﻿using System.Text;
+using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Result;
+using BeaverSoft.Texo.Core.Text;
 
 namespace BeaverSoft.Texo.Core.Inputting.History
 {
@@ -15,11 +16,13 @@ namespace BeaverSoft.Texo.Core.Inputting.History
 
         public ICommandResult Execute(CommandContext context)
         {
-            StringBuilder result = new StringBuilder();
+            AnsiStringBuilder result = new AnsiStringBuilder();
 
             foreach (IHistoryItem historyItem in history.GetHistory())
             {
-                result.AppendLine(historyItem.Input.ParsedInput.RawInput);
+                string rawInput = historyItem.Input.ParsedInput.RawInput;
+                result.AppendLink(rawInput, ActionBuilder.InputSetUri(rawInput));
+                result.AppendLine();
             }
 
             return new TextResult(result.ToString());

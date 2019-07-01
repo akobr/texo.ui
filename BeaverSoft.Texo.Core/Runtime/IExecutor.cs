@@ -10,8 +10,8 @@ namespace BeaverSoft.Texo.Core.Runtime
 
         Task ProcessAsync(string input);
 
-        void ExecuteAction(string actionUrl);
+        Task ExecuteActionAsync(string actionUrl);
 
-        void ExecuteAction(string actionName, IDictionary<string, string> arguments);
+        Task ExecuteActionAsync(string actionName, IDictionary<string, string> arguments);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace BeaverSoft.Texo.Commands.NugetManager.Model
+namespace BeaverSoft.Texo.Commands.NugetManager.Model
 {
     public interface IPackage
     {
@@ -6,6 +6,6 @@
 
         string Version { get; }
 
-        bool CanBeUpdated { get; }
+        bool? CanBeUpdated { get; }
     }
 }

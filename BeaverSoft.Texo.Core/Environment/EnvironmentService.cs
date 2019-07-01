@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Configuration;
@@ -8,7 +8,7 @@ using StrongBeaver.Core.Services;
 
 namespace BeaverSoft.Texo.Core.Environment
 {
-    public class EnvironmentService : IEnvironmentService, IMessageBusService<ISettingUpdatedMessage>
+    public class EnvironmentService : IEnvironmentService, IMessageBusService<ISettingUpdatedMessage>, IMessageBusService<ISetVariableMessage>
     {
         private readonly IServiceMessageBus messageBus;
         private readonly Dictionary<string, string> variables;
@@ -53,9 +53,14 @@ namespace BeaverSoft.Texo.Core.Environment
 
         public string GetVariable(string variable)
         {
+            return GetVariable(variable, string.Empty);
+        }
+
+        public string GetVariable(string variable, string defaultValue)
+        {
             if (!variables.TryGetValue(variable, out string value))
             {
-                return string.Empty;
+                return defaultValue;
             }
 
             return value;
@@ -66,6 +71,16 @@ namespace BeaverSoft.Texo.Core.Environment
             var builder = ImmutableDictionary<string, string>.Empty.ToBuilder();
             builder.AddRange(variables);
             return builder.ToImmutable();
+        }
+
+        public void RegisterVariableStrategy(string variable, IVariableStrategy strategy)
+        {
+            if (string.IsNullOrEmpty(variable))
+            {
+                throw new ArgumentNullException(nameof(variable));
+            }
+
+            strategies[variable] = strategy ?? throw new ArgumentNullException(nameof(strategy));
         }
 
         public void Dispose()
@@ -128,6 +143,11 @@ namespace BeaverSoft.Texo.Core.Environment
                     SetVariable(variable.Key, variable.Value);
                 }
             }
+        }
+
+        void IMessageBusRecipient<ISetVariableMessage>.ProcessMessage(ISetVariableMessage message)
+        {
+            SetVariable(message.Name, message.Value);
         }
     }
 }

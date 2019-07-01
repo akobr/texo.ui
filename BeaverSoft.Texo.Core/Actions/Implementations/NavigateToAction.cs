@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Threading.Tasks;
 
-namespace BeaverSoft.Texo.Core.Actions
+namespace BeaverSoft.Texo.Core.Actions.Implementations
 {
     public class NavigateToAction : IAction
     {
@@ -13,33 +13,35 @@ namespace BeaverSoft.Texo.Core.Actions
             this.actionService = actionService;
         }
 
-        public void Execute(IDictionary<string, string> arguments)
+        public Task ExecuteAsync(IDictionary<string, string> arguments)
         {
             if (!arguments.TryGetValue(ActionParameters.ADDRESS, out string address)
                 || string.IsNullOrWhiteSpace(address))
             {
-                return;
+                return Task.CompletedTask;
             }
 
             Uri uri = TryToBuildUri(address);
 
             if (uri == null)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             if (string.Equals(uri.Scheme, Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase))
             {
-                actionService.Execute(ActionBuilder.PathUri(uri.LocalPath));
+                actionService.ExecuteAsync(ActionBuilder.PathUri(uri.LocalPath));
             }
             else if (string.Equals(uri.Scheme, ActionConstants.ACTION_SCHEMA, StringComparison.OrdinalIgnoreCase))
             {
-                actionService.Execute(uri.OriginalString);
+                actionService.ExecuteAsync(uri.OriginalString);
             }
             else
             {
-                Process.Start(uri.OriginalString);
+                return UriOpenAction.ExecuteAsync(uri.OriginalString);
             }
+
+            return Task.CompletedTask;
         }
 
         public Uri TryToBuildUri(string address)

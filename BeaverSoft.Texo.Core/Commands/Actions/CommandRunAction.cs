@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Runtime;
 
@@ -13,15 +14,15 @@ namespace BeaverSoft.Texo.Core.Commands.Actions
             this.executor = executor;
         }
 
-        public async void Execute(IDictionary<string, string> arguments)
+        public Task ExecuteAsync(IDictionary<string, string> arguments)
         {
             if (!arguments.TryGetValue(ActionParameters.INPUT, out string input)
                 || string.IsNullOrWhiteSpace(input))
             {
-                return;
+                return Task.CompletedTask;
             }
 
-            await executor.ProcessAsync(input);
+            return executor.ProcessAsync(input);
         }
     }
 }
