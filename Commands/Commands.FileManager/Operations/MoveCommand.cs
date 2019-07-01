@@ -29,19 +29,19 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
         public ICommandResult Execute(CommandContext context)
         {
-            var paths = context.GetPaths(stage, stashes);
+            IOperationSource source = context.GetOperationSource(stage, stashes);
 
-            if (paths.Count < 1)
+            if (source.IsNullOrEmpty())
             {
                 return new TextResult("The stage is empty.");
             }
 
             MoveContext moveContext = new MoveContext
             {
-                Items = paths,
+                Items = source.GetPaths(),
                 Destination = context.GetTargetDirectory(),
-                SourceLobby = stage.GetLobby(),
-                Flat = context.HasOption(ApplyOptions.FLATTEN) || !stage.HasLobby(),
+                SourceLobby = source.GetLobby(),
+                Flat = context.HasOption(ApplyOptions.FLATTEN) || !source.HasLobby(),
                 Overwrite = context.HasOption(ApplyOptions.OVERWRITE),
                 Preview = context.HasOption(ApplyOptions.PREVIEW)
             };

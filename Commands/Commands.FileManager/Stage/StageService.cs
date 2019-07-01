@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -59,7 +59,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
                 return;
             }
 
-            Add(stash.Paths);
+            Add(stash.GetPaths());
         }
 
         public void Remove(IEnumerable<string> newPaths)
@@ -137,9 +137,9 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
                     return;
                 }
 
-                lobby = stage.LobbyPath ?? string.Empty;
+                lobby = stage.GetLobby() ?? string.Empty;
                 var pathsBuilder = ImmutableSortedSet.CreateBuilder(new InsensitiveFullPathComparer());
-                pathsBuilder.UnionWith(stage.Paths);
+                pathsBuilder.UnionWith(stage.GetPaths());
                 paths = pathsBuilder.ToImmutable();
             }
         }

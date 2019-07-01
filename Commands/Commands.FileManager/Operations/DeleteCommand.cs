@@ -28,17 +28,17 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
 
         public ICommandResult Execute(CommandContext context)
         {
-            var paths = context.GetPaths(stage, stashes);
+            IOperationSource source = context.GetOperationSource(stage, stashes);
 
-            if (paths.Count < 1)
+            if (source.IsNullOrEmpty())
             {
                 return new TextResult("The stage is empty.");
             }
 
             return Delete(new DeleteContext
             {
-                Items = paths,
-                SourceLobby = stage.GetLobby(),
+                Items = source.GetPaths(),
+                SourceLobby = source.GetLobby(),
                 Preview = context.HasOption(ApplyOptions.PREVIEW)
             });
         }

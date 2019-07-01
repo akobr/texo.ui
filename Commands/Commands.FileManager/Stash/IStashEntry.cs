@@ -1,13 +1,10 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
+using BeaverSoft.Texo.Commands.FileManager.Operations;
 
 namespace BeaverSoft.Texo.Commands.FileManager.Stash
 {
-    public interface IStashEntry
+    public interface IStashEntry : IOperationSource
     {
         string Name { get; }
-
-        string LobbyPath { get; }
-
-        IImmutableList<string> Paths { get; }
     }
 }

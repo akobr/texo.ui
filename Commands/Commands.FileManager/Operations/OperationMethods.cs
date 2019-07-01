@@ -41,24 +41,29 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             return !string.IsNullOrEmpty(stage.GetLobby());
         }
 
-        internal static IImmutableList<string> GetPaths(this CommandContext context, IStageService stage, IStashService stashes)
+        internal static IOperationSource GetOperationSource(this CommandContext context, IStageService stage, IStashService stashes)
         {
             OptionContext optionStash = context.GetOption(ApplyOptions.STASH);
 
             if (optionStash == null)
             {
-                stage.TryGetPaths(out var paths);
-                return paths;
+                return stage;
             }
 
             string id = optionStash.GetParameterValue(StashParameters.IDENTIFIER);
-            IStashEntry stash = int.TryParse(id, out int index)
+            return int.TryParse(id, out int index)
                 ? stashes.GetStash(index)
                 : stashes.GetStash(id);
+        }
 
-            return stash == null
-                ? ImmutableList<string>.Empty
-                : stash.Paths;
+        internal static bool IsNullOrEmpty(this IOperationSource source)
+        {
+            return source == null || source.GetPaths().Count < 1;
+        }
+
+        internal static bool HasLobby(this IOperationSource source)
+        {
+            return !string.IsNullOrEmpty(source.GetLobby());
         }
 
         internal static bool TryGetPaths(this IStageService stage, out IImmutableList<string> paths)

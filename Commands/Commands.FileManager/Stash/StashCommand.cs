@@ -154,7 +154,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
                 stage.Clear();
             }
 
-            stage.SetLobby(stash.LobbyPath);
+            stage.SetLobby(stash.GetLobby());
             stage.Add(stash);
         }
 
@@ -164,7 +164,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             builder.Header(GetStashHeader(stash, index));
             builder.Italic(GetStashLobbyTitle(stash));
             builder.WriteLine();
-            builder.WritePathLists(stash.Paths, stash.LobbyPath);
+            builder.WritePathLists(stash.GetPaths(), stash.GetLobby());
             return Item.Markdown(builder.ToString());
         }
 
@@ -174,15 +174,15 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             builder.Header(GetStashHeader(stash, index));
             builder.Bullet();
             builder.Italic(GetStashLobbyTitle(stash));
-            builder.WritePathOverview(stash.Paths, stash.LobbyPath);
+            builder.WritePathOverview(stash.GetPaths(), stash.GetLobby());
             return Item.Markdown(builder.ToString());
         }
 
         private static string GetStashLobbyTitle(IStashEntry stash)
         {
-            return string.IsNullOrEmpty(stash.LobbyPath)
+            return string.IsNullOrEmpty(stash.GetLobby())
                 ? "No lobby directory."
-                : stash.LobbyPath;
+                : stash.GetLobby();
         }
 
         private static string GetStashHeader(IStashEntry stash, int index)
