@@ -117,8 +117,9 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 return;
             }
 
+            renderInProgress = true;
             // TODO: [P3] A swallowed exception
-            _ = RenderModifiedStreamAsync((IReportableStream)sender);
+            Task.Run(() => RenderModifiedStreamAsync((IReportableStream)sender));
         }
 
         private async Task RenderModifiedStreamAsync(IReportableStream stream)
@@ -132,14 +133,7 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
                 newText = await reader.ReadToEndAsync();
             }
 
-            if (!streamedContainer.Dispatcher.CheckAccess())
-            {
-                await streamedContainer.Dispatcher.BeginInvoke(new RenderMethod(BuildStreamedText), newText);
-            }
-            else
-            {
-                BuildStreamedText(newText);
-            }          
+            await streamedContainer.Dispatcher.BeginInvoke(new RenderMethod(BuildStreamedText), DispatcherPriority.Background, newText);       
 
             if (renderIsRequested)
             {
