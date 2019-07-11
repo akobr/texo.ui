@@ -130,13 +130,25 @@
         <!-- OUTPUT -->
         <FlowDocumentScrollViewer Name="docOutput" Grid.Row="2" IsTabStop="False"
                                   MinZoom="50" VerticalScrollBarVisibility="Auto"
-                                  PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseWheel="HandleScrollSpeed">
+                                  ScrollViewer.ScrollChanged="HandleOutputScrollChanged"
+                                  PreviewKeyDown="HandleOutputPreviewKeyDown"
+                                  PreviewMouseWheel="HandleScrollSpeed">
             <FlowDocument>
                 <Section>
                     <Paragraph>Command(s) output...</Paragraph>
                 </Section>
             </FlowDocument>
         </FlowDocumentScrollViewer>
+
+        <Button Name="btnScroll" Grid.Row="2" Visibility="Collapsed"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"               
+                Background="{DynamicResource OutputBackgroundBrush}"
+                Foreground="{DynamicResource OutputForegroundBrush}"
+                BorderThickness="1" BorderBrush="{DynamicResource InfoForegroundBrush}"
+                Click="HandleScrollButtonClick"
+                Margin="18,10" Padding="3">
+            Auto-Scroll
+        </Button>
 
         <Border Grid.Row="2" Height="7" VerticalAlignment="Top" Visibility="{Binding ShadowsVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
             <Border.Background>
@@ -150,7 +162,7 @@
         <!-- INTELLISENSE -->
         <ListBox x:Name="listIntellisense" Grid.Row="2" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0,0,0,2"
                  MaxHeight="265" VerticalAlignment="Top" Foreground="{DynamicResource OutputForegroundBrush}" Focusable="False" IsTabStop="False"
-                 PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseDown="ListIntellisense_PreviewMouseDown"
+                 PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseDown="HandleIntellisenseListPreviewMouseDown"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
 
             <ListBox.Background>

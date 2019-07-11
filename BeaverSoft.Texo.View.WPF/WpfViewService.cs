@@ -122,9 +122,20 @@ namespace BeaverSoft.Texo.View.WPF
                                     return;
                                 }
 
+                                if (!control.IsAutoScrollEnabled)
+                                {
+                                    return;   
+                                }
+
                                 Inline lastLine = renderedSpan.Inlines.LastInline;
                                 if (lastLine.IsLoaded)
                                 {
+                                    if (!control.IsAutoScrollEnabled)
+                                    {
+                                        return;
+                                    }
+
+                                    control.RequestSystemScroll();
                                     lastLine.BringIntoView();
                                 }
                                 else
@@ -170,6 +181,13 @@ namespace BeaverSoft.Texo.View.WPF
         {
             FrameworkContentElement element = (FrameworkContentElement)sender;
             element.Loaded -= HandleLastElementLoaded;
+
+            if (!control.IsAutoScrollEnabled)
+            {
+                return;
+            }
+
+            control.RequestSystemScroll();
             element.BringIntoView();
         }
 
