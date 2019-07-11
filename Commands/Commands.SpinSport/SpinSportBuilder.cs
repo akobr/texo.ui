@@ -20,6 +20,7 @@ namespace Commands.SpinSport
                     BuildColourQuery(),
                     BuildColourUsageQuery(),
                     BuildLocalisationQuery(),
+                    BuildCodeQuery(),
                 });
 
             return command.ToImmutable();
@@ -239,6 +240,26 @@ namespace Commands.SpinSport
                 });
 
             return colourUsage.ToImmutable();
+        }
+
+        private static Query BuildCodeQuery()
+        {
+            var code = Query.CreateBuilder();
+            code.Key = SpinSportConstants.QUERY_CODE;
+            code.Representations.AddRange(
+                new[] { SpinSportConstants.QUERY_CODE, "source", "browser", "browse" });
+            code.Documentation.Title = "code-browse";
+            code.Documentation.Description = "Search in SpinSport SourceBrowser.";
+
+            var parameterSearchTerm = Parameter.CreateBuilder();
+            parameterSearchTerm.Key = SpinSportConstants.PARAMETER_SEARCH_TERM;
+            parameterSearchTerm.ArgumentTemplate = "^[A-Za-z0-9_]+$";
+            parameterSearchTerm.IsRepeatable = true;
+            parameterSearchTerm.Documentation.Title = "Search term";
+            parameterSearchTerm.Documentation.Description = "Search term, e.g. type or member name.";
+            code.Parameters.Add(parameterSearchTerm.ToImmutable());
+
+            return code.ToImmutable();
         }
     }
 }

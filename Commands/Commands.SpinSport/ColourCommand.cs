@@ -19,8 +19,8 @@ namespace Commands.SpinSport
         public ColourCommand(ISolutionDirectoryProvider solutionProvider)
             : base(solutionProvider)
         {
-            RegisterQueryMethod(SpinSportConstants.QUERY_LIST, List);
-            RegisterQueryMethod(SpinSportConstants.QUERY_SET, Set);
+            RegisterQuery(SpinSportConstants.QUERY_LIST, (Func<CommandContext, ICommandResult>)this.List);
+            RegisterQuery(SpinSportConstants.QUERY_SET, (Func<CommandContext, ICommandResult>)this.Set);
         }
 
         private TextResult List(CommandContext context)

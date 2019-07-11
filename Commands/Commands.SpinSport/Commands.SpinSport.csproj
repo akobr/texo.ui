@@ -50,6 +50,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\CodeCommand.cs" />
+    <Compile Include="Code\Model\DocumentReference.cs" />
+    <Compile Include="Code\Model\Record.cs" />
+    <Compile Include="Code\Model\Result.cs" />
     <Compile Include="ColourCommand.cs" />
     <Compile Include="ColourUsageCommand.cs" />
     <Compile Include="ContextExtensions.cs" />
@@ -63,6 +67,10 @@
     <Compile Include="SpinSportConstants.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\BeaverSoft.Texo.Core.MarkDown\BeaverSoft.Texo.Core.Markdown.csproj">
+      <Project>{9D99B9D9-ED3A-430C-8233-68CB05CB7CCA}</Project>
+      <Name>BeaverSoft.Texo.Core.Markdown</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj">
       <Project>{588610d7-7d21-4df8-aad6-e88c83560d87}</Project>
       <Name>BeaverSoft.Texo.Core</Name>
