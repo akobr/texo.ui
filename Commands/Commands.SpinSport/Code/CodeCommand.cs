@@ -58,6 +58,8 @@ namespace Commands.SpinSport.Code
                 {
                     builder.Bullet();
                     builder.Link(record.Document.Title, record.Document.Href);
+                    builder.Write(" ");
+                    builder.Italic($"({record.Document.Preview})");
                 }
             }
 
