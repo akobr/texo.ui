@@ -7,13 +7,13 @@ namespace BeaverSoft.Texo.Core.Result
     public class MarkdownItemsResult : ItemsResult
     {
         public MarkdownItemsResult(IEnumerable<string> content)
-            : base(content.Select(str => new Item(str, TextFormatEnum.Markdown)))
+            : base(content.Select(str => new Item.Markdown(str)))
         {
             // no operation
         }
 
         public MarkdownItemsResult(params string[] content)
-            : base(content.Select(str => new Item(str, TextFormatEnum.Markdown)))
+            : base(content.Select(str => new Item.Markdown(str)))
         {
             // no operation
         }

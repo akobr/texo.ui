@@ -8,7 +8,7 @@ namespace BeaverSoft.Texo.Core.Result
     {
         public MarkdownResult(string markdown)
         {
-            Content = new Item(markdown, TextFormatEnum.Markdown);
+            Content = new Item.Markdown(markdown);
         }
 
         dynamic ICommandResult.Content => Content;
@@ -20,6 +20,11 @@ namespace BeaverSoft.Texo.Core.Result
         public Task ExecuteResultAsync()
         {
             return Task.CompletedTask;
+        }
+
+        public static implicit operator MarkdownResult(string result)
+        {
+            return new MarkdownResult(result);
         }
     }
 }
