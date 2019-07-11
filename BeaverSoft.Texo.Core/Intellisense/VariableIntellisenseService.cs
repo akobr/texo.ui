@@ -28,7 +28,7 @@ namespace BeaverSoft.Texo.Core.Intellisense
                     continue;
                 }
 
-                yield return Item.Intellisense(variable.Key, $"${variable.Key}$", "variable", variable.Value ?? "[NULL]");
+                yield return Item.AsIntellisense(variable.Key, $"${variable.Key}$", "variable", variable.Value ?? "[NULL]");
             }
         }
     }

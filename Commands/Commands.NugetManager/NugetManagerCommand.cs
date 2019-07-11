@@ -8,7 +8,7 @@ using StrongBeaver.Core;
 
 namespace BeaverSoft.Texo.Commands.NugetManager
 {
-    public class NugetManagerCommand : IntersectionCommand, IInitialisable, IDisposable
+    public class NugetManagerCommand : ModularCommand, IInitialisable, IDisposable
     {
         private readonly IStageService stage;
         private readonly IManagementService management;
@@ -19,16 +19,16 @@ namespace BeaverSoft.Texo.Commands.NugetManager
             this.management = management ?? throw new ArgumentNullException(nameof(management));
 
             // Stage (default)
-            RegisterCommand(StageQueries.STAGE, new StageCommand(stage));
+            RegisterQuery(StageQueries.STAGE, new StageCommand(stage));
 
             // Management
-            RegisterCommand(ManageQueries.PROJECT, new ProjectCommand(management.Projects));
-            RegisterCommand(ManageQueries.PACKAGE, new PackageCommand(management.Packages, management.Projects));
+            RegisterQuery(ManageQueries.PROJECT, new ProjectCommand(management.Projects));
+            RegisterQuery(ManageQueries.PACKAGE, new PackageCommand(management.Packages, management.Projects));
 
             // Operations
-            RegisterCommand(ApplyQueries.INSTALL, new InstallCommand());
-            RegisterCommand(ApplyQueries.UNINSTALL, new UninstallCommand());
-            RegisterCommand(ApplyQueries.UPDATE, new UpdateCommand());
+            RegisterQuery(ApplyQueries.INSTALL, new InstallCommand());
+            RegisterQuery(ApplyQueries.UNINSTALL, new UninstallCommand());
+            RegisterQuery(ApplyQueries.UPDATE, new UpdateCommand());
         }
 
         // TODO: implement support for initialisable and disposable commands in core

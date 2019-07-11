@@ -10,13 +10,21 @@ using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.Inputting.History;
 using BeaverSoft.Texo.Core.Intellisense;
+using BeaverSoft.Texo.Core.Result;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Core.Runtime
 {
+    // TODO: [P2] Split entire texo monster to multiple engines (+ add support for middlewares and pipelines)
+    // TODO: [P2] Refactoring: Split render and transformation (IResultProcessingService)
     public class RuntimeCoordinatorService : IRuntimeCoordinatorService
     {
+        private static Type taskType = typeof(Task);
+        private static Type typedResultType = typeof(Result<>);
+        private static Type typedTaskResultType = typeof(TaskResult<>);
+        private static Type voidType = typeof(void);
+
         private readonly IEnvironmentService environment;
         private readonly IInputEvaluationService evaluator;
         private readonly ICommandManagementService commandManagement;
@@ -160,7 +168,7 @@ namespace BeaverSoft.Texo.Core.Runtime
                 if (fallback != null
                     && string.IsNullOrEmpty(inputModel.Context.Key))
                 {
-                    Render(inputModel, await fallback.FallbackAsync(inputModel));
+                    await RenderAsync(inputModel, await fallback.FallbackAsync(inputModel));
                 }
                 else if (didYouMean != null)
                 {
@@ -188,59 +196,47 @@ namespace BeaverSoft.Texo.Core.Runtime
 
             switch (command)
             {
-                case IAsyncCommand asyncCommand:
-                    return ProcessAsyncCommand(asyncCommand, context, input);
-
-                case ICommand syncCommand:
-                    return ProcessCommandAsTask(syncCommand.Execute, context, input);
+                case ICommand typedCommand:
+                    return ProcessTypedCommandAsync(typedCommand, context, input);
 
                 default:
                     return ProcessUnknownCommandAsync(command, context, input);
             }
         }
 
+        private async Task ProcessTypedCommandAsync(ICommand command, CommandContext context, Input input)
+        {
+            ICommandResult commandResult = await Task.Run(() => command.Execute(context));
+            await RenderAsync(input, commandResult);
+        }
+
         private Task ProcessUnknownCommandAsync(object command, CommandContext context, Input input)
         {
             Type commandType = command.GetType();
-            Type resultBaseType = typeof(ICommandResult);
-
             MethodInfo executionMethod = commandType.GetMethod(nameof(ICommand.Execute), BindingFlags.Public);
             ParameterInfo[] parameters = executionMethod?.GetParameters();
 
             if (executionMethod == null
-                || parameters.Length > 1
-                || (parameters.Length == 1 && parameters[0].ParameterType != typeof(CommandContext))
-                || !resultBaseType.IsAssignableFrom(executionMethod.ReturnType))
+                || parameters.Length != 1
+                || parameters[0].ParameterType != typeof(CommandContext))
             {
+
                 logger.Error(
-                    "Invalid command type, at least public method ICommandResult Execute(CommandContext) needs to be presented.",
+                    "Invalid command type, at least public method Execute(CommandContext) needs to be presented.",
                     context.Key, command.GetType().FullName, input.ParsedInput.RawInput);
                 return Task.CompletedTask;
             }
 
-            if (executionMethod.IsStatic)
-            {
-                return ProcessCommandAsTask((c) => (ICommandResult)executionMethod.Invoke(null, new object[] { c }), context, input);
-            }
-
-            return ProcessCommandAsTask((c) => (ICommandResult)executionMethod.Invoke(command, new object[] { c }), context, input);
+            return RenderAsync(
+                input,
+                TransformToResult(
+                    InvokeCommandMethod(executionMethod, command, context),
+                    executionMethod.ReturnType));
         }
 
-        private async Task ProcessCommandAsTask(Func<CommandContext, ICommandResult> commandExecution, CommandContext context, Input input)
+        private async Task RenderAsync(Input input, ICommandResult result)
         {
-            ICommandResult result = await Task.Run(() => commandExecution(context)).ConfigureAwait(true);
-            Render(input, result);
-        }
-
-        private async Task ProcessAsyncCommand(IAsyncCommand command, CommandContext context, Input input)
-        {
-            ICommandResult result = await command.ExecuteAsync(context);
-            Render(input, result);
-        }
-
-        private void Render(Input input, ICommandResult result)
-        {
-            Render(input, resultProcessing.Transfort(result));
+            Render(input, await resultProcessing.TransfortAsync(result));
         }
 
         private void Render(Input input, IImmutableList<IItem> items)
@@ -250,7 +246,37 @@ namespace BeaverSoft.Texo.Core.Runtime
 
         private void RenderError(Input input, string message)
         {
-            Render(input, ImmutableList<IItem>.Empty.Add(Item.Markdown($"> {message}")));
+            Render(input, ImmutableList<IItem>.Empty.Add(Item.AsMarkdown($"> {message}")));
+        }
+
+        private static ICommandResult TransformToResult(object value, Type type)
+        {
+            if (type == voidType)
+            {
+                return new VoidResult();
+            }
+
+            if (!taskType.IsAssignableFrom(type))
+            {
+                Type targetResultType = typedResultType.MakeGenericType(type);
+                return (ICommandResult)Activator.CreateInstance(targetResultType, value);
+            }
+
+            if (!type.IsGenericType
+                || type.GetGenericArguments().Length != 1)
+            {
+                return new TaskResult((Task)value);
+            }
+
+            Type targetTaskResultType = typedTaskResultType.MakeGenericType(type);
+            return (ICommandResult)Activator.CreateInstance(targetTaskResultType, value);
+        }
+
+        private static object InvokeCommandMethod(MethodInfo method, object command, CommandContext context)
+        {
+            return method.IsStatic
+                ? method.Invoke(null, new object[] { context })
+                : method.Invoke(command, new object[] { context });
         }
     }
 }

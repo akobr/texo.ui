@@ -71,13 +71,13 @@ namespace Commands.ReferenceCheck
             if (!directory.Exists)
             {
                 markdown.Italic("Directory doesn't exist.");
-                yield return Item.Markdown(markdown.ToString());
+                yield return Item.AsMarkdown(markdown.ToString());
                 yield break;
             }
 
             FileInfo[] projectFiles = directory.GetFiles("*.csproj", SearchOption.AllDirectories);
             markdown.Italic($"{projectFiles.Length} project file(s).");
-            yield return Item.Markdown(markdown.ToString());
+            yield return Item.AsMarkdown(markdown.ToString());
 
             foreach (FileInfo projectFile in projectFiles)
             {
@@ -99,7 +99,7 @@ namespace Commands.ReferenceCheck
                 markdown.Blockquotes(exception.Message);
             }
 
-            return Item.Markdown(markdown.ToString());
+            return Item.AsMarkdown(markdown.ToString());
         }
 
         private static void ProcessProjectContent(FileInfo projectFile, IMarkdownBuilder markdown)

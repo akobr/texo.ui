@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
@@ -9,7 +9,7 @@ using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Help
 {
-    public class HelpCommand : InlineIntersectionCommand
+    public class HelpCommand : ModularCommand
     {
         private readonly ISettingService setting;
 
@@ -17,9 +17,9 @@ namespace BeaverSoft.Texo.Core.Help
         {
             this.setting = setting ?? throw new ArgumentNullException(nameof(setting));
 
-            RegisterQueryMethod(HelpNames.QUERY_INFO, Info);
-            RegisterQueryMethod(HelpNames.QUERY_TREE, Tree);
-            RegisterQueryMethod(HelpNames.QUERY_LIST, List);
+            RegisterQuery(HelpNames.QUERY_INFO, Info);
+            RegisterQuery(HelpNames.QUERY_TREE, Tree);
+            RegisterQuery(HelpNames.QUERY_LIST, List);
         }
 
         private ICommandResult Info(CommandContext context)
@@ -105,7 +105,7 @@ namespace BeaverSoft.Texo.Core.Help
 
             CommandTextTreeBuilder builder = new CommandTextTreeBuilder(context.HasOption(HelpOptions.TEMPLATE));
             string tree = builder.BuildTree(command);
-            return new ItemsResult(Item.Plain(tree));
+            return new ItemsResult(Item.AsPlain(tree));
         }
 
         private ICommandResult List(CommandContext context)

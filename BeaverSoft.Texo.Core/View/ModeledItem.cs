@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using BeaverSoft.Texo.Core.Model.Text;
 
 namespace BeaverSoft.Texo.Core.View

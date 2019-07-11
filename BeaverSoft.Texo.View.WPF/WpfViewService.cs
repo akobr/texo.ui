@@ -158,7 +158,7 @@ namespace BeaverSoft.Texo.View.WPF
             }
             else
             {
-                sections.Add(renderer.Render(Item.Markdown("> command is done")));
+                sections.Add(renderer.Render(Item.AsMarkdown("> command is done")));
             }
 
             control.OutputDocument.Blocks.AddRange(sections);
@@ -418,7 +418,7 @@ namespace BeaverSoft.Texo.View.WPF
             //headerBuilder.WriteLine();
             //headerBuilder.Blockquotes(atPath);
             headerBuilder.Italic($"[{atPath}]");
-            return Item.Markdown(headerBuilder.ToString());
+            return Item.AsMarkdown(headerBuilder.ToString());
         }
 
         public void ProcessMessage(ISettingUpdatedMessage message)

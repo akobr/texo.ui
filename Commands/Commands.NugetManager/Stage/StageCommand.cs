@@ -11,7 +11,7 @@ using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Commands.NugetManager.Stage
 {
-    public class StageCommand : InlineIntersectionCommand
+    public class StageCommand : ModularCommand
     {
         private readonly IStageService stage;
 
@@ -19,11 +19,11 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
         {
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
 
-            RegisterQueryMethod(StageQueries.STATUS, Status);
-            RegisterQueryMethod(StageQueries.FETCH, Fetch);
-            RegisterQueryMethod(StageQueries.ADD, Add);
-            RegisterQueryMethod(StageQueries.REMOVE, Remove);
-            RegisterQueryMethod(StageQueries.CLEAR, Clear);
+            RegisterQuery(StageQueries.STATUS, Status);
+            RegisterQuery(StageQueries.FETCH, Fetch);
+            RegisterQuery(StageQueries.ADD, Add);
+            RegisterQuery(StageQueries.REMOVE, Remove);
+            RegisterQuery(StageQueries.CLEAR, Clear);
         }
 
         private ICommandResult Status(CommandContext context)
@@ -88,7 +88,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
                 return new TextResult("No project has been removed.");
             }
 
-            return new ItemsResult(removedProjects.Select(p => Item.Plain(p.Name)).ToImmutableList());
+            return new ItemsResult(removedProjects.Select(p => Item.AsPlain(p.Name)).ToImmutableList());
         }
 
         private ICommandResult Clear(CommandContext arg)
@@ -111,7 +111,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
                     builder.Bullet(source);
                 }
 
-                result.Add(Item.Markdown(builder.ToString()));
+                result.Add(Item.AsMarkdown(builder.ToString()));
             }
 
             return result;
@@ -127,7 +127,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
                 builder.Bullet(source);
             }
 
-            return Item.Markdown(builder.ToString());
+            return Item.AsMarkdown(builder.ToString());
         }
 
         internal static IEnumerable<Item> BuildProjectItems(IEnumerable<IProject> projects)
@@ -147,7 +147,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Stage
                     BuildProjectItem(builder, package);
                 }
 
-                result.Add(Item.Markdown(builder.ToString()));
+                result.Add(Item.AsMarkdown(builder.ToString()));
             }
 
             return result;

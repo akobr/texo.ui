@@ -12,7 +12,7 @@ namespace Commands.CodeBaseSearch
             command.Representations.AddRange(
                 new[] { CodeBaseSearchConstants.COMMAND_NAME, "code-search", "search", "s" });
             command.Documentation.Title = "Code-base search";
-            command.Documentation.Description = "Cobe-base search with context and rule definitions.";
+            command.Documentation.Description = "Cobe-base search with context and rule definitions. /Alfa/";
 
             var init = Query.CreateBuilder();
             init.Key = CodeBaseSearchConstants.QUERY_INIT;

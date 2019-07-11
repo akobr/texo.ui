@@ -27,7 +27,7 @@ namespace BeaverSoft.Texo.Core.Intellisense
                     continue;
                 }
 
-                yield return Item.Intellisense(query.GetMainRepresentation(), "command", query.Documentation.Description);
+                yield return Item.AsIntellisense(query.GetMainRepresentation(), "command", query.Documentation.Description);
             }
         }
     }

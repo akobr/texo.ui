@@ -8,7 +8,7 @@ namespace BeaverSoft.Texo.Commands.Functions
         {
             var command = Query.CreateBuilder();
             command.Key = "functions";
-            command.Representations.AddRange(new[] { "functions", "func", "fn", "dev" });
+            command.Representations.AddRange(new[] { "functions", "function", "func", "fn", "dev" });
             command.DefaultQueryKey = "list";
             command.Documentation.Title = "Developer functions";
             command.Documentation.Description = "Helpful functions for a developer.";

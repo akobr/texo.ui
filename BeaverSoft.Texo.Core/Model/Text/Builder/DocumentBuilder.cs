@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace BeaverSoft.Texo.Core.Model.Text
 {
@@ -43,11 +43,10 @@ namespace BeaverSoft.Texo.Core.Model.Text
 
         //public ISpanBuilder StartHeader()
         //{
-        //    Span content = new Span();
-        //    Header header = new Header(content);
+        //    ISpanBuilder builder = new SpanBuilder();
+        //    Header header = new Header(builder.Span);
         //    current = current.AddChild(header);
-        //    return new SpanBuilder(content);
+        //    return builder;
         //}
-
     }
 }

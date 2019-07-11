@@ -13,7 +13,7 @@ using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Commands.FileManager.Stage
 {
-    public class StageCommand : InlineIntersectionCommand
+    public class StageCommand : ModularCommand
     {
         private readonly IStageService stage;
 
@@ -21,13 +21,13 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
         {
             this.stage = stage ?? throw new ArgumentNullException(nameof(stage));
 
-            RegisterQueryMethod(StageQueries.STATUS, Status);
-            RegisterQueryMethod(StageQueries.LIST, List);
-            RegisterQueryMethod(StageQueries.ADD, Add);
-            RegisterQueryMethod(StageQueries.REMOVE, Remove);
-            RegisterQueryMethod(StageQueries.LOBBY, Lobby);
-            RegisterQueryMethod(StageQueries.REMOVE_LOBBY, RemoveLobby);
-            RegisterQueryMethod(StageQueries.CLEAR, Clear);
+            RegisterQuery(StageQueries.STATUS, Status);
+            RegisterQuery(StageQueries.LIST, List);
+            RegisterQuery(StageQueries.ADD, Add);
+            RegisterQuery(StageQueries.REMOVE, Remove);
+            RegisterQuery(StageQueries.LOBBY, Lobby);
+            RegisterQuery(StageQueries.REMOVE_LOBBY, RemoveLobby);
+            RegisterQuery(StageQueries.CLEAR, Clear);
         }
 
         private ICommandResult Status(CommandContext context)
@@ -143,7 +143,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stage
             builder.WriteLine();
             builder.WritePathLists(paths, lobbyPath);
 
-            return Item.Markdown(builder.ToString());
+            return Item.AsMarkdown(builder.ToString());
         }
     }
 }

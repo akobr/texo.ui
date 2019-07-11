@@ -62,25 +62,13 @@ namespace BeaverSoft.Texo.Core.Intellisense
             foreach (string directoryName in TexoDirectory.GetDirectories(directory, filter))
             {
                 string justName = directoryName.GetFileNameOrDirectoryName();
-
-                if (filter.StartsWith(justName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                yield return Item.Intellisense(justName, directoryName + System.IO.Path.DirectorySeparatorChar, "directory", null);
+                yield return Item.AsIntellisense(justName, directoryName + System.IO.Path.DirectorySeparatorChar, "directory", null);
             }
 
             foreach (string fileName in TexoDirectory.GetFiles(directory, filter))
             {
                 string justName = fileName.GetFileNameOrDirectoryName();
-
-                if (filter.StartsWith(justName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                yield return Item.Intellisense(justName, fileName, "file", null);
+                yield return Item.AsIntellisense(justName, fileName, "file", null);
             }
         }
     }

@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
-using BeaverSoft.Texo.Core.Result;
+using BeaverSoft.Texo.Core.Model.Text;
 using BeaverSoft.Texo.Core.Streaming;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services.Logging;
@@ -22,56 +23,17 @@ namespace BeaverSoft.Texo.Core.Runtime
             mapping = new Dictionary<Type, IItemMappingService>();
         }
 
-        public IImmutableList<IItem> Transfort(ICommandResult result)
+        public async Task<IImmutableList<IItem>> TransfortAsync(ICommandResult result)
         {
-            if ((object)result?.Content == null)
+            await result?.ExecuteResultAsync();
+
+            if (result?.Content is null)
             {
                 return ImmutableList<IItem>.Empty;
             }
 
-            switch (result)
-            {
-                case ErrorTextResult errorResult:
-                    return ImmutableList<IItem>.Empty.Add(Item.Markdown(errorResult.Content));
-
-                case ModeledResult modeledResult:
-                    return ImmutableList<IItem>.Empty.Add(new ModeledItem(modeledResult.Content));
-
-                case MarkdownResult markdownResult:
-                    return ImmutableList<IItem>.Empty.Add(Item.Markdown(markdownResult.Content));
-
-                case MarkdownItemsResult markdownItemsResult:
-                    return ImmutableList<IItem>.Empty.AddRange(markdownItemsResult.Content.Select(t => new Item(t)));
-
-                case TextStreamResult textStreamResult:
-                    return ImmutableList<IItem>.Empty.Add(new StreamedItem(textStreamResult.Content));
-            }
-
-            switch ((object)result.Content)
-            {
-                case IImmutableList<IItem> resultImmutableItems:
-                    return resultImmutableItems;
-
-                case IEnumerable<IItem> resultItems:
-                    return ImmutableList<IItem>.Empty.AddRange(resultItems);
-
-                case IEnumerable<string> resultTexts:
-                    return ImmutableList<IItem>.Empty.AddRange(resultTexts.Select(t => new Item(t)));
-
-                case IItem resultItem:
-                    return ImmutableList<IItem>.Empty.Add(resultItem);
-
-                case string resultText:
-                    return ImmutableList<IItem>.Empty.Add(new Item(resultText));
-
-                case IReportableStream textStream:
-                    return ImmutableList<IItem>.Empty.Add(new StreamedItem(textStream));
-
-                default:
-                    return TransformByMap((object)result.Content);
-            }
+            return await FromContentTypeAsync((object)result.Content);
         }
-
 
         public void RegisterMappingService<TContent>(IItemMappingService<TContent> service)
         {
@@ -87,6 +49,43 @@ namespace BeaverSoft.Texo.Core.Runtime
         {
             mapping.TryGetValue(typeof(TContent), out IItemMappingService mappingService);
             return (IItemMappingService<TContent>) mappingService;
+        }
+
+        private async Task<IImmutableList<IItem>> FromContentTypeAsync(object content)
+        {
+            switch (content)
+            {
+                case IImmutableList<IItem> resultImmutableItems:
+                    return resultImmutableItems;
+
+                case IItem resultItem:
+                    return ImmutableList<IItem>.Empty.Add(resultItem);
+
+                case string resultText:
+                    return ImmutableList<IItem>.Empty.Add(new Item(resultText));
+
+                case IReportableStream textStream:
+                    return ImmutableList<IItem>.Empty.Add(new StreamedItem(textStream));
+
+                // The order of IElement and IEnumerable<IElement> is important
+                case IElement resultModel:
+                    return ImmutableList<IItem>.Empty.Add(new ModeledItem(resultModel));
+
+                case IEnumerable<IItem> resultItems:
+                    return ImmutableList<IItem>.Empty.AddRange(resultItems);
+
+                case IEnumerable<string> resultTexts:
+                    return ImmutableList<IItem>.Empty.AddRange(resultTexts.Select(t => new Item(t)));
+
+                case IEnumerable<IElement> resultModels:
+                    return ImmutableList<IItem>.Empty.AddRange(resultModels.Select(m => new ModeledItem(m)));
+
+                case ICommandResult genericResult:
+                    return await TransfortAsync(genericResult);
+
+                default:
+                    return await Task.Run(() => TransformByMap(content));
+            }
         }
 
         private IImmutableList<IItem> TransformByMap(object content)

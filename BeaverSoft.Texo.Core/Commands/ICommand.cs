@@ -1,4 +1,4 @@
-﻿namespace BeaverSoft.Texo.Core.Commands
+namespace BeaverSoft.Texo.Core.Commands
 {
     public interface ICommand
     {

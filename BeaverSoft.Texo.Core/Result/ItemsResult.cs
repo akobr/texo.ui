@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.View;
 
@@ -6,19 +8,20 @@ namespace BeaverSoft.Texo.Core.Result
 {
     public class ItemsResult : ItemsResult<Item>
     {
-        public ItemsResult(ResultTypeEnum resultType, IImmutableList<Item> content)
-            : base(resultType, content)
+        public ItemsResult(IImmutableList<Item> content)
+            : base(content)
         {
             // no operation
         }
-        public ItemsResult(IImmutableList<Item> content)
-            : this(ResultTypeEnum.Success, content)
+
+        public ItemsResult(IEnumerable<Item> content)
+            : base(content)
         {
             // no operation
         }
 
         public ItemsResult(params Item[] content)
-            : this(ResultTypeEnum.Success, ImmutableList.Create<Item>(content))
+            : this(ImmutableList.Create(content))
         {
             // no operation
         }
@@ -27,28 +30,31 @@ namespace BeaverSoft.Texo.Core.Result
     public class ItemsResult<TItem> : ICommandResult<IImmutableList<TItem>>
         where TItem : IItem
     {
-        public ItemsResult(ResultTypeEnum resultType, IImmutableList<TItem> content)
+        public ItemsResult(IImmutableList<TItem> content)
         {
-            ResultType = resultType;
             Content = content;
         }
-        public ItemsResult(IImmutableList<TItem> content)
-            : this(ResultTypeEnum.Success, content)
+
+        public ItemsResult(IEnumerable<TItem> content)
         {
-            // no operation
+            Content = ImmutableList<TItem>.Empty.AddRange(content);
         }
 
         public ItemsResult(params TItem[] content)
-            : this(ResultTypeEnum.Success, ImmutableList.Create<TItem>(content))
+            : this(ImmutableList.Create(content))
         {
             // no operation
         }
-
-
-        public ResultTypeEnum ResultType { get; }
 
         dynamic ICommandResult.Content => Content;
 
         public IImmutableList<TItem> Content { get; }
+
+        public ResultTypeEnum ResultType { get; set; }
+
+        public virtual Task ExecuteResultAsync()
+        {
+            return Task.CompletedTask;
+        }
     }
 }

@@ -1,10 +1,14 @@
-﻿namespace BeaverSoft.Texo.Core.Commands
+using System.Threading.Tasks;
+
+namespace BeaverSoft.Texo.Core.Commands
 {
     public interface ICommandResult
     {
+        dynamic Content { get; }
+
         ResultTypeEnum ResultType { get; }
 
-        dynamic Content { get; }
+        Task ExecuteResultAsync();
     }
 
     public interface ICommandResult<out TResult> : ICommandResult

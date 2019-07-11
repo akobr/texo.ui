@@ -41,7 +41,7 @@ namespace BeaverSoft.Texo.Commands.TodoList
                 builder.Bullet($"{GetMarkdownTaskPrefix(item)} {item.Text}");
             }
 
-            return new ItemsResult(Item.Markdown(builder.ToString()));
+            return new ItemsResult(Item.AsMarkdown(builder.ToString()));
         }
 
         private static string GetMarkdownTaskPrefix(TodoItem item)

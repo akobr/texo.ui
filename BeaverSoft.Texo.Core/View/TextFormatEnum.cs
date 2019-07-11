@@ -1,4 +1,4 @@
-﻿namespace BeaverSoft.Texo.Core.View
+namespace BeaverSoft.Texo.Core.View
 {
     public enum TextFormatEnum
     {
@@ -9,6 +9,7 @@
         Markdown,
         Html,
         Json,
+        Yaml,
         Xml,
     }
 }

@@ -14,7 +14,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Markdown
 
         public Item Finish()
         {
-            Item result = Item.Markdown(markdown.ToString());
+            Item result = Item.AsMarkdown(markdown.ToString());
 
             markdown = null;
             return result;

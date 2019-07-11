@@ -8,7 +8,7 @@ using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Commands.FileManager.Stash
 {
-    public class StashCommand : InlineIntersectionCommand
+    public class StashCommand : ModularCommand
     {
         private readonly IStashService stashes;
         private readonly IStageService stage;
@@ -18,14 +18,14 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             this.stashes = stashes;
             this.stage = stage;
 
-            RegisterQueryMethod(StashQueries.LIST, List);
-            RegisterQueryMethod(StashQueries.SHOW, Show);
-            RegisterQueryMethod(StashQueries.PUSH, Push);
-            RegisterQueryMethod(StashQueries.APPLY, Apply);
-            RegisterQueryMethod(StashQueries.PEEK, Peek);
-            RegisterQueryMethod(StashQueries.POP, Pop);
-            RegisterQueryMethod(StashQueries.DROP, Drop);
-            RegisterQueryMethod(StashQueries.CLEAR, Clear);
+            RegisterQuery(StashQueries.LIST, List);
+            RegisterQuery(StashQueries.SHOW, Show);
+            RegisterQuery(StashQueries.PUSH, Push);
+            RegisterQuery(StashQueries.APPLY, Apply);
+            RegisterQuery(StashQueries.PEEK, Peek);
+            RegisterQuery(StashQueries.POP, Pop);
+            RegisterQuery(StashQueries.DROP, Drop);
+            RegisterQuery(StashQueries.CLEAR, Clear);
         }
 
         private ICommandResult List(CommandContext context)
@@ -165,7 +165,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             builder.Italic(GetStashLobbyTitle(stash));
             builder.WriteLine();
             builder.WritePathLists(stash.GetPaths(), stash.GetLobby());
-            return Item.Markdown(builder.ToString());
+            return Item.AsMarkdown(builder.ToString());
         }
 
         private static Item BuildStashOverviewItem(IStashEntry stash, int index)
@@ -175,7 +175,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Stash
             builder.Bullet();
             builder.Italic(GetStashLobbyTitle(stash));
             builder.WritePathOverview(stash.GetPaths(), stash.GetLobby());
-            return Item.Markdown(builder.ToString());
+            return Item.AsMarkdown(builder.ToString());
         }
 
         private static string GetStashLobbyTitle(IStashEntry stash)
