@@ -10,7 +10,7 @@ using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Core
 {
-    public class TexoEngine : IInitialisable<TextumConfiguration>, IDisposable
+    public class TexoEngine : IInitialisable<TexoConfiguration>, IDisposable
     {
         private readonly IRuntimeCoordinatorService runtime;
         private readonly IViewService view;
@@ -40,13 +40,13 @@ namespace BeaverSoft.Texo.Core
 
         public ILogService Logger => logger;
 
-        public void Initialise(TextumConfiguration configuration)
+        public void Initialise(TexoConfiguration configuration)
         {
             runtime.Initialise();
             setting.Configure(configuration);
         }
 
-        public Task InitialiseAsync(TextumConfiguration configuration)
+        public Task InitialiseAsync(TexoConfiguration configuration)
         {
             return Task.Run(() => Initialise(configuration));
         }
@@ -63,7 +63,7 @@ namespace BeaverSoft.Texo.Core
 
         public void Initialise(IEnumerable<Query> commands)
         {
-            Initialise(TextumConfiguration.CreateDefault().AddCommands(commands));
+            Initialise(TexoConfiguration.CreateDefault().AddCommands(commands));
         }
 
         public Task InitialiseAsync(IEnumerable<Query> commands)
@@ -71,7 +71,7 @@ namespace BeaverSoft.Texo.Core
             return Task.Run(() => Initialise(commands));
         }
 
-        public void Recorfigure(TextumConfiguration configuration)
+        public void Recorfigure(TexoConfiguration configuration)
         {
             setting.Configure(configuration);
         }

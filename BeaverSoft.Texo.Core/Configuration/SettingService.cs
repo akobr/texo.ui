@@ -11,9 +11,9 @@ namespace BeaverSoft.Texo.Core.Configuration
             this.messageBus = messageBus;
         }
 
-        public TextumConfiguration Configuration { get; private set; }
+        public TexoConfiguration Configuration { get; private set; }
 
-        public void Configure(TextumConfiguration configuration)
+        public void Configure(TexoConfiguration configuration)
         {
             Configuration = configuration;
             messageBus?.Send<ISettingUpdatedMessage>(new SettingUpdatedMessage(configuration));

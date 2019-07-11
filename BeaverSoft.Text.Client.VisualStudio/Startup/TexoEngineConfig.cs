@@ -23,7 +23,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
     {
         public static Task InitialiseWithCommandsAsync(this TexoEngine engine, SimpleIoc container)
         {
-            TextumConfiguration.Builder configuration = TextumConfiguration.CreateDefault().ToBuilder();
+            TexoConfiguration.Builder configuration = TexoConfiguration.CreateDefault().ToBuilder();
 
             string solutionFile = container.GetInstance<ISolutionPathProvider>().GetPath();
             if (!string.IsNullOrEmpty(solutionFile))

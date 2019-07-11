@@ -18,7 +18,7 @@ namespace BeaverSoft.Texo.View.Console
         private readonly CursorPosition position;
 
         private IExecutor executor;
-        private TextumConfiguration configuration;
+        private TexoConfiguration configuration;
         private string workingDir;
         private string prompt;
         private bool disposed;

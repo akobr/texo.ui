@@ -127,7 +127,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
 
             engine = engineBuilder.Build(commandFactory, container.GetInstance<IViewService>());
 
-            var config = TextumConfiguration.CreateDefault().ToBuilder();
+            var config = TexoConfiguration.CreateDefault().ToBuilder();
             config.Runtime.Commands.Add(ReferenceCheckCommand.BuildConfiguration());
             config.Runtime.Commands.Add(CommandLineCommand.BuildConfiguration());
             config.Runtime.Commands.Add(FileManagerBuilder.BuildCommand());

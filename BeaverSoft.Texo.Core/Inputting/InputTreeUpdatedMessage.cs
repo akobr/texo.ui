@@ -7,14 +7,14 @@ namespace BeaverSoft.Texo.Core.Inputting
     public class InputTreeUpdatedMessage : ServiceMessage, IInputTreeUpdatedMessage
     {
         public InputTreeUpdatedMessage(
-            TextumConfiguration configuration,
+            TexoConfiguration configuration,
             InputTree inputTree)
         {
             Configuration = configuration;
             InputTree = inputTree;
         }
 
-        public TextumConfiguration Configuration { get; }
+        public TexoConfiguration Configuration { get; }
 
         public InputTree InputTree { get; }
     }

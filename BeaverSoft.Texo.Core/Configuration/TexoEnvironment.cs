@@ -2,30 +2,30 @@
 
 namespace BeaverSoft.Texo.Core.Configuration
 {
-    public partial class TextumEnvironment
+    public partial class TexoEnvironment
     {
         private ImmutableDictionary<string, string> variables;
 
-        private TextumEnvironment()
+        private TexoEnvironment()
         {
             variables = ImmutableDictionary<string, string>.Empty;
         }
 
-        private TextumEnvironment(TextumEnvironment toClone)
+        private TexoEnvironment(TexoEnvironment toClone)
         {
             variables = toClone.variables;
         }
 
-        private TextumEnvironment(Builder builder)
+        private TexoEnvironment(Builder builder)
         {
             variables = builder.Variables.ToImmutable();
         }
 
         public ImmutableDictionary<string, string> Variables => variables;
 
-        public TextumEnvironment SetVariables(ImmutableDictionary<string, string> value)
+        public TexoEnvironment SetVariables(ImmutableDictionary<string, string> value)
         {
-            return new TextumEnvironment(this)
+            return new TexoEnvironment(this)
             {
                 variables = value
             };

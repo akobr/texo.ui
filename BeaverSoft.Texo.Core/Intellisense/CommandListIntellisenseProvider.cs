@@ -9,9 +9,9 @@ namespace BeaverSoft.Texo.Core.Intellisense
 {
     public class CommandListIntellisenseProvider : ISynchronousIntellisenseProvider
     {
-        private TextumConfiguration configuration;
+        private TexoConfiguration configuration;
 
-        public void SetConfiguration(TextumConfiguration configuration)
+        public void SetConfiguration(TexoConfiguration configuration)
         {
             this.configuration = configuration;
         }

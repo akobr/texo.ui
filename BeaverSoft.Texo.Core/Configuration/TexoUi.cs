@@ -1,23 +1,23 @@
-﻿namespace BeaverSoft.Texo.Core.Configuration
+namespace BeaverSoft.Texo.Core.Configuration
 {
-    public partial class TextumUi
+    public partial class TexoUi
     {
         private string prompt;
         private bool showWorkingPathAsPrompt;
 
-        private TextumUi()
+        private TexoUi()
         {
             prompt = string.Empty;
             showWorkingPathAsPrompt = false;
         }
 
-        private TextumUi(TextumUi toClone)
+        private TexoUi(TexoUi toClone)
         {
             prompt = toClone.prompt;
             showWorkingPathAsPrompt = toClone.showWorkingPathAsPrompt;
         }
 
-        private TextumUi(Builder builder)
+        private TexoUi(Builder builder)
         {
             prompt = builder.Prompt;
             showWorkingPathAsPrompt = builder.ShowWorkingPathAsPrompt;
@@ -27,17 +27,17 @@
 
         public bool ShowWorkingPathAsPrompt => showWorkingPathAsPrompt;
 
-        public TextumUi SetPrompt(string value)
+        public TexoUi SetPrompt(string value)
         {
-            return new TextumUi(this)
+            return new TexoUi(this)
             {
                 prompt = value
             };
         }
 
-        public TextumUi SetShowWorkingPathAsPrompt(bool value)
+        public TexoUi SetShowWorkingPathAsPrompt(bool value)
         {
-            return new TextumUi(this)
+            return new TexoUi(this)
             {
                 showWorkingPathAsPrompt = value
             };
