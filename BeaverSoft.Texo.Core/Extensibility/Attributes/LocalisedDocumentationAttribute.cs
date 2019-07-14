@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 {
@@ -6,7 +6,7 @@ namespace BeaverSoft.Texo.Core.Extensibility.Attributes
         AttributeTargets.Class | AttributeTargets.Method,
         Inherited = false,
         AllowMultiple = false)]
-    class LocalisedDocumentationAttribute : Attribute
+    public class LocalisedDocumentationAttribute : Attribute
     {
         public LocalisedDocumentationAttribute(string titleKey, string descriptionKey)
         {
@@ -19,6 +19,6 @@ namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 
         public string DescriptionKey { get; }
 
-        public string SubjectPath { get; set; }
+        public string Path { get; set; }
     }
 }

@@ -1,9 +1,9 @@
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Extensibility.Attributes;
 using BeaverSoft.Texo.Core.Result;
-using System;
 using System.Collections.Generic;
 
+// Tell to the system that this assembly (dll) contains command(s) and should be examined.
 [assembly: CommandLibrary]
 
 namespace BeaverSoft.Texo.Commands.TodoList
@@ -14,9 +14,10 @@ namespace BeaverSoft.Texo.Commands.TodoList
     {
         private readonly ITodoListService service;
 
-        public TodoListCommand(ITodoListService service)
+        public TodoListCommand()
         {
-            this.service = service ?? throw new ArgumentNullException(nameof(service));
+            // TODO: [P3] The service could be injected when the plugin specify his own type factory
+            service = new TodoListService();
         }
 
         [Query("add", Representations = "add new task a n")]

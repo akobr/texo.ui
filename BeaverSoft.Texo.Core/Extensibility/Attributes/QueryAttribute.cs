@@ -14,8 +14,6 @@ namespace BeaverSoft.Texo.Core.Extensibility.Attributes
 
         public string Representations { get; set; }
 
-        public string Path { get; set; }
-
         public bool IsDefault { get; set; }
     }
 }

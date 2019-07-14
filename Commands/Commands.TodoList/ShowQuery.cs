@@ -8,10 +8,22 @@ using System.Collections.Generic;
 
 namespace BeaverSoft.Texo.Commands.TodoList
 {
-    [Query("show", Representations = "show list display" , Path = "todo-list")]
-    [Option("open-only", Representations = "open-only open o")]
+    [SubCommand("show", Representations = "show list display" , Path = "todo-list")]
+    [Option("open-only", Representations = "open-only open o")] 
     [Documentation("List of todos", "Displays list of all todo items.")]
-    [Documentation("Open todos only", "With this option gonna show only open items.", Path = "todo-list show open-only" )]
+    [Documentation("Open todos only", "With this option gonna show only open items.", Path = "open-only" )]
+
+    // DELETE: just the example of complex usage of attributes 
+    [Parameter("index", ParameterTemplate = "^[0-9]+$")]
+    [Parameter("index", OptionKey = "open-only", ParameterTemplate = "^[0-9]+$")]
+    [Documentation("Test index parameter", "Test description.", Path = "o:open-only.index")]
+    [LocalisedDocumentation("PAR_INDEX_NAME", "PAR_INDEX_DESC", Path = "p:index")]
+
+    // representations can be separated by space or comma
+    // prefix p:(parameter) or o:(option) is neccesary only when there name/key collision
+    // path is always starting in current context (where the command's path ends)
+    // path can be separeted by space or dot
+
     public class ShowQuery : ICommand
     {
         private readonly ITodoListService service;
