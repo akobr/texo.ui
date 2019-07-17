@@ -33,6 +33,7 @@
                           BackgroundBaseColor="{DynamicResource {x:Static shell:EnvironmentColors.ToolWindowBackgroundColorKey}}"
                           BorderBaseColor="{DynamicResource {x:Static shell:EnvironmentColors.ControlOutlineColorKey}}"
                           AccentColor="{DynamicResource {x:Static shell:EnvironmentColors.CommandBarMenuLinkTextHoverColorKey}}"
+                          ScrollButtonMargin="24,8"
                           ShadowsVisibility="Collapsed" />
     </Grid>
 </UserControl>

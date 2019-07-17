@@ -102,6 +102,8 @@ namespace BeaverSoft.Texo.View.WPF
             set => SetValue(ShadowsVisibilityProperty, value);
         }
 
+        public Thickness ScrollButtonMargin { get; set; } = new Thickness(18, 10, 18, 10);
+
         public FlowDocument OutputDocument => docOutput.Document;
 
         public ListBox IntellisenseList => listIntellisense;
@@ -254,6 +256,7 @@ namespace BeaverSoft.Texo.View.WPF
             docOutput.Visibility = Visibility.Collapsed;
             docOutput.Document.Blocks.Clear();
             docOutput.Visibility = Visibility.Visible;
+            btnScroll.Visibility = Visibility.Collapsed;
         }
 
         private void HandleInputTextChanged(object sender, TextChangedEventArgs e)
@@ -551,6 +554,7 @@ namespace BeaverSoft.Texo.View.WPF
             }
             
             UpdateScrollButton();
+            btnScroll.Visibility = Visibility.Collapsed;
         }
 
         private void UpdateScrollButton()

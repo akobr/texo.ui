@@ -221,7 +221,8 @@ namespace BeaverSoft.Texo.View.WPF
                     Background = Brushes.Transparent,
                 };
 
-                box.SetResourceReference(Control.ForegroundProperty, "SystemBaseHighColorBrush");
+                // box.SetResourceReference(Control.ForegroundProperty, "SystemBaseHighColorBrush");
+                box.SetResourceReference(Control.ForegroundProperty, SystemColors.ControlTextBrushKey);
                 box.Document = new FlowDocument();
                 box.Document.Blocks.AddRange(itemSection.Blocks.ToList());
                 control.IntellisenseList.Items.Add(new ListBoxItem() { Content = box, Tag = item });
