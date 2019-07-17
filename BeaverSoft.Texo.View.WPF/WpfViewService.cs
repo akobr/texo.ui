@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +15,7 @@ using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.Inputting.History;
 using BeaverSoft.Texo.Core.Markdown.Builder;
+using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using Markdig.Wpf;
@@ -53,6 +53,23 @@ namespace BeaverSoft.Texo.View.WPF
 
             currentPrompt = DEFAULT_PROMPT;
             currentTitle = DEFAULT_TITLE;
+            WorkingDirectory = Environment.CurrentDirectory ?? string.Empty;
+        }
+
+        public string WorkingDirectory
+        {
+            get => workingDirectory;
+            set
+            {
+                value = value.RemoveEndDirectorySeparator();
+
+                if (string.Equals(value, workingDirectory, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
+                workingDirectory = value;
+            }
         }
 
         public void SetInput(string input)
@@ -449,17 +466,16 @@ namespace BeaverSoft.Texo.View.WPF
             }
 
             showWorkingPathAsPrompt = message.Configuration.Ui.ShowWorkingPathAsPrompt;
-            string currentDirectory = message.Configuration.Environment.Variables[VariableNames.CURRENT_DIRECTORY];
 
             if (showWorkingPathAsPrompt)
             {
-                SetPrompt(currentDirectory);
+                SetPrompt(WorkingDirectory);
                 SetTitle(DEFAULT_TITLE);
             }
             else
             {
                 SetPrompt(message.Configuration.Ui.Prompt);
-                SetTitle(currentDirectory);
+                SetTitle(WorkingDirectory);
             }
         }
 
@@ -489,14 +505,7 @@ namespace BeaverSoft.Texo.View.WPF
                 return;
             }
 
-            workingDirectory = message.NewValue;
-
-            if (workingDirectory.Length > 3
-                && (workingDirectory[workingDirectory.Length - 1] == System.IO.Path.AltDirectorySeparatorChar
-                    || workingDirectory[workingDirectory.Length - 1] == System.IO.Path.DirectorySeparatorChar))
-            {
-                workingDirectory = workingDirectory.Substring(0, workingDirectory.Length - 1);
-            }
+            WorkingDirectory = message.NewValue;
 
             if (showWorkingPathAsPrompt)
             {
