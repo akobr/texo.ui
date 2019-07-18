@@ -7,7 +7,6 @@ using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Help;
 using BeaverSoft.Texo.Core.View;
 using Commands.Calc;
-using Commands.Clipboard;
 using Commands.CodeBaseSearch;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
@@ -29,7 +28,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
             factory.Register("file-manager", container.GetInstance<FileManagerCommand>);
             factory.Register("nuget-manager", container.GetInstance<NugetManagerCommand>);
             factory.Register("calculator", container.GetInstance<CalcCommand>);
-            factory.Register(ClipboardConstants.COMMAND_NAME, container.GetInstance<ClipboardCommand>);
+            //factory.Register(ClipboardConstants.COMMAND_NAME, container.GetInstance<ClipboardCommand>);
             factory.Register("functions", container.GetInstance<FunctionsCommand>);
             factory.Register(CodeBaseSearchConstants.COMMAND_NAME, container.GetInstance<CodeBaseSearchCommand>);
             factory.Register(SpinSportConstants.COMMAND_NAME, container.GetInstance<SpinSportCommand>);
