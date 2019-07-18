@@ -496,6 +496,11 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
             streamedOnFinished?.Invoke();
             streamedOnFinished = null;
 
+            _ = Task.Run(() =>
+            {
+                GC.Collect(3, GCCollectionMode.Optimized, false);
+            });
+
             // Warn: This can cause freeze of an entire application
             // GC.Collect(3, GCCollectionMode.Forced, true);
         }

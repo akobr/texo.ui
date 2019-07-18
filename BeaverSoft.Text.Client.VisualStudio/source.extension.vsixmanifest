@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="BeaverSoft.Text.Client.VisualStudio.2fe1f9f4-25a6-4757-8679-1e2e49feb23d" Version="0.9.8.2" Language="en-US" Publisher="Ales Kobr" />
+        <Identity Id="BeaverSoft.Text.Client.VisualStudio.2fe1f9f4-25a6-4757-8679-1e2e49feb23d" Version="0.9.8.3" Language="en-US" Publisher="Ales Kobr" />
         <DisplayName>Texo Terminal</DisplayName>
         <Description xml:space="preserve">Powerful terminal with built-in commands and PowerShell fallback.</Description>
         <Preview>true</Preview>
