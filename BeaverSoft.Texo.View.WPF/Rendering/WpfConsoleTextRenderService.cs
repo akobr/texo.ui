@@ -495,7 +495,9 @@ namespace BeaverSoft.Texo.View.WPF.Rendering
             streamedOnAfterRender = null;
             streamedOnFinished?.Invoke();
             streamedOnFinished = null;
-            GC.Collect(3, GCCollectionMode.Forced, true);
+
+            // Warn: This can cause freeze of an entire application
+            // GC.Collect(3, GCCollectionMode.Forced, true);
         }
 
         private void SetEmptyCommandStream(Span target)
