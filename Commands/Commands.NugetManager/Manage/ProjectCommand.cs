@@ -23,7 +23,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
 
             foreach (string projectTerm in context.GetParameterValues(NugetManagerParameters.SEARCH_TERM))
             {
-                StageCommand.BuildProjectItems(projects.Find(projectTerm));
+                items.AddRange(StageCommand.BuildProjectItems(projects.Find(projectTerm)));
             }
 
             if (items.Count < 1)
