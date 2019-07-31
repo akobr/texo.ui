@@ -30,7 +30,7 @@ namespace Commands.SpinSport
 
             if (!File.Exists(configPath))
             {
-                return "Configuration hasn't been find.";
+                return "Configuration hasn't been found.";
             }
 
             Regex filter = context.GetFilterRegex();
@@ -66,7 +66,7 @@ namespace Commands.SpinSport
 
             if (!File.Exists(configPath))
             {
-                return "Configuration hasn't been find.";
+                return "Configuration hasn't been found.";
             }
 
             Regex filter = context.GetFilterRegex();
@@ -100,7 +100,7 @@ namespace Commands.SpinSport
 
             if (!File.Exists(configPath))
             {
-                return "Configuration hasn't been find.";
+                return "Configuration hasn't been found.";
             }
 
             string name = context.GetParameterValue(SpinSportConstants.PARAMETER_NAME);

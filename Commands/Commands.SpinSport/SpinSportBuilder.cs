@@ -8,7 +8,7 @@ namespace Commands.SpinSport
         {
             var command = Query.CreateBuilder();
             command.Key = SpinSportConstants.COMMAND_NAME;
-            command.DefaultQueryKey = SpinSportConstants.QUERY_CONFIG_COLOUR;
+            command.DefaultQueryKey = SpinSportConstants.QUERY_CODE;
             command.Representations.AddRange(
                 new[] { SpinSportConstants.COMMAND_NAME, "spin", "sport", "ss", "client" });
             command.Documentation.Title = "spin-sport tools";
@@ -87,7 +87,7 @@ namespace Commands.SpinSport
             colourUsage.Key = SpinSportConstants.QUERY_CONFIG_COLOUR_USAGE;
             colourUsage.DefaultQueryKey = SpinSportConstants.QUERY_LIST;
             colourUsage.Representations.AddRange(
-                new[] { SpinSportConstants.QUERY_CONFIG_COLOUR_USAGE, "cu" });
+                new[] { SpinSportConstants.QUERY_CONFIG_COLOUR_USAGE, "color-usage",  "cu" });
             colourUsage.Documentation.Title = "config-colour-usage";
             colourUsage.Documentation.Description = "Configuration of colour usages.";
 
