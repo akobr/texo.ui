@@ -1,9 +1,10 @@
 using System;
 using BeaverSoft.Texo.Core.Commands;
+using Commands.SpinSport.Code;
 
 namespace Commands.SpinSport
 {
-    public class SpinSportCommand : IntersectionCommand
+    public class SpinSportCommand : ModularCommand
     {
         private readonly ISolutionDirectoryProvider solutionProvider;
 
@@ -11,9 +12,10 @@ namespace Commands.SpinSport
         {
             this.solutionProvider = solutionProvider ?? throw new ArgumentNullException(nameof(solutionProvider));
 
-            RegisterCommand(SpinSportConstants.QUERY_CONFIG_LOCALISATION, new LocalisationCommand(solutionProvider));
-            RegisterCommand(SpinSportConstants.QUERY_CONFIG_COLOUR, new ColourCommand(solutionProvider));
-            RegisterCommand(SpinSportConstants.QUERY_CONFIG_COLOUR_USAGE, new ColourUsageCommand(solutionProvider));
+            RegisterQuery(SpinSportConstants.QUERY_CONFIG_LOCALISATION, new LocalisationCommand(solutionProvider));
+            RegisterQuery(SpinSportConstants.QUERY_CONFIG_COLOUR, new ColourCommand(solutionProvider));
+            RegisterQuery(SpinSportConstants.QUERY_CONFIG_COLOUR_USAGE, new ColourUsageCommand(solutionProvider));
+            RegisterQuery(SpinSportConstants.QUERY_CODE, new CodeCommand());
         }
     }
 }

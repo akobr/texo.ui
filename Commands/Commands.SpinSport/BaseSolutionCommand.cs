@@ -4,7 +4,7 @@ using BeaverSoft.Texo.Core.Commands;
 
 namespace Commands.SpinSport
 {
-    public abstract class BaseSolutionCommand : InlineIntersectionCommand
+    public abstract class BaseSolutionCommand : ModularCommand
     {
         private readonly ISolutionDirectoryProvider solutionProvider;
 

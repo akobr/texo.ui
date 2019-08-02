@@ -1,12 +1,12 @@
 ﻿namespace BeaverSoft.Texo.Core.Configuration
 {
-    public partial class TextumUi
+    public partial class TexoUi
     {
         public const string DEFAULT_PROMPT = "tu";
 
-        public static TextumUi Empty { get; } = new TextumUi();
+        public static TexoUi Empty { get; } = new TexoUi();
 
-        public static TextumUi CreateDefault()
+        public static TexoUi CreateDefault()
         {
             Builder builder = CreateBuilder();
             SetDefault(builder);

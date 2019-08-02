@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +15,7 @@ using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Inputting;
 using BeaverSoft.Texo.Core.Inputting.History;
 using BeaverSoft.Texo.Core.Markdown.Builder;
+using BeaverSoft.Texo.Core.Path;
 using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.View;
 using Markdig.Wpf;
@@ -53,6 +53,23 @@ namespace BeaverSoft.Texo.View.WPF
 
             currentPrompt = DEFAULT_PROMPT;
             currentTitle = DEFAULT_TITLE;
+            WorkingDirectory = Environment.CurrentDirectory ?? string.Empty;
+        }
+
+        public string WorkingDirectory
+        {
+            get => workingDirectory;
+            set
+            {
+                value = value.RemoveEndDirectorySeparator();
+
+                if (string.Equals(value, workingDirectory, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
+                workingDirectory = value;
+            }
         }
 
         public void SetInput(string input)
@@ -122,9 +139,20 @@ namespace BeaverSoft.Texo.View.WPF
                                     return;
                                 }
 
+                                if (!control.IsAutoScrollEnabled)
+                                {
+                                    return;   
+                                }
+
                                 Inline lastLine = renderedSpan.Inlines.LastInline;
                                 if (lastLine.IsLoaded)
                                 {
+                                    if (!control.IsAutoScrollEnabled)
+                                    {
+                                        return;
+                                    }
+
+                                    control.RequestSystemScroll();
                                     lastLine.BringIntoView();
                                 }
                                 else
@@ -158,7 +186,7 @@ namespace BeaverSoft.Texo.View.WPF
             }
             else
             {
-                sections.Add(renderer.Render(Item.Markdown("> command is done")));
+                sections.Add(renderer.Render(Item.AsMarkdown("> command is done")));
             }
 
             control.OutputDocument.Blocks.AddRange(sections);
@@ -170,6 +198,13 @@ namespace BeaverSoft.Texo.View.WPF
         {
             FrameworkContentElement element = (FrameworkContentElement)sender;
             element.Loaded -= HandleLastElementLoaded;
+
+            if (!control.IsAutoScrollEnabled)
+            {
+                return;
+            }
+
+            control.RequestSystemScroll();
             element.BringIntoView();
         }
 
@@ -203,7 +238,8 @@ namespace BeaverSoft.Texo.View.WPF
                     Background = Brushes.Transparent,
                 };
 
-                box.SetResourceReference(Control.ForegroundProperty, "SystemBaseHighColorBrush");
+                // box.SetResourceReference(Control.ForegroundProperty, "SystemBaseHighColorBrush");
+                box.SetResourceReference(Control.ForegroundProperty, SystemColors.ControlTextBrushKey);
                 box.Document = new FlowDocument();
                 box.Document.Blocks.AddRange(itemSection.Blocks.ToList());
                 control.IntellisenseList.Items.Add(new ListBoxItem() { Content = box, Tag = item });
@@ -418,7 +454,7 @@ namespace BeaverSoft.Texo.View.WPF
             //headerBuilder.WriteLine();
             //headerBuilder.Blockquotes(atPath);
             headerBuilder.Italic($"[{atPath}]");
-            return Item.Markdown(headerBuilder.ToString());
+            return Item.AsMarkdown(headerBuilder.ToString());
         }
 
         public void ProcessMessage(ISettingUpdatedMessage message)
@@ -430,17 +466,16 @@ namespace BeaverSoft.Texo.View.WPF
             }
 
             showWorkingPathAsPrompt = message.Configuration.Ui.ShowWorkingPathAsPrompt;
-            string currentDirectory = message.Configuration.Environment.Variables[VariableNames.CURRENT_DIRECTORY];
 
             if (showWorkingPathAsPrompt)
             {
-                SetPrompt(currentDirectory);
+                SetPrompt(WorkingDirectory);
                 SetTitle(DEFAULT_TITLE);
             }
             else
             {
                 SetPrompt(message.Configuration.Ui.Prompt);
-                SetTitle(currentDirectory);
+                SetTitle(WorkingDirectory);
             }
         }
 
@@ -470,14 +505,7 @@ namespace BeaverSoft.Texo.View.WPF
                 return;
             }
 
-            workingDirectory = message.NewValue;
-
-            if (workingDirectory.Length > 3
-                && (workingDirectory[workingDirectory.Length - 1] == System.IO.Path.AltDirectorySeparatorChar
-                    || workingDirectory[workingDirectory.Length - 1] == System.IO.Path.DirectorySeparatorChar))
-            {
-                workingDirectory = workingDirectory.Substring(0, workingDirectory.Length - 1);
-            }
+            WorkingDirectory = message.NewValue;
 
             if (showWorkingPathAsPrompt)
             {

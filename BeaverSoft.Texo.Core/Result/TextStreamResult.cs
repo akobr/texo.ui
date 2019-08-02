@@ -1,26 +1,25 @@
-﻿using BeaverSoft.Texo.Core.Commands;
+using System.Threading.Tasks;
+using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Streaming;
 
 namespace BeaverSoft.Texo.Core.Result
 {
     public class TextStreamResult : ICommandResult<IReportableStream>
     {
-        public TextStreamResult(ResultTypeEnum resultType, IReportableStream content)
+        public TextStreamResult(IReportableStream content)
         {
-            ResultType = resultType;
             Content = content;
         }
 
-        public TextStreamResult(IReportableStream content)
-            : this(ResultTypeEnum.Success, content)
-        {
-            // no operation
-        }
-
-        public ResultTypeEnum ResultType { get; }
+        dynamic ICommandResult.Content => Content;
 
         public IReportableStream Content { get; }
 
-        dynamic ICommandResult.Content => Content;
+        public ResultTypeEnum ResultType { get; set; }
+
+        public Task ExecuteResultAsync()
+        {
+            return Task.CompletedTask;
+        }
     }
 }

@@ -1,10 +1,10 @@
-﻿namespace BeaverSoft.Texo.Core.Configuration
+namespace BeaverSoft.Texo.Core.Configuration
 {
-    public partial class TextumUi
+    public partial class TexoUi
     {
         public sealed class Builder
         {
-            internal Builder(TextumUi immutable)
+            internal Builder(TexoUi immutable)
             {
                 Prompt = immutable.prompt;
             }
@@ -13,9 +13,9 @@
 
             public bool ShowWorkingPathAsPrompt { get; set; }
 
-            public TextumUi ToImmutable()
+            public TexoUi ToImmutable()
             {
-                return new TextumUi(this);
+                return new TexoUi(this);
             }
         }
     }

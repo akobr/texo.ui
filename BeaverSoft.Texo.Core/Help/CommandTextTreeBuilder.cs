@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +6,12 @@ using BeaverSoft.Texo.Core.Configuration;
 
 namespace BeaverSoft.Texo.Core.Help
 {
+    // TODO: [P4] refactor this and make it more readable
     public class CommandTextTreeBuilder
     {
         private readonly bool showTemplates;
         private StringBuilder result;
+        private List<char> indentedMask;
 
         public CommandTextTreeBuilder(bool showTemplates)
         {
@@ -19,13 +21,16 @@ namespace BeaverSoft.Texo.Core.Help
         public string BuildTree(Query command)
         {
             result = new StringBuilder();
+            indentedMask = new List<char>();
+            indentedMask.Add('\0');
+
             RenderQuery(command, 0, false, true);
             return result.ToString();
         }
 
         public void RenderQuery(Query query, ushort level, bool isDefault, bool isLast)
         {
-            RenderBullet(level, isLast);
+            RenderIndention(level, isLast);
 
             string mainRepresentation = query.GetMainRepresentation();
             result.Append(mainRepresentation);
@@ -39,9 +44,11 @@ namespace BeaverSoft.Texo.Core.Help
             result.Append("] ");
             RenderRepresentation(query, mainRepresentation);
             result.AppendLine();
+            UpdateIndentionBeforeChildren(level, isLast);
 
             var orderedQueries = query.Queries.OrderBy(q => q.Key).ToList();
             var orderedOptions = query.Options.OrderBy(o => o.Key).ToList();
+            var onlyQueries = query.Options.Count < 1 && query.Parameters.Count < 1;
 
             for (int i = 0, last = query.Queries.Count - 1; i <= last; i++)
             {
@@ -50,25 +57,35 @@ namespace BeaverSoft.Texo.Core.Help
                     subQuery,
                     (ushort)(level + 1),
                     string.Equals(query.DefaultQueryKey, subQuery.Key, StringComparison.OrdinalIgnoreCase),
-                    i == last);
+                    onlyQueries && i == last);
             }
+
+            var noParameters = query.Parameters.Count < 1;
 
             for (int i = 0, last = query.Options.Count - 1; i <= last; i++)
             {
                 Option option = orderedOptions[i];
-                RenderOption(option, (ushort)(level + 1), i == last);
+                RenderOption(
+                    option,
+                    (ushort)(level + 1),
+                    noParameters && i == last);
             }
 
             for (int i = 0, last = query.Parameters.Count - 1; i <= last; i++)
             {
                 Parameter parameter = query.Parameters[i];
-                RenderParameter(parameter, (ushort)(level + 1), i == last);
+                RenderParameter(
+                    parameter,
+                    (ushort)(level + 1),
+                    i == last);
             }
+
+            UpdateIndentionAfterChildren(level, isLast);
         }
 
         public void RenderOption(Option option, ushort level, bool isLast)
         {
-            RenderBullet(level, isLast);
+            RenderIndention(level, isLast);
             char? listCharacter = option.GetListCharacter();
 
             if (listCharacter.HasValue)
@@ -92,17 +109,20 @@ namespace BeaverSoft.Texo.Core.Help
             }
 
             result.AppendLine();
+            UpdateIndentionBeforeChildren(level, isLast);
 
             for (int i = 0, last = option.Parameters.Count - 1; i <= last; i++)
             {
                 Parameter parameter = option.Parameters[i];
                 RenderParameter(parameter, (ushort)(level + 1), i == last);
             }
+
+            UpdateIndentionAfterChildren(level, isLast);
         }
 
         public void RenderParameter(Parameter parameter, ushort level, bool isLast)
         {
-            RenderBullet(level, isLast);
+            RenderIndention(level, isLast);
             result.Append(parameter.Key);
             result.Append(" [p");
 
@@ -123,21 +143,36 @@ namespace BeaverSoft.Texo.Core.Help
             result.AppendLine();
         }
 
-        private void RenderBullet(ushort level, bool isLast)
+        private void RenderIndention(ushort level, bool isLast)
         {
-            //if (level > 0)
-            //{
-            //    for (int i = 1; i < level; i++)
-            //    {
-            //        result.Append(' ', 2);
-            //        result.Append('│');
-            //    }
-            //}
+            if (isLast)
+            {
+                indentedMask[level] = '└';
+            }
 
-            result.Append(' ', level * 2);
-            //result.Append(isLast ? '└' : '├');
-            result.Append('└');
+            for (int i = 1; i < indentedMask.Count; i++)
+            {
+                result.Append(' ');
+                result.Append(indentedMask[i]);
+            }
+
             result.Append(' ');
+        }
+
+        private void UpdateIndentionBeforeChildren(ushort level, bool isLast)
+        {
+            indentedMask[level] = isLast ? ' ' : '|';
+            indentedMask.Add('├');
+        }
+
+        private void UpdateIndentionAfterChildren(ushort level, bool isLast)
+        {
+            indentedMask.RemoveAt(level + 1);
+
+            if (!isLast)
+            {
+                indentedMask[level] = '├';
+            }
         }
 
         private void RenderRepresentation(InputStatement statement, params string[] exceptedRepresentations)

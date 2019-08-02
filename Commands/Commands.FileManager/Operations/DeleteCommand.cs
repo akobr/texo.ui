@@ -59,7 +59,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 }
             }
 
-            return new ItemsResult(Item.Markdown(BuildOutput(context)));
+            return new ItemsResult(Item.AsMarkdown(BuildOutput(context)));
         }
 
         private void DeleteFile(string filePath, DeleteContext context)

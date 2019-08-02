@@ -19,23 +19,23 @@ namespace BeaverSoft.Texo.Commands.Functions
 {
     [Command("functions", Representations = "functions func fn dev")]
     [Documentation("Developer functions", "Helpful functions for a developer.")]
-    public class FunctionsCommand : InlineIntersectionCommand
+    public class FunctionsCommand : ModularCommand
     {
         public FunctionsCommand()
         {
-            RegisterQueryMethod("list", List);
-            RegisterQueryMethod("color", ColorFunction);
-            RegisterQueryMethod("number", Number);
-            RegisterQueryMethod("base64", Base64);
-            RegisterQueryMethod("guid", Guid);
-            RegisterQueryMethod("hash-md5", HashMd5);
-            RegisterQueryMethod("hash-sha1", HashSha1);
-            RegisterQueryMethod("random", Random);
+            RegisterQuery("list", List);
+            RegisterQuery("color", ColorFunction);
+            RegisterQuery("number", Number);
+            RegisterQuery("base64", Base64);
+            RegisterQuery("guid", Guid);
+            RegisterQuery("hash-md5", HashMd5);
+            RegisterQuery("hash-sha1", HashSha1);
+            RegisterQuery("random", Random);
         }
 
         [Query("list", Representations = "list", IsDefault = true)]
         [Documentation("List of functions", "Shows all available help functions.")]
-        public TextResult List(CommandContext context)
+        public string List(CommandContext context)
         {
             AnsiStringBuilder builder = new AnsiStringBuilder();
             AddFunctionToList(builder, "base64", "Codes and decodes base64 string from input or a file.");
@@ -51,7 +51,7 @@ namespace BeaverSoft.Texo.Commands.Functions
         [Query("color", Representations = "color colour")]
         [Parameter("color", IsRepetable = true)]
         [Documentation("Color function", "Shows a colour(s) in multiple formats. Supported inputs: #[AA]RRGGBB; int[] { [AAA], RRR, GGG, BBB }.")]
-        public TextResult ColorFunction(CommandContext context)
+        public string ColorFunction(CommandContext context)
         {
             AnsiStringBuilder result = new AnsiStringBuilder();
             var parValues = context.GetParameterValues("color");
@@ -91,7 +91,7 @@ namespace BeaverSoft.Texo.Commands.Functions
         [Query("number", Representations = "number num")]
         [Parameter("number", IsRepetable = true)]
         [Documentation("Number function", "Shows a number in multiple numerical systems (dec, hex, bin). Supported inputs: 42; [0]b101010; [0]x2A.")]
-        public TextResult Number(CommandContext context)
+        public string Number(CommandContext context)
         {
             AnsiStringBuilder result = new AnsiStringBuilder();
 
@@ -107,7 +107,7 @@ namespace BeaverSoft.Texo.Commands.Functions
         [Query("base64", Representations = "base64 b64 64")]
         [Parameter("text", IsRepetable = false)]
         [Documentation("Base64 function", "Codes and decodes base64 string from input or a file.")]
-        public TextResult Base64(CommandContext context)
+        public string Base64(CommandContext context)
         {
             string text = context.GetParameterValue("text");
 
@@ -129,7 +129,7 @@ namespace BeaverSoft.Texo.Commands.Functions
         [Query("hash-md5", Representations = "hash-md5 md5")]
         [Parameter("source", IsRepetable = false)]
         [Documentation("Hash function (MD5)", "Calculates MD5 hash from input text or a file.")]
-        public TextResult HashMd5(CommandContext context)
+        public string HashMd5(CommandContext context)
         {
             return ComputeHash(context, new MD5CryptoServiceProvider());
         }
@@ -137,14 +137,14 @@ namespace BeaverSoft.Texo.Commands.Functions
         [Query("hash-sha1", Representations = "hash-sha1 sha1")]
         [Parameter("source", IsRepetable = false)]
         [Documentation("Hash function (SHA1)", "Calculates SHA1 hash from input text or a file.")]
-        public TextResult HashSha1(CommandContext context)
+        public string HashSha1(CommandContext context)
         {
             return ComputeHash(context, new SHA1CryptoServiceProvider());
         }
 
         [Query("guid", Representations = "guid")]
         [Documentation("Guid generator", "Generates random GUID and shows it in multiple formats.")]
-        public TextResult Guid(CommandContext context)
+        public string Guid(CommandContext context)
         {
             Guid guid = System.Guid.NewGuid();
             AnsiStringBuilder builder = new AnsiStringBuilder();            
@@ -184,7 +184,7 @@ namespace BeaverSoft.Texo.Commands.Functions
 
         [Query("random", Representations = "random rnd")]
         [Documentation("Random generator", "Generates random text, person information, address, GPS coordinates and numbers.")]
-        public TextResult Random(CommandContext context)
+        public string Random(CommandContext context)
         {
             AnsiStringBuilder builder = new AnsiStringBuilder();
             Faker faker = new Faker("en");

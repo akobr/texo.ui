@@ -60,7 +60,7 @@ namespace BeaverSoft.Texo.Commands.NugetManager.Manage
             builder.Write(package.Versions.Min);
             AddVersionsToResult(package, builder);
             AddProjectsToResult(package, builder);
-            return Item.Markdown(builder.ToString());
+            return Item.AsMarkdown(builder.ToString());
         }
 
         private void AddVersionsToResult(IPackageInfo package, MarkdownBuilder builder)

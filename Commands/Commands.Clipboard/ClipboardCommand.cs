@@ -9,7 +9,7 @@ using ViewItem = BeaverSoft.Texo.Core.View.Item;
 
 namespace Commands.Clipboard
 {
-    public class ClipboardCommand : InlineIntersectionCommand
+    public class ClipboardCommand : ModularCommand
     {
         private readonly ClipboardMonitoringService service;
 
@@ -17,9 +17,9 @@ namespace Commands.Clipboard
         {
             this.service = service ?? throw new ArgumentNullException(nameof(service));
 
-            RegisterQueryMethod(ClipboardConstants.QUERY_HISTORY, History);
-            RegisterQueryMethod(ClipboardConstants.QUERY_SET, Set);
-            RegisterQueryMethod(ClipboardConstants.QUERY_CONFIGURE, Configure);
+            RegisterQuery(ClipboardConstants.QUERY_HISTORY, History);
+            RegisterQuery(ClipboardConstants.QUERY_SET, Set);
+            RegisterQuery(ClipboardConstants.QUERY_CONFIGURE, Configure);
         }
 
         private ICommandResult History(CommandContext context)
@@ -49,7 +49,7 @@ namespace Commands.Clipboard
                 MarkdownBuilder itemBuilder = new MarkdownBuilder();
                 itemBuilder.Header(argIndex.ToString(), 3);
                 itemBuilder.CodeBlock(string.Empty, item.Content);
-                builder.Add(ViewItem.Markdown(itemBuilder.ToString()));
+                builder.Add(ViewItem.AsMarkdown(itemBuilder.ToString()));
             }
 
             if (builder.Count > 0)
@@ -63,7 +63,7 @@ namespace Commands.Clipboard
                 MarkdownBuilder itemBuilder = new MarkdownBuilder();
                 itemBuilder.Header((++index).ToString(), 3);
                 itemBuilder.CodeBlock(string.Empty, item.Thumbnail);
-                builder.Add(ViewItem.Markdown(itemBuilder.ToString()));
+                builder.Add(ViewItem.AsMarkdown(itemBuilder.ToString()));
             }
 
             if (builder.Count <= 0)
@@ -97,7 +97,7 @@ namespace Commands.Clipboard
 
             MarkdownBuilder itemBuilder = new MarkdownBuilder();
             itemBuilder.CodeBlock(string.Empty, item.Content);         
-            return new ItemsResult(ViewItem.Markdown(itemBuilder.ToString()));
+            return new ItemsResult(ViewItem.AsMarkdown(itemBuilder.ToString()));
         }
 
         private ICommandResult Configure(CommandContext context)
@@ -125,7 +125,7 @@ namespace Commands.Clipboard
             MarkdownBuilder itemBuilder = new MarkdownBuilder();
             itemBuilder.WriteLine($"- Text simplification is {EnabledOrDisabled(service.Configuration.SimplifyText)}.");
             itemBuilder.WriteLine($"- File-to-path transformation is {EnabledOrDisabled(service.Configuration.ConvertFilesToPaths)}.");
-            return new ItemsResult(ViewItem.Markdown(itemBuilder.ToString()));
+            return new ItemsResult(ViewItem.AsMarkdown(itemBuilder.ToString()));
         }
 
         private string EnabledOrDisabled(bool value)

@@ -10,7 +10,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
             MarkdownBuilder builder = new MarkdownBuilder();
             builder.Header(source);
             builder.Italic("Item doesn't exist.");
-            return Item.Markdown(builder.ToString());
+            return Item.AsMarkdown(builder.ToString());
         }
     }
 }

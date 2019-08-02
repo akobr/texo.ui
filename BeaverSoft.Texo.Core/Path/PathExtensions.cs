@@ -246,6 +246,25 @@ namespace BeaverSoft.Texo.Core.Path
             }
         }
 
+        public static string RemoveEndDirectorySeparator(this string path)
+        {
+            if (!IsValidPath(path))
+            {
+                return path;
+            }
+
+            int lastIndex = path.Length - 1;
+
+            if (path.Length > 3
+                && (path[lastIndex] == System.IO.Path.AltDirectorySeparatorChar
+                    || path[lastIndex] == System.IO.Path.DirectorySeparatorChar))
+            {
+                return path.Substring(0, lastIndex);
+            }
+
+            return path;
+        }
+
         public static bool IsValidWildcardPath(this string path)
         {
             if (string.IsNullOrWhiteSpace(path))

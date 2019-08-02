@@ -19,9 +19,9 @@ namespace Commands.SpinSport
         public ColourUsageCommand(ISolutionDirectoryProvider solutionProvider)
             : base(solutionProvider)
         {
-            RegisterQueryMethod(SpinSportConstants.QUERY_LIST, List);
-            RegisterQueryMethod(SpinSportConstants.QUERY_GET, Get);
-            RegisterQueryMethod(SpinSportConstants.QUERY_SET, Set);
+            RegisterQuery(SpinSportConstants.QUERY_LIST, (Func<CommandContext, ICommandResult>)this.List);
+            RegisterQuery(SpinSportConstants.QUERY_GET, (Func<CommandContext, ICommandResult>)this.Get);
+            RegisterQuery(SpinSportConstants.QUERY_SET, (Func<CommandContext, ICommandResult>)this.Set);
         }
 
         private TextResult List(CommandContext context)
@@ -30,7 +30,7 @@ namespace Commands.SpinSport
 
             if (!File.Exists(configPath))
             {
-                return "Configuration hasn't been find.";
+                return "Configuration hasn't been found.";
             }
 
             Regex filter = context.GetFilterRegex();
@@ -66,7 +66,7 @@ namespace Commands.SpinSport
 
             if (!File.Exists(configPath))
             {
-                return "Configuration hasn't been find.";
+                return "Configuration hasn't been found.";
             }
 
             Regex filter = context.GetFilterRegex();
@@ -100,7 +100,7 @@ namespace Commands.SpinSport
 
             if (!File.Exists(configPath))
             {
-                return "Configuration hasn't been find.";
+                return "Configuration hasn't been found.";
             }
 
             string name = context.GetParameterValue(SpinSportConstants.PARAMETER_NAME);

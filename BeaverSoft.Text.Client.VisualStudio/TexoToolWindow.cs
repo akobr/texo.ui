@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using BeaverSoft.Texo.View.WPF;
-using Commands.Clipboard;
 using Microsoft;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
@@ -16,10 +15,10 @@ namespace BeaverSoft.Text.Client.VisualStudio
     {
         public const string WindowGuidString = "ca179975-59a3-4af6-b516-47017165b291";
         public const string MenuCommandGuidString = "6f375fee-28b1-4c82-9b0e-d7f973c68612";
-        public const string Title = "Texo terminal";
+        public const string Title = "Texo Terminal";
 
         private readonly ExtensionContext state;
-        private ClipboardMonitorForm clipboardMonitor;
+        //private ClipboardMonitorForm clipboardMonitor;
 
         // "state" parameter is the object returned from MyPackage.InitializeToolWindowAsync
         public TexoToolWindow(ExtensionContext state)
@@ -54,8 +53,8 @@ namespace BeaverSoft.Text.Client.VisualStudio
         {
             if (disposing)
             {
-                clipboardMonitor?.Dispose();
-                clipboardMonitor = null;
+                //clipboardMonitor?.Dispose();
+                //clipboardMonitor = null;
             }
 
             base.Dispose(disposing);
@@ -81,8 +80,8 @@ namespace BeaverSoft.Text.Client.VisualStudio
 
         private void InitilialiseClipboardControl()
         {
-            clipboardMonitor = new ClipboardMonitorForm(state.MessageBus);
-            clipboardMonitor.Initialise(Window);
+            //clipboardMonitor = new ClipboardMonitorForm(state.MessageBus);
+            //clipboardMonitor.Initialise(Window);
         }
     }
 }

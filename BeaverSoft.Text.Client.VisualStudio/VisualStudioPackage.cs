@@ -48,7 +48,7 @@ namespace BeaverSoft.Text.Client.VisualStudio
     /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
     /// </para>
     /// </remarks>
-    [InstalledProductRegistration("Texo terminal", "Powerful terminal with built-in commands and PowerShell fallback.", "1.0")]
+    [InstalledProductRegistration("Texo Terminal", "Powerful terminal with built-in commands and PowerShell fallback.", "1.0")]
     [ProvideToolWindow(typeof(TexoToolWindow), Style = VsDockStyle.Tabbed, DockedWidth = 400, Window = "DocumentWell", Orientation = ToolWindowOrientation.Right)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
@@ -57,7 +57,6 @@ namespace BeaverSoft.Text.Client.VisualStudio
     {
         // Log from launch available at:
         // c:\Users\[USER_NAME]\AppData\Roaming\Microsoft\VisualStudio\16.0_c3776c56Exp\ActivityLog.xml
-
         public const string PackageGuidString = "2dc0bff1-fbaf-4c05-98a5-b1a2afc000cb";
         public static bool IsMarkdownAssemblyLoaded;
         public static bool IsNewtonsoftJsonAssemblyLoaded;

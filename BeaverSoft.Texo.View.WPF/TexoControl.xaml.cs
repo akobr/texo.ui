@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using BeaverSoft.Texo.View.WPF.Extensions;
 
 namespace BeaverSoft.Texo.View.WPF
 {
@@ -12,9 +13,12 @@ namespace BeaverSoft.Texo.View.WPF
     /// </summary>
     public partial class TexoControl : UserControl
     {
+        // TODO: [P3] refactor this messy and huge class
+
         private bool skipNextTextChange;
         private string prompt;
         private bool isInputDisabled;
+        private bool isSystemScrollRequested;
 
         public static readonly DependencyProperty TextBaseColorProperty =
             DependencyProperty.Register(nameof(TextBaseColor), typeof(Color), typeof(TexoControl), new PropertyMetadata(Colors.White));
@@ -46,6 +50,8 @@ namespace BeaverSoft.Texo.View.WPF
             InitiliaseColors();
         }
 
+        public bool IsAutoScrollEnabled { get; set; } = true;
+
         private void InitiliaseColors()
         {
             SetResourceReference(TextBaseColorProperty, "SystemBaseHighColor");
@@ -53,6 +59,11 @@ namespace BeaverSoft.Texo.View.WPF
             AccentColor = SystemParameters.WindowGlassColor; // SetResourceReference(AccentColorProperty, "ImmersiveSystemAccent");
             SetResourceReference(BackgroundBaseColorProperty, "SystemAltHighColor");
             SetResourceReference(BorderBaseColorProperty, "SystemAltHighColor");
+        }
+
+        public void RequestSystemScroll()
+        {
+            isSystemScrollRequested = true;
         }
 
         public Color TextBaseColor
@@ -91,6 +102,8 @@ namespace BeaverSoft.Texo.View.WPF
             set => SetValue(ShadowsVisibilityProperty, value);
         }
 
+        public Thickness ScrollButtonMargin { get; set; } = new Thickness(18, 10, 18, 10);
+
         public FlowDocument OutputDocument => docOutput.Document;
 
         public ListBox IntellisenseList => listIntellisense;
@@ -123,6 +136,8 @@ namespace BeaverSoft.Texo.View.WPF
             tbInput.SetResourceReference(ForegroundProperty, "OutputForegroundBrush");
             //tbInput.IsReadOnly = false;
             isInputDisabled = false;
+            IsAutoScrollEnabled = true;
+            UpdateScrollButton();
         }
 
         public void DisableInput()
@@ -241,6 +256,7 @@ namespace BeaverSoft.Texo.View.WPF
             docOutput.Visibility = Visibility.Collapsed;
             docOutput.Document.Blocks.Clear();
             docOutput.Visibility = Visibility.Visible;
+            btnScroll.Visibility = Visibility.Collapsed;
         }
 
         private void HandleInputTextChanged(object sender, TextChangedEventArgs e)
@@ -369,6 +385,11 @@ namespace BeaverSoft.Texo.View.WPF
 
         private void HandleOutputPreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (docOutput.IsToolBarVisible)
+            {
+                return;
+            }
+
             if (e.Key == Key.Enter)
             {
                 TryFinishInput();
@@ -483,7 +504,7 @@ namespace BeaverSoft.Texo.View.WPF
             progress.Foreground = brush;
         }
 
-        private void ListIntellisense_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void HandleIntellisenseListPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (!(e.Source is ListBoxItem clickedItem))
             {
@@ -499,6 +520,67 @@ namespace BeaverSoft.Texo.View.WPF
             lbTitle.HorizontalAlignment = (pHeaderInfo.ActualWidth + lbTitle.ActualWidth) > gHeader.ActualWidth
                     ? HorizontalAlignment.Right
                     : HorizontalAlignment.Left;
+        }
+
+        private void HandleOutputScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (Math.Abs(e.VerticalChange) < 1)
+            {
+                return;
+            }
+
+            if (isSystemScrollRequested)
+            {
+                isSystemScrollRequested = false;
+            }
+            else if (isInputDisabled)
+            {
+                IsAutoScrollEnabled = false;
+            }
+
+            UpdateScrollButton();
+        }
+
+        private void HandleScrollButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (!IsAutoScrollEnabled)
+            {
+                IsAutoScrollEnabled = true;
+            }
+            else
+            {
+                ScrollViewer scrollViewer = docOutput.FindScrollViewer();
+                scrollViewer.ScrollToBottom();
+            }
+            
+            UpdateScrollButton();
+            btnScroll.Visibility = Visibility.Collapsed;
+        }
+
+        private void UpdateScrollButton()
+        {
+            if (docOutput.IsToolBarVisible)
+            {
+                btnScroll.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (!IsAutoScrollEnabled)
+            {
+                btnScroll.Content = "auto-scroll";
+                btnScroll.Visibility = Visibility.Visible;
+                return;
+            }
+
+            ScrollViewer scrollViewer = docOutput.FindScrollViewer();
+            if (Math.Abs(scrollViewer.ScrollableHeight - scrollViewer.VerticalOffset) < 420)
+            {
+                btnScroll.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            btnScroll.Content = "to-end";
+            btnScroll.Visibility = Visibility.Visible;
         }
     }
 }

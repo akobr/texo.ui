@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace BeaverSoft.Texo.Core.View
 {
@@ -19,5 +19,10 @@ namespace BeaverSoft.Texo.Core.View
         public string Title { get; }
 
         public Uri Address { get; }
+
+        public static implicit operator Link((string title, string url) link)
+        {
+            return new Link(link.title, link.url);
+        }
     }
 }

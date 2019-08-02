@@ -15,7 +15,7 @@ namespace BeaverSoft.Texo.Core.Inputting
         private readonly IServiceMessageBus messageBus;
         private readonly ILogService logger;
 
-        private TextumConfiguration configuration;
+        private TexoConfiguration configuration;
         private InputTree tree;
 
         public InputEvaluationService(
@@ -63,7 +63,7 @@ namespace BeaverSoft.Texo.Core.Inputting
             }            
         }
 
-        private InputTree BuildInputTree(TextumConfiguration fromConfiguration)
+        private InputTree BuildInputTree(TexoConfiguration fromConfiguration)
         {
             IInputTreeBuilder treeBuilder = new InputTreeBuilder(logger);
             return treeBuilder.Build(fromConfiguration.Runtime.Commands, fromConfiguration.Runtime.DefaultCommand);

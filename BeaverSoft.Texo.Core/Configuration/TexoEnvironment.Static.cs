@@ -2,11 +2,11 @@
 
 namespace BeaverSoft.Texo.Core.Configuration
 {
-    public partial class TextumEnvironment
+    public partial class TexoEnvironment
     {
-        public static TextumEnvironment Empty { get; } = new TextumEnvironment();
+        public static TexoEnvironment Empty { get; } = new TexoEnvironment();
 
-        public static TextumEnvironment CreateDefault()
+        public static TexoEnvironment CreateDefault()
         {
             Builder builder = CreateBuilder();
             SetDefault(builder);

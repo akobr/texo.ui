@@ -98,7 +98,7 @@ namespace Commands.Calc
                     continue;
                 }
 
-                yield return Item.Intellisense(variablePair.Key, variablePair.Key, "variable", variablePair.Value.ToString());
+                yield return Item.AsIntellisense(variablePair.Key, variablePair.Key, "variable", variablePair.Value.ToString());
             }
 
             foreach (string functionName in engine.Functions.Keys)
@@ -108,7 +108,7 @@ namespace Commands.Calc
                     continue;
                 }
 
-                yield return Item.Intellisense(functionName, "function", string.Empty);
+                yield return Item.AsIntellisense(functionName, "function", string.Empty);
             }
         }
     }

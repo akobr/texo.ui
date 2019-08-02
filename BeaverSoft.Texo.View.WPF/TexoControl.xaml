@@ -80,6 +80,39 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Foreground" Value="{DynamicResource InfoForegroundBrush}" />
+            <Setter Property="Background" Value="{DynamicResource OutputBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Padding" Value="3" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Name="border"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="true">
+                            <ContentPresenter Name="contentPresenter" Focusable="False"
+                                              TextElement.Foreground="{StaticResource InfoForegroundBrush}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              Margin="{TemplateBinding Padding}"
+                                              RecognizesAccessKey="True"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource OutputForegroundBrush}" />
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{DynamicResource OutputForegroundBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -130,13 +163,25 @@
         <!-- OUTPUT -->
         <FlowDocumentScrollViewer Name="docOutput" Grid.Row="2" IsTabStop="False"
                                   MinZoom="50" VerticalScrollBarVisibility="Auto"
-                                  PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseWheel="HandleScrollSpeed">
+                                  ScrollViewer.ScrollChanged="HandleOutputScrollChanged"
+                                  PreviewKeyDown="HandleOutputPreviewKeyDown"
+                                  PreviewMouseWheel="HandleScrollSpeed">
             <FlowDocument>
                 <Section>
                     <Paragraph>Command(s) output...</Paragraph>
                 </Section>
             </FlowDocument>
         </FlowDocumentScrollViewer>
+
+        <Button Name="btnScroll" Grid.Row="2" Visibility="Collapsed"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"               
+                Background="{DynamicResource OutputBackgroundBrush}"
+                Foreground="{DynamicResource OutputForegroundBrush}"
+                BorderThickness="1" BorderBrush="{DynamicResource InfoForegroundBrush}"
+                Click="HandleScrollButtonClick"
+                Margin="{Binding ScrollButtonMargin, RelativeSource={RelativeSource AncestorType=UserControl}}" Padding="3">
+            Auto-Scroll
+        </Button>
 
         <Border Grid.Row="2" Height="7" VerticalAlignment="Top" Visibility="{Binding ShadowsVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
             <Border.Background>
@@ -150,7 +195,7 @@
         <!-- INTELLISENSE -->
         <ListBox x:Name="listIntellisense" Grid.Row="2" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="0,0,0,2"
                  MaxHeight="265" VerticalAlignment="Top" Foreground="{DynamicResource OutputForegroundBrush}" Focusable="False" IsTabStop="False"
-                 PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseDown="ListIntellisense_PreviewMouseDown"
+                 PreviewKeyDown="HandleOutputPreviewKeyDown" PreviewMouseDown="HandleIntellisenseListPreviewMouseDown"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
 
             <ListBox.Background>

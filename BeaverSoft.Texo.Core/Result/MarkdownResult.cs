@@ -1,19 +1,30 @@
-﻿using BeaverSoft.Texo.Core.Commands;
+using System.Threading.Tasks;
+using BeaverSoft.Texo.Core.Commands;
+using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Result
 {
-    public class MarkdownResult : TextResult
+    public class MarkdownResult : ICommandResult<IItem>
     {
-        public MarkdownResult(ResultTypeEnum resultType, string markdown)
-            : base(resultType, markdown)
+        public MarkdownResult(string markdown)
         {
-            // no operation
+            Content = new Item.Markdown(markdown);
         }
 
-        public MarkdownResult(string markdown)
-            : base(ResultTypeEnum.Success, markdown)
+        dynamic ICommandResult.Content => Content;
+
+        public IItem Content { get; }
+
+        public ResultTypeEnum ResultType { get; set; }
+
+        public Task ExecuteResultAsync()
         {
-            // no operation
+            return Task.CompletedTask;
+        }
+
+        public static implicit operator MarkdownResult(string result)
+        {
+            return new MarkdownResult(result);
         }
     }
 }

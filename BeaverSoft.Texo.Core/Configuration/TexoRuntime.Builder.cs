@@ -1,12 +1,12 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 
 namespace BeaverSoft.Texo.Core.Configuration
 {
-    public partial class TextumRuntime
+    public partial class TexoRuntime
     {
         public sealed class Builder
         {
-            internal Builder(TextumRuntime immutable)
+            internal Builder(TexoRuntime immutable)
             {
                 Commands = immutable.commands.ToBuilder();
                 DefaultCommand = immutable.defaultCommand;
@@ -16,9 +16,9 @@ namespace BeaverSoft.Texo.Core.Configuration
 
             public string DefaultCommand { get; set; }
 
-            public TextumRuntime ToImmutable()
+            public TexoRuntime ToImmutable()
             {
-                return new TextumRuntime(this);
+                return new TexoRuntime(this);
             }
         }
     }

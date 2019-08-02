@@ -7,7 +7,7 @@ using StrongBeaver.Core.Services.Logging;
 
 namespace BeaverSoft.Texo.Commands.FileManager
 {
-    public partial class FileManagerCommand : IntersectionCommand
+    public partial class FileManagerCommand : ModularCommand
     {
         private readonly IStageService stageService;
         private readonly IStashService stashService;
@@ -19,9 +19,9 @@ namespace BeaverSoft.Texo.Commands.FileManager
             this.stashService = stashService ?? throw new ArgumentNullException(nameof(stashService));
             this.logger = logger;
 
-            RegisterCommand(StageQueries.STAGE, new StageCommand(stageService));
-            RegisterCommand(StashQueries.STASH, new StashCommand(stashService, stageService));
-            RegisterCommand(ApplyQueries.APPLY, new ApplyCommand(stageService, stashService, logger));
+            RegisterQuery(StageQueries.STAGE, new StageCommand(stageService));
+            RegisterQuery(StashQueries.STASH, new StashCommand(stashService, stageService));
+            RegisterQuery(ApplyQueries.APPLY, new ApplyCommand(stageService, stashService, logger));
         }
     }
 }

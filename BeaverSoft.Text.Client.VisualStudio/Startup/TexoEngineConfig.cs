@@ -1,4 +1,3 @@
-using System.IO;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.Functions;
@@ -7,10 +6,7 @@ using BeaverSoft.Texo.Core;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Text.Client.VisualStudio.Core.Environment;
 using BeaverSoft.Text.Client.VisualStudio.Core.Providers;
-using BeaverSoft.Text.Client.VisualStudio.Environment;
-using BeaverSoft.Text.Client.VisualStudio.Providers;
 using Commands.Calc;
-using Commands.Clipboard;
 using Commands.CodeBaseSearch;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
@@ -23,7 +19,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
     {
         public static Task InitialiseWithCommandsAsync(this TexoEngine engine, SimpleIoc container)
         {
-            TextumConfiguration.Builder configuration = TextumConfiguration.CreateDefault().ToBuilder();
+            TexoConfiguration.Builder configuration = TexoConfiguration.CreateDefault().ToBuilder();
 
             string solutionFile = container.GetInstance<ISolutionPathProvider>().GetPath();
             if (!string.IsNullOrEmpty(solutionFile))
@@ -37,7 +33,7 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
                 FileManagerBuilder.BuildCommand(),
                 NugetManagerBuilder.BuildCommand(),
                 CalcCommand.BuildConfiguration(),
-                ClipboardBuilder.BuildCommand(),
+                //ClipboardBuilder.BuildCommand(),
                 FunctionsBuilder.BuildCommand(),
                 CodeBaseSearchBuilder.BuildCommand(),
                 SpinSportBuilder.BuildCommand()

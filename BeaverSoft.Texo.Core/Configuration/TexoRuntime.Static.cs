@@ -1,10 +1,10 @@
 ﻿namespace BeaverSoft.Texo.Core.Configuration
 {
-    public partial class TextumRuntime
+    public partial class TexoRuntime
     {
-        public static TextumRuntime Empty { get; } = new TextumRuntime();
+        public static TexoRuntime Empty { get; } = new TexoRuntime();
 
-        public static TextumRuntime CreateDefault()
+        public static TexoRuntime CreateDefault()
         {
             Builder builder = CreateBuilder();
             SetDefault(builder);

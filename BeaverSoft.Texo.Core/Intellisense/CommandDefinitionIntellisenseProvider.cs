@@ -41,13 +41,13 @@ namespace BeaverSoft.Texo.Core.Intellisense
 
             foreach (Query subQuery in query.Query.Queries.OrderBy(q => q.Key))
             {
-                yield return Item.Intellisense(subQuery.GetMainRepresentation(), "query", subQuery.Documentation.Description);
+                yield return Item.AsIntellisense(subQuery.GetMainRepresentation(), "query", subQuery.Documentation.Description);
             }
 
             foreach (Option subOption in query.Query.Options.OrderBy(o => o.Key))
             {
                 string representation = subOption.GetMainRepresentation();
-                yield return Item.Intellisense($"--{representation}", "option", subOption.Documentation.Description);
+                yield return Item.AsIntellisense($"--{representation}", "option", subOption.Documentation.Description);
             }
 
             if (!commandManagement.HasCommand(input.Context.Key))

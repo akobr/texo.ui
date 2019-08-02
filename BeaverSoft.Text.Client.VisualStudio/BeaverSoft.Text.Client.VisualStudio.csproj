@@ -146,10 +146,6 @@
       <Project>{ee949f35-15bd-47d3-bc1e-01c18847cf6b}</Project>
       <Name>Commands.Calc</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Commands\Commands.Clipboard\Commands.Clipboard.csproj">
-      <Project>{694220f2-5d6e-4543-8c3c-0ac6acabc957}</Project>
-      <Name>Commands.Clipboard</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.CodeBaseSearch\Commands.CodeBaseSearch.csproj">
       <Project>{15afb5d0-4d42-4077-9f04-0d83e8d70d79}</Project>
       <Name>Commands.CodeBaseSearch</Name>

@@ -18,7 +18,6 @@ using BeaverSoft.Texo.View.WPF.Markdown;
 using BeaverSoft.Text.Client.VisualStudio.Core.Providers;
 using BeaverSoft.Text.Client.VisualStudio.Providers;
 using Commands.Calc;
-using Commands.Clipboard;
 using Commands.CodeBaseSearch;
 using Commands.CommandLine;
 using Commands.ReferenceCheck;
@@ -66,8 +65,8 @@ namespace BeaverSoft.Text.Client.VisualStudio.Startup
             container.Register<CalcCommand>();
 
             // Clipboard
-            container.Register<ClipboardMonitoringService>();
-            container.Register<ClipboardCommand>();
+            // container.Register<ClipboardMonitoringService>();
+            // container.Register<ClipboardCommand>();
 
             // Developer Functions
             container.Register<FunctionsCommand>();

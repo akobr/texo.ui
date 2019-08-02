@@ -56,7 +56,7 @@ namespace BeaverSoft.Texo.Commands.FileManager.Operations
                 && !context.Override)
             {
                 return new ItemsResult(
-                    Item.Markdown("The zip file already exists, use options `--override` or `--add`."));
+                    Item.AsMarkdown("The zip file already exists, use options `--override` or `--add`."));
             }
 
             context.FileOutputList = new List();

@@ -6,7 +6,7 @@ namespace BeaverSoft.Texo.Core.Inputting
 {
     public interface IInputTreeUpdatedMessage : IServiceMessage
     {
-        TextumConfiguration Configuration { get; }
+        TexoConfiguration Configuration { get; }
 
         InputTree InputTree { get; }
     }

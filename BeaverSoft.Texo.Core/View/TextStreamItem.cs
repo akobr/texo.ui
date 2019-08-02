@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Streaming;
+using BeaverSoft.Texo.Core.Streaming;
 using System.Collections.Immutable;
 
 namespace BeaverSoft.Texo.Core.View
@@ -17,5 +17,10 @@ namespace BeaverSoft.Texo.Core.View
         public TextFormatEnum Format => TextFormatEnum.Plain;
 
         public IImmutableList<ILink> Actions => ImmutableList<ILink>.Empty;
+
+        public static implicit operator StreamedItem(ReportableStream stream)
+        {
+            return new StreamedItem(stream);
+        }
     }
 }

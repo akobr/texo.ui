@@ -6,12 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Markdown.Builder;
-using BeaverSoft.Texo.Core.Result;
+using BeaverSoft.Texo.Core.Streaming;
+using BeaverSoft.Texo.Core.View;
 using Commands.CodeBaseSearch.Model;
 
 namespace Commands.CodeBaseSearch
 {
-    public class CodeBaseSearchCommand : InlineIntersectionAsyncCommand
+    public class CodeBaseSearchCommand : ModularCommand
     {
         private readonly ICodeBaseSearchService search;
 
@@ -19,20 +20,20 @@ namespace Commands.CodeBaseSearch
         {
             this.search = search ?? throw new ArgumentNullException(nameof(search));
 
-            RegisterQueryMethod(CodeBaseSearchConstants.QUERY_SEARCH, Search);
-            RegisterQueryMethod(CodeBaseSearchConstants.QUERY_CATEGORIES, Categories);
-            RegisterQueryMethod(CodeBaseSearchConstants.QUERY_INIT, Init);
+            RegisterQuery(CodeBaseSearchConstants.QUERY_SEARCH, SearchAsync);
+            RegisterQuery(CodeBaseSearchConstants.QUERY_CATEGORIES, Categories);
+            RegisterQuery(CodeBaseSearchConstants.QUERY_INIT, Init);
         }
 
-        private Task<ICommandResult> Init(CommandContext context)
+        private IReportableStream Init(CommandContext context)
         {
             InitialisationReporter reporter = new InitialisationReporter();
             search.LoadAsync(reporter);
-            return Task.FromResult<ICommandResult>(new TextStreamResult(reporter.Stream));
+            return reporter.Stream;
         }
 
         // TODO: refactor this mess
-        private async Task<ICommandResult> Search(CommandContext context)
+        private async Task<Item.Markdown> SearchAsync(CommandContext context)
         {
             MarkdownBuilder builder = new MarkdownBuilder();
 
@@ -69,7 +70,7 @@ namespace Commands.CodeBaseSearch
             if (results.Count < 1)
             {
                 builder.Italic("No results");
-                return new MarkdownResult(builder.ToString());
+                return builder.ToString();
             }
 
             foreach (ISubject item in results)
@@ -77,10 +78,10 @@ namespace Commands.CodeBaseSearch
                 item.WriteToMarkdown(builder);
             }
 
-            return new MarkdownResult(builder.ToString());
+            return builder.ToString();
         }
 
-        private Task<ICommandResult> Categories(CommandContext context)
+        private string Categories(CommandContext context)
         {
             StringBuilder builder = new StringBuilder();
 
@@ -89,7 +90,7 @@ namespace Commands.CodeBaseSearch
                 builder.AppendLine($"-{category.Character}--{category.Name} ({category.Subjects.Count})");
             }
 
-            return Task.FromResult<ICommandResult>(new TextResult(builder.ToString()));
+            return builder.ToString();
         }
     }
 }

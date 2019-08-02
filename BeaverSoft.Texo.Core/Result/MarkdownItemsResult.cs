@@ -1,25 +1,19 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
-using BeaverSoft.Texo.Core.Commands;
+using System.Collections.Generic;
+using System.Linq;
+using BeaverSoft.Texo.Core.View;
 
 namespace BeaverSoft.Texo.Core.Result
 {
-    public class MarkdownItemsResult : TextItemsResult
+    public class MarkdownItemsResult : ItemsResult
     {
-        public MarkdownItemsResult(ResultTypeEnum resultType, IEnumerable<string> content)
-            : base(resultType, content)
-        {
-            // no operation
-        }
-
         public MarkdownItemsResult(IEnumerable<string> content)
-            : base(ResultTypeEnum.Success, content)
+            : base(content.Select(str => new Item.Markdown(str)))
         {
             // no operation
         }
 
         public MarkdownItemsResult(params string[] content)
-            : base(ResultTypeEnum.Success, ImmutableList.Create<string>(content))
+            : base(content.Select(str => new Item.Markdown(str)))
         {
             // no operation
         }

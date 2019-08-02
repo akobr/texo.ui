@@ -53,7 +53,7 @@ namespace Commands.Dotnet
                 return Enumerable.Empty<IItem>();
             }
 
-            var newItems = commandResults.Select<string, IItem>(item => Item.Intellisense(item, item.StartsWith("-") ? "option" : "command", null));
+            var newItems = commandResults.Select<string, IItem>(item => Item.AsIntellisense(item, item.StartsWith("-") ? "option" : "command", null));
 
             if (commandsToCache.Contains(dotnetInput))
             {

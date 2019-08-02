@@ -9,6 +9,7 @@ namespace Commands.SpinSport
         public const string QUERY_CONFIG_LOCALISATION = "localisation";
         public const string QUERY_CONFIG_COLOUR = "colour";
         public const string QUERY_CONFIG_COLOUR_USAGE = "colour-usage";
+        public const string QUERY_CODE = "code";
 
         public const string QUERY_LIST = "list";
         public const string QUERY_GET = "get";
@@ -33,5 +34,6 @@ namespace Commands.SpinSport
         public const string PARAMETER_FILTER = "filter";
         public const string PARAMETER_NAME = "name";
         public const string PARAMETER_VALUE = "value";
+        public const string PARAMETER_SEARCH_TERM = "search-term";
     }
 }

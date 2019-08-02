@@ -2,8 +2,8 @@
 {
     public interface ISettingService
     {
-        TextumConfiguration Configuration { get; }
+        TexoConfiguration Configuration { get; }
 
-        void Configure(TextumConfiguration configuration);
+        void Configure(TexoConfiguration configuration);
     }
 }

@@ -4,6 +4,6 @@ namespace BeaverSoft.Texo.Core.Configuration
 {
     public interface ISettingUpdatedMessage : IServiceMessage
     {
-        TextumConfiguration Configuration { get; }
+        TexoConfiguration Configuration { get; }
     }
 }

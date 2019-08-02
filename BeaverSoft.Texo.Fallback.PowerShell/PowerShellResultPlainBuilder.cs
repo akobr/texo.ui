@@ -14,7 +14,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public Item Finish()
         {
-            return Item.Plain(builder.ToString());
+            return Item.AsPlain(builder.ToString());
         }
 
         public bool Start(InputModel inputModel)
