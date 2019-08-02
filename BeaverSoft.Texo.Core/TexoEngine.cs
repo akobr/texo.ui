@@ -32,7 +32,7 @@ namespace BeaverSoft.Texo.Core
             this.logger = logger;
         }
 
-        public static Version Version => new Version(0, 9, 8, 3);
+        public static Version Version => new Version(0, 9, 8, 4);
 
         public IRuntimeCoordinatorService Runtime => runtime;
 
