@@ -115,13 +115,20 @@ namespace BeaverSoft.Texo.Core
             command.Key = CommandKeys.TEXO;
             command.Representations.AddRange(
                 new[] {CommandKeys.TEXO, "textum", "textus", "texui", "texere", "tex", "tx"});
-            command.DefaultQueryKey = EnvironmentNames.QUERY_ENVIRONMENT;
             command.Documentation.Title = "Texo management";
             command.Documentation.Description = "Management of the Texo UI environment.";
 
             command.Queries.Add(CreateEnvironmentQuery());
             command.Queries.Add(CreateHistoryQuery());
             //command.Queries.Add(CreateSettingQuery());
+
+            var optionVersion = Option.CreateBuilder();
+            optionVersion.Key = "version";
+            optionVersion.Representations.AddRange(
+                new[] { "version", "ver", "v" });
+            optionVersion.Documentation.Title = "--version";
+            optionVersion.Documentation.Description = "Prints out the version of the Texo UI in use.";
+            command.Options.Add(optionVersion.ToImmutable());
 
             return command.ToImmutable();
         }
