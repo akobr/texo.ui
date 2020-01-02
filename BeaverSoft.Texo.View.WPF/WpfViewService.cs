@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -427,7 +428,7 @@ namespace BeaverSoft.Texo.View.WPF
             control.DisableInput();
             lastWorkingDirectory = workingDirectory;
             historyItem = null;
-            await executor.ProcessAsync(input);
+            await executor.ProcessAsync(input, CancellationToken.None);
         }
 
         private Item BuildCommandHeaderItem(Input input)

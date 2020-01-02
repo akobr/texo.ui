@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Commands.FileManager;
 using BeaverSoft.Texo.Commands.FileManager.Stage;
@@ -51,7 +52,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
         private static void Startup()
         {
             SimpleIoc container = new SimpleIoc();
-            
+
             container.Register<ServiceMessageBus>();
             container.Register<IServiceMessageBus>(() => container.GetInstance<ServiceMessageBus>());
             container.Register<IServiceMessageBusRegister>(() => container.GetInstance<ServiceMessageBus>());
@@ -148,7 +149,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
 
         private static Task RunAsync(string[] args)
         {
-            return engine.ProcessAsync(string.Join(" ", args));
+            return engine.ProcessAsync(string.Join(" ", args), CancellationToken.None);
         }
 
         private static bool IsLongRunning(string[] args)

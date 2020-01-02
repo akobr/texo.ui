@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
+using System.Threading;
 using BeaverSoft.Texo.Core.Configuration;
 using BeaverSoft.Texo.Core.Environment;
 using BeaverSoft.Texo.Core.Inputting;
@@ -60,7 +61,7 @@ namespace BeaverSoft.Texo.View.Console
 
             using (new ConsoleStopwatch())
             {
-                await executor.ProcessAsync(input);
+                await executor.ProcessAsync(input, CancellationToken.None);
             }
         }
 

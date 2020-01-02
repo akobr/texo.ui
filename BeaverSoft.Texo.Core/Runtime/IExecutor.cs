@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Inputting;
 
@@ -8,7 +9,7 @@ namespace BeaverSoft.Texo.Core.Runtime
     {
         Input PreProcess(string input, int cursorPosition);
 
-        Task ProcessAsync(string input);
+        Task ProcessAsync(string input, CancellationToken cancellation = default);
 
         Task ExecuteActionAsync(string actionUrl);
 

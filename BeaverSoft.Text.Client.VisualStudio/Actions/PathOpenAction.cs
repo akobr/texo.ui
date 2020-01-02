@@ -5,6 +5,7 @@ using StrongBeaver.Core.Services.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BeaverSoft.Text.Client.VisualStudio.Actions
@@ -51,14 +52,14 @@ namespace BeaverSoft.Text.Client.VisualStudio.Actions
                 path = $"\"{path}\"";
             }
 
-            await context.Executor.ProcessAsync($"cd {path}");
-            await context.Executor.ProcessAsync("dir");
+            await context.Executor.ProcessAsync($"cd {path}", CancellationToken.None);
+            await context.Executor.ProcessAsync("dir", CancellationToken.None);
         }
 
         private async Task OpenFileAsync(string path, IDictionary<string, string> arguments)
         {
             await context.TaskFactory.SwitchToMainThreadAsync();
-            
+
             var window = context.DTE.ItemOperations.OpenFile(path);
             var selection = (TextSelection)window.Document.Selection;
 

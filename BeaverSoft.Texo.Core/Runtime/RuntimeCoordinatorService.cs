@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Commands;
@@ -80,7 +81,7 @@ namespace BeaverSoft.Texo.Core.Runtime
         public Input PreProcess(string input, int cursorPosition)
         {
             Input inputModel = evaluator.Evaluate(input);
-            
+
             if (intellisense == null)
             {
                 return inputModel;
@@ -105,7 +106,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             return inputModel;
         }
 
-        public async Task ProcessAsync(string input)
+        public async Task ProcessAsync(string input, CancellationToken cancellation = default)
         {
             Input inputModel;
 
@@ -125,7 +126,7 @@ namespace BeaverSoft.Texo.Core.Runtime
 
             try
             {
-                await ProcessInputAsync(inputModel);
+                await ProcessInputAsync(inputModel, cancellation);
             }
             catch (Exception exception)
             {
@@ -161,14 +162,15 @@ namespace BeaverSoft.Texo.Core.Runtime
             return inputModel;
         }
 
-        private async Task ProcessInputAsync(Input inputModel)
+        private async Task ProcessInputAsync(Input inputModel, CancellationToken cancellation)
         {
             if (!inputModel.Context.IsValid)
             {
                 if (fallback != null
                     && string.IsNullOrEmpty(inputModel.Context.Key))
                 {
-                    await RenderAsync(inputModel, await fallback.FallbackAsync(inputModel));
+                    Task<ICommandResult> fallbackTask = fallback.FallbackAsync(inputModel, cancellation);
+                    await RenderAsync(inputModel, await fallbackTask, cancellation);
                 }
                 else if (didYouMean != null)
                 {
@@ -187,30 +189,31 @@ namespace BeaverSoft.Texo.Core.Runtime
                 return;
             }
 
-            await ProcessContextAsync(inputModel, inputModel.Context);
+            await ProcessContextAsync(inputModel, inputModel.Context, cancellation);
         }
 
-        private Task ProcessContextAsync(Input input, CommandContext context)
+        private Task ProcessContextAsync(Input input, CommandContext context, CancellationToken cancellation)
         {
             object command = commandManagement.BuildCommand(context.Key);
+            context.CancellationToken = cancellation; // TODO: [P2] Should not to be here
 
             switch (command)
             {
                 case ICommand typedCommand:
-                    return ProcessTypedCommandAsync(typedCommand, context, input);
+                    return ProcessTypedCommandAsync(typedCommand, context, input, cancellation);
 
                 default:
-                    return ProcessUnknownCommandAsync(command, context, input);
+                    return ProcessUnknownCommandAsync(command, context, input, cancellation);
             }
         }
 
-        private async Task ProcessTypedCommandAsync(ICommand command, CommandContext context, Input input)
+        private async Task ProcessTypedCommandAsync(ICommand command, CommandContext context, Input input, CancellationToken cancellation)
         {
-            ICommandResult commandResult = await Task.Run(() => command.Execute(context));
-            await RenderAsync(input, commandResult);
+            ICommandResult commandResult = await Task.Run(() => command.Execute(context), cancellation);
+            await RenderAsync(input, commandResult, cancellation);
         }
 
-        private Task ProcessUnknownCommandAsync(object command, CommandContext context, Input input)
+        private Task ProcessUnknownCommandAsync(object command, CommandContext context, Input input, CancellationToken cancellation)
         {
             Type commandType = command.GetType();
             MethodInfo executionMethod = commandType.GetMethod(nameof(ICommand.Execute), BindingFlags.Public);
@@ -231,12 +234,13 @@ namespace BeaverSoft.Texo.Core.Runtime
                 input,
                 TransformToResult(
                     InvokeCommandMethod(executionMethod, command, context),
-                    executionMethod.ReturnType));
+                    executionMethod.ReturnType),
+                cancellation);
         }
 
-        private async Task RenderAsync(Input input, ICommandResult result)
+        private async Task RenderAsync(Input input, ICommandResult result, CancellationToken cancellation)
         {
-            Render(input, await resultProcessing.TransfortAsync(result));
+            Render(input, await resultProcessing.TransfortAsync(result, cancellation));
         }
 
         private void Render(Input input, IImmutableList<IItem> items)

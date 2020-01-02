@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Actions;
 using BeaverSoft.Texo.Core.Runtime;
@@ -22,7 +23,7 @@ namespace BeaverSoft.Texo.Core.Commands.Actions
                 return Task.CompletedTask;
             }
 
-            return executor.ProcessAsync(input);
+            return executor.ProcessAsync(input, CancellationToken.None);
         }
     }
 }

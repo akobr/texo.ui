@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Model.Text;
@@ -23,7 +24,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             mapping = new Dictionary<Type, IItemMappingService>();
         }
 
-        public async Task<IImmutableList<IItem>> TransfortAsync(ICommandResult result)
+        public async Task<IImmutableList<IItem>> TransfortAsync(ICommandResult result, CancellationToken cancellation = default)
         {
             await result?.ExecuteResultAsync();
 
@@ -32,7 +33,7 @@ namespace BeaverSoft.Texo.Core.Runtime
                 return ImmutableList<IItem>.Empty;
             }
 
-            return await FromContentTypeAsync((object)result.Content);
+            return await FromContentTypeAsync((object)result.Content, cancellation);
         }
 
         public void RegisterMappingService<TContent>(IItemMappingService<TContent> service)
@@ -51,7 +52,7 @@ namespace BeaverSoft.Texo.Core.Runtime
             return (IItemMappingService<TContent>) mappingService;
         }
 
-        private async Task<IImmutableList<IItem>> FromContentTypeAsync(object content)
+        private async Task<IImmutableList<IItem>> FromContentTypeAsync(object content, CancellationToken cancellation)
         {
             switch (content)
             {
@@ -81,10 +82,10 @@ namespace BeaverSoft.Texo.Core.Runtime
                     return ImmutableList<IItem>.Empty.AddRange(resultModels.Select(m => new ModeledItem(m)));
 
                 case ICommandResult genericResult:
-                    return await TransfortAsync(genericResult);
+                    return await TransfortAsync(genericResult, cancellation);
 
                 default:
-                    return await Task.Run(() => TransformByMap(content));
+                    return await Task.Run(() => TransformByMap(content), cancellation);
             }
         }
 

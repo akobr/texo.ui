@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using BeaverSoft.Texo.Core.Path;
 
 namespace BeaverSoft.Texo.Core.Commands
@@ -45,6 +46,9 @@ namespace BeaverSoft.Texo.Core.Commands
         public ImmutableDictionary<string, OptionContext> Options => options;
 
         public ImmutableDictionary<string, ParameterContext> Parameters => parameters;
+
+        // TODO: [P2] Should be setup on context build
+        public CancellationToken CancellationToken { get; internal set; }
 
         public static CommandContext Empty { get; } = new CommandContext();
 
