@@ -31,7 +31,7 @@ namespace BeaverSoft.Texo.Core.Result
             }
 
             set => resultType = value;
-        }       
+        }
 
         public async Task ExecuteResultAsync()
         {

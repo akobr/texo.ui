@@ -197,6 +197,12 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
             return this;
         }
 
+        public IMarkdownBuilder Clear()
+        {
+            stringBuilder.Clear();
+            return this;
+        }
+
         public override string ToString()
         {
             return stringBuilder.ToString();

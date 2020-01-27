@@ -72,6 +72,9 @@ namespace BeaverSoft.Texo.Core.Runtime
                 case IElement resultModel:
                     return ImmutableList<IItem>.Empty.Add(new ModeledItem(resultModel));
 
+                //case IAsyncEnumerable<string> asyncTexts:
+                //    return asyncTexts.Select(t => new Item(t));
+
                 case IEnumerable<IItem> resultItems:
                     return ImmutableList<IItem>.Empty.AddRange(resultItems);
 

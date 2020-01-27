@@ -45,12 +45,15 @@ namespace BeaverSoft.Texo.Core.Streaming
             {
                 long currentPosition = stream.ReadingPosition;
                 stream.SeekReading(0, SeekOrigin.Begin);
-                return reader.ReadToEnd();
+                string entireContent = reader.ReadToEnd();
+                stream.SeekReading(currentPosition, SeekOrigin.Begin);
+                return entireContent;
             }
         }
 
         public void Dispose()
         {
+            IsCompleted = true;
             stream.Dispose();
         }
     }

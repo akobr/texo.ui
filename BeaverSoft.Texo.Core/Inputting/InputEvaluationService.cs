@@ -43,6 +43,11 @@ namespace BeaverSoft.Texo.Core.Inputting
             return evaluation.Evaluate(parsedInput);
         }
 
+        public void PrepareInputTree(TexoConfiguration configuration)
+        {
+            tree = BuildInputTree(configuration);
+        }
+
         async void IMessageBusRecipient<ISettingUpdatedMessage>.ProcessMessage(ISettingUpdatedMessage message)
         {
             try

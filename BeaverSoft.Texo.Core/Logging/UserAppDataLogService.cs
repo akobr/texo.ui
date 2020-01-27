@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -16,10 +16,12 @@ namespace BeaverSoft.Texo.Core.Logging
 
         private static readonly object locker = new object();
         private readonly LogMessageLevelEnum minimumLevel;
+        private string logFilePrefix;
         private TextWriter currentWriter;
 
-        public UserAppDataLogService(LogMessageLevelEnum minimumLevel)
+        public UserAppDataLogService(LogMessageLevelEnum minimumLevel, string logFilePrefix = null)
         {
+            this.logFilePrefix = string.IsNullOrWhiteSpace(logFilePrefix) ? string.Empty : logFilePrefix;
             this.minimumLevel = minimumLevel;
         }
 
@@ -66,7 +68,7 @@ namespace BeaverSoft.Texo.Core.Logging
             }
 
             string logDirectory = PathExtensions.GetAndCreateDataDirectoryPath(LOG_DIRECTORY);
-            string fileName = $"{DateTime.Now:yy-MM-dd-hh-mm-ss}-{Guid.NewGuid():D}{LOG_FILE_EXTENSION}";
+            string fileName = $"{logFilePrefix}{DateTime.Now:yy-MM-dd-hh-mm-ss}-{Guid.NewGuid():D}{LOG_FILE_EXTENSION}";
 
             FileStream logFile = new FileStream(logDirectory.CombinePathWith(fileName),
                 FileMode.OpenOrCreate, FileAccess.Write);

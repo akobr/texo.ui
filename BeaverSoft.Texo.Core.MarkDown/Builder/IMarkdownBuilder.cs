@@ -38,5 +38,7 @@ namespace BeaverSoft.Texo.Core.Markdown.Builder
         IMarkdownBuilder WriteLine(string text);
 
         IMarkdownBuilder Write(string text);
+
+        IMarkdownBuilder Clear();
     }
 }
