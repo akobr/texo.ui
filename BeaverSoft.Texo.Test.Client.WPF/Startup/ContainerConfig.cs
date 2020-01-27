@@ -13,6 +13,7 @@ using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Fallback.PowerShell;
+using BeaverSoft.Texo.Fallback.PseudoConsole;
 using BeaverSoft.Texo.View.WPF;
 using BeaverSoft.Texo.View.WPF.Markdown;
 using Commands.Calc;
@@ -82,9 +83,13 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
             container.Register<IViewService>(container.GetInstance<WpfViewService>);
             container.Register<IPromptableViewService>(container.GetInstance<WpfViewService>);
 
-            // PowerShell Fallback
-            container.Register<PowerShellFallbackService>();
-            container.Register<IFallbackService>(container.GetInstance<PowerShellFallbackService>);
+            // PowerShell Fallback (inside console)
+            //container.Register<PowerShellFallbackService>();
+            //container.Register<IFallbackService>(container.GetInstance<PowerShellFallbackService>);
+
+            // PowerShell Fallback (external host through pseudo console)
+            container.Register<PseudoConsoleFallbackService>();
+            container.Register<IFallbackService>(container.GetInstance<PseudoConsoleFallbackService>);
         }
 
         public static void RegisterEngineServices(this SimpleIoc container, TexoEngineBuilder builder)

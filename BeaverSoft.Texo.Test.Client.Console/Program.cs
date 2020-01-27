@@ -16,7 +16,6 @@ using BeaverSoft.Texo.Core.Runtime;
 using BeaverSoft.Texo.Core.Services;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Fallback.PowerShell;
-using BeaverSoft.Texo.Fallback.PowerShell.Markdown;
 using BeaverSoft.Texo.View.Console;
 using BeaverSoft.Texo.View.Console.Markdown;
 using Commands.CommandLine;
@@ -71,7 +70,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
             container.Register<IPromptableViewService>(() => container.GetInstance<ConsoleViewService>());
 
             // PowerShell Fallback
-            container.Register<IPowerShellResultBuilder, PowerShellResultMarkdownBuilder>();
+            container.Register<IPowerShellResultBuilder, PowerShellResultPlainBuilder>();
             container.Register<IFallbackService, PowerShellFallbackService>();
 
             // Core commands
@@ -115,7 +114,7 @@ namespace BeaverSoft.Texo.Test.Client.Console
             var engineBuilder = new TexoEngineBuilder(messageBus, messageBus)
                 .WithLogService(container.GetInstance<ILogService>())
                 .WithInputParseService(container.GetInstance<IInputParseService>())
-                .WithInputEvaluationService(container.GetInstance<IInputEvaluationService>())
+                //.WithInputEvaluationService(container.GetInstance<IInputEvaluationService>())
                 .WithEnvironmentService(container.GetInstance<IEnvironmentService>())
                 .WithSettingService(container.GetInstance<ISettingService>())
                 .WithCommandManagementService(container.GetInstance<ICommandManagementService>())

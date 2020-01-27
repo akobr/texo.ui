@@ -78,7 +78,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Text.Client.Visu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands.SpinSport", "Commands\Commands.SpinSport\Commands.SpinSport.csproj", "{636E7983-C0D3-49D1-B83A-A1DE7887F182}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Text.Client.VisualStudio.Core", "BeaverSoft.Text.Client.VisualStudio.Core\BeaverSoft.Text.Client.VisualStudio.Core.csproj", "{3D71844C-8591-426E-8CEE-40DE11AAE1C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Text.Client.VisualStudio.Core", "BeaverSoft.Text.Client.VisualStudio.Core\BeaverSoft.Text.Client.VisualStudio.Core.csproj", "{3D71844C-8591-426E-8CEE-40DE11AAE1C4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Texo.Fallback.PseudoConsole", "BeaverSoft.Texo.Fallback.PseudoConsole\BeaverSoft.Texo.Fallback.PseudoConsole.csproj", "{8FFF169D-D99F-4233-A647-9B6E4E0BEF41}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Texo.Core.Console", "BeaverSoft.Texo.Core.Console\BeaverSoft.Texo.Core.Console.csproj", "{559BE938-653D-414E-8B28-017E6306D26F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Texo.Fallback.PowerShell.Core", "BeaverSoft.Texo.Fallback.PowerShell.Core\BeaverSoft.Texo.Fallback.PowerShell.Core.csproj", "{416069F6-2BD7-48BC-AD12-C6EA2CFDFB2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Texo.Fallback.PowerShell.Standalone", "BeaverSoft.Texo.Fallback.PowerShell.Standalone\BeaverSoft.Texo.Fallback.PowerShell.Standalone.csproj", "{35BDA4C5-C1E4-41A4-ABFD-8E599B1A62A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Terminal", "tools\Example.Terminal\Example.Terminal.csproj", "{9720F490-CC6E-4A8A-B5BB-2DCAA40173ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Console.App", "tools\Example.Console.App\Example.Console.App.csproj", "{1084174C-3B2D-403A-A25A-939B8E58FD69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VT100.Viewer", "tools\VT100.Viewer\VT100.Viewer.csproj", "{2D5118E5-CF41-4822-B137-52EB173D0463}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -202,6 +216,34 @@ Global
 		{3D71844C-8591-426E-8CEE-40DE11AAE1C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D71844C-8591-426E-8CEE-40DE11AAE1C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D71844C-8591-426E-8CEE-40DE11AAE1C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FFF169D-D99F-4233-A647-9B6E4E0BEF41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FFF169D-D99F-4233-A647-9B6E4E0BEF41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FFF169D-D99F-4233-A647-9B6E4E0BEF41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FFF169D-D99F-4233-A647-9B6E4E0BEF41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{559BE938-653D-414E-8B28-017E6306D26F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{559BE938-653D-414E-8B28-017E6306D26F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{559BE938-653D-414E-8B28-017E6306D26F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{559BE938-653D-414E-8B28-017E6306D26F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{416069F6-2BD7-48BC-AD12-C6EA2CFDFB2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{416069F6-2BD7-48BC-AD12-C6EA2CFDFB2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{416069F6-2BD7-48BC-AD12-C6EA2CFDFB2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{416069F6-2BD7-48BC-AD12-C6EA2CFDFB2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35BDA4C5-C1E4-41A4-ABFD-8E599B1A62A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35BDA4C5-C1E4-41A4-ABFD-8E599B1A62A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35BDA4C5-C1E4-41A4-ABFD-8E599B1A62A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35BDA4C5-C1E4-41A4-ABFD-8E599B1A62A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9720F490-CC6E-4A8A-B5BB-2DCAA40173ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9720F490-CC6E-4A8A-B5BB-2DCAA40173ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9720F490-CC6E-4A8A-B5BB-2DCAA40173ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9720F490-CC6E-4A8A-B5BB-2DCAA40173ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1084174C-3B2D-403A-A25A-939B8E58FD69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1084174C-3B2D-403A-A25A-939B8E58FD69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1084174C-3B2D-403A-A25A-939B8E58FD69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1084174C-3B2D-403A-A25A-939B8E58FD69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D5118E5-CF41-4822-B137-52EB173D0463}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D5118E5-CF41-4822-B137-52EB173D0463}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D5118E5-CF41-4822-B137-52EB173D0463}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D5118E5-CF41-4822-B137-52EB173D0463}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -234,6 +276,12 @@ Global
 		{A3965F79-BC11-46DB-B6C4-6713E8E9B6EF} = {061058FB-1E54-4BC5-9F15-1BFAA70DA966}
 		{636E7983-C0D3-49D1-B83A-A1DE7887F182} = {DA3E9648-B96A-433E-A86A-FA7E3F925058}
 		{3D71844C-8591-426E-8CEE-40DE11AAE1C4} = {061058FB-1E54-4BC5-9F15-1BFAA70DA966}
+		{8FFF169D-D99F-4233-A647-9B6E4E0BEF41} = {4005EDEB-D8D4-4662-8EB2-80E4CE64F9DA}
+		{416069F6-2BD7-48BC-AD12-C6EA2CFDFB2F} = {4005EDEB-D8D4-4662-8EB2-80E4CE64F9DA}
+		{35BDA4C5-C1E4-41A4-ABFD-8E599B1A62A1} = {4005EDEB-D8D4-4662-8EB2-80E4CE64F9DA}
+		{9720F490-CC6E-4A8A-B5BB-2DCAA40173ED} = {033465D5-8DBB-4F82-B013-3FD6137E8569}
+		{1084174C-3B2D-403A-A25A-939B8E58FD69} = {033465D5-8DBB-4F82-B013-3FD6137E8569}
+		{2D5118E5-CF41-4822-B137-52EB173D0463} = {033465D5-8DBB-4F82-B013-3FD6137E8569}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDFCCFD5-8669-4BBF-83FF-8DFCC3F39551}

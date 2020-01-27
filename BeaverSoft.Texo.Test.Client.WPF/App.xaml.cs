@@ -51,7 +51,7 @@ namespace BeaverSoft.Texo.Test.Client.WPF
             container.RegisterWithMessageBus();
             container.RegisterIntellisense();
 
-            await TexoEngine.InitialiseWithCommandsAsync();        
+            await TexoEngine.InitialiseWithCommandsAsync();
             TexoEngine.Start();
 
             //var searchService = container.GetInstance<ICodeBaseSearchService>();
