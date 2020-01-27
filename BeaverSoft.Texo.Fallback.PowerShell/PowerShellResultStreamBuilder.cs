@@ -45,7 +45,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             input = inputModel;
             containError = false;
-            
+
             stream = new ReportableStream();
             writer = new FormattableStreamWriter(stream.Stream, Encoding.UTF8, 1024, true);
             return true;
@@ -58,7 +58,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public Item Finish()
         {
-            writer.Dispose();
+            writer?.Dispose();
             writer = null;
             return Item.Empty;
         }
@@ -102,7 +102,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             writer.SetForegroundTextColor(ConsoleColor.Red);
             writer.Write(output.Output);
             writer.ResetFormatting();
-            
+
             if (!output.NoNewLine)
             {
                 writer.WriteLine();

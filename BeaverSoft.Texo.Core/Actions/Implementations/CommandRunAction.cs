@@ -1,6 +1,7 @@
 using BeaverSoft.Texo.Core.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Core.Actions.Implementations
@@ -21,7 +22,7 @@ namespace BeaverSoft.Texo.Core.Actions.Implementations
                 return Task.CompletedTask;
             }
 
-            return executor.ProcessAsync(statement);
+            return executor.ProcessAsync(statement, CancellationToken.None);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BeaverSoft.Texo.Test.Client.WPF.Actions
@@ -39,15 +40,14 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Actions
         }
 
         private async Task OpenDirectoryAsync(string path)
-        {           
+        {
             if (path.Contains(' '))
             {
                 path = $"\"{path}\"";
             }
 
-            // Process.Start(path);
-            await executor.ProcessAsync($"cd {path}");
-            await executor.ProcessAsync("dir");
+            await executor.ProcessAsync($"cd {path}", CancellationToken.None);
+            await executor.ProcessAsync("dir", CancellationToken.None);
         }
 
         private void OpenFile(string path, IDictionary<string, string> arguments)

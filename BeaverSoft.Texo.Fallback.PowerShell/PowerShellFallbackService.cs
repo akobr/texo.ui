@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
+using System.Threading;
 using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Commands;
 using BeaverSoft.Texo.Core.Environment;
@@ -30,6 +31,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         private readonly ILogService logger;
 
         private System.Management.Automation.PowerShell shell;
+        private Task cancellationTask;
         private System.Management.Automation.PowerShell independentShell;
 
         public PowerShellFallbackService(
@@ -53,7 +55,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             inputPipeline.AddPipe(new GetChildItemInput());
         }
 
-        public async Task<ICommandResult> FallbackAsync(Input input)
+        public async Task<ICommandResult> FallbackAsync(Input input, CancellationToken cancellation = default)
         {
             if (input == null || input.ParsedInput.IsEmpty())
             {
@@ -67,13 +69,18 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
             BuildShell();
 
+            if (cancellation.IsCancellationRequested)
+            {
+                return new ErrorTextResult("Command has been cancelled.");
+            }
+
             try
             {
                 InputModel inputModel = await inputPipeline.ProcessAsync(new InputModel(input));
 
                 resultBuilder.Start(inputModel);
 
-                _ = RunScriptToOutputAsync(inputModel.Command);
+                _ = RunScriptToOutputAsync(inputModel.Command, cancellation);
                 return new TextStreamResult(resultBuilder.Stream);
             }
             catch (Exception e)
@@ -196,7 +203,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             });
         }
 
-        private Task RunScriptToOutputAsync(string script)
+        private Task RunScriptToOutputAsync(string script, CancellationToken cancellation)
         {
             shell.Runspace = host.Runspace;
             shell.AddScript(script);
@@ -209,7 +216,9 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             shell.Streams.Debug.DataAdded += Debug_DataAdded;
             //shell.Streams.Information.DataAdded += Information_DataAdded;
 
-            return Task.Factory.FromAsync(shell.BeginInvoke(), (result) => 
+            cancellationTask = CheckForCancellation(cancellation);
+
+            return Task.Factory.FromAsync(shell.BeginInvoke(), (result) =>
             {
                 //var output = shell.EndInvoke(result);
                 resultBuilder.Finish();
@@ -222,6 +231,29 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
                 //shell.Streams.Information.DataAdded -= Information_DataAdded;
                 ReleaseShell();
             });
+        }
+
+        private async Task CheckForCancellation(CancellationToken token)
+        {
+            while (token.CanBeCanceled)
+            {
+                if (shell == null)
+                {
+                    break;
+                }
+
+                if (token.IsCancellationRequested)
+                {
+                    if (shell != null)
+                    {
+                        shell.Stop();
+                    }
+
+                    break;
+                }
+
+                await Task.Delay(500, token);
+            }
         }
 
         private void Error_DataAdded(object sender, DataAddedEventArgs e)
@@ -295,6 +327,9 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             lock (executionLock)
             {
+                cancellationTask?.Dispose();
+                cancellationTask = null;
+
                 shell?.Dispose();
                 shell = null;
             }

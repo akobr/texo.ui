@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 
@@ -25,6 +25,11 @@ namespace BeaverSoft.Texo.Core.Streaming
 
         public void NotifyAboutCompletion()
         {
+            if (IsCompleted)
+            {
+                return;
+            }
+
             IsCompleted = true;
             StreamCompleted?.Invoke(this, new EventArgs());
         }

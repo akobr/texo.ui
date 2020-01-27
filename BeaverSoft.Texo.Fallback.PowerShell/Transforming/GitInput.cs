@@ -10,11 +10,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
     public class GitInput : ITransformation<InputModel>
     {
         private readonly HashSet<string> targetCommands;
+        private const string PROGRESS_ARGUMENT = " --progress";
 
         public GitInput()
         {
             targetCommands = new HashSet<string>(
-                new[] { "push", "pull", "fetch", "checkout", "clone" },
+                new[] { "push", "pull", "fetch", "clone" },
                 StringComparer.OrdinalIgnoreCase);
         }
 
@@ -36,9 +37,22 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Transforming
                 {
                     data.Flags.Add(TransformationFlags.GIT_STATUS);
                 }
+                else if(string.Equals(command, "checkout", StringComparison.OrdinalIgnoreCase))
+                {
+                    int pathSpecIndex = data.Command.IndexOf(" -- ");
+
+                    if (pathSpecIndex > 0)
+                    {
+                        data.Command = data.Command.Insert(pathSpecIndex, PROGRESS_ARGUMENT);
+                    }
+                    else
+                    {
+                        data.Command += PROGRESS_ARGUMENT;
+                    }
+                }
                 else if (targetCommands.Contains(command))
                 {
-                    data.Command += " --progress";
+                    data.Command += PROGRESS_ARGUMENT;
                 }
 
                 if (string.Equals(command, "push", StringComparison.OrdinalIgnoreCase))

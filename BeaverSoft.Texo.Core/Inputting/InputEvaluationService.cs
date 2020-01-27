@@ -60,7 +60,7 @@ namespace BeaverSoft.Texo.Core.Inputting
             catch (System.Exception exception)
             {
                 logger.Error("An unknown error happend during input tree build.", exception);
-            }            
+            }
         }
 
         private InputTree BuildInputTree(TexoConfiguration fromConfiguration)
