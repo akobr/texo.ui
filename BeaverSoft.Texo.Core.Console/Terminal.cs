@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Threading;
 using BeaverSoft.Texo.Core.Console.Interop;
 using Microsoft.Win32.SafeHandles;
@@ -13,7 +14,6 @@ namespace BeaverSoft.Texo.Core.Console
         private PseudoConsole console;
         private Process process;
         private bool disposed;
-        private FileStream inputStream, outputStream;
 
         public Terminal()
         {
@@ -30,9 +30,9 @@ namespace BeaverSoft.Texo.Core.Console
             Dispose(false);
         }
 
-        public FileStream Input => inputStream;
+        public FileStream Input { get; private set; }
 
-        public FileStream Output => outputStream;
+        public FileStream Output { get; private set; }
 
         public void Start(string shellCommand, short consoleWidth, short consoleHeight)
         {
@@ -42,8 +42,8 @@ namespace BeaverSoft.Texo.Core.Console
             console = PseudoConsole.Create(input.Read, output.Write, consoleWidth, consoleHeight);
             process = ProcessFactory.Start(shellCommand, PseudoConsole.PseudoConsoleThreadAttribute, console.Handle);
 
-            inputStream = new FileStream(input.Write, FileAccess.Write);
-            outputStream = new FileStream(output.Read, FileAccess.Read);
+            Input = new FileStream(input.Write, FileAccess.Write);
+            Output = new FileStream(output.Read, FileAccess.Read);
         }
 
         public void KillConsole()
@@ -78,17 +78,32 @@ namespace BeaverSoft.Texo.Core.Console
             }
 
             disposed = true;
+            process?.Dispose();
+            console?.Dispose();
 
             if (disposing)
             {
-                inputStream.Dispose();
-                outputStream.Dispose();
+                Input?.Dispose();
+                //FakeEndOfFile(output?.Write);
+                Output?.Dispose();
             }
 
-            process?.Dispose();
-            console?.Dispose();
             input?.Dispose();
             output?.Dispose();
+        }
+
+        private void FakeEndOfFile(SafeFileHandle fileHandler)
+        {
+            if (fileHandler == null || fileHandler.IsInvalid || fileHandler.IsClosed)
+            {
+                return;
+            }
+
+            using (FileStream stream = new FileStream(new SafeFileHandle(fileHandler.DangerousGetHandle(), false), FileAccess.Write))
+            {
+                byte[] endBytes = Encoding.UTF8.GetBytes("\n" + (char)26);
+                stream.Write(endBytes, 0, endBytes.Length);
+            }
         }
     }
 }

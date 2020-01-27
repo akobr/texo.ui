@@ -83,14 +83,14 @@ namespace BeaverSoft.Texo.Core.Console
         /// </summary>
         private static void SetConsoleModeToVirtualTerminal()
         {
-            SafeFileHandle stdOut = ConsoleApi.GetStdHandle(StdHandle.OutputHandle);
-            if (!ConsoleApi.GetConsoleMode(stdOut, out uint outConsoleMode))
+            SafeFileHandle stdIn = ConsoleApi.GetStdHandle(StdHandle.InputHandle);
+            if (!ConsoleApi.GetConsoleMode(stdIn, out uint outConsoleMode))
             {
-                //throw InteropException.CreateWithInnerHResultException("Could not get console mode.");
+                throw InteropException.CreateWithInnerHResultException("Could not get console mode.");
             }
 
             outConsoleMode |= Constants.ENABLE_VIRTUAL_TERMINAL_PROCESSING | Constants.DISABLE_NEWLINE_AUTO_RETURN;
-            if (!ConsoleApi.SetConsoleMode(stdOut, outConsoleMode))
+            if (!ConsoleApi.SetConsoleMode(stdIn, outConsoleMode))
             {
                 throw InteropException.CreateWithInnerHResultException("Could not enable virtual terminal processing.");
             }

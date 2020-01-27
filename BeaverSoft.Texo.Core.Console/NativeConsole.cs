@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Threading;
 using BeaverSoft.Texo.Core.Console.Interop;
 using BeaverSoft.Texo.Core.Console.Interop.Definitions;
 
@@ -9,10 +8,8 @@ namespace BeaverSoft.Texo.Core.Console
     public class NativeConsole : IDisposable
     {
         private IntPtr handle;
-        //private System.Diagnostics.Process process;
         private bool isDisposed;
         private Pipe stdOut, stdErr, stdIn;
-        private FileStream stdOutStream, stdErrStream, stdInStream;
 
         public NativeConsole(bool hidden = true)
         {
@@ -24,11 +21,11 @@ namespace BeaverSoft.Texo.Core.Console
             Dispose(false);
         }
 
-        public FileStream Output => stdOutStream;
+        public FileStream Output { get; private set; }
 
-        public FileStream Error => stdErrStream;
+        public FileStream Error { get; private set; }
 
-        public FileStream Input => stdInStream;
+        public FileStream Input { get; private set; }
 
         public static void SendCtrlEvent(CtrlEvent ctrlEvent)
         {
@@ -70,9 +67,9 @@ namespace BeaverSoft.Texo.Core.Console
 
             if (disposing)
             {
-                stdInStream.Dispose();
-                stdOutStream.Dispose();
-                stdErrStream.Dispose();
+                Input.Dispose();
+                Output.Dispose();
+                Error.Dispose();
             }
 
             ConsoleApi.FreeConsole();
@@ -116,7 +113,7 @@ namespace BeaverSoft.Texo.Core.Console
                 throw InteropException.CreateWithInnerHResultException("Could not redirect STDOUT.");
             }
             //stdOut.MakeReadNoninheritable(process.Handle);
-            stdOutStream = new FileStream(stdOut.Read, FileAccess.Read);
+            Output = new FileStream(stdOut.Read, FileAccess.Read);
         }
 
         private void CreateStdErrPipe()
@@ -127,7 +124,7 @@ namespace BeaverSoft.Texo.Core.Console
                 throw InteropException.CreateWithInnerHResultException("Could not redirect STDERR.");
             }
             //stdErr.MakeReadNoninheritable(process.Handle);
-            stdErrStream = new FileStream(stdErr.Read, FileAccess.Read);
+            Error = new FileStream(stdErr.Read, FileAccess.Read);
         }
 
         private void CreateStdInPipe()
@@ -138,7 +135,7 @@ namespace BeaverSoft.Texo.Core.Console
                 throw InteropException.CreateWithInnerHResultException("Could not redirect STDIN.");
             }
             //stdIn.MakeWriteNoninheritable(process.Handle);
-            stdInStream = new FileStream(stdIn.Write, FileAccess.Write);
+            Input = new FileStream(stdIn.Write, FileAccess.Write);
         }
     }
 }
