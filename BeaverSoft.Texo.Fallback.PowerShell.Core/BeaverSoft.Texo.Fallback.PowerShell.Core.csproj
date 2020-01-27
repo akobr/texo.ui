@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+      <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="4.7.0" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Transforming\" />
+  </ItemGroup>
+
+</Project>

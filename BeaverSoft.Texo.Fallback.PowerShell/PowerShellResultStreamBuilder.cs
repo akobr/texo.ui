@@ -1,26 +1,22 @@
+using System;
+using System.Text;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.Streaming;
 using BeaverSoft.Texo.Core.Transforming;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Fallback.PowerShell.Transforming;
 using StrongBeaver.Core.Services.Logging;
-using System;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace BeaverSoft.Texo.Fallback.PowerShell
 {
-    class PowerShellResultStreamBuilder : IPowerShellResultBuilder
+    public class PowerShellResultStreamBuilder : IPowerShellResultBuilder
     {
-        private static Regex progressRegex = new Regex(@"\s\d{1,3}%\s", RegexOptions.Compiled);
-
         private readonly ILogService logger;
         private readonly IPipeline<OutputModel> pipelineOutput;
 
         private ReportableStream stream;
         private FormattableStreamWriter writer;
         private InputModel input;
-        private bool containError;
 
         public PowerShellResultStreamBuilder(ILogService logger)
         {
@@ -37,18 +33,15 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             pipelineOutput.AddPipe(new GetChildItemOutput());
         }
 
-        public bool ContainError => containError;
-
         public ReportableStream Stream => stream;
 
-        public bool Start(InputModel inputModel)
+        public ValueTask StartAsync(InputModel inputModel)
         {
             input = inputModel;
-            containError = false;
 
             stream = new ReportableStream();
             writer = new FormattableStreamWriter(stream.Stream, Encoding.UTF8, 1024, true);
-            return true;
+            return new ValueTask();
         }
 
         public IStreamedItem BuildStreamItem()
@@ -56,45 +49,42 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             return new StreamedItem(stream);
         }
 
-        public Item Finish()
+        public ValueTask<Item> FinishAsync()
         {
             writer?.Dispose();
             writer = null;
-            return Item.Empty;
+            return new ValueTask<Item>(Item.Empty);
         }
 
-        public void Write(string text)
+        public ValueTask WriteAsync(string text)
         {
             writer.Write(text);
             writer.Flush();
+            return new ValueTask();
         }
 
-        public void Write(string text, ConsoleColor foreground, ConsoleColor background)
+        public ValueTask WriteAsync(string text, ConsoleColor foreground, ConsoleColor? background = null)
         {
-            if (foreground != ConsoleColor.White)
+            if (string.IsNullOrEmpty(text))
             {
-                writer.SetForegroundTextColor(foreground);
+                return new ValueTask();
             }
 
-            if (background != ConsoleColor.Black)
+            writer.SetForegroundTextColor(foreground);
+
+            if (background.HasValue)
             {
-                writer.SetBackgroundTextColor(background);
+                writer.SetBackgroundTextColor(background.Value);
             }
 
             writer.Write(text);
             writer.ResetFormatting();
             writer.Flush();
+            return new ValueTask();
         }
 
-        public void WriteDebugLine(string text)
+        public async ValueTask WriteErrorLineAsync(string text)
         {
-            WriteColoredLine(text, ConsoleColor.Magenta);
-        }
-
-        public async void WriteErrorLine(string text)
-        {
-            containError = true;
-
             OutputModel output = new OutputModel(text, input);
             output.Flags.Add(TransformationFlags.ERROR);
             output = await pipelineOutput.ProcessAsync(output);
@@ -111,7 +101,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             writer.Flush();
         }
 
-        public async void WriteLine(string text)
+        public async ValueTask WriteLineAsync(string text)
         {
             OutputModel output = await pipelineOutput.ProcessAsync(new OutputModel(text, input));
 
@@ -125,31 +115,33 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             writer.Flush();
         }
 
-        public void WriteLine()
+        public ValueTask WriteLineAsync(string text, ConsoleColor foreground, ConsoleColor? background = null)
         {
-            writer.WriteLine();
-        }
-
-        public void WriteVerboseLine(string text)
-        {
-            WriteColoredLine(text, ConsoleColor.Green);
-        }
-
-        public void WriteWarningLine(string text)
-        {
-            WriteColoredLine(text, ConsoleColor.Yellow);
-        }
-
-        private void WriteColored(string text, ConsoleColor color)
-        {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrWhiteSpace(text))
             {
-                return;
+                writer.WriteLine();
+                writer.Flush();
+                return new ValueTask();
             }
 
-            writer.SetForegroundTextColor(color);
+            writer.SetForegroundTextColor(foreground);
+
+            if (background.HasValue)
+            {
+                writer.SetBackgroundTextColor(background.Value);
+            }
+
             writer.Write(text);
             writer.ResetFormatting();
+            writer.WriteLine();
+            writer.Flush();
+            return new ValueTask();
+        }
+
+        public ValueTask WriteLineAsync()
+        {
+            writer.WriteLine();
+            return new ValueTask();
         }
 
         private void WriteColored(string text, byte red, byte green, byte blue)
@@ -162,22 +154,6 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             writer.SetForegroundTextColor(red, green, blue);
             writer.Write(text);
             writer.ResetFormatting();
-        }
-
-        private void WriteColoredLine(string text, ConsoleColor color)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                writer.WriteLine();
-                writer.Flush();
-                return;
-            }
-
-            writer.SetForegroundTextColor(color);
-            writer.Write(text);
-            writer.ResetFormatting();
-            writer.WriteLine();
-            writer.Flush();
         }
     }
 }

@@ -5,14 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.PowerShell.5.ReferenceAssemblies" Version="1.1.0" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BeaverSoft.Texo.Core.Console\BeaverSoft.Texo.Core.Console.csproj" />
-    <ProjectReference Include="..\BeaverSoft.Texo.Core.MarkDown\BeaverSoft.Texo.Core.Markdown.csproj" />
     <ProjectReference Include="..\BeaverSoft.Texo.Core\BeaverSoft.Texo.Core.csproj" />
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell.Core\BeaverSoft.Texo.Fallback.PowerShell.Core.csproj" />
+    <ProjectReference Include="..\BeaverSoft.Texo.Fallback.PowerShell\BeaverSoft.Texo.Fallback.PowerShell.csproj" />
   </ItemGroup>
 
 </Project>

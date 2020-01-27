@@ -78,7 +78,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             {
                 InputModel inputModel = await inputPipeline.ProcessAsync(new InputModel(input));
 
-                resultBuilder.Start(inputModel);
+                resultBuilder.StartAsync(inputModel);
 
                 _ = RunScriptToOutputAsync(inputModel.Command, cancellation);
                 return new TextStreamResult(resultBuilder.Stream);
@@ -130,6 +130,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public void Initialise()
         {
+            //host.MakeConsole();
             host.Initialise();
             LoadPowerShellProfile();
         }
@@ -221,7 +222,9 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             return Task.Factory.FromAsync(shell.BeginInvoke(), (result) =>
             {
                 //var output = shell.EndInvoke(result);
-                resultBuilder.Finish();
+                //var state = shell.InvocationStateInfo;
+
+                resultBuilder.FinishAsync();
                 resultBuilder.Stream.NotifyAboutCompletion();
 
                 shell.Streams.Error.DataAdded -= Error_DataAdded;
@@ -256,10 +259,10 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             }
         }
 
-        private void Error_DataAdded(object sender, DataAddedEventArgs e)
+        private async void Error_DataAdded(object sender, DataAddedEventArgs e)
         {
             var data = shell.Streams.Error[e.Index];
-            resultBuilder.WriteErrorLine(data.Exception.Message);
+            await resultBuilder.WriteErrorLineAsync(data.Exception.Message);
 
             if (string.Equals(data.FullyQualifiedErrorId, "NativeCommandError", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(data.FullyQualifiedErrorId, "NativeCommandErrorMessage", StringComparison.OrdinalIgnoreCase))
@@ -271,40 +274,40 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             {
                 foreach (string line in data.InvocationInfo.PositionMessage.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
                 {
-                    resultBuilder.WriteErrorLine(line);
+                    await resultBuilder.WriteLineAsync(line, ConsoleColor.Red);
                 }
             }
 
             if (data.CategoryInfo != null)
             {
-                resultBuilder.WriteErrorLine($"    + CategoryInfo: {data.CategoryInfo.Category}");
+                await resultBuilder.WriteLineAsync($"    + CategoryInfo: {data.CategoryInfo.Category}", ConsoleColor.Red);
             }
 
-            resultBuilder.WriteErrorLine($"    + FullyQualifiedErrorId: {data.FullyQualifiedErrorId}");
+            await resultBuilder.WriteLineAsync($"    + FullyQualifiedErrorId: {data.FullyQualifiedErrorId}", ConsoleColor.Red);
         }
 
         private void Warning_DataAdded(object sender, DataAddedEventArgs e)
         {
             var data = shell.Streams.Warning[e.Index];
-            resultBuilder.WriteWarningLine(data.Message);
+            resultBuilder.WriteLineAsync(data.Message, ConsoleColor.Yellow);
         }
 
         private void Verbose_DataAdded(object sender, DataAddedEventArgs e)
         {
             var data = shell.Streams.Verbose[e.Index];
-            resultBuilder.WriteVerboseLine(data.Message);
+            resultBuilder.WriteLineAsync(data.Message, ConsoleColor.Green);
         }
 
         private void Debug_DataAdded(object sender, DataAddedEventArgs e)
         {
             var data = shell.Streams.Debug[e.Index];
-            resultBuilder.WriteDebugLine(data.Message);
+            resultBuilder.WriteLineAsync(data.Message, ConsoleColor.Magenta);
         }
 
         private void Information_DataAdded(object sender, DataAddedEventArgs e)
         {
             var data = shell.Streams.Information[e.Index];
-            resultBuilder.WriteVerboseLine(data.MessageData.ToString());
+            resultBuilder.WriteLineAsync(data.MessageData.ToString(), ConsoleColor.Green);
         }
 
         private void BuildShell()

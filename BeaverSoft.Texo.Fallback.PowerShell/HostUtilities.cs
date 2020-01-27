@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
@@ -23,8 +23,8 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         internal const string PowerShellEngineKey = "PowerShellEngine";
 
         /// <summary>
-        /// Registry key used to determine the directory where Windows  
-        /// PowerShell is installed. 
+        /// Registry key used to determine the directory where Windows
+        /// PowerShell is installed.
         /// </summary>
         internal const string PowerShellEngineApplicationBase = "ApplicationBase";
 
@@ -188,7 +188,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             Assembly assem = Assembly.GetEntryAssembly();
             if (assem != null)
             {
-                // For minishells, we just return the executable path. 
+                // For minishells, we just return the executable path.
                 return Path.GetDirectoryName(assem.Location);
             }
 
@@ -197,7 +197,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             assem = Assembly.GetAssembly(typeof(System.Management.Automation.PSObject));
             if (assem != null)
             {
-                // For for other hosts. 
+                // For for other hosts.
                 return Path.GetDirectoryName(assem.Location);
             }
 

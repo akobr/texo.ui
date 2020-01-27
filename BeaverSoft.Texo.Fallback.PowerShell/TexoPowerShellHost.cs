@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Management.Automation.Host;
 using System.Management.Automation.Runspaces;
-using System.Text;
 using System.Threading;
+using BeaverSoft.Texo.Core.Console;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core;
 using StrongBeaver.Core.Services.Logging;
@@ -18,8 +17,10 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         private readonly IPromptableViewService view;
         private readonly ILogService logger;
 
+        private NativeConsole console;
+
         private Runspace independentRunspace;
-        private object independentLocker = new object(); 
+        private object independentLocker = new object();
 
         private Runspace pushedRunspace;
         private Stack<Guid> applications;
@@ -67,7 +68,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
             {
                 lock (independentLocker)
                 {
-                    if(independentRunspace == null)
+                    if (independentRunspace == null)
                     {
                         independentRunspace = RunspaceFactory.CreateRunspace(this);
                         independentRunspace.Open();
@@ -119,6 +120,29 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         {
             pushedRunspace = Runspace;
             Runspace = runspace;
+        }
+
+        public void MakeConsole()
+        {
+            if (console != null)
+            {
+                return;
+            }
+
+            try
+            {
+                console = new NativeConsole(false);
+            }
+            catch (InteropException cie)
+            {
+                logger.Error("Could not initialize the native console.", cie);
+            }
+        }
+
+        public void KillConsole()
+        {
+            console?.Dispose();
+            console = null;
         }
     }
 }

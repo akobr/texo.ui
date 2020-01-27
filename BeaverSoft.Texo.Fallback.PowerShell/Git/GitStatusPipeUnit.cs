@@ -1,4 +1,4 @@
-﻿using BeaverSoft.Texo.Core.Markdown.Builder;
+using BeaverSoft.Texo.Core.Markdown.Builder;
 using BeaverSoft.Texo.Core.Transforming;
 using BeaverSoft.Texo.Core.View;
 using StrongBeaver.Core.Services;
@@ -46,7 +46,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell.Git
             Regex branchRegex = new Regex("On\\sbranch\\s(\\S*)");
             Regex fileRegex = new Regex("(new\\sfile|modified|deleted):\\s*([\\S]*)");
             Regex untrackedFileRegex = new Regex("\\s*([\\S]*)");
-            
+
             foreach (string line in lines)
             {
                 if (line.StartsWith("\t"))

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using BeaverSoft.Texo.Core.View;
 using BeaverSoft.Texo.Fallback.PowerShell.Transforming;
 
@@ -6,26 +7,18 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 {
     public interface IPowerShellResultBuilder
     {
-        bool ContainError { get; }
+        ValueTask StartAsync(InputModel inputModel);
 
-        bool Start(InputModel inputModel);
+        ValueTask WriteAsync(string text);
 
-        void Write(string text);
+        ValueTask WriteAsync(string text, ConsoleColor foreground, ConsoleColor? background = null);
 
-        void Write(string text, ConsoleColor foreground, ConsoleColor background);
+        ValueTask WriteLineAsync(string text);
 
-        void WriteLine(string text);
+        ValueTask WriteLineAsync(string text, ConsoleColor foreground, ConsoleColor? background = null);
 
-        void WriteLine();
+        ValueTask WriteLineAsync();
 
-        void WriteVerboseLine(string text);
-
-        void WriteDebugLine(string text);
-
-        void WriteWarningLine(string text);
-
-        void WriteErrorLine(string text);
-
-        Item Finish();
+        ValueTask<Item> FinishAsync();
     }
 }

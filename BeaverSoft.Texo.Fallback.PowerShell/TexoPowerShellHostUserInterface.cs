@@ -34,21 +34,21 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         public override Dictionary<string, PSObject> Prompt(
             string caption, string message, Collection<FieldDescription> descriptions)
         {
-            resultBuilder.WriteLine($"PowerShell expect the parameter(s):");
+            resultBuilder.WriteLineAsync($"PowerShell expect the parameter(s):");
 
             if (descriptions != null && descriptions.Count > 0)
             {
-                resultBuilder.WriteLine(string.Join(", ", descriptions.Select(f => f.Name)));
+                resultBuilder.WriteLineAsync(string.Join(", ", descriptions.Select(f => f.Name)));
             }
 
             if (string.IsNullOrWhiteSpace(caption))
             {
-                resultBuilder.WriteLine(caption);
+                resultBuilder.WriteLineAsync(caption);
             }
 
             if (string.IsNullOrWhiteSpace(message))
             {
-                resultBuilder.WriteLine(message);
+                resultBuilder.WriteLineAsync(message);
             }
 
             return new Dictionary<string, PSObject>();
@@ -92,38 +92,37 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
         public override void Write(
             ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value)
         {
-            resultBuilder.Write(value, foregroundColor, backgroundColor);
+            resultBuilder.WriteAsync(value, foregroundColor, backgroundColor);
         }
 
         public override void Write(string value)
         {
-            resultBuilder.Write(value);
+            resultBuilder.WriteAsync(value);
         }
 
         public override void WriteDebugLine(string message)
         {
-            resultBuilder.WriteDebugLine(message);
+            resultBuilder.WriteLineAsync(message, ConsoleColor.Magenta);
         }
 
         public override void WriteErrorLine(string value)
         {
-             resultBuilder.WriteErrorLine(value);
+             resultBuilder.WriteLineAsync(value, ConsoleColor.Red);
         }
 
         public override void WriteLine(string value)
         {
-            resultBuilder.WriteLine(value);
+            resultBuilder.WriteLineAsync(value);
         }
 
         public override void WriteLine(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value)
         {
-            resultBuilder.Write(value, foregroundColor, backgroundColor);
-            resultBuilder.WriteLine(string.Empty);
+            resultBuilder.WriteLineAsync(value, foregroundColor, backgroundColor);
         }
 
         public override void WriteLine()
         {
-            resultBuilder.WriteLine(string.Empty);
+            resultBuilder.WriteLineAsync();
         }
 
         public override void WriteInformation(InformationRecord record)
@@ -136,7 +135,7 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
             // When the script contains 'Write-Host -NoNewLine [MESSAGE]',
             // we are expecting update message which will override current line.
-            resultBuilder.Write(
+            resultBuilder.WriteAsync(
                     '\r' + message.Message,
                     message.ForegroundColor ?? ConsoleColor.White,
                     message.BackgroundColor ?? ConsoleColor.Black);
@@ -150,12 +149,12 @@ namespace BeaverSoft.Texo.Fallback.PowerShell
 
         public override void WriteVerboseLine(string message)
         {
-            resultBuilder.WriteVerboseLine(message);
+            resultBuilder.WriteLineAsync(message, ConsoleColor.Green);
         }
 
         public override void WriteWarningLine(string message)
         {
-            resultBuilder.WriteWarningLine(message);
+            resultBuilder.WriteLineAsync(message, ConsoleColor.Yellow);
         }
     }
 }
