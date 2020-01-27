@@ -1,13 +1,8 @@
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BeaverSoft.Texo.Core.Console;
@@ -16,8 +11,9 @@ namespace VT100.Viewer
 {
     public partial class MainForm : Form
     {
-        private NativeConsole console;
+        //private NativeConsole console;
         private Terminal terminal;
+        private bool terminalIsExiting;
 
         public MainForm()
         {
@@ -27,13 +23,15 @@ namespace VT100.Viewer
 
         private void InitialiseTerminal()
         {
-            console = new NativeConsole(false);
+            //console = new NativeConsole(false);
             terminal = new Terminal();
 
             //terminal.Start(@"c:\Working\textum.ui\BeaverSoft.Texo.Fallback.PowerShell.Standalone\bin\Debug\BeaverSoft.Texo.Fallback.PowerShell.Standalone.exe", 126, 32);
-            terminal.Start(@"c:\Working\textum.ui\tools\Example.Console.App\bin\Debug\Example.Console.App.exe", 126, 32);
-            Thread reading = new Thread(CopyConsoleToWindow);
-            reading.Start();
+            //terminal.Start(@"c:\Working\textum.ui\tools\Example.Console.App\bin\Debug\Example.Console.App.exe", 126, 32);
+            terminal.Start(@"ping localhost", 126, 32);
+            //terminal.Start(@"powershell", 126, 32);
+
+            _ = Task.Run(CopyConsoleToWindow);
         }
 
         private void CopyConsoleToWindow()
@@ -55,21 +53,15 @@ namespace VT100.Viewer
                         }
 
                         fileWriter.Write(buffer, 0, readed);
-
-                        if (CheckForIllegalCrossThreadCalls)
-                        {
-                            Invoke(new Action(() => { tbOutput.Text += new string(buffer.Take(readed).ToArray()); }));
-                        }
-                        else
-                        {
-                            tbOutput.Text += new string(buffer.Take(readed).ToArray());
-                        }
+                        OutputCharacters(buffer, readed);
                     }
                 }
             }
+            catch (ObjectDisposedException) { /* Pseudo terminal is terminated. */ }
             catch (Exception exception)
             {
-
+                string message = Environment.NewLine + "Error: " + exception.Message;
+                OutputCharacters(message.ToCharArray(), message.Length);
             }
             finally
             {
@@ -77,9 +69,30 @@ namespace VT100.Viewer
             }
         }
 
-        private void btnSend_Click(object sender, EventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
-            terminal.KillConsole();
+            terminalIsExiting = true;
+            terminal?.Dispose();
+            //console?.Dispose();
+        }
+
+        private void OutputCharacters(char[] buffer, int length)
+        {
+            if (terminalIsExiting)
+            {
+                return;
+            }
+
+            string text = new string(buffer.Take(length).ToArray());
+
+            if (CheckForIllegalCrossThreadCalls)
+            {
+                Invoke(new Action(() => { tbOutput.Text += text; }));
+            }
+            else
+            {
+                tbOutput.Text += text;
+            }
         }
     }
 }
