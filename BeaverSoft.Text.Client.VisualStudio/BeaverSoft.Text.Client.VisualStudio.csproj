@@ -166,6 +166,10 @@
       <Project>{33bcb6f8-8a55-44a9-910e-628a096e41e6}</Project>
       <Name>Commands.Functions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.Git\Commands.Git.csproj">
+      <Project>{9df2658d-1ff8-48b7-9219-91a316a7c353}</Project>
+      <Name>Commands.Git</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Commands\Commands.NugetManager\Commands.NugetManager.csproj">
       <Project>{6b1ba988-e9c1-46b7-86ee-1d0269d21906}</Project>
       <Name>Commands.NugetManager</Name>

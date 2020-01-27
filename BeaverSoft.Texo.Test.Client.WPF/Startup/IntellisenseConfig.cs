@@ -1,5 +1,6 @@
 using BeaverSoft.Texo.Core.Intellisense;
 using Commands.Dotnet;
+using Commands.Git;
 using StrongBeaver.Core.Container;
 
 namespace BeaverSoft.Texo.Test.Client.WPF.Startup
@@ -12,6 +13,9 @@ namespace BeaverSoft.Texo.Test.Client.WPF.Startup
 
             container.Register<DotnetIntellisenseProvider>();
             service.RegisterExternalHelpProvider("dotnet", container.GetInstance<DotnetIntellisenseProvider>());
+
+            container.Register<GitIntellisenseProvider>();
+            service.RegisterExternalHelpProvider("git", container.GetInstance<GitIntellisenseProvider>());
         }
     }
 }
