@@ -10,6 +10,8 @@ Universal text based user interface for any type of application.
 
 The main goal is to create a simple framework for text base UI which is usable on desktop and touchable devices, as well.
 
+![Example of texo terminal](doc/texo-example.gif)
+
 ## Main concepts
 
 * Input is only plain text (*touch friendly* command line)
