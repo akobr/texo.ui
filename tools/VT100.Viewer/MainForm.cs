@@ -1,24 +1,43 @@
 using System;
 using System.Buffers;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BeaverSoft.Texo.Core.Console;
+using BeaverSoft.Texo.Core.Console.Decoding;
+using BeaverSoft.Texo.Core.Console.Decoding.Ansi;
+using VT100.Viewer.Decoding;
 
 namespace VT100.Viewer
 {
     public partial class MainForm : Form
     {
+        private const int TERMINAL_WIDTH = 126;
+        private const int TERMINAL_HEIGHT = 32;
+
         //private NativeConsole console;
         private Terminal terminal;
         private bool terminalIsExiting;
+        private IDecoder decoder;
 
         public MainForm()
         {
             InitializeComponent();
+            Size = new Size(1200, 700);
+
+            InitialiseDecoderClient();
             InitialiseTerminal();
+        }
+
+        private void InitialiseDecoderClient()
+        {
+            var ansi = new AnsiDecoder();
+            ansi.Subscribe(new AnsiDecoderClient(tbOutput, TERMINAL_WIDTH, TERMINAL_HEIGHT));
+            decoder = ansi;
         }
 
         private void InitialiseTerminal()
@@ -26,34 +45,33 @@ namespace VT100.Viewer
             //console = new NativeConsole(false);
             terminal = new Terminal();
 
-            //terminal.Start(@"c:\Working\textum.ui\BeaverSoft.Texo.Fallback.PowerShell.Standalone\bin\Debug\BeaverSoft.Texo.Fallback.PowerShell.Standalone.exe", 126, 32);
-            //terminal.Start(@"c:\Working\textum.ui\tools\Example.Console.App\bin\Debug\Example.Console.App.exe", 126, 32);
-            terminal.Start(@"ping localhost", 126, 32);
-            //terminal.Start(@"powershell", 126, 32);
+            //terminal.Start(@"c:\Working\textum.ui\BeaverSoft.Texo.Fallback.PowerShell.Standalone\bin\Debug\BeaverSoft.Texo.Fallback.PowerShell.Standalone.exe", TERMINAL_WIDTH, TERMINAL_HEIGHT);
+            //terminal.Start(@"c:\Working\textum.ui\tools\Example.Console.App\bin\Debug\Example.Console.App.exe", TERMINAL_WIDTH, TERMINAL_HEIGHT);
+            terminal.Start(@"ping localhost", TERMINAL_WIDTH, TERMINAL_HEIGHT);
+            //terminal.Start(@"powershell", TERMINAL_WIDTH, TERMINAL_HEIGHT);
 
             _ = Task.Run(CopyConsoleToWindow);
         }
 
         private void CopyConsoleToWindow()
         {
-            var buffer = ArrayPool<char>.Shared.Rent(1024);
+            var buffer = ArrayPool<byte>.Shared.Rent(1024);
 
             try
             {
-                using (StreamReader reader = new StreamReader(terminal.Output))
                 using (StreamWriter fileWriter = new StreamWriter(File.Open("output.txt", FileMode.Create, FileAccess.Write)) { AutoFlush = true })
                 {
                     while (true)
                     {
-                        int readed = reader.Read(buffer, 0, buffer.Length);
+                        int readed = terminal.Output.Read(buffer, 0, buffer.Length);
 
                         if (readed == 0)
                         {
                             return;
                         }
 
-                        fileWriter.Write(buffer, 0, readed);
-                        OutputCharacters(buffer, readed);
+                        fileWriter.Write(Encoding.UTF8.GetString(buffer, 0, readed));
+                        OnOutput(buffer, readed);
                     }
                 }
             }
@@ -61,11 +79,11 @@ namespace VT100.Viewer
             catch (Exception exception)
             {
                 string message = Environment.NewLine + "Error: " + exception.Message;
-                OutputCharacters(message.ToCharArray(), message.Length);
+                Invoke(new Action(() => { tbOutput.Text += message; }));
             }
             finally
             {
-                ArrayPool<char>.Shared.Return(buffer);
+                ArrayPool<byte>.Shared.Return(buffer);
             }
         }
 
@@ -76,22 +94,22 @@ namespace VT100.Viewer
             //console?.Dispose();
         }
 
-        private void OutputCharacters(char[] buffer, int length)
+        private void OnOutput(byte[] buffer, int length)
         {
             if (terminalIsExiting)
             {
                 return;
             }
 
-            string text = new string(buffer.Take(length).ToArray());
+            byte[] validBytes = buffer.Take(length).ToArray();
 
             if (CheckForIllegalCrossThreadCalls)
             {
-                Invoke(new Action(() => { tbOutput.Text += text; }));
+                Invoke(new Action(() => { decoder.Input(validBytes); }));
             }
             else
             {
-                tbOutput.Text += text;
+                decoder.Input(validBytes);
             }
         }
     }

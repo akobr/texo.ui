@@ -1,5 +1,7 @@
 namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
 {
+    // TODO: [P2] Support for all SGR parameters should be added
+    // https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
     public enum GraphicRendition
     {
         /// all attributes off
@@ -21,7 +23,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
         /// Conceal     not widely supported
         Conceal = 8,
         /// Font selection (not sure which)
-        Font1 = 10,
+        DefaultFont = 10,
         /// Underline: Double
         UnderlineDouble = 21,
         /// Intensity: Normal     not bold and not faint

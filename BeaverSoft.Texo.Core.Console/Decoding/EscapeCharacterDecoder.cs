@@ -5,10 +5,12 @@ using System.Text;
 
 namespace BeaverSoft.Texo.Core.Console.Decoding
 {
-    internal abstract class EscapeCharacterDecoder : IDecoder
+    public abstract class EscapeCharacterDecoder : IDecoder
     {
         public const byte EscapeCharacter = 0x1B;
+        public const byte BelCharacter = 7;
         public const byte LeftBracketCharacter = 0x5B;
+        public const byte RightBracketCharacter = 0x5D;
         public const byte XonCharacter = 17;
         public const byte XoffCharacter = 19;
 
@@ -38,6 +40,11 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
 
             supportXonXoff = true;
             xOffReceived = false;
+        }
+
+        ~EscapeCharacterDecoder()
+        {
+            Dispose(false);
         }
 
         public Encoding Encoding
@@ -116,28 +123,46 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
             OnOutput(data);
         }
 
-        public bool KeyPressed(int modifiers, int key)
+        public virtual bool KeyPressed(Keys modifiers, Keys key)
         {
             return false;
         }
 
         public void Dispose()
         {
-            commandBuffer.Clear();
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                commandBuffer.Clear();
+            }
         }
 
         protected abstract void OnCharacters(char[] characters);
-        protected abstract void ProcessCommand(byte command, string parameter);
+        protected abstract void ProcessCommand(byte commandGroup, byte command, string parameter);
 
-        protected virtual bool IsValidOneCharacterCommand(char command)
+        protected virtual bool IsValidOneCharacterCommand(byte command)
         {
             return false;
         }
 
-        protected virtual bool IsValidParameterCharacter(char character)
+        protected virtual bool IsValidParameterCharacter(byte commandGroup, byte character)
         {
-            return char.IsNumber(character)
+            if (commandGroup == RightBracketCharacter) // OSC: Operating System Command
+            {
+                return character != BelCharacter
+                    && character != EscapeCharacter;
+            }
+
+            return char.IsNumber((char)character)
+                || character == ':'
                 || character == ';'
+                || character == '<'
+                || character == '='
+                || character == '>'
                 || character == '"'
                 || character == '?';
         }
@@ -208,13 +233,13 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
                     throw new DecodeException("Internal error, first command character MUST be the escape character, please report this bug to the author.");
                 }
 
+                byte commandGroup = commandBuffer[1];
                 int start = 1;
-                // Is this a one or two byte escape code?
-                if (commandBuffer[start] == LeftBracketCharacter)
+
+                if (commandGroup == LeftBracketCharacter      // CSI: Control Sequence Introducer '['
+                    || commandGroup == RightBracketCharacter) // OSC: Operating System Command ']'
                 {
                     start++;
-
-                    // It is a two byte escape code, but we still need more data
                     if (commandBuffer.Count < 3)
                     {
                         return;
@@ -223,7 +248,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
 
                 bool insideQuotes = false;
                 int end = start;
-                while (end < commandBuffer.Count && (IsValidParameterCharacter((char)commandBuffer[end]) || insideQuotes))
+                while (end < commandBuffer.Count && (IsValidParameterCharacter(commandGroup, commandBuffer[end]) || insideQuotes))
                 {
                     if (commandBuffer[end] == '"')
                     {
@@ -232,7 +257,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
                     end++;
                 }
 
-                if (commandBuffer.Count == 2 && IsValidOneCharacterCommand((char)commandBuffer[start]))
+                if (commandBuffer.Count == 2 && IsValidOneCharacterCommand(commandBuffer[start]))
                 {
                     end = commandBuffer.Count - 1;
                 }
@@ -257,7 +282,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
 
                 try
                 {
-                    ProcessCommand(command, parameter);
+                    ProcessCommand(commandGroup, command, parameter);
                 }
                 finally
                 {

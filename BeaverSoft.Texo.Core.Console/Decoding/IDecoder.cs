@@ -9,7 +9,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
 
         void Input(byte[] data);
 
-        bool KeyPressed(int modifiers, int key);
+        bool KeyPressed(Keys modifiers, Keys key);
 
         void CharacterTyped(char character);
     }

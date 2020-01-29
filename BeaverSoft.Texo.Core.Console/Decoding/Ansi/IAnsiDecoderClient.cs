@@ -10,6 +10,8 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
 
         void Characters(char[] chars);
 
+        void EraseCharacters(int count);
+
         void SaveCursor();
 
         void RestoreCursor();
@@ -23,6 +25,8 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
         void MoveCursorToColumn(int columnNumber);
 
         void MoveCursorTo(Point position);
+
+        void MoveCursorByTabulation(ClearDirection direction, int tabs);
 
         void SetGraphicRendition(GraphicRendition[] commands);
 

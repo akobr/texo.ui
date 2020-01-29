@@ -1,6 +1,6 @@
 namespace BeaverSoft.Texo.Core.Console.Decoding
 {
-    internal enum DecoderState
+    public enum DecoderState
     {
         Normal = 0,
         Command,
