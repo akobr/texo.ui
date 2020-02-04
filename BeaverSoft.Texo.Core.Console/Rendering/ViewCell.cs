@@ -6,15 +6,15 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
     {
         public const char EMPTY_CHARACTER = '\0';
 
-        public ViewCell(char character, GraphicAttributes attributes = default)
+        public ViewCell(char character, byte styleId = 0)
         {
             Character = character;
-            Attributes = attributes;
+            StyleId = styleId;
         }
 
         public char Character { get; }
 
-        public GraphicAttributes Attributes { get; }
+        public byte StyleId { get; }
 
         public bool IsEmpty => Character == EMPTY_CHARACTER;
 
@@ -22,18 +22,18 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public ViewCell SetCharacter(char character)
         {
-            return new ViewCell(character, Attributes);
+            return new ViewCell(character, StyleId);
         }
 
-        public ViewCell SetAttributes(GraphicAttributes attributes)
+        public ViewCell SetStyleId(byte styleId)
         {
-            return new ViewCell(Character, attributes);
+            return new ViewCell(Character, styleId);
         }
 
         public static bool operator ==(ViewCell left, ViewCell right)
         {
             return left.Character == right.Character
-                && left.Attributes == right.Attributes;
+                && left.StyleId == right.StyleId;
         }
 
         public static bool operator !=(ViewCell left, ViewCell right)
@@ -68,12 +68,12 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public override int GetHashCode()
         {
-            return new { Character, Attributes }.GetHashCode();
+            return new { Character, StyleId }.GetHashCode();
         }
 
         public override string ToString()
         {
-            return $"'{Character}', {Character:D}, \\u{Character:x}, {Attributes}";
+            return $"'{Character}', {Character:D}, \\u{Character:x}, Style: {StyleId}";
         }
     }
 }

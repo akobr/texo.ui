@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace BeaverSoft.Texo.Core.Console.Decoding
@@ -11,19 +9,11 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
         public const byte BelCharacter = 7;
         public const byte LeftBracketCharacter = 0x5B;
         public const byte RightBracketCharacter = 0x5D;
-        public const byte XonCharacter = 17;
-        public const byte XoffCharacter = 19;
 
-        private readonly List<byte> commandBuffer;
-        protected readonly List<byte[]> outBuffer;
-
-        protected DecoderState state;
         protected Encoding encoding;
         protected Decoder decoder;
         //protected Encoder encoder;
-
-        protected bool supportXonXoff;
-        protected bool xOffReceived;
+        private byte[] inputBuffer;
 
         public virtual event Action<IDecoder, byte[]> Output;
 
@@ -32,14 +22,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
 
         public EscapeCharacterDecoder(Encoding encoding)
         {
-            commandBuffer = new List<byte>();
-            outBuffer = new List<byte[]>();
-
-            state = DecoderState.Normal;
-            SetEncoding(encoding);
-
-            supportXonXoff = true;
-            xOffReceived = false;
+            SetEncoding(encoding ?? throw new ArgumentNullException(nameof(encoding)));
         }
 
         ~EscapeCharacterDecoder()
@@ -60,60 +43,34 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
                 throw new ArgumentException("Input can not process an empty array.");
             }
 
-            if (supportXonXoff)
+            if (inputBuffer != null)
             {
-                foreach (byte b in data)
-                {
-                    if (b == XoffCharacter)
-                    {
-                        xOffReceived = true;
-                    }
-                    else if (b == XonCharacter)
-                    {
-                        xOffReceived = false;
-                        if (outBuffer.Count > 0)
-                        {
-                            foreach (byte[] output in outBuffer)
-                            {
-                                OnOutput(output);
-                            }
-                        }
-                    }
-                }
+                byte[] temp = inputBuffer;
+                inputBuffer = new byte[temp.Length + data.Length];
+                Array.Copy(temp, 0, inputBuffer, 0, temp.Length);
+                Array.Copy(data, 0, inputBuffer, temp.Length, data.Length);
+
+                data = inputBuffer;
+                inputBuffer = null;
             }
 
-            switch (state)
-            {
-                case DecoderState.Normal:
-                    if (data[0] == EscapeCharacter)
-                    {
-                        AddToCommandBuffer(data);
-                        ProcessCommandBuffer();
-                    }
-                    else
-                    {
-                        int i = 0;
-                        while (i < data.Length && data[i] != EscapeCharacter)
-                        {
-                            ProcessNormalInput(data[i]);
-                            i++;
-                        }
-                        if (i != data.Length)
-                        {
-                            while (i < data.Length)
-                            {
-                                AddToCommandBuffer(data[i]);
-                                i++;
-                            }
-                            ProcessCommandBuffer();
-                        }
-                    }
-                    break;
+            int index = 0;
 
-                case DecoderState.Command:
-                    AddToCommandBuffer(data);
-                    ProcessCommandBuffer();
-                    break;
+            while (index < data.Length)
+            {
+                int newIndex = data[index] == EscapeCharacter
+                    ? OnCommand(data, index)
+                    : OnNormalInput(data, index);
+
+                if (newIndex < 0)
+                {
+                    int bufferSize = data.Length - index;
+                    inputBuffer = new byte[bufferSize];
+                    Array.Copy(data, index, inputBuffer, 0, bufferSize);
+                    return;
+                }
+
+                index = newIndex;
             }
         }
 
@@ -135,10 +92,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                commandBuffer.Clear();
-            }
+            // no operation ( template method )
         }
 
         protected abstract void OnCharacters(char[] characters);
@@ -169,19 +123,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
 
         protected virtual void OnOutput(byte[] output)
         {
-            if (Output == null)
-            {
-                return;
-            }
-
-            if (supportXonXoff && xOffReceived)
-            {
-                outBuffer.Add(output);
-            }
-            else
-            {
-                Output(this, output);
-            }
+            Output?.Invoke(this, output);
         }
 
         protected void SetEncoding(Encoding encoding)
@@ -196,154 +138,97 @@ namespace BeaverSoft.Texo.Core.Console.Decoding
             //encoder = encoding.GetEncoder();
         }
 
-        protected void AddToCommandBuffer(byte data)
+        private int OnCommand(byte[] data, int startIndex)
         {
-            if (supportXonXoff)
+            if (data.Length <= startIndex + 1)
             {
-                if (data == XonCharacter || data == XoffCharacter)
-                {
-                    return;
-                }
+                // More data needed
+                return -1;
             }
 
-            commandBuffer.Add(data);
-        }
+            byte commandGroup = data[startIndex + 1];
+            int start = startIndex + 1;
 
-        protected void AddToCommandBuffer(byte[] data)
-        {
-            if (supportXonXoff)
+            if (commandGroup == LeftBracketCharacter      // CSI: Control Sequence Introducer '['
+                || commandGroup == RightBracketCharacter) // OSC: Operating System Command ']'
             {
-                commandBuffer.AddRange(
-                    data.Where(b => b != XonCharacter && b != XoffCharacter));
-            }
-            else
-            {
-                commandBuffer.AddRange(data);
-            }
-        }
+                start++;
 
-        protected void ProcessCommandBuffer()
-        {
-            state = DecoderState.Command;
-
-            if (commandBuffer.Count > 1)
-            {
-                if (commandBuffer[0] != EscapeCharacter)
-                {
-                    throw new DecodeException("Internal error, first command character MUST be the escape character, please report this bug to the author.");
-                }
-
-                byte commandGroup = commandBuffer[1];
-                int start = 1;
-
-                if (commandGroup == LeftBracketCharacter      // CSI: Control Sequence Introducer '['
-                    || commandGroup == RightBracketCharacter) // OSC: Operating System Command ']'
-                {
-                    start++;
-                    if (commandBuffer.Count < 3)
-                    {
-                        return;
-                    }
-                }
-
-                bool insideQuotes = false;
-                int end = start;
-                while (end < commandBuffer.Count && (IsValidParameterCharacter(commandGroup, commandBuffer[end]) || insideQuotes))
-                {
-                    if (commandBuffer[end] == '"')
-                    {
-                        insideQuotes = !insideQuotes;
-                    }
-                    end++;
-                }
-
-                if (commandBuffer.Count == 2 && IsValidOneCharacterCommand(commandBuffer[start]))
-                {
-                    end = commandBuffer.Count - 1;
-                }
-                if (end == commandBuffer.Count)
+                if (data.Length < startIndex + 3)
                 {
                     // More data needed
-                    return;
-                }
-
-                Decoder decoder = (this as IDecoder).Encoding.GetDecoder();
-                byte[] parameterData = new byte[end - start];
-                for (int i = 0; i < parameterData.Length; i++)
-                {
-                    parameterData[i] = commandBuffer[start + i];
-                }
-                int parameterLength = decoder.GetCharCount(parameterData, 0, parameterData.Length);
-                char[] parameterChars = new char[parameterLength];
-                decoder.GetChars(parameterData, 0, parameterData.Length, parameterChars, 0);
-                string parameter = new string(parameterChars);
-
-                byte command = commandBuffer[end];
-
-                try
-                {
-                    ProcessCommand(commandGroup, command, parameter);
-                }
-                finally
-                {
-                    // Remove the processed commands
-                    if (commandBuffer.Count == end - 1)
-                    {
-                        // All command bytes processed, we can go back to normal handling
-                        commandBuffer.Clear();
-                        state = DecoderState.Normal;
-                    }
-                    else
-                    {
-                        bool returnToNormalState = true;
-                        for (int i = end + 1; i < commandBuffer.Count; i++)
-                        {
-                            if (commandBuffer[i] == EscapeCharacter)
-                            {
-                                commandBuffer.RemoveRange(0, i);
-                                ProcessCommandBuffer();
-                                returnToNormalState = false;
-                            }
-                            else
-                            {
-                                ProcessNormalInput(commandBuffer[i]);
-                            }
-                        }
-                        if (returnToNormalState)
-                        {
-                            commandBuffer.Clear();
-
-                            state = DecoderState.Normal;
-                        }
-                    }
+                    return -1;
                 }
             }
+
+            bool insideQuotes = false;
+            int end = start;
+
+            while (end < data.Length && (IsValidParameterCharacter(commandGroup, data[end]) || insideQuotes))
+            {
+                if (data[end] == '"') // TODO: not sure about this
+                {
+                    insideQuotes = !insideQuotes;
+                }
+
+                end++;
+            }
+
+            if (data.Length == 2 && IsValidOneCharacterCommand(data[start]))
+            {
+                end = data.Length - 1;
+            }
+
+            if (end == data.Length)
+            {
+                // More data needed
+                return -1;
+            }
+
+            byte[] parameterData = new byte[end - start];
+
+            for (int i = 0; i < parameterData.Length; i++)
+            {
+                parameterData[i] = data[start + i];
+            }
+
+            int parameterLength = decoder.GetCharCount(parameterData, 0, parameterData.Length);
+            char[] parameterChars = new char[parameterLength];
+            decoder.GetChars(parameterData, 0, parameterData.Length, parameterChars, 0);
+            string parameter = new string(parameterChars);
+
+            byte command = data[end];
+            ProcessCommand(commandGroup, command, parameter);
+            return end + 1;
         }
 
-        protected void ProcessNormalInput(byte data)
+        private int OnNormalInput(byte[] data, int startIndex)
         {
-            if (data == EscapeCharacter)
+            int inputLength = CalculateNormalInputLength(data, startIndex);
+
+            if (inputLength <= 0)
             {
-                throw new DecodeException("Internal error, ProcessNormalInput was passed an escape character, please report this bug to the author.");
+                return startIndex;
             }
 
-            if (supportXonXoff)
+            int charCount = decoder.GetCharCount(data, startIndex, inputLength);
+            char[] characters = new char[charCount];
+            decoder.GetChars(data, startIndex, inputLength, characters, 0);
+            OnCharacters(characters);
+            return startIndex + inputLength;
+        }
+
+        private int CalculateNormalInputLength(byte[] data, int startIndex)
+        {
+            for (int i = startIndex; i < data.Length; i++)
             {
-                if (data == XonCharacter || data == XoffCharacter)
+                if (data[i] == EscapeCharacter)
                 {
-                    return;
+                    return i - startIndex;
                 }
             }
 
-            byte[] inputData = new byte[] { data };
-            int charCount = decoder.GetCharCount(inputData, 0, 1);
-            char[] characters = new char[charCount];
-            decoder.GetChars(inputData, 0, 1, characters, 0);
-
-            if (charCount > 0)
-            {
-                OnCharacters(characters);
-            }
+            return data.Length - startIndex;
         }
     }
 }

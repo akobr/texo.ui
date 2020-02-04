@@ -8,6 +8,13 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
     {
         public GraphicAttributes(Color foreground = default, Color background = default, GraphicStyle style = GraphicStyle.None)
         {
+            Foreground = (foreground.R, foreground.G, foreground.B);
+            Background = (background.R, background.G, background.B);
+            Style = style;
+        }
+
+        public GraphicAttributes((byte R, byte G, byte B) foreground = default, (byte R, byte G, byte B) background = default, GraphicStyle style = GraphicStyle.None)
+        {
             Foreground = foreground;
             Background = background;
             Style = style;
@@ -20,9 +27,9 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             Style = prototype.Style;
         }
 
-        public Color Foreground { get; }
+        public (byte R, byte G, byte B) Foreground { get; }
 
-        public Color Background { get; }
+        public (byte R, byte G, byte B) Background { get; }
 
         public GraphicStyle Style { get; }
 
@@ -48,17 +55,37 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public bool IsEmpty =>
             Style == GraphicStyle.None
-            && Foreground.IsEmpty
-            && Background.IsEmpty;
+            && Foreground.R == 0 && Foreground.G == 0 && Foreground.B == 0
+            && Background.R == 0 && Background.G == 0 && Background.B == 0;
 
         public static GraphicAttributes Empty;
 
+        public Color GetForeground()
+        {
+            return Color.FromArgb(Foreground.R, Foreground.G, Foreground.B);
+        }
+
+        public Color GetBackground()
+        {
+            return Color.FromArgb(Background.R, Background.G, Background.B);
+        }
+
         public GraphicAttributes SetForeground(Color foreground)
+        {
+            return new GraphicAttributes((foreground.R, foreground.G, foreground.B), Background, Style);
+        }
+
+        public GraphicAttributes SetForeground((byte R, byte G, byte B) foreground)
         {
             return new GraphicAttributes(foreground, Background, Style);
         }
 
         public GraphicAttributes SetBackground(Color background)
+        {
+            return new GraphicAttributes(Foreground, (background.R, background.G, background.B), Style);
+        }
+
+        public GraphicAttributes SetBackground((byte R, byte G, byte B) background)
         {
             return new GraphicAttributes(Foreground, background, Style);
         }
@@ -113,8 +140,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
-            builder.Append($"Foreground: {Foreground}");
-            builder.Append($", Background: {Background}");
+            builder.Append($"Foreground: #{Foreground.R:x2}{Foreground.G:x2}{Foreground.B:x2}");
+            builder.Append($", Background: #{Background.R:x2}{Background.G:x2}{Background.B:x2}");
 
             if (IsRegular) builder.Append(", Regular");
             else if (IsBold) builder.Append(", Bold");

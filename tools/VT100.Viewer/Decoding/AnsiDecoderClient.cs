@@ -1,5 +1,5 @@
-using System;
 using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
 using BeaverSoft.Texo.Core.Console.Decoding.Ansi;
 
@@ -60,17 +60,42 @@ namespace VT100.Viewer.Decoding
 
         public void Characters(char[] chars)
         {
-            if (chars.Length == 1
-                && TryProcessControlCharacter(chars[0]))
+            StringBuilder writeBuilder = new StringBuilder(chars.Length);
+
+            foreach (char character in chars)
+            {
+                if (IsControlCharacter(character))
+                {
+                    WriteText(writeBuilder.ToString());
+                    writeBuilder.Clear();
+                    TryProcessControlCharacter(character);
+                }
+                else
+                {
+                    writeBuilder.Append(character);
+                }
+            }
+
+            if (writeBuilder.Length < 1)
+            {
+                return;
+            }
+
+            WriteText(writeBuilder.ToString());
+        }
+
+        private void WriteText(string textToWrite)
+        {
+            if (string.IsNullOrEmpty(textToWrite))
             {
                 return;
             }
 
             int index = output.SelectionStart;
-            output.Select(index, chars.Length);
+            output.Select(index, textToWrite.Length);
             SetRendition();
-            output.SelectedText = new string(chars);
-            output.Select(index + chars.Length, 0);
+            output.SelectedText = textToWrite;
+            output.Select(index + textToWrite.Length, 0);
         }
 
         public void EraseCharacters(int count)
@@ -88,6 +113,11 @@ namespace VT100.Viewer.Decoding
             SetDefaultRendition();
             output.SelectedText = new string(' ', finalCount);
             output.Select(index, 0);
+        }
+
+        private bool IsControlCharacter(char character)
+        {
+            return character == '\r' || character == '\n';
         }
 
         private bool TryProcessControlCharacter(char character)
