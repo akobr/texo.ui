@@ -2,7 +2,6 @@ using System;
 using System.Collections.Immutable;
 using System.Drawing;
 using System.Runtime.CompilerServices;
-using System.Text;
 using BeaverSoft.Texo.Core.Console.Decoding.Ansi;
 
 namespace BeaverSoft.Texo.Core.Console.Rendering
@@ -15,10 +14,10 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         private static ViewCell DefaultCell = new ViewCell(ViewCell.EMPTY_CHARACTER, 0);
 
         private readonly ViewStyles styles;
-        private readonly ViewChanges changes;
+        private readonly IViewChangesManager changes;
 
         private ImmutableArray<ViewCell>.Builder buffer;
-        private int width, height, bufferZeroIndex, cursor, savedCursor;
+        private int width, height, screenZeroIndex, screenLength, screenEndIndex, cursor, savedCursor;
         private GraphicAttributes currentAttributes;
         private bool currentAttributesNotSaved;
         private byte currentAttributesId;
@@ -28,11 +27,13 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             this.width = width;
             this.height = height;
 
-            cursor = bufferZeroIndex = 0;
-            buffer = ImmutableArray.CreateBuilder<ViewCell>(
-                Math.Min(height * width * INITIAL_BUFFERS_COUNT, MAX_BUFFER_SIZE));
+            cursor = screenZeroIndex = 0;
+            screenLength = height * width;
+            screenEndIndex = cursor + screenLength;
+            int capacity = Math.Min(screenLength * INITIAL_BUFFERS_COUNT, MAX_BUFFER_SIZE);
+            buffer = ImmutableArray.CreateBuilder<ViewCell>(capacity);
 
-            changes = new ViewChanges();
+            changes = new ViewBitArrayChanges(capacity);
             styles = new ViewStyles(new GraphicAttributes(Color.White, Color.Black));
             currentAttributes = styles.DefaultStyle;
             currentAttributesNotSaved = false;
@@ -46,43 +47,63 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void Characters(char[] chars)
         {
-            StringBuilder writeBuilder = new StringBuilder(chars.Length);
+            TryBuildStyle();
 
             foreach (char character in chars)
             {
                 if (IsControlCharacter(character))
                 {
-                    WriteText(writeBuilder.ToString());
-                    writeBuilder.Clear();
                     TryProcessControlCharacter(character);
                 }
                 else
                 {
-                    writeBuilder.Append(character);
+                    buffer[cursor] = new ViewCell(character, currentAttributesId);
+                    changes.AddChange(cursor++);
                 }
-            }
-
-            if (writeBuilder.Length < 1)
-            {
-                return;
-            }
-
-            WriteText(writeBuilder.ToString());
-
-            for (int i = 0; i < chars.Length; i++)
-            {
-                buffer[cursor++] = new ViewCell(chars[i], currentAttributes);
             }
         }
 
         public void ClearLine(ClearDirection direction)
         {
-            throw new System.NotImplementedException();
+            int startIndex, excludedEndIndex;
+
+            switch (direction)
+            {
+                case ClearDirection.Backward:
+                    startIndex = GetFullIndexOfRow(GetRowIndex());
+                    excludedEndIndex = cursor + 1;
+                    break;
+
+                case ClearDirection.Both:
+                    startIndex = GetFullIndexOfRow(GetRowIndex());
+                    excludedEndIndex = GetFullIndexOfRow(GetRowIndex() + 1);
+                    break;
+
+                case ClearDirection.Forward:
+                default:
+                    startIndex = cursor;
+                    excludedEndIndex = GetFullIndexOfRow(GetRowIndex() + 1);
+                    break;
+            }
+
+            for (int i = startIndex; i < excludedEndIndex; i++)
+            {
+                buffer[i] = DefaultCell;
+            }
+
+            changes.AddChange(startIndex, excludedEndIndex - startIndex);
         }
 
         public void ClearScreen(ClearDirection direction)
         {
-            throw new System.NotImplementedException();
+            int excludedEndIndex = screenZeroIndex + screenLength;
+
+            for (int i = screenZeroIndex; i < excludedEndIndex; i++)
+            {
+                buffer[i] = DefaultCell;
+            }
+
+            changes.AddChange(screenZeroIndex, screenLength);
         }
 
         public void EraseCharacters(int count)
@@ -91,6 +112,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             {
                 buffer[i] = DefaultCell;
             }
+
+            changes.AddChange(screenZeroIndex, count);
         }
 
         public Point GetCursorPosition()
@@ -105,7 +128,26 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void MoveCursor(Direction direction, int amount)
         {
-            throw new System.NotImplementedException();
+            switch (direction)
+            {
+                case Direction.Up:
+                    MoveCursorUp(amount);
+                    break;
+
+                case Direction.Down:
+                    MoveCursorDown(amount);
+                    break;
+
+                case Direction.Forward:
+                    index += amount;
+                    output.Select(index, 0);
+                    break;
+
+                case Direction.Backward:
+                    index -= amount;
+                    output.Select(index, 0);
+                    break;
+            }
         }
 
         public void MoveCursorByTabulation(ClearDirection direction, int tabs)
@@ -184,7 +226,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         public void MoveCursorToNextLineOrScrollPage()
         {
             int row = GetRowIndex();
-            if (row - GetRowIndex(bufferZeroIndex) >= height)
+            if (row - GetRowIndex(screenZeroIndex) >= height)
             {
                 ScrollPageUpwards(1);
                 cursor = GetFullIndexOfRow(row);
@@ -193,6 +235,38 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             {
                 cursor = GetFullIndexOfRow(row + 1);
             }
+        }
+
+        private void MoveCursorDown(int amount)
+        {
+            cursor = cursor + (width * amount);
+            if (cursor >= buffer.Count) cursor = buffer.Count - 1;
+            int minBufferZeroIndex = cursor - screenLength;
+            if (screenZeroIndex < minBufferZeroIndex) screenZeroIndex = minBufferZeroIndex;
+        }
+
+        private void MoveCursorUp(int amount)
+        {
+            cursor = cursor - (width * amount);
+            if (cursor < 0) cursor = 0;
+            if (cursor < screenZeroIndex) screenZeroIndex = cursor;
+        }
+
+        private void SetCursor(int newCursor)
+        {
+            cursor = newCursor;
+            if (cursor < screenZeroIndex) cursor = screenZeroIndex;
+            else if (cursor > screenEndIndex) cursor = screenEndIndex;
+        }
+
+        private void TryBuildStyle()
+        {
+            if (!currentAttributesNotSaved)
+            {
+                return;
+            }
+
+            currentAttributesId = styles.GetOrCreateStyle(currentAttributes);
         }
 
         private void ApplyGraphicRendition(GraphicRendition command)

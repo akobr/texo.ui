@@ -4,13 +4,32 @@ using System.Collections.Generic;
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
     // TODO: should be a binary tree which is splitting the buffer
-    public class ViewChanges
+    public class ViewSequenceChanges : IViewChangesManager
     {
-        LinkedList<Sequence> changes;
+        private readonly LinkedList<Sequence> changes;
+        private int sequenceInProgressStart, sequenceInProgressEnd;
 
-        public ViewChanges()
+        public ViewSequenceChanges()
         {
             changes = new LinkedList<Sequence>();
+        }
+
+        public void AddChange(int index)
+        {
+            if (sequenceInProgressStart < 0)
+            {
+                sequenceInProgressStart = sequenceInProgressEnd = index;
+                return;
+            }
+
+            if (sequenceInProgressEnd == index - 1)
+            {
+                sequenceInProgressEnd = index;
+                return;
+            }
+
+            AddChange(sequenceInProgressStart, sequenceInProgressEnd);
+            sequenceInProgressStart = sequenceInProgressEnd = index;
         }
 
         public void AddChange(int start, int end)
@@ -64,7 +83,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             }
         }
 
-        public void Restart()
+        public void Reset()
         {
             changes.Clear();
         }
