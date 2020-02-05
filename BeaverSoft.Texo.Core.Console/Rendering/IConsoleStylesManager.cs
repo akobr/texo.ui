@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
-    public interface IViewStyles
+    public interface IConsoleStylesManager
     {
         GraphicAttributes this[byte styleId] { get; }
 

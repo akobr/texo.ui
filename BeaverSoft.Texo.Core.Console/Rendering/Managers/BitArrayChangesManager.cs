@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BeaverSoft.Texo.Core.Console.Rendering
+namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 {
-    class BitArrayChangesManager : IViewChangesManager
+    class BitArrayChangesManager : IConsoleBufferChangesManager
     {
         private readonly BitArray changes;
         private int screenStart, screenLenght, lineWidth, cursor;
@@ -44,7 +44,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             this.cursor = cursor;
         }
 
-        public IReadOnlyCollection<Sequence> Finish(int screenStart, int screenLenght, int lineWidth, int cursor)
+        public ConsoleBufferChangeBatch Finish(int screenStart, int screenLenght, int lineWidth, int cursor)
         {
             throw new NotImplementedException();
         }

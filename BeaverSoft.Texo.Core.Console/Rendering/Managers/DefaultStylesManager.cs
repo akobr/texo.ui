@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace BeaverSoft.Texo.Core.Console.Rendering
+namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 {
-    public class ViewStyles : IViewStyles
+    public class DefaultStylesManager : IConsoleStylesManager
     {
         private readonly ImmutableList<GraphicAttributes>.Builder styles;
         private readonly Dictionary<byte, Dictionary<uint, Dictionary<uint, byte>>> styleMap;
 
         private byte styleId;
 
-        public ViewStyles(GraphicAttributes defaultStyle)
+        public DefaultStylesManager(GraphicAttributes defaultStyle)
         {
             styles = ImmutableList.CreateBuilder<GraphicAttributes>();
             styleMap = new Dictionary<byte, Dictionary<uint, Dictionary<uint, byte>>>();

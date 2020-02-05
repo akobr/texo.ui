@@ -1,4 +1,4 @@
-namespace BeaverSoft.Texo.Core.Console.Rendering
+namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 {
     class BinaryTreeChangesManager // : IViewChangesManager
     {

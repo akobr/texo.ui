@@ -4,13 +4,13 @@ using System.Drawing;
 
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
-    public class ViewBuffer : IViewBuffer
+    public class ConsoleBuffer : IConsoleBuffer
     {
-        private readonly ReadOnlyMemory<ViewCell> buffer;
+        private readonly ReadOnlyMemory<BufferCell> buffer;
 
-        public ViewBuffer(
-            ReadOnlyMemory<ViewCell> buffer,
-            IReadOnlyCollection<Sequence> changes,
+        public ConsoleBuffer(
+            ReadOnlyMemory<BufferCell> buffer,
+            ConsoleBufferChangeBatch changes,
             IReadOnlyList<GraphicAttributes> styles,
             Rectangle screen,
             Point cursor)
@@ -23,23 +23,23 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             Cursor = cursor;
         }
 
-        public ViewCell this[int rowIndex, int columnIndex]
+        public BufferCell this[int rowIndex, int columnIndex]
             => buffer.Span[rowIndex * Screen.Width + columnIndex];
 
         public Rectangle Screen { get; }
 
         public Point Cursor { get; }
 
-        public IReadOnlyCollection<Sequence> Changes { get; }
+        public ConsoleBufferChangeBatch Changes { get; }
 
         public IReadOnlyList<GraphicAttributes> Styles { get; }
 
-        public ReadOnlySpan<ViewCell> GetScreen()
+        public ReadOnlySpan<BufferCell> GetScreen()
         {
             return buffer.Slice(Screen.Y * Screen.Width + Screen.X, Screen.Height * Screen.Width).Span;
         }
 
-        public ReadOnlySpan<ViewCell> GetFull()
+        public ReadOnlySpan<BufferCell> GetFull()
         {
             return buffer.Span;
         }

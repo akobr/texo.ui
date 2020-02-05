@@ -8,12 +8,12 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
 {
     public static class ViewBufferExtensions
     {
-        public static BitmapImage ToBitmap(this ViewBuffer buffer)
+        public static BitmapImage ToBitmap(this ConsoleBuffer buffer)
         {
             return ToBitmap(buffer, new Font(new FontFamily("Consolas"), 12, FontStyle.Regular));
         }
 
-        public static BitmapImage ToBitmap(this ViewBuffer buffer, Font font)
+        public static BitmapImage ToBitmap(this ConsoleBuffer buffer, Font font)
         {
             if (font == null)
             {
@@ -31,7 +31,7 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
             {
                 for (int x = 0; x < buffer.Screen.Width; ++x)
                 {
-                    ViewCell character = buffer[x, y];
+                    BufferCell character = buffer[x, y];
                     Rectangle rect = new Rectangle(font.Height * x, font.Height * y, font.Height, font.Height);
                     graphics.FillRectangle(new SolidBrush(attributes.GetBackground()), rect);
 

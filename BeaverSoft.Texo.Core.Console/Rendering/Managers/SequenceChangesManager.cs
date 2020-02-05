@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace BeaverSoft.Texo.Core.Console.Rendering
+namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 {
-    public partial class SequenceChangesManager : IViewChangesManager
+    public partial class SequenceChangesManager : IConsoleBufferChangesManager
     {
         private readonly LinkedList<Sequence> changes;
         private int screenStart, screenLenght, lineWidth, cursor;
@@ -93,7 +93,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             this.cursor = cursor;
         }
 
-        public IReadOnlyCollection<Sequence> Finish(int screenStart, int screenLenght, int lineWidth, int cursor)
+        public ConsoleBufferChangeBatch Finish(int screenStart, int screenLenght, int lineWidth, int cursor)
         {
             throw new NotImplementedException();
         }

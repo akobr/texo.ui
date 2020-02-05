@@ -3,26 +3,27 @@ using System.Collections.Immutable;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using BeaverSoft.Texo.Core.Console.Decoding.Ansi;
+using BeaverSoft.Texo.Core.Console.Rendering.Managers;
 
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
-    public class ViewBuilder : IAnsiDecoderClient
+    public class ConsoleBufferBuilder : IAnsiDecoderClient
     {
         private const int MAX_BUFFER_SIZE = 4200 * 126;
         private const int INITIAL_BUFFERS_COUNT = 4;
 
-        private static ViewCell DefaultCell = new ViewCell(ViewCell.EMPTY_CHARACTER, 0);
+        private static BufferCell DefaultCell = new BufferCell(BufferCell.EMPTY_CHARACTER, 0);
 
-        private readonly ImmutableArray<ViewCell>.Builder buffer;
-        private readonly IViewStyles styles;
-        private readonly IViewChangesManager changes;
+        private readonly ImmutableArray<BufferCell>.Builder buffer;
+        private readonly IConsoleStylesManager styles;
+        private readonly IConsoleBufferChangesManager changes;
 
         private int width, height, maxCapacity, screenLength, screenZeroIndex, screenEndIndex, cursor, savedCursor;
         private GraphicAttributes currentAttributes;
         private bool currentAttributesNotSaved;
         private byte currentAttributesId;
 
-        public ViewBuilder(int width, int height)
+        public ConsoleBufferBuilder(int width, int height)
         {
             this.width = width;
             this.height = height;
@@ -32,10 +33,10 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             screenEndIndex = screenZeroIndex + screenLength;
             maxCapacity = (MAX_BUFFER_SIZE + width) / width * width;
             int capacity = Math.Min(screenLength * INITIAL_BUFFERS_COUNT, maxCapacity);
-            buffer = ImmutableArray.CreateBuilder<ViewCell>(capacity);
+            buffer = ImmutableArray.CreateBuilder<BufferCell>(capacity);
 
             changes = new BitArrayChangesManager(capacity);
-            styles = new ViewStyles(new GraphicAttributes(Color.White, Color.Black));
+            styles = new DefaultStylesManager(new GraphicAttributes(Color.White, Color.Black));
             currentAttributes = styles.DefaultStyle;
             currentAttributesNotSaved = false;
             currentAttributesId = 0;
@@ -60,7 +61,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                 }
                 else
                 {
-                    buffer[cursor] = new ViewCell(character, currentAttributesId);
+                    buffer[cursor] = new BufferCell(character, currentAttributesId);
                     changes.AddChange(cursor++);
                 }
             }
