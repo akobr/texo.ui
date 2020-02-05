@@ -7,7 +7,7 @@ using BeaverSoft.Texo.Core.Console.Rendering.Managers;
 
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
-    public class ConsoleBufferBuilder : IAnsiDecoderClient
+    public class ConsoleBufferBuilder : IAnsiDecoderClient, IConsoleBufferBuilder
     {
         private const int MAX_BUFFER_SIZE = 4200 * 126;
         private const int INITIAL_BUFFERS_COUNT = 4;
@@ -35,6 +35,11 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             int capacity = Math.Min(screenLength * INITIAL_BUFFERS_COUNT, maxCapacity);
             buffer = ImmutableArray.CreateBuilder<BufferCell>(capacity);
 
+            for (int i = 0; i < maxCapacity; ++i)
+            {
+                buffer.Add(DefaultCell);
+            }
+
             changes = new BitArrayChangesManager(capacity);
             styles = new DefaultStylesManager(new GraphicAttributes(Color.White, Color.Black));
             currentAttributes = styles.DefaultStyle;
@@ -42,7 +47,18 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             currentAttributesId = 0;
         }
 
+        public void Start()
+        {
+            changes.Start(screenZeroIndex, screenLength, width, cursor);
+        }
 
+        public ConsoleBuffer Snapshot()
+        {
+            var batch = changes.Finish(screenZeroIndex, screenLength, width, cursor);
+            ConsoleBuffer snapshot = new ConsoleBuffer(buffer.ToImmutable().AsMemory(), batch, styles.ProvideStyles());
+            changes.Start(screenZeroIndex, screenLength, width, cursor);
+            return snapshot;
+        }
 
         public void ChangeMode(AnsiMode mode)
         {
@@ -117,7 +133,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                 buffer[i] = DefaultCell;
             }
 
-            changes.AddChange(screenZeroIndex, count);
+            changes.AddChange(cursor, count);
         }
 
         public Point GetCursorPosition()
@@ -257,7 +273,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
             if (virtualRow >= height)
             {
-                ScrollPageUpwards(virtualRow - height - 1);
+                ScrollPageUpwards(virtualRow - height + 1);
                 SetCursor(GetFullIndexOfRow(row));
             }
             else

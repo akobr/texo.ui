@@ -11,16 +11,13 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         public ConsoleBuffer(
             ReadOnlyMemory<BufferCell> buffer,
             ConsoleBufferChangeBatch changes,
-            IReadOnlyList<GraphicAttributes> styles,
-            Rectangle screen,
-            Point cursor)
+            IReadOnlyList<GraphicAttributes> styles)
         {
             this.buffer = buffer;
-
             Changes = changes;
             Styles = styles;
-            Screen = screen;
-            Cursor = cursor;
+            Screen = changes.EndScreen;
+            Cursor = changes.EndCursor;
         }
 
         public BufferCell this[int rowIndex, int columnIndex]

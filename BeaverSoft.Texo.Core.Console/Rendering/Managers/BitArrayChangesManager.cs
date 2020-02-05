@@ -1,6 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Drawing;
 
 namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 {
@@ -46,7 +47,11 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 
         public ConsoleBufferChangeBatch Finish(int screenStart, int screenLenght, int lineWidth, int cursor)
         {
-            throw new NotImplementedException();
+            Rectangle startScreen = new Rectangle(this.screenStart % this.lineWidth, this.screenStart / this.lineWidth, this.lineWidth, this.screenLenght / this.lineWidth);
+            Rectangle endScreen = new Rectangle(screenStart % lineWidth, screenStart / lineWidth, lineWidth, screenLenght / lineWidth);
+            Point startCursor = new Point(this.cursor % this.lineWidth, this.cursor / this.lineWidth);
+            Point endCursor = new Point(cursor % lineWidth, cursor / lineWidth);
+            return new ConsoleBufferChangeBatch(startScreen, endScreen, startCursor, endCursor, BuildSequences());
         }
 
         public void Reset()
@@ -54,6 +59,41 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
             startIndex = int.MaxValue;
             endIndex = int.MinValue;
             changes.SetAll(false);
+        }
+
+        private IReadOnlyCollection<Sequence> BuildSequences()
+        {
+            if (startIndex == int.MaxValue)
+            {
+                return ImmutableList<Sequence>.Empty;
+            }
+
+            var sequenceBuilder = ImmutableList.CreateBuilder<Sequence>();
+            bool isSequenceInProgress = false;
+            int sequenceStart = -1;
+
+            for (int i = startIndex; i <= endIndex; ++i)
+            {
+                bool bit = changes.Get(i);
+
+                if (bit && !isSequenceInProgress)
+                {
+                    isSequenceInProgress = true;
+                    sequenceStart = i;
+                }
+                else if (!bit && isSequenceInProgress)
+                {
+                    sequenceBuilder.Add(new Sequence(sequenceStart, i - 1));
+                    isSequenceInProgress = false;
+                }
+            }
+
+            if (isSequenceInProgress)
+            {
+                sequenceBuilder.Add(new Sequence(sequenceStart, endIndex));
+            }
+
+            return sequenceBuilder.ToImmutable();
         }
     }
 }

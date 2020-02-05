@@ -16,7 +16,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
             styles = ImmutableList.CreateBuilder<GraphicAttributes>();
             styleMap = new Dictionary<byte, Dictionary<uint, Dictionary<uint, byte>>>();
 
-            styles[0] = defaultStyle;
+            styles.Add(defaultStyle);
             styleId = 0;
         }
 
@@ -43,7 +43,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
             {
                 styleIndex = GetNextStyleId();
                 TryRemoveStyle(styleIndex);
-                styles[styleIndex] = style;
+                if (styleIndex >= styles.Count) styles.Add(style);
+                else styles[styleIndex] = style;
                 foregorundMap[foregroundKey] = styleIndex;
             }
 
@@ -68,17 +69,15 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 
         private byte GetNextStyleId()
         {
-            byte test = 255;
-            ++test;
-
+            //byte test = 255;
+            //++test;
             return ++styleId == 0 ? ++styleId : styleId;
         }
 
         private static uint MakeRgb((byte R, byte G, byte B) color)
         {
             uint colorInt = (uint)(color.R << 16 | color.G << 8 | color.B << 0 | 255 << 24);
-            string text = Convert.ToString(colorInt, 2);
-
+            //string text = Convert.ToString(colorInt, 2);
             return colorInt;
         }
     }

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using BeaverSoft.Texo.Core.Console;
 using BeaverSoft.Texo.Core.Console.Decoding;
 using BeaverSoft.Texo.Core.Console.Decoding.Ansi;
+using BeaverSoft.Texo.Core.Console.Rendering;
 using VT100.Viewer.Decoding;
 
 namespace VT100.Viewer
@@ -36,7 +37,8 @@ namespace VT100.Viewer
         private void InitialiseDecoderClient()
         {
             var ansi = new AnsiDecoder();
-            ansi.Subscribe(new AnsiDecoderClient(tbOutput, TERMINAL_WIDTH, TERMINAL_HEIGHT));
+            ansi.Subscribe(new ConsoleBufferBuilder(TERMINAL_WIDTH, TERMINAL_HEIGHT));
+            //ansi.Subscribe(new AnsiDecoderClient(tbOutput, TERMINAL_WIDTH, TERMINAL_HEIGHT));
             decoder = ansi;
         }
 
@@ -47,7 +49,7 @@ namespace VT100.Viewer
 
             //terminal.Start(@"c:\Working\textum.ui\BeaverSoft.Texo.Fallback.PowerShell.Standalone\bin\Debug\BeaverSoft.Texo.Fallback.PowerShell.Standalone.exe", TERMINAL_WIDTH, TERMINAL_HEIGHT);
             //terminal.Start(@"c:\Working\textum.ui\tools\Example.Console.App\bin\Debug\Example.Console.App.exe", TERMINAL_WIDTH, TERMINAL_HEIGHT);
-            terminal.Start(@"ping localhost", TERMINAL_WIDTH, TERMINAL_HEIGHT);
+            terminal.Start(@"mc", TERMINAL_WIDTH, TERMINAL_HEIGHT);
             //terminal.Start(@"powershell", TERMINAL_WIDTH, TERMINAL_HEIGHT);
 
             _ = Task.Run(CopyConsoleToWindow);
