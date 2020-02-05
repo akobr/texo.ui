@@ -299,12 +299,12 @@ namespace VT100.Viewer.Decoding
             output.Select(targetIndex, 0);
         }
 
-        public void MoveCursorToColumn(int columnNumber)
+        public void MoveCursorToColumn(int columnIndex)
         {
             int index = output.SelectionStart;
             int line = output.GetLineFromCharIndex(index);
             int firstLineIndex = output.GetFirstCharIndexFromLine(line);
-            output.Select(firstLineIndex + columnNumber - 1, 0);
+            output.Select(firstLineIndex + columnIndex, 0);
         }
 
         public void MoveCursorByTabulation(ClearDirection direction, int tabs)

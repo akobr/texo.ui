@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
-    // TODO: should be a binary tree which is splitting the buffer
-    public class ViewSequenceChanges : IViewChangesManager
+    public partial class SequenceChangesManager : IViewChangesManager
     {
         private readonly LinkedList<Sequence> changes;
+        private int screenStart, screenLenght, lineWidth, cursor;
         private int sequenceInProgressStart, sequenceInProgressEnd;
 
-        public ViewSequenceChanges()
+        public SequenceChangesManager()
         {
             changes = new LinkedList<Sequence>();
         }
@@ -39,7 +39,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void AddChange(Sequence sequence)
         {
-            if (!sequence.IsValid())
+            if (!sequence.IsValid)
             {
                 throw new ArgumentOutOfRangeException(nameof(sequence), "Invalid change sequence; start must be smaller or equal to end.");
             }
@@ -53,7 +53,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                 {
                     sequence = Union(sequence, listItem.Value);
                 }
-                else if (sequence.IsBefore(listItem.Value))
+                else if (sequence.IsEndingBeforeOrSame(listItem.Value))
                 {
                     beforeItem = listItem;
                     break;
@@ -83,6 +83,21 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             }
         }
 
+        public void Start(int screenStart, int screenLenght, int lineWidth, int cursor)
+        {
+            Reset();
+
+            this.screenStart = screenStart;
+            this.screenLenght = screenLenght;
+            this.lineWidth = lineWidth;
+            this.cursor = cursor;
+        }
+
+        public IReadOnlyCollection<Sequence> Finish(int screenStart, int screenLenght, int lineWidth, int cursor)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Reset()
         {
             changes.Clear();
@@ -99,29 +114,6 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             return new Sequence(
                 first.StartIndex < second.StartIndex ? first.StartIndex : second.StartIndex,
                 first.EndIndex > second.EndIndex ? first.EndIndex : second.EndIndex);
-        }
-
-        public struct Sequence
-        {
-            public readonly int StartIndex;
-
-            public readonly int EndIndex;
-
-            public Sequence(int start, int end)
-            {
-                StartIndex = start;
-                EndIndex = end;
-            }
-
-            public bool IsValid()
-            {
-                return StartIndex < EndIndex;
-            }
-
-            public bool IsBefore(Sequence other)
-            {
-                return EndIndex <= other.EndIndex;
-            }
         }
     }
 }

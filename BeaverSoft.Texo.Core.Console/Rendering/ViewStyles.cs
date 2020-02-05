@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
-    public class ViewStyles
+    public class ViewStyles : IViewStyles
     {
         private readonly ImmutableList<GraphicAttributes>.Builder styles;
         private readonly Dictionary<byte, Dictionary<uint, Dictionary<uint, byte>>> styleMap;
@@ -50,6 +50,11 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             return styleIndex;
         }
 
+        public IReadOnlyList<GraphicAttributes> ProvideStyles()
+        {
+            return styles.ToImmutable();
+        }
+
         private void TryRemoveStyle(byte index)
         {
             if (index >= styles.Count)
@@ -71,9 +76,10 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         private static uint MakeRgb((byte R, byte G, byte B) color)
         {
-            uint colorInt = (uint)(color.R << 16 | color.G << 8 | color.B << 0 | 255 << 24 );
+            uint colorInt = (uint)(color.R << 16 | color.G << 8 | color.B << 0 | 255 << 24);
             string text = Convert.ToString(colorInt, 2);
 
             return colorInt;
         }
+    }
 }

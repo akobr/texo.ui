@@ -22,7 +22,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
 
         void MoveCursorToBeginningOfLineAbove(int lineNumberRelativeToCurrentLine);
 
-        void MoveCursorToColumn(int columnNumber);
+        void MoveCursorToColumn(int columnIndex);
 
         void MoveCursorTo(Point position);
 

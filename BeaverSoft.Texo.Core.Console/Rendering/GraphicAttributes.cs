@@ -13,7 +13,10 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             Style = style;
         }
 
-        public GraphicAttributes((byte R, byte G, byte B) foreground = default, (byte R, byte G, byte B) background = default, GraphicStyle style = GraphicStyle.None)
+        public GraphicAttributes(
+            (byte R, byte G, byte B) foreground = default,
+            (byte R, byte G, byte B) background = default,
+            GraphicStyle style = GraphicStyle.None)
         {
             Foreground = foreground;
             Background = background;
@@ -68,6 +71,18 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         public Color GetBackground()
         {
             return Color.FromArgb(Background.R, Background.G, Background.B);
+        }
+
+        public Font GetFont(Font prototype)
+        {
+            FontStyle fontStyles = FontStyle.Regular;
+
+            if (IsBold) fontStyles |= FontStyle.Bold;
+            if (IsItalic) fontStyles |= FontStyle.Italic;
+            if (IsUnderlined) fontStyles |= FontStyle.Underline;
+            if (IsCrossedOut) fontStyles |= FontStyle.Strikeout;
+
+            return new Font(prototype, fontStyles);
         }
 
         public GraphicAttributes SetForeground(Color foreground)

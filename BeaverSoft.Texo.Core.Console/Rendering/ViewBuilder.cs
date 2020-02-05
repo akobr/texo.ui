@@ -8,16 +8,16 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 {
     public class ViewBuilder : IAnsiDecoderClient
     {
-        private const int MAX_BUFFER_SIZE = 2000 * 126;
+        private const int MAX_BUFFER_SIZE = 4200 * 126;
         private const int INITIAL_BUFFERS_COUNT = 4;
 
         private static ViewCell DefaultCell = new ViewCell(ViewCell.EMPTY_CHARACTER, 0);
 
-        private readonly ViewStyles styles;
+        private readonly ImmutableArray<ViewCell>.Builder buffer;
+        private readonly IViewStyles styles;
         private readonly IViewChangesManager changes;
 
-        private ImmutableArray<ViewCell>.Builder buffer;
-        private int width, height, screenZeroIndex, screenLength, screenEndIndex, cursor, savedCursor;
+        private int width, height, maxCapacity, screenLength, screenZeroIndex, screenEndIndex, cursor, savedCursor;
         private GraphicAttributes currentAttributes;
         private bool currentAttributesNotSaved;
         private byte currentAttributesId;
@@ -29,16 +29,19 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
             cursor = screenZeroIndex = 0;
             screenLength = height * width;
-            screenEndIndex = cursor + screenLength;
-            int capacity = Math.Min(screenLength * INITIAL_BUFFERS_COUNT, MAX_BUFFER_SIZE);
+            screenEndIndex = screenZeroIndex + screenLength;
+            maxCapacity = (MAX_BUFFER_SIZE + width) / width * width;
+            int capacity = Math.Min(screenLength * INITIAL_BUFFERS_COUNT, maxCapacity);
             buffer = ImmutableArray.CreateBuilder<ViewCell>(capacity);
 
-            changes = new ViewBitArrayChanges(capacity);
+            changes = new BitArrayChangesManager(capacity);
             styles = new ViewStyles(new GraphicAttributes(Color.White, Color.Black));
             currentAttributes = styles.DefaultStyle;
             currentAttributesNotSaved = false;
             currentAttributesId = 0;
         }
+
+
 
         public void ChangeMode(AnsiMode mode)
         {
@@ -118,7 +121,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public Point GetCursorPosition()
         {
-            return new Point(GetRowIndex(), GetColumnIndex());
+            int virtualScreenCursor = cursor - screenZeroIndex;
+            return new Point(GetRowIndex(virtualScreenCursor), GetColumnIndex(virtualScreenCursor));
         }
 
         public Size GetSize()
@@ -131,48 +135,66 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             switch (direction)
             {
                 case Direction.Up:
-                    MoveCursorUp(amount);
+                    SetCursor(cursor - (width * amount));
                     break;
 
                 case Direction.Down:
-                    MoveCursorDown(amount);
+                    SetCursor(cursor + (width * amount));
                     break;
 
                 case Direction.Forward:
-                    index += amount;
-                    output.Select(index, 0);
+                    SetCursor(cursor + amount);
                     break;
 
                 case Direction.Backward:
-                    index -= amount;
-                    output.Select(index, 0);
+                    SetCursor(cursor - amount);
                     break;
             }
         }
 
         public void MoveCursorByTabulation(ClearDirection direction, int tabs)
         {
-            throw new System.NotImplementedException();
+            const int DEFAULT_TAB_SIZE = 8;
+            int column = GetColumnIndex();
+            int nextTabStop = column;
+
+            switch (direction)
+            {
+                case ClearDirection.Backward:
+                    nextTabStop -= DEFAULT_TAB_SIZE * tabs;
+                    break;
+
+                //case ClearDirection.Forward:
+                //case ClearDirection.Both:
+                default:
+                    nextTabStop += DEFAULT_TAB_SIZE * tabs;
+                    break;
+            }
+
+            nextTabStop = nextTabStop / DEFAULT_TAB_SIZE * DEFAULT_TAB_SIZE;
+            if (nextTabStop < 0) nextTabStop = 0;
+            if (nextTabStop >= width) nextTabStop = width - 1;
+            SetCursor(GetFullIndexOfRow(GetRowIndex()) + nextTabStop);
         }
 
         public void MoveCursorTo(Point position)
         {
-            throw new System.NotImplementedException();
+            SetCursor(screenZeroIndex + (position.Y * width) + position.X);
         }
 
         public void MoveCursorToBeginningOfLineAbove(int lineNumberRelativeToCurrentLine)
         {
-            throw new System.NotImplementedException();
+            SetCursor(GetFullIndexOfRow(GetRowIndex()) - (lineNumberRelativeToCurrentLine * width));
         }
 
         public void MoveCursorToBeginningOfLineBelow(int lineNumberRelativeToCurrentLine)
         {
-            throw new System.NotImplementedException();
+            SetCursor(GetFullIndexOfRow(GetRowIndex()) + (lineNumberRelativeToCurrentLine * width));
         }
 
-        public void MoveCursorToColumn(int columnNumber)
+        public void MoveCursorToColumn(int columnIndex)
         {
-            throw new System.NotImplementedException();
+            SetCursor(GetFullIndexOfRow(GetRowIndex()) + columnIndex);
         }
 
         public void RestoreCursor()
@@ -187,12 +209,16 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void ScrollPageDownwards(int linesToScroll)
         {
-            throw new System.NotImplementedException();
+            screenZeroIndex = screenZeroIndex - (linesToScroll * width);
+            screenEndIndex = screenZeroIndex + screenLength;
+            // TODO: [P1] update/resize buffer
         }
 
         public void ScrollPageUpwards(int linesToScroll)
         {
-            throw new System.NotImplementedException();
+            screenZeroIndex = screenZeroIndex + (linesToScroll * width);
+            screenEndIndex = screenZeroIndex + screenLength;
+            // TODO: [P1] update/resize buffer
         }
 
         public void SetBackgroundColor(Color background)
@@ -226,30 +252,17 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         public void MoveCursorToNextLineOrScrollPage()
         {
             int row = GetRowIndex();
-            if (row - GetRowIndex(screenZeroIndex) >= height)
+            int virtualRow = row - GetRowIndex(screenZeroIndex);
+
+            if (virtualRow >= height)
             {
-                ScrollPageUpwards(1);
-                cursor = GetFullIndexOfRow(row);
+                ScrollPageUpwards(virtualRow - height - 1);
+                SetCursor(GetFullIndexOfRow(row));
             }
             else
             {
-                cursor = GetFullIndexOfRow(row + 1);
+                SetCursor(GetFullIndexOfRow(row + 1));
             }
-        }
-
-        private void MoveCursorDown(int amount)
-        {
-            cursor = cursor + (width * amount);
-            if (cursor >= buffer.Count) cursor = buffer.Count - 1;
-            int minBufferZeroIndex = cursor - screenLength;
-            if (screenZeroIndex < minBufferZeroIndex) screenZeroIndex = minBufferZeroIndex;
-        }
-
-        private void MoveCursorUp(int amount)
-        {
-            cursor = cursor - (width * amount);
-            if (cursor < 0) cursor = 0;
-            if (cursor < screenZeroIndex) screenZeroIndex = cursor;
         }
 
         private void SetCursor(int newCursor)
@@ -278,10 +291,14 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                     currentAttributes = styles.DefaultStyle;
                     break;
 
-                case GraphicRendition.Positive: // TODO: [P3] Not sure
+                case GraphicRendition.Positive: // TODO: [P3] Not sure; oposite of GraphicRendition.Inverse
                     currentAttributes = currentAttributes
                         .SetBackground(Color.Black)
                         .SetForeground(Color.White);
+                    break;
+
+                case GraphicRendition.Inverse:
+                    currentAttributes = currentAttributes.Reverse();
                     break;
 
                 case GraphicRendition.Bold:
@@ -296,29 +313,45 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                     currentAttributes = currentAttributes.SetStyle(GraphicStyle.Italic);
                     break;
 
+                case GraphicRendition.NoItalic:
+                    currentAttributes = currentAttributes.RemoveStyle(GraphicStyle.Italic);
+                    break;
+
                 case GraphicRendition.Underline:
                 case GraphicRendition.UnderlineDouble:
                     currentAttributes = currentAttributes.SetStyle(GraphicStyle.Underline);
-                    break;
-
-                case GraphicRendition.Inverse:
-                    currentAttributes = currentAttributes.Reverse();
-                    break;
-
-                case GraphicRendition.Conceal:
-                    currentAttributes = currentAttributes.SetStyle(GraphicStyle.Conceal);
-                    break;
-
-                case GraphicRendition.NormalIntensity:
-                    currentAttributes = currentAttributes.RemoveStyle(GraphicStyle.Bold | GraphicStyle.Faint);
                     break;
 
                 case GraphicRendition.NoUnderline:
                     currentAttributes = currentAttributes.RemoveStyle(GraphicStyle.Underline);
                     break;
 
+                case GraphicRendition.CrossedOut:
+                    currentAttributes = currentAttributes.SetStyle(GraphicStyle.CrossOut);
+                    break;
+
+                case GraphicRendition.NoCrossedOut:
+                    currentAttributes = currentAttributes.RemoveStyle(GraphicStyle.CrossOut);
+                    break;
+
+                case GraphicRendition.Overlined:
+                    currentAttributes = currentAttributes.SetStyle(GraphicStyle.Overline);
+                    break;
+
+                case GraphicRendition.NoOverlined:
+                    currentAttributes = currentAttributes.RemoveStyle(GraphicStyle.Overline);
+                    break;
+
+                case GraphicRendition.Conceal:
+                    currentAttributes = currentAttributes.SetStyle(GraphicStyle.Conceal);
+                    break;
+
                 case GraphicRendition.Reveal:
                     currentAttributes = currentAttributes.RemoveStyle(GraphicStyle.Conceal);
+                    break;
+
+                case GraphicRendition.NormalIntensity:
+                    currentAttributes = currentAttributes.RemoveStyle(GraphicStyle.Bold | GraphicStyle.Faint);
                     break;
 
                 case GraphicRendition.ForegroundNormalBlack:
@@ -520,9 +553,27 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int GetColumnIndex(int specificCursor)
+        {
+            return cursor % width;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetFullIndexOfRow(int rowIndex)
         {
             return rowIndex * width;
+        }
+
+        private void ResizeBuffer()
+        {
+            if (buffer.Capacity >= MAX_BUFFER_SIZE)
+            {
+                return;
+            }
+
+            buffer.Capacity = Math.Min(
+                buffer.Capacity + (screenLength * INITIAL_BUFFERS_COUNT),
+                maxCapacity);
         }
     }
 }
