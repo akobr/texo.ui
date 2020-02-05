@@ -73,18 +73,6 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             return Color.FromArgb(Background.R, Background.G, Background.B);
         }
 
-        public Font GetFont(Font prototype)
-        {
-            FontStyle fontStyles = FontStyle.Regular;
-
-            if (IsBold) fontStyles |= FontStyle.Bold;
-            if (IsItalic) fontStyles |= FontStyle.Italic;
-            if (IsUnderlined) fontStyles |= FontStyle.Underline;
-            if (IsCrossedOut) fontStyles |= FontStyle.Strikeout;
-
-            return new Font(prototype, fontStyles);
-        }
-
         public GraphicAttributes SetForeground(Color foreground)
         {
             return new GraphicAttributes((foreground.R, foreground.G, foreground.B), Background, Style);
