@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 
 namespace VT100.Viewer
@@ -57,6 +58,7 @@ namespace VT100.Viewer
             this.btnSend.TabIndex = 1;
             this.btnSend.Text = "Send";
             this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.Click += HandleSendButtonClick;
             //
             // tbOutput
             //            

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BeaverSoft.Texo.Core.Console.Bitmap\BeaverSoft.Texo.Core.Console.Bitmap.csproj" />
     <ProjectReference Include="..\..\BeaverSoft.Texo.Core.Console\BeaverSoft.Texo.Core.Console.csproj" />
   </ItemGroup>
 

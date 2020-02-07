@@ -8,12 +8,13 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
     class BitArrayChangesManager : IConsoleBufferChangesManager
     {
         private readonly BitArray changes;
-        private int screenStart, screenLenght, lineWidth, cursor;
+        private int screenStart, screenLenght, lineWidth, controlLength, lineWidthWithControl, cursor;
         private int startIndex, endIndex;
 
-        public BitArrayChangesManager(int length)
+        public BitArrayChangesManager(int length, int controlLength)
         {
             changes = new BitArray(length);
+            this.controlLength = controlLength;
         }
 
         public void AddChange(int index)
@@ -42,15 +43,18 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
             this.screenStart = screenStart;
             this.screenLenght = screenLenght;
             this.lineWidth = lineWidth;
+            lineWidthWithControl = lineWidth + controlLength;
             this.cursor = cursor;
         }
 
         public ConsoleBufferChangeBatch Finish(int screenStart, int screenLenght, int lineWidth, int cursor)
         {
-            Rectangle startScreen = new Rectangle(this.screenStart % this.lineWidth, this.screenStart / this.lineWidth, this.lineWidth, this.screenLenght / this.lineWidth);
-            Rectangle endScreen = new Rectangle(screenStart % lineWidth, screenStart / lineWidth, lineWidth, screenLenght / lineWidth);
-            Point startCursor = new Point(this.cursor % this.lineWidth, this.cursor / this.lineWidth);
-            Point endCursor = new Point(cursor % lineWidth, cursor / lineWidth);
+            int lineWidthWithControl = lineWidth + controlLength;
+
+            Rectangle startScreen = new Rectangle(this.screenStart % this.lineWidthWithControl, this.screenStart / this.lineWidthWithControl, this.lineWidth, this.screenLenght / this.lineWidth);
+            Rectangle endScreen = new Rectangle(screenStart % lineWidthWithControl, screenStart / lineWidthWithControl, lineWidth, screenLenght / lineWidth);
+            Point startCursor = new Point(this.cursor % this.lineWidthWithControl, this.cursor / this.lineWidthWithControl);
+            Point endCursor = new Point(cursor % lineWidthWithControl, cursor / lineWidthWithControl);
             return new ConsoleBufferChangeBatch(startScreen, endScreen, startCursor, endCursor, BuildSequences());
         }
 

@@ -20,19 +20,20 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
                 throw new ArgumentNullException(nameof(font), "A font must be specified.");
             }
 
-            BitmapImage bitmap = new BitmapImage(font.Height * buffer.Screen.Width, font.Height * buffer.Screen.Height);
+            Size charSize = new Size((int)Math.Ceiling(font.Height / 2.0), font.Height);
+            BitmapImage bitmap = new BitmapImage(charSize.Width * buffer.Screen.Width, charSize.Height * buffer.Screen.Height);
             Graphics graphics = Graphics.FromImage(bitmap);
 
             byte attributesId = 0;
             GraphicAttributes attributes = buffer.Styles[attributesId];
             Font usedFont = attributes.GetFont(font);
 
-            for (int y = 0; y < buffer.Screen.Height; ++y)
+            for (int r = 0; r < buffer.Screen.Height; ++r)
             {
-                for (int x = 0; x < buffer.Screen.Width; ++x)
+                for (int c = 0; c < buffer.Screen.Width; ++c)
                 {
-                    BufferCell character = buffer[x, y];
-                    Rectangle rect = new Rectangle(font.Height * x, font.Height * y, font.Height, font.Height);
+                    BufferCell character = buffer[c, r];
+                    Rectangle rect = new Rectangle(charSize.Width * c, charSize.Height * r, charSize.Width, charSize.Height);
                     graphics.FillRectangle(new SolidBrush(attributes.GetBackground()), rect);
 
                     if (character.StyleId != attributesId)

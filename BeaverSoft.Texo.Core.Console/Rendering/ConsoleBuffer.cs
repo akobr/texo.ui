@@ -7,21 +7,26 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
     public class ConsoleBuffer : IConsoleBuffer
     {
         private readonly ReadOnlyMemory<BufferCell> buffer;
+        private readonly int controlLength;
 
         public ConsoleBuffer(
             ReadOnlyMemory<BufferCell> buffer,
             ConsoleBufferChangeBatch changes,
-            IReadOnlyList<GraphicAttributes> styles)
+            IReadOnlyList<GraphicAttributes> styles,
+            int controlLength)
         {
             this.buffer = buffer;
+            this.controlLength = controlLength;
+
             Changes = changes;
             Styles = styles;
             Screen = changes.EndScreen;
             Cursor = changes.EndCursor;
         }
 
-        public BufferCell this[int rowIndex, int columnIndex]
-            => buffer.Span[rowIndex * Screen.Width + columnIndex];
+        // TODO: [P1] calculate with control columns
+        public BufferCell this[int columnIndex, int rowIndex]
+            => buffer.Span[rowIndex * (Screen.Width + controlLength) + columnIndex];
 
         public Rectangle Screen { get; }
 

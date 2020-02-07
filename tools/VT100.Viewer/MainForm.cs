@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BeaverSoft.Texo.Core.Console;
+using BeaverSoft.Texo.Core.Console.Bitmap;
 using BeaverSoft.Texo.Core.Console.Decoding;
 using BeaverSoft.Texo.Core.Console.Decoding.Ansi;
 using BeaverSoft.Texo.Core.Console.Rendering;
@@ -24,6 +25,7 @@ namespace VT100.Viewer
         private Terminal terminal;
         private bool terminalIsExiting;
         private IDecoder decoder;
+        private ConsoleBufferBuilder bufferBuilder;
 
         public MainForm()
         {
@@ -37,7 +39,10 @@ namespace VT100.Viewer
         private void InitialiseDecoderClient()
         {
             var ansi = new AnsiDecoder();
-            ansi.Subscribe(new ConsoleBufferBuilder(TERMINAL_WIDTH, TERMINAL_HEIGHT));
+            bufferBuilder = new ConsoleBufferBuilder(TERMINAL_WIDTH, TERMINAL_HEIGHT);
+            bufferBuilder.Start();
+
+            ansi.Subscribe(bufferBuilder);
             //ansi.Subscribe(new AnsiDecoderClient(tbOutput, TERMINAL_WIDTH, TERMINAL_HEIGHT));
             decoder = ansi;
         }
@@ -113,6 +118,12 @@ namespace VT100.Viewer
             {
                 decoder.Input(validBytes);
             }
+        }
+
+        private void HandleSendButtonClick(object sender, EventArgs e)
+        {
+            ConsoleBuffer buffer = bufferBuilder.Snapshot();
+            buffer.ToBitmap().Save("screen.png");
         }
     }
 }

@@ -4,6 +4,6 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
     {
         void Start();
 
-        ConsoleBuffer Snapshot();
+        ConsoleBuffer Snapshot(bool fullBuffer = false);
     }
 }

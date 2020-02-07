@@ -11,14 +11,17 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
     {
         private const int MAX_BUFFER_SIZE = 4200 * 126;
         private const int INITIAL_BUFFERS_COUNT = 4;
+        private const int CONTROL_LENGTH = 1;
 
         private static BufferCell DefaultCell = new BufferCell(BufferCell.EMPTY_CHARACTER, 0);
 
-        private readonly ImmutableArray<BufferCell>.Builder buffer;
         private readonly IConsoleStylesManager styles;
         private readonly IConsoleBufferChangesManager changes;
 
-        private int width, height, maxCapacity, screenLength, screenZeroIndex, screenEndIndex, cursor, savedCursor;
+        private ImmutableArray<BufferCell>.Builder buffer;
+        private int width, widthWithControl, height;
+        private int maxCapacity, screenLength, screenZeroIndex, screenEndIndex;
+        private int cursor, savedCursor;
         private GraphicAttributes currentAttributes;
         private bool currentAttributesNotSaved;
         private byte currentAttributesId;
@@ -26,21 +29,18 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         public ConsoleBufferBuilder(int width, int height)
         {
             this.width = width;
+            widthWithControl = width + CONTROL_LENGTH;
             this.height = height;
 
             cursor = screenZeroIndex = 0;
-            screenLength = height * width;
-            screenEndIndex = screenZeroIndex + screenLength;
-            maxCapacity = (MAX_BUFFER_SIZE + width) / width * width;
+            screenLength = height * widthWithControl;
+            screenEndIndex = screenZeroIndex + screenLength - 1;
+            maxCapacity = (MAX_BUFFER_SIZE + widthWithControl) / widthWithControl * widthWithControl;
             int capacity = Math.Min(screenLength * INITIAL_BUFFERS_COUNT, maxCapacity);
             buffer = ImmutableArray.CreateBuilder<BufferCell>(capacity);
+            InitialiseBuffer();
 
-            for (int i = 0; i < maxCapacity; ++i)
-            {
-                buffer.Add(DefaultCell);
-            }
-
-            changes = new BitArrayChangesManager(capacity);
+            changes = new BitArrayChangesManager(capacity, CONTROL_LENGTH);
             styles = new DefaultStylesManager(new GraphicAttributes(Color.White, Color.Black));
             currentAttributes = styles.DefaultStyle;
             currentAttributesNotSaved = false;
@@ -52,11 +52,19 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             changes.Start(screenZeroIndex, screenLength, width, cursor);
         }
 
-        public ConsoleBuffer Snapshot()
+        public ConsoleBuffer Snapshot(bool fullBuffer = false)
         {
             var batch = changes.Finish(screenZeroIndex, screenLength, width, cursor);
-            ConsoleBuffer snapshot = new ConsoleBuffer(buffer.ToImmutable().AsMemory(), batch, styles.ProvideStyles());
-            changes.Start(screenZeroIndex, screenLength, width, cursor);
+
+            ConsoleBuffer snapshot = new ConsoleBuffer(
+                fullBuffer
+                    ? buffer.ToImmutable().AsMemory()
+                    : buffer.ToImmutable().AsMemory().Slice(screenZeroIndex, screenLength),
+                batch,
+                styles.ProvideStyles(),
+                CONTROL_LENGTH);
+
+            changes.Start(screenZeroIndex, screenLength, widthWithControl, cursor);
             return snapshot;
         }
 
@@ -69,14 +77,24 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         {
             TryBuildStyle();
 
-            foreach (char character in chars)
+            int controlIndex = GetControlIndex();
+
+            for (int i = 0; i < chars.Length; i++)
             {
+                char character = chars[i];
+
                 if (IsControlCharacter(character))
                 {
-                    TryProcessControlCharacter(character);
+                    if (TryProcessControlCharacter(character)) controlIndex = GetControlIndex();
                 }
                 else
                 {
+                    if (cursor == controlIndex)
+                    {
+                        ++cursor;
+                        controlIndex = GetControlIndex();
+                    }
+
                     buffer[cursor] = new BufferCell(character, currentAttributesId);
                     changes.AddChange(cursor++);
                 }
@@ -86,6 +104,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         public void ClearLine(ClearDirection direction)
         {
             int startIndex, excludedEndIndex;
+            TryBuildStyle();
 
             switch (direction)
             {
@@ -108,7 +127,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
             for (int i = startIndex; i < excludedEndIndex; i++)
             {
-                buffer[i] = DefaultCell;
+                buffer[i] = new BufferCell(BufferCell.EMPTY_CHARACTER, currentAttributesId);
             }
 
             changes.AddChange(startIndex, excludedEndIndex - startIndex);
@@ -118,9 +137,9 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         {
             int excludedEndIndex = screenZeroIndex + screenLength;
 
-            for (int i = screenZeroIndex; i < excludedEndIndex; i++)
+            for (int i = screenZeroIndex; i < excludedEndIndex; ++i)
             {
-                buffer[i] = DefaultCell;
+                buffer[i] = new BufferCell(BufferCell.EMPTY_CHARACTER, currentAttributesId);
             }
 
             changes.AddChange(screenZeroIndex, screenLength);
@@ -128,12 +147,21 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void EraseCharacters(int count)
         {
-            for (int i = cursor; i < cursor + count; i++)
+            int excludedTargetEndIndex = cursor + count;
+            int controlIndex = GetControlIndex();
+            int excludedEndIndex = Math.Min(excludedTargetEndIndex, controlIndex);
+
+            for (int i = cursor; i < excludedEndIndex; ++i)
             {
-                buffer[i] = DefaultCell;
+                buffer[i] = new BufferCell(BufferCell.EMPTY_CHARACTER, currentAttributesId);
             }
 
-            changes.AddChange(cursor, count);
+            if (excludedTargetEndIndex == controlIndex)
+            {
+                buffer[controlIndex] = new BufferCell(BufferCell.EMPTY_CHARACTER, currentAttributesId);
+            }
+
+            changes.AddChange(cursor, excludedEndIndex + cursor);
         }
 
         public Point GetCursorPosition()
@@ -152,19 +180,19 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             switch (direction)
             {
                 case Direction.Up:
-                    SetCursor(cursor - (width * amount));
+                    SetCursor(cursor - (widthWithControl * amount));
                     break;
 
                 case Direction.Down:
-                    SetCursor(cursor + (width * amount));
+                    SetCursor(cursor + (widthWithControl * amount));
                     break;
 
                 case Direction.Forward:
-                    SetCursor(cursor + amount);
+                    SetCursor(Math.Min(cursor + amount, GetFullIndexOfRow(GetRowIndex()) + width));
                     break;
 
                 case Direction.Backward:
-                    SetCursor(cursor - amount);
+                    SetCursor(Math.Max(cursor - amount, GetFullIndexOfRow(GetRowIndex())));
                     break;
             }
         }
@@ -190,23 +218,23 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
             nextTabStop = nextTabStop / DEFAULT_TAB_SIZE * DEFAULT_TAB_SIZE;
             if (nextTabStop < 0) nextTabStop = 0;
-            if (nextTabStop >= width) nextTabStop = width - 1;
+            if (nextTabStop > width) nextTabStop = width;
             SetCursor(GetFullIndexOfRow(GetRowIndex()) + nextTabStop);
         }
 
         public void MoveCursorTo(Point position)
         {
-            SetCursor(screenZeroIndex + (position.Y * width) + position.X);
+            SetCursor(screenZeroIndex + (position.Y * widthWithControl) + position.X);
         }
 
         public void MoveCursorToBeginningOfLineAbove(int lineNumberRelativeToCurrentLine)
         {
-            SetCursor(GetFullIndexOfRow(GetRowIndex()) - (lineNumberRelativeToCurrentLine * width));
+            SetCursor(GetFullIndexOfRow(GetRowIndex()) - (lineNumberRelativeToCurrentLine * widthWithControl));
         }
 
         public void MoveCursorToBeginningOfLineBelow(int lineNumberRelativeToCurrentLine)
         {
-            SetCursor(GetFullIndexOfRow(GetRowIndex()) + (lineNumberRelativeToCurrentLine * width));
+            SetCursor(GetFullIndexOfRow(GetRowIndex()) + (lineNumberRelativeToCurrentLine * widthWithControl));
         }
 
         public void MoveCursorToColumn(int columnIndex)
@@ -226,16 +254,39 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void ScrollPageDownwards(int linesToScroll)
         {
-            screenZeroIndex = screenZeroIndex - (linesToScroll * width);
-            screenEndIndex = screenZeroIndex + screenLength;
-            // TODO: [P1] update/resize buffer
+            screenZeroIndex = screenZeroIndex - (linesToScroll * widthWithControl);
+
+            if (screenZeroIndex >= 0)
+            {
+                screenEndIndex = screenZeroIndex + screenLength - 1;
+                return;
+            }
+
+            ResizeBuffer();
+
+            // TODO: [P1] move content
+            screenZeroIndex = 0;
+            screenEndIndex = screenZeroIndex + screenLength - 1;
         }
 
         public void ScrollPageUpwards(int linesToScroll)
         {
-            screenZeroIndex = screenZeroIndex + (linesToScroll * width);
-            screenEndIndex = screenZeroIndex + screenLength;
-            // TODO: [P1] update/resize buffer
+            screenZeroIndex = screenZeroIndex + (linesToScroll * widthWithControl);
+            screenEndIndex = screenZeroIndex + screenLength - 1;
+
+            if (screenEndIndex < buffer.Count)
+            {
+                return;
+            }
+
+            ResizeBuffer();
+
+            if (screenEndIndex < buffer.Count)
+            {
+                return;
+            }
+
+            // TODO: [P1] Move content
         }
 
         public void SetBackgroundColor(Color background)
@@ -257,7 +308,6 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                 ApplyGraphicRendition(command);
             }
 
-            // TODO: Maybe save here?
             currentAttributesNotSaved = true;
         }
 
@@ -527,7 +577,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         private bool IsControlCharacter(char character)
         {
-            return character == '\r' || character == '\n';
+            return character == '\r' || character == '\n' || character == '\a' || character == '\x1B';
         }
 
         private bool TryProcessControlCharacter(char character)
@@ -536,13 +586,14 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             {
                 case '\a':   // BEL
                 case '\x1B': // ESC
-                    return true;
+                    return false;
 
                 case '\r':
                     MoveCursorToBeginningOfLine();
-                    return true;
+                    return false;
 
                 case '\n':
+                    buffer[GetControlIndex()] = new BufferCell('\n', 0);
                     MoveCursorToNextLineOrScrollPage();
                     return true;
 
@@ -554,36 +605,42 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetRowIndex()
         {
-            return cursor / width;
+            return cursor / widthWithControl;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetRowIndex(int specificCursor)
         {
-            return specificCursor / width;
+            return specificCursor / widthWithControl;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetColumnIndex()
         {
-            return cursor % width;
+            return cursor % widthWithControl;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetColumnIndex(int specificCursor)
         {
-            return cursor % width;
+            return cursor % widthWithControl;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetFullIndexOfRow(int rowIndex)
         {
-            return rowIndex * width;
+            return rowIndex * widthWithControl;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int GetControlIndex()
+        {
+            return (cursor / widthWithControl * widthWithControl) + width;
         }
 
         private void ResizeBuffer()
         {
-            if (buffer.Capacity >= MAX_BUFFER_SIZE)
+            if (buffer.Count < maxCapacity)
             {
                 return;
             }
@@ -591,6 +648,16 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             buffer.Capacity = Math.Min(
                 buffer.Capacity + (screenLength * INITIAL_BUFFERS_COUNT),
                 maxCapacity);
+
+            InitialiseBuffer();
+        }
+
+        private void InitialiseBuffer()
+        {
+            for (int i = buffer.Count; i < buffer.Capacity; ++i)
+            {
+                buffer.Add(DefaultCell);
+            }
         }
     }
 }
