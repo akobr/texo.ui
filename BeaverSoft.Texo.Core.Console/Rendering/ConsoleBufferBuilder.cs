@@ -577,15 +577,16 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         private bool IsControlCharacter(char character)
         {
-            return character == '\r' || character == '\n' || character == '\a' || character == '\x1B';
+            return character < 32 || character == 127;
         }
 
         private bool TryProcessControlCharacter(char character)
         {
             switch (character)
             {
-                case '\a':   // BEL
-                case '\x1B': // ESC
+                case '\b': // BS: Backspace
+                    MoveCursor(Direction.Backward, 1);
+                    EraseCharacters(1);
                     return false;
 
                 case '\r':
