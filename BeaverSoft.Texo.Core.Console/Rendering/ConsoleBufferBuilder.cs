@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Immutable;
+using System.Buffers;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using BeaverSoft.Texo.Core.Console.Decoding.Ansi;
@@ -9,42 +9,50 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 {
     public class ConsoleBufferBuilder : IAnsiDecoderClient, IConsoleBufferBuilder
     {
+        internal const int CONTROL_LENGTH = 1;
         private const int MAX_BUFFER_SIZE = 4200 * 126;
         private const int INITIAL_BUFFERS_COUNT = 4;
-        private const int CONTROL_LENGTH = 1;
 
-        private static BufferCell DefaultCell = new BufferCell(BufferCell.EMPTY_CHARACTER, 0);
-
+        private readonly ArrayPool<BufferCell> buffersPool;
         private readonly IConsoleStylesManager styles;
         private readonly IConsoleBufferChangesManager changes;
 
-        private ImmutableArray<BufferCell>.Builder buffer;
+        private BufferCell[] buffer;
+        private int bufferSize;
         private int width, widthWithControl, height;
-        private int maxCapacity, screenLength, screenZeroIndex, screenEndIndex;
+        private int screenLength, screenZeroIndex, screenEndIndex;
+        private int maxCapacity, capacityIncrement;
         private int cursor, savedCursor;
+
         private GraphicAttributes currentAttributes;
         private bool currentAttributesNotSaved;
         private byte currentAttributesId;
 
-        public ConsoleBufferBuilder(int width, int height)
+        public ConsoleBufferBuilder(int width, int heigh)
+            : this(width, heigh, ArrayPool<BufferCell>.Shared)
         {
-            this.width = width;
-            widthWithControl = width + CONTROL_LENGTH;
-            this.height = height;
+            // no operation
+        }
 
+        public ConsoleBufferBuilder(int width, int height, ArrayPool<BufferCell> buffersPool)
+        {
+            this.buffersPool = buffersPool;
             cursor = screenZeroIndex = 0;
-            screenLength = height * widthWithControl;
-            screenEndIndex = screenZeroIndex + screenLength - 1;
-            maxCapacity = (MAX_BUFFER_SIZE + widthWithControl) / widthWithControl * widthWithControl;
-            int capacity = Math.Min(screenLength * INITIAL_BUFFERS_COUNT, maxCapacity);
-            buffer = ImmutableArray.CreateBuilder<BufferCell>(capacity);
-            InitialiseBuffer();
+            SetScreenSize(width, height);
 
-            changes = new BitArrayChangesManager(capacity, CONTROL_LENGTH);
+            bufferSize = Math.Min(capacityIncrement, maxCapacity);
+            buffer = buffersPool.Rent(bufferSize);
+            changes = new BitArrayChangesManager(capacityIncrement, CONTROL_LENGTH);
             styles = new DefaultStylesManager(new GraphicAttributes(Color.White, Color.Black));
+
             currentAttributes = styles.DefaultStyle;
             currentAttributesNotSaved = false;
             currentAttributesId = 0;
+        }
+
+        public void Dispose()
+        {
+            buffersPool.Return(buffer);
         }
 
         public void Start()
@@ -52,20 +60,47 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             changes.Start(screenZeroIndex, screenLength, width, cursor);
         }
 
-        public ConsoleBuffer Snapshot(bool fullBuffer = false)
+        public ConsoleBuffer Snapshot(ConsoleBufferType bufferType = ConsoleBufferType.Screen)
         {
-            var batch = changes.Finish(screenZeroIndex, screenLength, width, cursor);
+            var batch = changes.Finish(bufferType, screenZeroIndex, screenLength, width, cursor);
 
             ConsoleBuffer snapshot = new ConsoleBuffer(
-                fullBuffer
-                    ? buffer.ToImmutable().AsMemory()
-                    : buffer.ToImmutable().AsMemory().Slice(screenZeroIndex, screenLength),
+                BuildBufferSnapshot(bufferType, out int bufferUsedSize),
+                bufferUsedSize,
+                buffersPool,
                 batch,
                 styles.ProvideStyles(),
-                CONTROL_LENGTH);
+                bufferType);
 
             changes.Start(screenZeroIndex, screenLength, widthWithControl, cursor);
             return snapshot;
+        }
+
+        private BufferCell[] BuildBufferSnapshot(ConsoleBufferType bufferType, out int bufferUsedSize)
+        {
+            switch (bufferType)
+            {
+                case ConsoleBufferType.AllChanges:
+                    int endIndex = GetFullIndexOfRow(GetRowIndex(changes.AllChangeSequence.EndIndex)) + widthWithControl - 1;
+                    int length = endIndex - changes.AllChangeSequence.StartIndex + 1;
+                    BufferCell[] allChanges = buffersPool.Rent(length);
+                    Array.Copy(buffer, 0, allChanges, 0, length);
+                    bufferUsedSize = length;
+                    return allChanges;
+
+                case ConsoleBufferType.Full:
+                    BufferCell[] full = buffersPool.Rent(bufferSize);
+                    Array.Copy(buffer, 0, full, 0, bufferSize);
+                    bufferUsedSize = bufferSize;
+                    return full;
+
+                // case ConsoleBufferType.Screen:
+                default:
+                    BufferCell[] screen = buffersPool.Rent(screenLength);
+                    Array.Copy(buffer, screenZeroIndex, screen, 0, screenLength);
+                    bufferUsedSize = screenLength;
+                    return screen;
+            }
         }
 
         public void ChangeMode(AnsiMode mode)
@@ -79,7 +114,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
             int controlIndex = GetControlIndex();
 
-            for (int i = 0; i < chars.Length; i++)
+            for (int i = 0; i < chars.Length; ++i)
             {
                 char character = chars[i];
 
@@ -91,7 +126,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                 {
                     if (cursor == controlIndex)
                     {
-                        ++cursor;
+                        cursor += CONTROL_LENGTH;
                         controlIndex = GetControlIndex();
                     }
 
@@ -125,7 +160,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                     break;
             }
 
-            for (int i = startIndex; i < excludedEndIndex; i++)
+            for (int i = startIndex; i < excludedEndIndex; ++i)
             {
                 buffer[i] = new BufferCell(BufferCell.EMPTY_CHARACTER, currentAttributesId);
             }
@@ -161,7 +196,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                 buffer[controlIndex] = new BufferCell(BufferCell.EMPTY_CHARACTER, currentAttributesId);
             }
 
-            changes.AddChange(cursor, excludedEndIndex + cursor);
+            changes.AddChange(cursor, excludedEndIndex - cursor);
         }
 
         public Point GetCursorPosition()
@@ -188,11 +223,15 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                     break;
 
                 case Direction.Forward:
-                    SetCursor(Math.Min(cursor + amount, GetFullIndexOfRow(GetRowIndex()) + width));
+                    int requestedIndexForward = cursor + amount;
+                    int maxIndexForward = GetFullIndexOfRow(GetRowIndex()) + width;
+                    SetCursor(Math.Min(requestedIndexForward, maxIndexForward));
                     break;
 
                 case Direction.Backward:
-                    SetCursor(Math.Max(cursor - amount, GetFullIndexOfRow(GetRowIndex())));
+                    int requestedIndexBackward = cursor - amount;
+                    int maxIndexBackward = GetFullIndexOfRow(GetRowIndex());
+                    SetCursor(Math.Max(requestedIndexBackward, maxIndexBackward));
                     break;
             }
         }
@@ -254,39 +293,62 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void ScrollPageDownwards(int linesToScroll)
         {
-            screenZeroIndex = screenZeroIndex - (linesToScroll * widthWithControl);
-
-            if (screenZeroIndex >= 0)
+            if (linesToScroll > height)
             {
+                // TODO: [P3] support for big scroll requests
+                linesToScroll = height;
+            }
+
+            int newScreenZeroIndex = screenZeroIndex - (linesToScroll * widthWithControl);
+
+            if (newScreenZeroIndex >= 0)
+            {
+                screenZeroIndex = newScreenZeroIndex;
                 screenEndIndex = screenZeroIndex + screenLength - 1;
                 return;
             }
 
             ResizeBuffer();
 
-            // TODO: [P1] move content
-            screenZeroIndex = 0;
+            BufferCell[] tmp = buffer;
+            buffer = buffersPool.Rent(bufferSize);
+            int copyStartIndex = GetFullIndexOfRow(height);
+            Array.Copy(tmp, 0, buffer, copyStartIndex, bufferSize - copyStartIndex);
+            ClearBufferRange(buffer, 0, copyStartIndex);
+
+            screenZeroIndex = (screenZeroIndex + copyStartIndex) - (linesToScroll * widthWithControl);
             screenEndIndex = screenZeroIndex + screenLength - 1;
         }
 
         public void ScrollPageUpwards(int linesToScroll)
         {
+            if (linesToScroll > height)
+            {
+                // TODO: [P3] support for big scroll requests
+                linesToScroll = height;
+            }
+
             screenZeroIndex = screenZeroIndex + (linesToScroll * widthWithControl);
             screenEndIndex = screenZeroIndex + screenLength - 1;
 
-            if (screenEndIndex < buffer.Count)
+            if (screenEndIndex < bufferSize)
             {
                 return;
             }
 
             ResizeBuffer();
 
-            if (screenEndIndex < buffer.Count)
+            if (screenEndIndex < bufferSize)
             {
                 return;
             }
 
-            // TODO: [P1] Move content
+            BufferCell[] tmp = buffer;
+            buffer = buffersPool.Rent(bufferSize);
+            int copyStartIndex = GetFullIndexOfRow(height);
+            Array.Copy(tmp, copyStartIndex, buffer, 0, bufferSize - copyStartIndex);
+            ClearBufferRange(buffer, bufferSize - copyStartIndex, bufferSize);
+            buffersPool.Return(tmp);
         }
 
         public void SetBackgroundColor(Color background)
@@ -316,27 +378,30 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             cursor = GetFullIndexOfRow(GetRowIndex());
         }
 
-        public void MoveCursorToNextLineOrScrollPage()
+        private void SetCursor(int newCursor)
         {
-            int row = GetRowIndex();
-            int virtualRow = row - GetRowIndex(screenZeroIndex);
-
-            if (virtualRow >= height)
+            if (newCursor < screenZeroIndex)
             {
-                ScrollPageUpwards(virtualRow - height + 1);
-                SetCursor(GetFullIndexOfRow(row));
+                int screenStartRow = GetRowIndex(screenZeroIndex);
+                int cursorRow = GetRowIndexFromNegative(newCursor);
+                ScrollPageDownwards(screenStartRow - cursorRow);
+
+                if (cursorRow < 0)
+                {
+                    int cursorBase = GetFullIndexOfRow(Math.Abs(cursorRow));
+                    cursor = cursorBase + newCursor;
+                }
+            }
+            else if (newCursor > screenEndIndex)
+            {
+                int screenEndRow = GetRowIndex(screenEndIndex);
+                int cursorRow = GetRowIndex(newCursor);
+                ScrollPageUpwards(cursorRow - screenEndRow);
             }
             else
             {
-                SetCursor(GetFullIndexOfRow(row + 1));
+                cursor = newCursor;
             }
-        }
-
-        private void SetCursor(int newCursor)
-        {
-            cursor = newCursor;
-            if (cursor < screenZeroIndex) cursor = screenZeroIndex;
-            else if (cursor > screenEndIndex) cursor = screenEndIndex;
         }
 
         private void TryBuildStyle()
@@ -586,7 +651,6 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             {
                 case '\b': // BS: Backspace
                     MoveCursor(Direction.Backward, 1);
-                    EraseCharacters(1);
                     return false;
 
                 case '\r':
@@ -595,7 +659,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
                 case '\n':
                     buffer[GetControlIndex()] = new BufferCell('\n', 0);
-                    MoveCursorToNextLineOrScrollPage();
+                    MoveCursorToBeginningOfLineBelow(1);
                     return true;
 
                 default:
@@ -613,6 +677,14 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         private int GetRowIndex(int specificCursor)
         {
             return specificCursor / widthWithControl;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int GetRowIndexFromNegative(int specificCursor)
+        {
+            return specificCursor < 0
+                ? -(int)Math.Ceiling((double)Math.Abs(specificCursor) / widthWithControl)
+                : GetRowIndex(specificCursor);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -639,25 +711,49 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             return (cursor / widthWithControl * widthWithControl) + width;
         }
 
-        private void ResizeBuffer()
+        private void SetScreenSize(int width, int height)
         {
-            if (buffer.Count < maxCapacity)
-            {
-                return;
-            }
+            this.width = width;
+            this.height = height;
 
-            buffer.Capacity = Math.Min(
-                buffer.Capacity + (screenLength * INITIAL_BUFFERS_COUNT),
-                maxCapacity);
+            widthWithControl = width + CONTROL_LENGTH;
+            screenLength = height * widthWithControl;
+            screenEndIndex = screenZeroIndex + screenLength - 1;
 
-            InitialiseBuffer();
+            maxCapacity = (MAX_BUFFER_SIZE + widthWithControl) / widthWithControl * widthWithControl;
+            capacityIncrement = screenLength * INITIAL_BUFFERS_COUNT;
         }
 
-        private void InitialiseBuffer()
+        private bool ResizeBuffer()
         {
-            for (int i = buffer.Count; i < buffer.Capacity; ++i)
+            if (bufferSize >= MAX_BUFFER_SIZE)
             {
-                buffer.Add(DefaultCell);
+                return false;
+            }
+
+            BufferCell[] temp = buffer;
+            int tempSize = bufferSize;
+            bufferSize = Math.Min(bufferSize + capacityIncrement, maxCapacity);
+            buffer = buffersPool.Rent(bufferSize);
+            Array.Copy(temp, 0, buffer, 0, tempSize);
+            int realBufferSize = buffer.Length / widthWithControl * widthWithControl;
+
+            if (realBufferSize > bufferSize)
+            {
+                ClearBufferRange(buffer, bufferSize, realBufferSize);
+                bufferSize = realBufferSize;
+            }
+
+            buffersPool.Return(temp);
+            changes.Resize(bufferSize);
+            return true;
+        }
+
+        private static void ClearBufferRange(BufferCell[] buffer, int startIndex, int excludedEndIndex)
+        {
+            for (int i = startIndex; i < excludedEndIndex; ++i)
+            {
+                buffer[i] = new BufferCell(BufferCell.EMPTY_CHARACTER, 0);
             }
         }
     }

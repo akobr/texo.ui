@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Drawing;
-using BeaverSoft.Texo.Core.Console.Rendering.Extensions;
 
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
@@ -11,7 +10,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             Rectangle endScreen,
             Point startCursor,
             Point endCursor,
-            IReadOnlyCollection<Sequence> changes)
+            IReadOnlyCollection<ConsoleBufferChange> changes)
         {
             StartScreen = startScreen;
             EndScreen = endScreen;
@@ -28,23 +27,6 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public Point EndCursor { get; }
 
-        public IReadOnlyCollection<Sequence> Changes { get; }
-
-        public int ScreenScrolledBy
-            => (EndScreen.GetZeroIndex() - StartScreen.GetZeroIndex()) / EndScreen.Width;
-
-        public int CursorMovedBy
-            => EndCursor.GetIndex(EndScreen.Width) - StartCursor.GetIndex(StartScreen.Width);
-
-        public bool HasBeenScreenScrolled
-            => EndScreen.Y != StartScreen.Y;
-
-        public bool HasBeenScreenResized
-            => EndScreen.Width != StartScreen.Width
-            || EndScreen.Height != StartScreen.Height;
-
-        public bool HasBeenCursorMoved
-            => EndCursor.X != StartCursor.X
-            || EndCursor.Y != StartCursor.Y;
+        public IReadOnlyCollection<ConsoleBufferChange> Changes { get; }
     }
 }

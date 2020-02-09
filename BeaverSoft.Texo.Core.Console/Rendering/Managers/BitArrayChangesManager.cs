@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -7,22 +8,25 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 {
     class BitArrayChangesManager : IConsoleBufferChangesManager
     {
-        private readonly BitArray changes;
-        private int screenStart, screenLenght, lineWidth, controlLength, lineWidthWithControl, cursor;
+        private readonly BitArray changeMask;
+        private readonly int controlLength;
+        private int startScreenIndex, startScreenLenght, startScreenLineWidth, startCursor;
         private int startIndex, endIndex;
 
-        public BitArrayChangesManager(int length, int controlLength)
+        public BitArrayChangesManager(int bufferLength, int controlLength)
         {
-            changes = new BitArray(length);
+            changeMask = new BitArray(bufferLength);
             this.controlLength = controlLength;
         }
+
+        public BufferSequence AllChangeSequence => new BufferSequence(startIndex, endIndex);
 
         public void AddChange(int index)
         {
             if (startIndex > index) startIndex = index;
-            if (endIndex < index) startIndex = index;
+            if (endIndex < index) endIndex = index;
 
-            changes.Set(index, true);
+            changeMask.Set(index, true);
         }
 
         public void AddChange(int start, int length)
@@ -32,72 +36,117 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 
             for (int i = start; i < length; i++)
             {
-                changes.Set(i, true);
+                changeMask.Set(i, true);
             }
         }
 
-        public void Start(int screenStart, int screenLenght, int lineWidth, int cursor)
+        public void Start(int startScreenIndex, int startScreenLenght, int startScreenLineWidth, int startCursor)
         {
             Reset();
 
-            this.screenStart = screenStart;
-            this.screenLenght = screenLenght;
-            this.lineWidth = lineWidth;
-            lineWidthWithControl = lineWidth + controlLength;
-            this.cursor = cursor;
+            this.startScreenIndex = startScreenIndex;
+            this.startScreenLenght = startScreenLenght;
+            this.startScreenLineWidth = startScreenLineWidth;
+            this.startCursor = startCursor;
         }
 
-        public ConsoleBufferChangeBatch Finish(int screenStart, int screenLenght, int lineWidth, int cursor)
+        public ConsoleBufferChangeBatch Finish(ConsoleBufferType batchType, int endScreenIndex, int endScreenLenght, int endScreenLineWidth, int endCursor)
         {
-            int lineWidthWithControl = lineWidth + controlLength;
+            int startLineFullWidth = startScreenLineWidth + controlLength;
+            int endLineFullWidth = endScreenLineWidth + controlLength;
 
-            Rectangle startScreen = new Rectangle(this.screenStart % this.lineWidthWithControl, this.screenStart / this.lineWidthWithControl, this.lineWidth, this.screenLenght / this.lineWidth);
-            Rectangle endScreen = new Rectangle(screenStart % lineWidthWithControl, screenStart / lineWidthWithControl, lineWidth, screenLenght / lineWidth);
-            Point startCursor = new Point(this.cursor % this.lineWidthWithControl, this.cursor / this.lineWidthWithControl);
-            Point endCursor = new Point(cursor % lineWidthWithControl, cursor / lineWidthWithControl);
-            return new ConsoleBufferChangeBatch(startScreen, endScreen, startCursor, endCursor, BuildSequences());
+            int startWindowIndex, endWindowIndex;
+
+            switch (batchType)
+            {
+                case ConsoleBufferType.AllChanges:
+                    startWindowIndex = startIndex;
+                    endWindowIndex = endIndex;
+                    break;
+
+                case ConsoleBufferType.Full:
+                    startWindowIndex = 0;
+                    endWindowIndex = changeMask.Length - 1;
+                    break;
+
+                // case ConsoleBufferType.Screen:
+                default:
+                    startWindowIndex = endScreenIndex;
+                    endWindowIndex = endScreenIndex + endScreenLenght - 1;
+                    break;
+            }
+
+            Rectangle startScreen = new Rectangle(startScreenIndex % startLineFullWidth, startScreenIndex / startLineFullWidth, startScreenLineWidth, startScreenLenght / startLineFullWidth);
+            Rectangle endScreen = new Rectangle(endScreenIndex % endLineFullWidth, endScreenIndex / endLineFullWidth, endScreenLineWidth, endScreenLenght / endLineFullWidth);
+            Point startCursorPoint = new Point((startCursor - startScreenIndex) % startLineFullWidth, (startCursor - startScreenIndex) / startLineFullWidth);
+            Point endCursorPoint = new Point((endCursor - endScreenIndex) % endLineFullWidth, (endCursor - endScreenIndex) / endLineFullWidth);
+            return new ConsoleBufferChangeBatch(startScreen, endScreen, startCursorPoint, endCursorPoint, BuildSequences(startWindowIndex, endWindowIndex, endLineFullWidth).ToImmutableList());
         }
 
         public void Reset()
         {
             startIndex = int.MaxValue;
             endIndex = int.MinValue;
-            changes.SetAll(false);
+            changeMask.SetAll(false);
         }
 
-        private IReadOnlyCollection<Sequence> BuildSequences()
+        public void Resize(int bufferLength)
+        {
+            if (changeMask.Length > bufferLength)
+            {
+                return;
+            }
+
+            changeMask.Length = bufferLength;
+        }
+
+        private IEnumerable<ConsoleBufferChange> BuildSequences(int startWindowIndex, int endWindowIndex, int lineWidth)
         {
             if (startIndex == int.MaxValue)
             {
-                return ImmutableList<Sequence>.Empty;
+                yield break;
             }
 
-            var sequenceBuilder = ImmutableList.CreateBuilder<Sequence>();
             bool isSequenceInProgress = false;
             int sequenceStart = -1;
 
             for (int i = startIndex; i <= endIndex; ++i)
             {
-                bool bit = changes.Get(i);
+                bool bit = changeMask.Get(i);
 
                 if (bit && !isSequenceInProgress)
                 {
                     isSequenceInProgress = true;
                     sequenceStart = i;
+
+                    if (sequenceStart > endWindowIndex)
+                    {
+                        yield break;
+                    }
                 }
                 else if (!bit && isSequenceInProgress)
                 {
-                    sequenceBuilder.Add(new Sequence(sequenceStart, i - 1));
+                    int sequenceEnd = i - 1;
+
+                    if (sequenceEnd < startWindowIndex)
+                    {
+                        continue;
+                    }
+
+                    yield return new ConsoleBufferChange(
+                            new Point((sequenceStart - startWindowIndex) % lineWidth, (sequenceStart - startWindowIndex) / lineWidth),
+                            new Point((sequenceEnd - startWindowIndex) % lineWidth, (sequenceEnd - startWindowIndex) / lineWidth));
+
                     isSequenceInProgress = false;
                 }
             }
 
             if (isSequenceInProgress)
             {
-                sequenceBuilder.Add(new Sequence(sequenceStart, endIndex));
+                yield return new ConsoleBufferChange(
+                    new Point((sequenceStart - startWindowIndex) % lineWidth, (sequenceStart - startWindowIndex) / lineWidth),
+                    new Point((endIndex - startWindowIndex) % lineWidth, (endIndex - startWindowIndex) / lineWidth));
             }
-
-            return sequenceBuilder.ToImmutable();
         }
     }
 }

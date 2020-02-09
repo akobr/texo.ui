@@ -73,7 +73,12 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public override string ToString()
         {
-            return $"'{Character}', {Character:D}, \\u{Character:x}, Style: {StyleId}";
+            if (IsEmpty)
+            {
+                return $"\\0, Style: {StyleId}";
+            }
+
+            return $"'{Character}', {(int)Character}, \\u{(int)Character:x4}, Style: {StyleId}";
         }
     }
 }

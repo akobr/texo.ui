@@ -1,4 +1,4 @@
-using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -6,27 +6,37 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 {
     public class ConsoleBuffer : IConsoleBuffer
     {
-        private readonly ReadOnlyMemory<BufferCell> buffer;
-        private readonly int controlLength;
+        private readonly ArrayPool<BufferCell> bufferPool;
+        private readonly BufferCell[] buffer;
+        private readonly int widthWithControl;
 
         public ConsoleBuffer(
-            ReadOnlyMemory<BufferCell> buffer,
+            BufferCell[] buffer,
+            int bufferUsedSize,
+            ArrayPool<BufferCell> bufferPool,
             ConsoleBufferChangeBatch changes,
             IReadOnlyList<GraphicAttributes> styles,
-            int controlLength)
+            ConsoleBufferType type)
         {
             this.buffer = buffer;
-            this.controlLength = controlLength;
+            this.bufferPool = bufferPool;
+            Type = type;
 
             Changes = changes;
             Styles = styles;
             Screen = changes.EndScreen;
             Cursor = changes.EndCursor;
+
+            widthWithControl = Screen.Width + ConsoleBufferBuilder.CONTROL_LENGTH;
+            Size = new Size(widthWithControl, bufferUsedSize / widthWithControl);
         }
 
-        // TODO: [P1] calculate with control columns
         public BufferCell this[int columnIndex, int rowIndex]
-            => buffer.Span[rowIndex * (Screen.Width + controlLength) + columnIndex];
+            => buffer[rowIndex * widthWithControl + columnIndex];
+
+        public ConsoleBufferType Type { get; }
+
+        public Size Size { get; }
 
         public Rectangle Screen { get; }
 
@@ -36,14 +46,9 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public IReadOnlyList<GraphicAttributes> Styles { get; }
 
-        public ReadOnlySpan<BufferCell> GetScreen()
+        public void Dispose()
         {
-            return buffer.Slice(Screen.Y * Screen.Width + Screen.X, Screen.Height * Screen.Width).Span;
-        }
-
-        public ReadOnlySpan<BufferCell> GetFull()
-        {
-            return buffer.Span;
+            bufferPool.Return(buffer);
         }
     }
 }

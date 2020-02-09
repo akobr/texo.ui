@@ -1,9 +1,11 @@
+using System;
+
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
-    public interface IConsoleBufferBuilder
+    public interface IConsoleBufferBuilder : IDisposable
     {
         void Start();
 
-        ConsoleBuffer Snapshot(bool fullBuffer = false);
+        ConsoleBuffer Snapshot(ConsoleBufferType bufferType = ConsoleBufferType.Screen);
     }
 }

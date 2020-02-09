@@ -54,9 +54,9 @@ namespace VT100.Viewer
 
             //terminal.Start(@"c:\Working\textum.ui\BeaverSoft.Texo.Fallback.PowerShell.Standalone\bin\Debug\BeaverSoft.Texo.Fallback.PowerShell.Standalone.exe", TERMINAL_WIDTH, TERMINAL_HEIGHT);
             //terminal.Start(@"c:\Working\textum.ui\tools\Example.Console.App\bin\Debug\Example.Console.App.exe", TERMINAL_WIDTH, TERMINAL_HEIGHT);
-            terminal.Start(@"git status", TERMINAL_WIDTH, TERMINAL_HEIGHT);
+            //terminal.Start(@"git status", TERMINAL_WIDTH, TERMINAL_HEIGHT);
             //terminal.Start(@"ping localhost", TERMINAL_WIDTH, TERMINAL_HEIGHT);
-            //terminal.Start(@"git show-branch --all", TERMINAL_WIDTH, TERMINAL_HEIGHT);
+            terminal.Start(@"git show-branch --all", TERMINAL_WIDTH, TERMINAL_HEIGHT);
             //terminal.Start(@"mc", TERMINAL_WIDTH, TERMINAL_HEIGHT);
             //terminal.Start(@"powershell", TERMINAL_WIDTH, TERMINAL_HEIGHT);
 
@@ -125,7 +125,7 @@ namespace VT100.Viewer
 
         private void HandleSendButtonClick(object sender, EventArgs e)
         {
-            ConsoleBuffer buffer = bufferBuilder.Snapshot();
+            ConsoleBuffer buffer = bufferBuilder.Snapshot(ConsoleBufferType.AllChanges);
             buffer.ToBitmap().Save("screen.png");
         }
     }

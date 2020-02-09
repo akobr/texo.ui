@@ -1,12 +1,12 @@
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
-    public struct Sequence
+    public struct BufferSequence
     {
         public readonly int StartIndex;
 
         public readonly int EndIndex;
 
-        public Sequence(int start, int end)
+        public BufferSequence(int start, int end)
         {
             StartIndex = start;
             EndIndex = end;
@@ -14,7 +14,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public bool IsValid => StartIndex < EndIndex;
 
-        public bool IsEndingBeforeOrSame(Sequence other)
+        public bool IsEndingBeforeOrSame(BufferSequence other)
         {
             return EndIndex <= other.EndIndex;
         }
