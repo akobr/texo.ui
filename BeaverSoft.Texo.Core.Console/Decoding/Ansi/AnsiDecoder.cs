@@ -76,7 +76,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
                     break;
 
                 case 'I': // CHT: Cursor Forward Tabulation
-                    client?.MoveCursorByTabulation(ClearDirection.Forward, DecodeInt(parameter, 1));
+                    client?.MoveCursorByTabulation(Direction.Forward, DecodeInt(parameter, 1));
                     break;
 
                 case 'J': // Clear screen commands
@@ -84,11 +84,11 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
                         switch (parameter)
                         {
                             case "1": // ED1: Clear screen from cursor up
-                                client?.ClearLine(DecodeEnum(parameter, ClearDirection.Backward));
+                                client?.ClearScreen(DecodeEnum(parameter, ClearDirection.Backward));
                                 break;
 
                             case "2": // ED2: Clear entire screen
-                                client?.ClearLine(DecodeEnum(parameter, ClearDirection.Both));
+                                client?.ClearScreen(DecodeEnum(parameter, ClearDirection.Both));
                                 break;
 
                             case "":
@@ -134,7 +134,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
                     break;
 
                 case 'Z': // CBT: Cursor Backward Tabulation
-                    client?.MoveCursorByTabulation(ClearDirection.Backward, DecodeInt(parameter, 1));
+                    client?.MoveCursorByTabulation(Direction.Backward, DecodeInt(parameter, 1));
                     break;
 
                 case 'm':

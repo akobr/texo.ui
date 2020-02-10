@@ -307,19 +307,18 @@ namespace VT100.Viewer.Decoding
             output.Select(firstLineIndex + columnIndex, 0);
         }
 
-        public void MoveCursorByTabulation(ClearDirection direction, int tabs)
+        public void MoveCursorByTabulation(Direction direction, int tabs)
         {
             int column = output.SelectionStart;
             int nextTabStop = column;
 
             switch (direction)
             {
-                case ClearDirection.Backward:
+                case Direction.Backward:
                     nextTabStop -= DEFAULT_TAB_SIZE;
                     break;
 
-                //case ClearDirection.Forward:
-                //case ClearDirection.Both:
+                //case Direction.Forward:
                 default:
                     nextTabStop += DEFAULT_TAB_SIZE;
                     break;

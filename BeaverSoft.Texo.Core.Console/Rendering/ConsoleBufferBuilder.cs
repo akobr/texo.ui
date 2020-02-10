@@ -170,14 +170,33 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void ClearScreen(ClearDirection direction)
         {
-            int excludedEndIndex = screenZeroIndex + screenLength;
+            int startClearIndex, endClearIndex;
 
-            for (int i = screenZeroIndex; i < excludedEndIndex; ++i)
+            switch (direction)
+            {
+                case ClearDirection.Backward:
+                    startClearIndex = screenZeroIndex;
+                    endClearIndex = cursor;
+                    break;
+
+                case ClearDirection.Both:
+                    startClearIndex = screenZeroIndex;
+                    endClearIndex = screenEndIndex;
+                    break;
+
+                // case ClearDirection.Forward:
+                default:
+                    startClearIndex = cursor;
+                    endClearIndex = screenEndIndex;
+                    break;
+            }
+
+            for (int i = startClearIndex; i <= endClearIndex; ++i)
             {
                 buffer[i] = new BufferCell(BufferCell.EMPTY_CHARACTER, currentAttributesId);
             }
 
-            changes.AddChange(screenZeroIndex, screenLength);
+            changes.AddChange(startClearIndex, endClearIndex - startClearIndex + 1);
         }
 
         public void EraseCharacters(int count)
@@ -236,7 +255,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             }
         }
 
-        public void MoveCursorByTabulation(ClearDirection direction, int tabs)
+        public void MoveCursorByTabulation(Direction direction, int tabs)
         {
             const int DEFAULT_TAB_SIZE = 8;
             int column = GetColumnIndex();
@@ -244,7 +263,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
             switch (direction)
             {
-                case ClearDirection.Backward:
+                case Direction.Backward:
                     nextTabStop -= DEFAULT_TAB_SIZE * tabs;
                     break;
 
@@ -647,6 +666,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         private bool TryProcessControlCharacter(char character)
         {
+            // TODO: [P2] Create own decoder for control characters
             switch (character)
             {
                 case '\b': // BS: Backspace
@@ -655,6 +675,10 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
                 case '\r':
                     MoveCursorToBeginningOfLine();
+                    return false;
+
+                case '\t':
+                    MoveCursorByTabulation(Direction.Forward, 1);
                     return false;
 
                 case '\n':

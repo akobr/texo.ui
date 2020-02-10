@@ -26,7 +26,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
 
         void MoveCursorTo(Point position);
 
-        void MoveCursorByTabulation(ClearDirection direction, int tabs);
+        void MoveCursorByTabulation(Direction direction, int tabs);
 
         void SetGraphicRendition(GraphicRendition[] commands);
 

@@ -54,7 +54,7 @@ namespace VT100.Viewer.Decoding
             throw new NotImplementedException();
         }
 
-        public void MoveCursorByTabulation(ClearDirection direction, int tabs)
+        public void MoveCursorByTabulation(Direction direction, int tabs)
         {
             throw new NotImplementedException();
         }

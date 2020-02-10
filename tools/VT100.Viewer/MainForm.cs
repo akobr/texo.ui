@@ -18,7 +18,7 @@ namespace VT100.Viewer
 {
     public partial class MainForm : Form
     {
-        private const int TERMINAL_WIDTH = 126;
+        private const int TERMINAL_WIDTH = 300;
         private const int TERMINAL_HEIGHT = 32;
 
         //private NativeConsole console;
