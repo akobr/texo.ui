@@ -69,20 +69,23 @@ namespace VT100.Viewer
 
             try
             {
-                using (StreamWriter fileWriter = new StreamWriter(File.Open("output.txt", FileMode.Create, FileAccess.Write)) { AutoFlush = true })
+                File.Delete("output.txt");
+
+                while (true)
                 {
-                    while (true)
+                    int readed = terminal.Output.Read(buffer, 0, buffer.Length);
+
+                    if (readed == 0)
                     {
-                        int readed = terminal.Output.Read(buffer, 0, buffer.Length);
-
-                        if (readed == 0)
-                        {
-                            return;
-                        }
-
-                        fileWriter.Write(Encoding.UTF8.GetString(buffer, 0, readed));
-                        OnOutput(buffer, readed);
+                        return;
                     }
+
+                    using (StreamWriter fileWriter = new StreamWriter(File.Open("output.txt", FileMode.Append, FileAccess.Write)) { AutoFlush = true })
+                    {
+                        fileWriter.Write(Encoding.UTF8.GetString(buffer, 0, readed));
+                    }
+
+                    OnOutput(buffer, readed);
                 }
             }
             catch (ObjectDisposedException) { /* Pseudo terminal is terminated. */ }
@@ -113,14 +116,14 @@ namespace VT100.Viewer
 
             byte[] validBytes = buffer.Take(length).ToArray();
 
-            if (CheckForIllegalCrossThreadCalls)
-            {
-                Invoke(new Action(() => { decoder.Input(validBytes); }));
-            }
-            else
-            {
+            //if (CheckForIllegalCrossThreadCalls)
+            //{
+            //    Invoke(new Action(() => { decoder.Input(validBytes); }));
+            //}
+            //else
+            //{
                 decoder.Input(validBytes);
-            }
+            //}
         }
 
         private void HandleSendButtonClick(object sender, EventArgs e)

@@ -31,10 +31,12 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 
         public void AddChange(int start, int length)
         {
-            if (startIndex > start) startIndex = start;
-            if (endIndex < start + length - 1) endIndex = start + length - 1;
+            int end = start + length - 1;
 
-            for (int i = start; i < length; i++)
+            if (startIndex > start) startIndex = start;
+            if (endIndex < start + length - 1) endIndex = end;
+
+            for (int i = start; i <= end; ++i)
             {
                 changeMask.Set(i, true);
             }
@@ -60,8 +62,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
             switch (batchType)
             {
                 case ConsoleBufferType.AllChanges:
-                    startWindowIndex = startIndex;
-                    endWindowIndex = endIndex;
+                    startWindowIndex = Math.Min(startIndex, endScreenIndex);
+                    endWindowIndex = Math.Max(endIndex, endScreenIndex + endScreenLenght - 1);
                     break;
 
                 case ConsoleBufferType.Full:

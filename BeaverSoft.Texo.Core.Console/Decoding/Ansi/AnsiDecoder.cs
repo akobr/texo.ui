@@ -64,13 +64,13 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
                         int separator = parameter.IndexOf(';');
                         if (separator == -1)
                         {
-                            client?.MoveCursorTo(new Point(0, 0));
+                            client?.MoveCursorTo(new Point(1, 1));
                         }
                         else
                         {
                             string row = parameter.Substring(0, separator);
                             string column = parameter.Substring(separator + 1, parameter.Length - separator - 1);
-                            client?.MoveCursorTo(new Point(DecodeInt(column, 1) - 1, DecodeInt(row, 1) - 1));
+                            client?.MoveCursorTo(new Point(DecodeInt(column, 1), DecodeInt(row, 1)));
                         }
                     }
                     break;

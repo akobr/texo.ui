@@ -249,10 +249,15 @@ namespace VT100.Viewer.Decoding
             output.Select(targetIndex, 0);
         }
 
-        public void MoveCursorTo(Point position)
+        public void MoveCursorTo(Point positionNumbers)
         {
-            int index = output.GetFirstCharIndexFromLine(position.Y);
-            output.Select(index + position.X, 0);
+            if (positionNumbers.X < 1) positionNumbers.X = 1;
+            else if (positionNumbers.X > width) positionNumbers.X = width;
+            if (positionNumbers.Y < 1) positionNumbers.Y = 1;
+
+            // TODO: [P1] this is not zero based indexes
+            int index = output.GetFirstCharIndexFromLine(positionNumbers.Y - 1);
+            output.Select(index + positionNumbers.X - 1, 0);
         }
 
         public void MoveCursorToBeginningOfLine()
@@ -299,12 +304,13 @@ namespace VT100.Viewer.Decoding
             output.Select(targetIndex, 0);
         }
 
-        public void MoveCursorToColumn(int columnIndex)
+        public void MoveCursorToColumn(int columnNumber)
         {
+            if (columnNumber < 1) columnNumber = 1;
             int index = output.SelectionStart;
             int line = output.GetLineFromCharIndex(index);
             int firstLineIndex = output.GetFirstCharIndexFromLine(line);
-            output.Select(firstLineIndex + columnIndex, 0);
+            output.Select(firstLineIndex + columnNumber - 1, 0);
         }
 
         public void MoveCursorByTabulation(Direction direction, int tabs)

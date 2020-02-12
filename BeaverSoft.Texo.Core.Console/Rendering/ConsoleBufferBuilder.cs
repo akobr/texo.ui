@@ -7,6 +7,7 @@ using BeaverSoft.Texo.Core.Console.Rendering.Managers;
 
 namespace BeaverSoft.Texo.Core.Console.Rendering
 {
+    // TODO: [P2] check everything agains https://terminalguide.netlify.com/seq/
     public class ConsoleBufferBuilder : IAnsiDecoderClient, IConsoleBufferBuilder
     {
         internal const int CONTROL_LENGTH = 1;
@@ -81,10 +82,11 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             switch (bufferType)
             {
                 case ConsoleBufferType.AllChanges:
-                    int endIndex = GetFullIndexOfRow(GetRowIndex(changes.AllChangeSequence.EndIndex)) + widthWithControl - 1;
-                    int length = endIndex - changes.AllChangeSequence.StartIndex + 1;
+                    int startIndex = Math.Min(changes.AllChangeSequence.StartIndex, screenZeroIndex);
+                    int endIndex = Math.Max(GetFullIndexOfRow(GetRowIndex(changes.AllChangeSequence.EndIndex)) + widthWithControl - 1, screenEndIndex);
+                    int length = endIndex - startIndex + 1;
                     BufferCell[] allChanges = buffersPool.Rent(length);
-                    Array.Copy(buffer, 0, allChanges, 0, length);
+                    Array.Copy(buffer, startIndex, allChanges, 0, length);
                     bufferUsedSize = length;
                     return allChanges;
 
@@ -126,7 +128,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                 {
                     if (cursor == controlIndex)
                     {
-                        cursor += CONTROL_LENGTH;
+                        buffer[cursor] = new BufferCell((char)6, 0);
+                        MoveCursorToBeginningOfLineBelow(1);
                         controlIndex = GetControlIndex();
                     }
 
@@ -201,6 +204,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void EraseCharacters(int count)
         {
+            if (count < 1) count = 1;
             int excludedTargetEndIndex = cursor + count;
             int controlIndex = GetControlIndex();
             int excludedEndIndex = Math.Min(excludedTargetEndIndex, controlIndex);
@@ -280,9 +284,13 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             SetCursor(GetFullIndexOfRow(GetRowIndex()) + nextTabStop);
         }
 
-        public void MoveCursorTo(Point position)
+        public void MoveCursorTo(Point positionNumbers)
         {
-            SetCursor(screenZeroIndex + (position.Y * widthWithControl) + position.X);
+            if (positionNumbers.X < 1) positionNumbers.X = 1;
+            else if (positionNumbers.X > widthWithControl) positionNumbers.X = widthWithControl;
+            if (positionNumbers.Y < 1) positionNumbers.Y = 1;
+
+            SetCursor(screenZeroIndex + ((positionNumbers.Y - 1) * widthWithControl) + positionNumbers.X - 1);
         }
 
         public void MoveCursorToBeginningOfLineAbove(int lineNumberRelativeToCurrentLine)
@@ -295,9 +303,10 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             SetCursor(GetFullIndexOfRow(GetRowIndex()) + (lineNumberRelativeToCurrentLine * widthWithControl));
         }
 
-        public void MoveCursorToColumn(int columnIndex)
+        public void MoveCursorToColumn(int columnNumber)
         {
-            SetCursor(GetFullIndexOfRow(GetRowIndex()) + columnIndex);
+            if (columnNumber < 1) columnNumber = 1;
+            SetCursor(GetFullIndexOfRow(GetRowIndex()) + columnNumber - 1);
         }
 
         public void RestoreCursor()
@@ -409,6 +418,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                 {
                     int cursorBase = GetFullIndexOfRow(Math.Abs(cursorRow));
                     cursor = cursorBase + newCursor;
+                    return;
                 }
             }
             else if (newCursor > screenEndIndex)
@@ -417,10 +427,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
                 int cursorRow = GetRowIndex(newCursor);
                 ScrollPageUpwards(cursorRow - screenEndRow);
             }
-            else
-            {
-                cursor = newCursor;
-            }
+
+            cursor = newCursor;
         }
 
         private void TryBuildStyle()

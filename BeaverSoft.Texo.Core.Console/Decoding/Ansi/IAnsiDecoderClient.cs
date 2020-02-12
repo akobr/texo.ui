@@ -22,9 +22,9 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
 
         void MoveCursorToBeginningOfLineAbove(int lineNumberRelativeToCurrentLine);
 
-        void MoveCursorToColumn(int columnIndex);
+        void MoveCursorToColumn(int columnNumber);
 
-        void MoveCursorTo(Point position);
+        void MoveCursorTo(Point positionNumbers);
 
         void MoveCursorByTabulation(Direction direction, int tabs);
 
