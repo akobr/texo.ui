@@ -1,6 +1,6 @@
 using System;
 
-namespace BeaverSoft.Texo.Core.Console.Decoding
+namespace BeaverSoft.Texo.Core.Console
 {
     /// <summary>
     /// Specifies key codes and modifiers.

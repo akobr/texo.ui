@@ -11,6 +11,7 @@ using BeaverSoft.Texo.Core.Console;
 using BeaverSoft.Texo.Core.Console.Bitmap;
 using BeaverSoft.Texo.Core.Console.Decoding;
 using BeaverSoft.Texo.Core.Console.Decoding.Ansi;
+using BeaverSoft.Texo.Core.Console.Interop;
 using BeaverSoft.Texo.Core.Console.Rendering;
 using VT100.Viewer.Decoding;
 
@@ -18,7 +19,7 @@ namespace VT100.Viewer
 {
     public partial class MainForm : Form
     {
-        private const int TERMINAL_WIDTH = 300;
+        private const int TERMINAL_WIDTH = 128;
         private const int TERMINAL_HEIGHT = 32;
 
         //private NativeConsole console;
@@ -26,6 +27,7 @@ namespace VT100.Viewer
         private bool terminalIsExiting;
         private IDecoder decoder;
         private ConsoleBufferBuilder bufferBuilder;
+        private System.Windows.Forms.Keys lastKeyData;
 
         public MainForm()
         {
@@ -44,6 +46,7 @@ namespace VT100.Viewer
 
             ansi.Subscribe(bufferBuilder);
             //ansi.Subscribe(new AnsiDecoderClient(tbOutput, TERMINAL_WIDTH, TERMINAL_HEIGHT));
+            ansi.Output += OnDecoderInput;
             decoder = ansi;
         }
 
@@ -56,10 +59,11 @@ namespace VT100.Viewer
             //terminal.Start(@"c:\Working\textum.ui\tools\Example.Console.App\bin\Debug\Example.Console.App.exe", TERMINAL_WIDTH, TERMINAL_HEIGHT);
             //terminal.Start(@"git status", TERMINAL_WIDTH, TERMINAL_HEIGHT);
             //terminal.Start(@"ping localhost", TERMINAL_WIDTH, TERMINAL_HEIGHT);
-            terminal.Start(@"git show-branch --all", TERMINAL_WIDTH, TERMINAL_HEIGHT);
+            //terminal.Start(@"git show-branch --all", TERMINAL_WIDTH, TERMINAL_HEIGHT);
             //terminal.Start(@"mc", TERMINAL_WIDTH, TERMINAL_HEIGHT);
-            //terminal.Start(@"powershell", TERMINAL_WIDTH, TERMINAL_HEIGHT);
-
+            terminal.Start(@"powershell", TERMINAL_WIDTH, TERMINAL_HEIGHT);
+            //terminal.Start(@"cmd", TERMINAL_WIDTH, TERMINAL_HEIGHT);
+            //terminal.Start("\"C:\\Program Files\\Git\\git-bash.exe\" --cd-to-home", TERMINAL_WIDTH, TERMINAL_HEIGHT);
             _ = Task.Run(CopyConsoleToWindow);
         }
 
@@ -92,7 +96,7 @@ namespace VT100.Viewer
             catch (Exception exception)
             {
                 string message = Environment.NewLine + "Error: " + exception.Message;
-                Invoke(new Action(() => { tbOutput.Text += message; }));
+                //Invoke(new Action(() => { tbOutput.Text += message; }));
             }
             finally
             {
@@ -126,10 +130,87 @@ namespace VT100.Viewer
             //}
         }
 
+        private void RenderBuffer()
+        {
+            ConsoleBuffer buffer = bufferBuilder.Snapshot(ConsoleBufferType.Screen);
+
+            Invoke(new Action(() => {
+                pbBuffer.Image = buffer.ToScreenBitmap(true);
+            }));
+        }
+
+        private void OnDecoderInput(IDecoder decoder, byte[] data)
+        {
+            terminal.Input.Write(data, 0, data.Length);
+            terminal.Input.Flush();
+        }
+
         private void HandleSendButtonClick(object sender, EventArgs e)
         {
             ConsoleBuffer buffer = bufferBuilder.Snapshot(ConsoleBufferType.AllChanges);
             buffer.ToBitmap().Save("screen.png");
+
+            Bitmap image = buffer.ToScreenBitmap();
+            pbBuffer.Image = image;
+        }
+
+        private async void HandleRawInputTextBoxKeyDown(object sender, KeyEventArgs e)
+        {
+            const char SPACE = ' ';
+            e.SuppressKeyPress = true;
+
+            if (e.KeyData == lastKeyData)
+            {
+                return;
+            }
+
+            if (tbRawInput.Text.Split(SPACE).Length > 10)
+            {
+                int separatorIndex = tbRawInput.Text.IndexOf(SPACE);
+                tbRawInput.Text = tbRawInput.Text.Substring(separatorIndex + 1);
+            }
+
+            string keyString = null;
+
+            if (!decoder.KeyPressed(
+                (BeaverSoft.Texo.Core.Console.Keys)(int)e.Modifiers,
+                (BeaverSoft.Texo.Core.Console.Keys)(int)e.KeyCode))
+            {
+                keyString = Keyboard.GetCharsFromKeys((uint)e.KeyCode, e.Shift);
+                byte[] bytes = Encoding.UTF8.GetBytes(keyString);
+
+                if (bytes.Length < 1)
+                {
+                    return;
+                }
+
+                terminal.Input.Write(bytes, 0, bytes.Length);
+                terminal.Input.Flush();
+            }
+
+            KeysConverter kc = new KeysConverter();
+            string inputDescription = SPACE + kc.ConvertToString(e.KeyData);
+            if (!string.IsNullOrWhiteSpace(keyString)) inputDescription += $"({keyString})";
+
+            lastKeyData = e.KeyData;
+            tbRawInput.Text += inputDescription;
+            await Task.Delay(250);
+            RenderBuffer();
+        }
+
+        private void HandleRawInputTextBoxKeyUp(object sender, KeyEventArgs e)
+        {
+            lastKeyData = System.Windows.Forms.Keys.None;
+        }
+
+        private void HandleRawInputTextBoxEnter(object sender, EventArgs e)
+        {
+            tbRawInput.BackColor = Color.LightGreen;
+        }
+
+        private void HandleRawInputTextBoxLeave(object sender, EventArgs e)
+        {
+            tbRawInput.BackColor = DefaultBackColor;
         }
     }
 }

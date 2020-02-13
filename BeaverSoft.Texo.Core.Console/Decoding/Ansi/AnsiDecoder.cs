@@ -353,14 +353,14 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
 
         private static string[] FUNCTIONKEY_MAP = {
         //   F1    F2    F3    F4    F5    F6    F7    F8    F9    F10   F11   F12
-            "11", "12", "13", "14", "15", "17", "18", "19", "20", "21", "23", "24",
-        //   F13   F14   F15   F16   F17   F18   F19   F20   F21   F22
-            "25", "26", "28", "29", "31", "32", "33", "34", "23", "24" };
+            "1P", "1Q", "1R", "1S", "15", "17", "18", "19", "20", "21", "23", "24",
+        //   F13   F14   F15   F16   F17   F18   F19   F20   F21   F22   F23   F24
+            "25", "26", "28", "29", "31", "32", "33", "34", "23", "24", "25", "26" };
 
         // TODO: [P3] review and refactor
         public override bool KeyPressed(Keys modifiers, Keys key)
         {
-            if ((int)Keys.F1 <= (int)key && (int)key <= (int)Keys.F12)
+            if ((int)Keys.F1 <= (int)key && (int)key <= (int)Keys.F24)
             {
                 byte[] r = new byte[5];
                 r[0] = 0x1B;
@@ -384,11 +384,7 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
             {
                 byte[] r = new byte[3];
                 r[0] = 0x1B;
-                //if ( _cursorKeyMode == TerminalMode.Normal )
                 r[1] = (byte)'[';
-                //else
-                //    r[1] = (byte) 'O';
-
                 switch (key)
                 {
                     case Keys.Up:
@@ -404,9 +400,121 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
                         r[2] = (byte)'D';
                         break;
                     default:
-                        throw new ArgumentException("unknown cursor key code", "key");
+                        return false;
                 }
                 OnOutput(r);
+                return true;
+            }
+            else if (modifiers.HasFlag(Keys.Control))
+            {
+                byte controlCode;
+                // https://www.windmill.co.uk/ascii-control-codes.html
+                switch (key)
+                {
+                    case Keys.D2: // ^@	NUL	000	00	Null character
+                        controlCode = 0;
+                        break;
+                    case Keys.A: // ^A	SOH	001	01	Start of Header
+                        controlCode = 1;
+                        break;
+                    case Keys.B: // ^B	STX	002	02	Start of Text
+                        controlCode = 2;
+                        break;
+                    case Keys.C: // ^C	ETX	003	03	End of Text
+                        controlCode = 3;
+                        break;
+                    case Keys.D: // ^D	EOT	004	04	End of Transmission
+                        controlCode = 4;
+                        break;
+                    case Keys.E: // ^E	ENQ	005	05	Enquiry
+                        controlCode = 5;
+                        break;
+                    case Keys.F: // ^F	ACK	006	06	Acknowledge
+                        controlCode = 6;
+                        break;
+                    case Keys.G: // ^G	BEL	007	07	Bell
+                        controlCode = 7;
+                        break;
+                    case Keys.H: // ^H	BS	008	08	Backspace
+                        controlCode = 8;
+                        break;
+                    case Keys.I: // ^I	HT	009	09	Horizontal tab
+                        controlCode = 9;
+                        break;
+                    case Keys.J: // ^J	LF	010	0A	Line feed
+                        controlCode = 10;
+                        break;
+                    case Keys.K: // ^K	VT	011	0B	Vertical tab
+                        controlCode = 11;
+                        break;
+                    case Keys.L: // ^L	FF	012	0C	Form feed
+                        controlCode = 12;
+                        break;
+                    case Keys.M: // ^M	CR	013	0D	Carriage return
+                        controlCode = 13;
+                        break;
+                    case Keys.N: // ^N	SO	014	0E	Shift out
+                        controlCode = 14;
+                        break;
+                    case Keys.O: // ^O	SI	015	0F	Shift in
+                        controlCode = 15;
+                        break;
+                    case Keys.P: // ^P	DLE	016	10	Data link escape
+                        controlCode = 16;
+                        break;
+                    case Keys.Q: // ^Q	DCL	017	11	Xon (transmit on)
+                        controlCode = 17;
+                        break;
+                    case Keys.R: // ^R	DC2	018	12	Device control 2
+                        controlCode = 18;
+                        break;
+                    case Keys.S: // ^S	DC3	019	13	Xoff (transmit off)
+                        controlCode = 19;
+                        break;
+                    case Keys.T: // ^T	DC4	020	14	Device control 4
+                        controlCode = 20;
+                        break;
+                    case Keys.U: // ^U	NAK	021	15	Negative acknowledge
+                        controlCode = 21;
+                        break;
+                    case Keys.V: // ^V	SYN	022	16	Synchronous idle
+                        controlCode = 22;
+                        break;
+                    case Keys.W: // ^W	ETB	023	17	End of transmission
+                        controlCode = 23;
+                        break;
+                    case Keys.X: // ^X	CAN	024	18	Cancel
+                        controlCode = 24;
+                        break;
+                    case Keys.Y: // ^Y	EM	025	19	End of medium
+                        controlCode = 25;
+                        break;
+                    case Keys.Z: // ^Z	SUB	026	1A	Substitute
+                        controlCode = 26;
+                        break;
+                    case Keys.OemOpenBrackets: // ^[	ESC	027	1B	Escape
+                        controlCode = 27;
+                        break;
+                    case Keys.OemBackslash: // ^\	FS	028	1C	File separator
+                    case Keys.OemPipe:
+                    // case Keys.Oem5:
+                        controlCode = 28;
+                        break;
+                    case Keys.OemCloseBrackets: // ^]	GS	029	1D	Group separator
+                    // case Keys.Oem6:
+                        controlCode = 29;
+                        break;
+                    case Keys.D6: // ^^	RS	030	1E	Record separator
+                        controlCode = 30;
+                        break;
+                    case Keys.Oemplus: // ^_	US	031	1F	Unit separator
+                    case Keys.OemMinus:
+                        controlCode = 31;
+                        break;
+                    default:
+                        return false;
+                }
+                OnOutput(new byte[] { controlCode });
                 return true;
             }
             else
@@ -415,49 +523,37 @@ namespace BeaverSoft.Texo.Core.Console.Decoding.Ansi
                 r[0] = 0x1B;
                 r[1] = (byte)'[';
                 r[3] = (byte)'~';
-                if (key == Keys.Insert)
+                switch (key)
                 {
-                    r[2] = (byte)'1';
-                }
-                else if (key == Keys.Home)
-                {
-                    r[2] = (byte)'2';
-                }
-                else if (key == Keys.PageUp)
-                {
-                    r[2] = (byte)'3';
-                }
-                else if (key == Keys.Delete)
-                {
-                    r[2] = (byte)'4';
-                }
-                else if (key == Keys.End)
-                {
-                    r[2] = (byte)'5';
-                }
-                else if (key == Keys.PageDown)
-                {
-                    r[2] = (byte)'6';
-                }
-                else if (key == Keys.Enter)
-                {
-                    //return new byte[] { 0x1B, (byte) 'M', (byte) '~' };
-                    //r[1] = (byte) 'O';
-                    //r[2] = (byte) 'M';
-                    //return new byte[] { (byte) '\r', (byte) '\n' };
-                    r = new byte[] { 13 };
-                }
-                else if (key == Keys.Escape)
-                {
-                    r = new byte[] { 0x1B };
-                }
-                else if (key == Keys.Tab)
-                {
-                    r = new byte[] { (byte)'\t' };
-                }
-                else
-                {
-                    return false;
+                    case Keys.Home:
+                        r[2] = (byte)'1';
+                        break;
+                    case Keys.Insert:
+                        r[2] = (byte)'2';
+                        break;
+                    case Keys.Delete:
+                        r[2] = (byte)'3';
+                        break;
+                    case Keys.End:
+                        r[2] = (byte)'4';
+                        break;
+                    case Keys.PageUp:
+                        r[2] = (byte)'5';
+                        break;
+                    case Keys.PageDown:
+                        r[2] = (byte)'6';
+                        break;
+                    case Keys.Enter:
+                        r = new byte[] { 13 };
+                        break;
+                    case Keys.Escape:
+                        r = new byte[] { 0x1B };
+                        break;
+                    case Keys.Tab:
+                        r = new byte[] { (byte)'\t' };
+                        break;
+                    default:
+                        return false;
                 }
                 OnOutput(r);
                 return true;

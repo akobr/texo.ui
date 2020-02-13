@@ -174,6 +174,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         public void ClearScreen(ClearDirection direction)
         {
             int startClearIndex, endClearIndex;
+            TryBuildStyle();
 
             switch (direction)
             {
@@ -204,6 +205,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void EraseCharacters(int count)
         {
+            TryBuildStyle();
+
             if (count < 1) count = 1;
             int excludedTargetEndIndex = cursor + count;
             int controlIndex = GetControlIndex();

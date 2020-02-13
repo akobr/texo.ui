@@ -9,29 +9,45 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
 {
     public static class ViewBufferExtensions
     {
-        public static BitmapImage ToBitmap(this ConsoleBuffer buffer)
+        public static BitmapImage ToBitmap(this ConsoleBuffer buffer, bool showChangesOverlay = false)
         {
-            return ToBitmap(buffer, new Font(new FontFamily("Consolas"), 12, FontStyle.Regular));
+            return ToBitmap(buffer, new Font(new FontFamily("Consolas"), 12, FontStyle.Regular), showChangesOverlay);
         }
 
-        public static BitmapImage ToBitmap(this ConsoleBuffer buffer, Font font)
+        public static BitmapImage ToBitmap(this ConsoleBuffer buffer, Font font, bool showChangesOverlay = false)
+        {
+            return ToBitmap(buffer, new Rectangle(0, 0, buffer.Screen.Width, buffer.Size.Height), font, showChangesOverlay);
+        }
+
+        public static BitmapImage ToScreenBitmap(this ConsoleBuffer buffer, bool showChangesOverlay = false)
+        {
+            return ToBitmap(buffer, new Font(new FontFamily("Consolas"), 12, FontStyle.Regular), showChangesOverlay);
+        }
+
+        public static BitmapImage ToScreenBitmap(this ConsoleBuffer buffer, Font font, bool showChangesOverlay = false)
+        {
+            return ToBitmap(buffer, buffer.Screen, font, showChangesOverlay);
+        }
+
+        public static BitmapImage ToBitmap(this ConsoleBuffer buffer, Rectangle areaToRender, Font font, bool showChangesOverlay = false)
         {
             if (font == null)
             {
                 throw new ArgumentNullException(nameof(font), "A font must be specified.");
             }
 
+            // TODO: [P3] Find better way how to calculate sizes
             Size charSize = new Size((int)Math.Ceiling(font.Height / 2.0) + 1, font.Height);
-            BitmapImage bitmap = new BitmapImage(charSize.Width * buffer.Screen.Width, charSize.Height * buffer.Size.Height);
+            BitmapImage bitmap = new BitmapImage(charSize.Width * areaToRender.Width, charSize.Height * areaToRender.Height);
             Graphics graphics = Graphics.FromImage(bitmap);
 
             byte attributesId = 0;
             GraphicAttributes attributes = buffer.Styles[attributesId];
             Font usedFont = attributes.GetFont(font);
 
-            for (int r = 0; r < buffer.Size.Height; ++r)
+            for (int r = areaToRender.Y; r < areaToRender.Height; ++r)
             {
-                for (int c = 0; c < buffer.Screen.Width; ++c)
+                for (int c = areaToRender.X; c < areaToRender.Width; ++c)
                 {
                     BufferCell character = buffer[c, r];
 
@@ -49,7 +65,12 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
             }
 
             RenderCursor(buffer, charSize, graphics);
-            RenderChangesOverlay(buffer, charSize, graphics);
+
+            if (showChangesOverlay)
+            {
+                RenderChangesOverlay(buffer, charSize, graphics);
+            }
+
             return bitmap;
         }
 
@@ -88,14 +109,14 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
             }
             else if (change.End.X >= buffer.Screen.Width - 1) // End is full row
             {
-                polygon.Add(new Point(charSize.Width * buffer.Screen.Width, charSize.Height * change.Start.Y));
-                polygon.Add(new Point(charSize.Width * buffer.Screen.Width, charSize.Height * (change.End.Y + 1)));
+                polygon.Add(new Point((charSize.Width * buffer.Screen.Width) - 1, charSize.Height * change.Start.Y));
+                polygon.Add(new Point((charSize.Width * buffer.Screen.Width) - 1, charSize.Height * (change.End.Y + 1)));
                 polygon.Add(new Point(0, charSize.Height * (change.End.Y + 1)));
             }
             else // End isn't full row
             {
-                polygon.Add(new Point(charSize.Width * buffer.Screen.Width, charSize.Height * change.Start.Y));
-                polygon.Add(new Point(charSize.Width * buffer.Screen.Width, charSize.Height * change.End.Y));
+                polygon.Add(new Point((charSize.Width * buffer.Screen.Width) - 1, charSize.Height * change.Start.Y));
+                polygon.Add(new Point((charSize.Width * buffer.Screen.Width) - 1, charSize.Height * change.End.Y));
                 polygon.Add(new Point(charSize.Width * (change.End.X + 1), charSize.Height * change.End.Y));
                 polygon.Add(new Point(charSize.Width * (change.End.X + 1), charSize.Height * (change.End.Y + 1)));
                 polygon.Add(new Point(0, charSize.Height * (change.End.Y + 1)));
