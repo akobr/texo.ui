@@ -34,6 +34,9 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         public BufferCell this[int columnIndex, int rowIndex]
             => buffer[rowIndex * widthWithControl + columnIndex];
 
+        public BufferCell this[int flatIndex]
+            => buffer[flatIndex];
+
         public ConsoleBufferType Type { get; }
 
         public Size Size { get; }

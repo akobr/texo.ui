@@ -28,6 +28,7 @@ namespace VT100.Viewer
         private IDecoder decoder;
         private ConsoleBufferBuilder bufferBuilder;
         private System.Windows.Forms.Keys lastKeyData;
+        private Bitmap bufferImage;
 
         public MainForm()
         {
@@ -96,7 +97,7 @@ namespace VT100.Viewer
             catch (Exception exception)
             {
                 string message = Environment.NewLine + "Error: " + exception.Message;
-                //Invoke(new Action(() => { tbOutput.Text += message; }));
+                Invoke(new Action(() => { MessageBox.Show(message); }));
             }
             finally
             {
@@ -128,14 +129,26 @@ namespace VT100.Viewer
             //{
                 decoder.Input(validBytes);
             //}
+
+            try
+            {
+                RenderBuffer();
+            }
+            catch (Exception) { }
         }
 
         private void RenderBuffer()
         {
+            if (bufferImage == null)
+            {
+                return;
+            }
+
             ConsoleBuffer buffer = bufferBuilder.Snapshot(ConsoleBufferType.Screen);
+            buffer.RenderScreenChangesToExistingBitmap(bufferImage);
 
             Invoke(new Action(() => {
-                pbBuffer.Image = buffer.ToScreenBitmap(true);
+                pbBuffer.Image = bufferImage;
             }));
         }
 
@@ -149,9 +162,8 @@ namespace VT100.Viewer
         {
             ConsoleBuffer buffer = bufferBuilder.Snapshot(ConsoleBufferType.AllChanges);
             buffer.ToBitmap().Save("screen.png");
-
-            Bitmap image = buffer.ToScreenBitmap();
-            pbBuffer.Image = image;
+            bufferImage = buffer.ToScreenBitmap();
+            pbBuffer.Image = bufferImage;
         }
 
         private async void HandleRawInputTextBoxKeyDown(object sender, KeyEventArgs e)
@@ -194,8 +206,8 @@ namespace VT100.Viewer
 
             lastKeyData = e.KeyData;
             tbRawInput.Text += inputDescription;
-            await Task.Delay(250);
-            RenderBuffer();
+            //await Task.Delay(250);
+            //RenderBuffer();
         }
 
         private void HandleRawInputTextBoxKeyUp(object sender, KeyEventArgs e)
