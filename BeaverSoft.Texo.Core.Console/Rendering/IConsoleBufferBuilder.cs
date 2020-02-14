@@ -6,6 +6,6 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
     {
         void Start();
 
-        ConsoleBuffer Snapshot(ConsoleBufferType bufferType = ConsoleBufferType.Screen);
+        ConsoleBuffer Snapshot(ConsoleBufferType type = ConsoleBufferType.Screen);
     }
 }

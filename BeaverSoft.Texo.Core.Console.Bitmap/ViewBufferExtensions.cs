@@ -45,9 +45,9 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
             GraphicAttributes attributes = buffer.Styles[attributesId];
             Font usedFont = attributes.GetFont(font);
 
-            for (int r = areaToRender.Y; r < areaToRender.Height; ++r)
+            for (int r = areaToRender.Y; r <= areaToRender.Bottom; ++r)
             {
-                for (int c = areaToRender.X; c < areaToRender.Width; ++c)
+                for (int c = areaToRender.X; c <= areaToRender.Right; ++c)
                 {
                     BufferCell character = buffer[c, r];
 
@@ -64,7 +64,7 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
                 }
             }
 
-            RenderCursor(buffer, buffer.Screen, charSize, graphics);
+            RenderCursor(buffer, areaToRender, charSize, graphics);
 
             if (showChangesOverlay)
             {
@@ -74,12 +74,69 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
             return bitmap;
         }
 
-        public static void RenderScreenChangesToExistingBitmap(this ConsoleBuffer buffer, BitmapImage target)
+        public static void ToExistingBitmap(this ConsoleBuffer buffer, BitmapImage target)
         {
-            RenderScreenChangesToExistingBitmap(buffer, target, new Font(new FontFamily("Consolas"), 12, FontStyle.Regular));
+            ToExistingBitmap(buffer, target, new Font(new FontFamily("Consolas"), 12, FontStyle.Regular));
         }
 
-        public static void RenderScreenChangesToExistingBitmap(this ConsoleBuffer buffer, BitmapImage target, Font font)
+        public static void ToExistingBitmap(this ConsoleBuffer buffer, BitmapImage target, Font font)
+        {
+            if (buffer.Changes.StartScreen.Y != buffer.Changes.EndScreen.Y)
+            {
+                RenderEntireScreenToExistingBitmap(buffer, target, font);
+            }
+            else
+            {
+                RenderScreenChangesToExistingBitmap(buffer, target, font);
+            }
+        }
+
+        private static void RenderEntireScreenToExistingBitmap(this ConsoleBuffer buffer, BitmapImage target, Font font)
+        {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target), "A target bitmap image must be specified.");
+            }
+
+            if (font == null)
+            {
+                throw new ArgumentNullException(nameof(font), "A font must be specified.");
+            }
+
+            // TODO: [P3] Find better way how to calculate sizes
+            Size charSize = new Size((int)Math.Ceiling(font.Height / 2.0) + 1, font.Height);
+            Graphics graphics = Graphics.FromImage(target);
+
+            byte attributesId = 0;
+            GraphicAttributes attributes = buffer.Styles[attributesId];
+            Font usedFont = attributes.GetFont(font);
+
+            //ClearPreviousCursor(buffer, charSize, graphics, font);
+
+            for (int r = buffer.Screen.Y; r <= buffer.Screen.Bottom; ++r)
+            {
+                for (int c = buffer.Screen.X; c <= buffer.Screen.Right; ++c)
+                {
+                    BufferCell character = buffer[c, r];
+
+                    if (character.StyleId != attributesId)
+                    {
+                        attributesId = character.StyleId;
+                        attributes = buffer.Styles[attributesId];
+                        usedFont = attributes.GetFont(font);
+                    }
+
+                    Rectangle rect = new Rectangle(charSize.Width * c, charSize.Height * r, charSize.Width, charSize.Height);
+                    graphics.FillRectangle(new SolidBrush(attributes.GetBackground()), rect);
+                    graphics.DrawString(character.Character.ToString(), usedFont, new SolidBrush(attributes.GetForeground()), rect);
+                }
+            }
+
+            //RenderChangesOverlay(buffer, charSize, graphics);
+            RenderCursor(buffer, buffer.Screen, charSize, graphics);
+        }
+
+        private static void RenderScreenChangesToExistingBitmap(this ConsoleBuffer buffer, BitmapImage target, Font font)
         {
             if (target == null)
             {
@@ -102,12 +159,14 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
             int startScreenIndex = buffer.Screen.Y * buffer.Size.Width + buffer.Screen.X;
             int endScreenIndex = buffer.Screen.Bottom * buffer.Size.Width + buffer.Screen.Left;
 
+            //ClearPreviousCursor(buffer, charSize, graphics, font);
+
             foreach (ConsoleBufferChange change in buffer.Changes.Changes)
             {
                 int startIndex = change.Start.Y * buffer.Size.Width + change.Start.X;
                 int endIndex = change.End.Y * buffer.Size.Width + change.End.X;
 
-                for (int i = startIndex; i < endIndex; ++i)
+                for (int i = startIndex; i <= endIndex; ++i)
                 {
                     if (i < startScreenIndex
                         || i > endScreenIndex
@@ -134,7 +193,7 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
                 }
             }
 
-            RenderNonCursor(buffer, buffer.Screen, charSize, graphics);
+            //RenderChangesOverlay(buffer, charSize, graphics);
             RenderCursor(buffer, buffer.Screen, charSize, graphics);
         }
 
@@ -198,14 +257,26 @@ namespace BeaverSoft.Texo.Core.Console.Bitmap
 
         private static void RenderCursor(IConsoleBuffer buffer, Rectangle screen, Size charSize, Graphics graphics)
         {
-            Rectangle cursorRect = new Rectangle(charSize.Width * (buffer.Cursor.X + screen.X), charSize.Height * (buffer.Cursor.Y + screen.Y) + charSize.Height - 5, charSize.Width, 5);
+            Rectangle cursorRect = new Rectangle(charSize.Width * buffer.Cursor.X, charSize.Height * (buffer.Cursor.Y - screen.Y) + charSize.Height - 5, charSize.Width, 5);
             graphics.FillRectangle(new SolidBrush(Color.White), cursorRect);
         }
 
-        private static void RenderNonCursor(IConsoleBuffer buffer, Rectangle screen, Size charSize, Graphics graphics)
+        private static void ClearPreviousCursor(IConsoleBuffer buffer, Size charSize, Graphics graphics, Font font)
         {
-            Rectangle cursorRect = new Rectangle(charSize.Width * (buffer.Changes.StartCursor.X + screen.X), charSize.Height * (buffer.Changes.StartCursor.Y + screen.Y) + charSize.Height - 5, charSize.Width, 5);
-            graphics.FillRectangle(new SolidBrush(Color.Black), cursorRect);
+            if (buffer.Screen.Y > buffer.Changes.StartCursor.Y
+                || buffer.Screen.Bottom < buffer.Changes.StartCursor.Y)
+            {
+                return;
+            }
+
+            int c = buffer.Changes.StartCursor.X - buffer.Screen.X;
+            int r = buffer.Changes.StartCursor.Y - buffer.Screen.Y;
+            BufferCell character = buffer[c, r];
+            GraphicAttributes attributes = buffer.Styles[character.StyleId];
+            Font usedFont = attributes.GetFont(font);
+            Rectangle rect = new Rectangle(charSize.Width * c, charSize.Height * r, charSize.Width, charSize.Height);
+            graphics.FillRectangle(new SolidBrush(attributes.GetBackground()), rect);
+            graphics.DrawString(character.Character.ToString(), usedFont, new SolidBrush(attributes.GetForeground()), rect);
         }
     }
 }

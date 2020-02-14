@@ -10,7 +10,6 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
     // TODO: [P2] check everything agains https://terminalguide.netlify.com/seq/
     public class ConsoleBufferBuilder : IAnsiDecoderClient, IConsoleBufferBuilder
     {
-        internal const int CONTROL_LENGTH = 1;
         private const int MAX_BUFFER_SIZE = 4200 * 126;
         private const int INITIAL_BUFFERS_COUNT = 4;
 
@@ -43,7 +42,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
             bufferSize = Math.Min(capacityIncrement, maxCapacity);
             buffer = buffersPool.Rent(bufferSize);
-            changes = new BitArrayChangesManager(capacityIncrement, CONTROL_LENGTH);
+            changes = new BitArrayChangesManager(capacityIncrement);
             styles = new DefaultStylesManager(new GraphicAttributes(Color.White, Color.Black));
 
             currentAttributes = styles.DefaultStyle;
@@ -58,49 +57,60 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public void Start()
         {
-            changes.Start(screenZeroIndex, screenLength, width, cursor);
+            changes.Start(GetCurrectFlatScreen(), cursor);
         }
 
-        public ConsoleBuffer Snapshot(ConsoleBufferType bufferType = ConsoleBufferType.Screen)
+        public ConsoleBuffer Snapshot(ConsoleBufferType type = ConsoleBufferType.Screen)
         {
-            var batch = changes.Finish(bufferType, screenZeroIndex, screenLength, width, cursor);
-
+            SizedBufferSequence screen = GetCurrectFlatScreen();
+            BufferCell[] snapshotBuffer = BuildBufferSnapshot(type, out int snapshotStartIndex, out int snapshotLength);
+            ConsoleBufferChangeBatch batch = changes.Finish(screen, cursor, snapshotStartIndex, snapshotLength);
             ConsoleBuffer snapshot = new ConsoleBuffer(
-                BuildBufferSnapshot(bufferType, out int bufferUsedSize),
-                bufferUsedSize,
-                buffersPool,
+                type,
+                snapshotBuffer,
                 batch,
                 styles.ProvideStyles(),
-                bufferType);
+                buffersPool);
 
-            changes.Start(screenZeroIndex, screenLength, widthWithControl, cursor);
+            changes.Start(screen, cursor);
             return snapshot;
         }
 
-        private BufferCell[] BuildBufferSnapshot(ConsoleBufferType bufferType, out int bufferUsedSize)
+        public Rectangle GetCurrectScreen()
         {
-            switch (bufferType)
+            return new Rectangle(0, GetRowIndex(screenZeroIndex), width, height);
+        }
+
+        public SizedBufferSequence GetCurrectFlatScreen()
+        {
+            return new SizedBufferSequence(screenZeroIndex, screenEndIndex, width);
+        }
+
+        private BufferCell[] BuildBufferSnapshot(ConsoleBufferType type, out int startIndex, out int length)
+        {
+            switch (type)
             {
                 case ConsoleBufferType.AllChanges:
-                    int startIndex = Math.Min(changes.AllChangeSequence.StartIndex, screenZeroIndex);
+                    startIndex = Math.Min(GetFullIndexOfRow(GetRowIndex(changes.AllChangeSequence.StartIndex)), screenZeroIndex);
                     int endIndex = Math.Max(GetFullIndexOfRow(GetRowIndex(changes.AllChangeSequence.EndIndex)) + widthWithControl - 1, screenEndIndex);
-                    int length = endIndex - startIndex + 1;
+                    length = endIndex - startIndex + 1;
                     BufferCell[] allChanges = buffersPool.Rent(length);
                     Array.Copy(buffer, startIndex, allChanges, 0, length);
-                    bufferUsedSize = length;
                     return allChanges;
 
                 case ConsoleBufferType.Full:
                     BufferCell[] full = buffersPool.Rent(bufferSize);
                     Array.Copy(buffer, 0, full, 0, bufferSize);
-                    bufferUsedSize = bufferSize;
+                    startIndex = 0;
+                    length = bufferSize;
                     return full;
 
                 // case ConsoleBufferType.Screen:
                 default:
                     BufferCell[] screen = buffersPool.Rent(screenLength);
                     Array.Copy(buffer, screenZeroIndex, screen, 0, screenLength);
-                    bufferUsedSize = screenLength;
+                    startIndex = screenZeroIndex;
+                    length = screenLength;
                     return screen;
             }
         }
@@ -228,7 +238,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         public Point GetCursorPosition()
         {
             int virtualScreenCursor = cursor - screenZeroIndex;
-            return new Point(GetRowIndex(virtualScreenCursor), GetColumnIndex(virtualScreenCursor));
+            return new Point(GetRowIndex(virtualScreenCursor) + 1, GetColumnIndex(virtualScreenCursor) + 1);
         }
 
         public Size GetSize()
@@ -751,7 +761,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
             this.width = width;
             this.height = height;
 
-            widthWithControl = width + CONTROL_LENGTH;
+            widthWithControl = width + ConsoleBuffer.CONTROL_LENGTH;
             screenLength = height * widthWithControl;
             screenEndIndex = screenZeroIndex + screenLength - 1;
 

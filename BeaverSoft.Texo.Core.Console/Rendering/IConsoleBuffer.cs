@@ -11,7 +11,13 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         ConsoleBufferType Type { get; }
 
         /// <summary>
-        /// Gets size of the buffer, with control column.
+        /// Gets area of the buffer, position and size against original buffer.
+        /// The size is with control column(s).
+        /// </summary>
+        Rectangle Area { get; }
+
+        /// <summary>
+        /// Gets size of the buffer, with control column(s).
         /// </summary>
         Size Size { get; }
 
@@ -20,7 +26,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
         ConsoleBufferChangeBatch Changes { get; }
 
         /// <summary>
-        /// Gets size of the screen, without control column.
+        /// Gets size of the screen, without control column(s).
         /// </summary>
         Rectangle Screen { get; }
 

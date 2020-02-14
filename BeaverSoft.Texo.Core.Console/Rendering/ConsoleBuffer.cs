@@ -6,29 +6,28 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 {
     public class ConsoleBuffer : IConsoleBuffer
     {
+        public const int CONTROL_LENGTH = 1;
+
         private readonly ArrayPool<BufferCell> bufferPool;
         private readonly BufferCell[] buffer;
         private readonly int widthWithControl;
 
         public ConsoleBuffer(
+            ConsoleBufferType type,
             BufferCell[] buffer,
-            int bufferUsedSize,
-            ArrayPool<BufferCell> bufferPool,
             ConsoleBufferChangeBatch changes,
             IReadOnlyList<GraphicAttributes> styles,
-            ConsoleBufferType type)
+            ArrayPool<BufferCell> bufferPool)
         {
             this.buffer = buffer;
             this.bufferPool = bufferPool;
             Type = type;
-
             Changes = changes;
             Styles = styles;
+            Area = changes.Area;
             Screen = changes.EndScreen;
             Cursor = changes.EndCursor;
-
-            widthWithControl = Screen.Width + ConsoleBufferBuilder.CONTROL_LENGTH;
-            Size = new Size(widthWithControl, bufferUsedSize / widthWithControl);
+            widthWithControl = Screen.Width + CONTROL_LENGTH;
         }
 
         public BufferCell this[int columnIndex, int rowIndex]
@@ -39,7 +38,9 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         public ConsoleBufferType Type { get; }
 
-        public Size Size { get; }
+        public Rectangle Area { get; }
+
+        public Size Size => Area.Size;
 
         public Rectangle Screen { get; }
 

@@ -9,14 +9,13 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
     class BitArrayChangesManager : IConsoleBufferChangesManager
     {
         private readonly BitArray changeMask;
-        private readonly int controlLength;
-        private int startScreenIndex, startScreenLenght, startScreenLineWidth, startCursor;
+        private SizedBufferSequence startScreen;
+        private int startCursor;
         private int startIndex, endIndex;
 
-        public BitArrayChangesManager(int bufferLength, int controlLength)
+        public BitArrayChangesManager(int bufferLength)
         {
             changeMask = new BitArray(bufferLength);
-            this.controlLength = controlLength;
         }
 
         public BufferSequence AllChangeSequence => new BufferSequence(startIndex, endIndex);
@@ -42,47 +41,34 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
             }
         }
 
-        public void Start(int startScreenIndex, int startScreenLenght, int startScreenLineWidth, int startCursor)
+        public void Start(SizedBufferSequence screen, int cursor)
         {
             Reset();
 
-            this.startScreenIndex = startScreenIndex;
-            this.startScreenLenght = startScreenLenght;
-            this.startScreenLineWidth = startScreenLineWidth;
-            this.startCursor = startCursor;
+            startScreen = screen;
+            startCursor = cursor;
         }
 
-        public ConsoleBufferChangeBatch Finish(ConsoleBufferType batchType, int endScreenIndex, int endScreenLenght, int endScreenLineWidth, int endCursor)
+        public ConsoleBufferChangeBatch Finish(SizedBufferSequence screen, int cursor, int snapshotStartIndex, int snapshotLength)
         {
-            int startLineFullWidth = startScreenLineWidth + controlLength;
-            int endLineFullWidth = endScreenLineWidth + controlLength;
+            int snapshotEndIndex = snapshotStartIndex + snapshotLength - 1;
+            int snapshotFullWidth = screen.Width + ConsoleBuffer.CONTROL_LENGTH;
+            int snapshotStartRow = snapshotStartIndex / snapshotFullWidth;
+            int startScreenFullWidth = startScreen.Width + ConsoleBuffer.CONTROL_LENGTH;
+            Rectangle areaRect = new Rectangle(0, snapshotStartRow, snapshotFullWidth, snapshotLength / snapshotFullWidth);
+            Rectangle startScreenRect = new Rectangle(0, startScreen.StartRow - snapshotStartRow, startScreen.Width, startScreen.Height);
+            Rectangle endScreenRect = new Rectangle(0, screen.StartRow - snapshotStartRow, screen.Width, screen.Height);
+            Point startCursorPoint = new Point(startCursor % startScreenFullWidth, (startCursor / startScreenFullWidth) - snapshotStartRow);
+            Point endCursorPoint = new Point(cursor % snapshotFullWidth, (cursor / snapshotFullWidth) - snapshotStartRow);
 
-            int startWindowIndex, endWindowIndex;
-
-            switch (batchType)
-            {
-                case ConsoleBufferType.AllChanges:
-                    startWindowIndex = Math.Min(startIndex, endScreenIndex);
-                    endWindowIndex = Math.Max(endIndex, endScreenIndex + endScreenLenght - 1);
-                    break;
-
-                case ConsoleBufferType.Full:
-                    startWindowIndex = 0;
-                    endWindowIndex = changeMask.Length - 1;
-                    break;
-
-                // case ConsoleBufferType.Screen:
-                default:
-                    startWindowIndex = endScreenIndex;
-                    endWindowIndex = endScreenIndex + endScreenLenght - 1;
-                    break;
-            }
-
-            Rectangle startScreen = new Rectangle(startScreenIndex % startLineFullWidth, startScreenIndex / startLineFullWidth, startScreenLineWidth, startScreenLenght / startLineFullWidth);
-            Rectangle endScreen = new Rectangle(endScreenIndex % endLineFullWidth, endScreenIndex / endLineFullWidth, endScreenLineWidth, endScreenLenght / endLineFullWidth);
-            Point startCursorPoint = new Point((startCursor - startScreenIndex) % startLineFullWidth, (startCursor - startScreenIndex) / startLineFullWidth);
-            Point endCursorPoint = new Point((endCursor - endScreenIndex) % endLineFullWidth, (endCursor - endScreenIndex) / endLineFullWidth);
-            return new ConsoleBufferChangeBatch(startScreen, endScreen, startCursorPoint, endCursorPoint, BuildSequences(startWindowIndex, endWindowIndex, endLineFullWidth).ToImmutableList());
+            return new ConsoleBufferChangeBatch(
+                areaRect,
+                startScreenRect,
+                endScreenRect,
+                startCursorPoint,
+                endCursorPoint,
+                BuildSequences(snapshotStartIndex, snapshotEndIndex, snapshotFullWidth)
+                    .ToImmutableList());
         }
 
         public void Reset()
@@ -111,6 +97,7 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 
             bool isSequenceInProgress = false;
             int sequenceStart = -1;
+            int startRow = startWindowIndex / lineWidth;
 
             for (int i = startIndex; i <= endIndex; ++i)
             {
@@ -136,8 +123,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
                     }
 
                     yield return new ConsoleBufferChange(
-                            new Point((sequenceStart - startWindowIndex) % lineWidth, (sequenceStart - startWindowIndex) / lineWidth),
-                            new Point((sequenceEnd - startWindowIndex) % lineWidth, (sequenceEnd - startWindowIndex) / lineWidth));
+                            new Point(sequenceStart % lineWidth, (sequenceStart / lineWidth) - startRow),
+                            new Point(sequenceEnd % lineWidth, (sequenceEnd / lineWidth) - startRow));
 
                     isSequenceInProgress = false;
                 }
@@ -146,8 +133,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
             if (isSequenceInProgress)
             {
                 yield return new ConsoleBufferChange(
-                    new Point((sequenceStart - startWindowIndex) % lineWidth, (sequenceStart - startWindowIndex) / lineWidth),
-                    new Point((endIndex - startWindowIndex) % lineWidth, (endIndex - startWindowIndex) / lineWidth));
+                    new Point(sequenceStart % lineWidth, (sequenceStart / lineWidth) - startRow),
+                    new Point(endIndex % lineWidth, (endIndex / lineWidth) - startRow));
             }
         }
     }

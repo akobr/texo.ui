@@ -8,9 +8,9 @@ namespace BeaverSoft.Texo.Core.Console.Rendering
 
         void AddChange(int start, int length);
 
-        void Start(int screenStart, int screenLenght, int lineWidth, int cursor);
+        void Start(SizedBufferSequence screen, int cursor);
 
-        ConsoleBufferChangeBatch Finish(ConsoleBufferType batchType, int screenStart, int screenLenght, int lineWidth, int cursor);
+        ConsoleBufferChangeBatch Finish(SizedBufferSequence screen, int cursor, int snapshotStartIndex, int snapshotLength);
 
         void Resize(int bufferLength);
 

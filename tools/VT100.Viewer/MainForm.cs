@@ -145,7 +145,8 @@ namespace VT100.Viewer
             }
 
             ConsoleBuffer buffer = bufferBuilder.Snapshot(ConsoleBufferType.Screen);
-            buffer.RenderScreenChangesToExistingBitmap(bufferImage);
+            buffer.ToExistingBitmap(bufferImage);
+            buffer.Dispose();
 
             Invoke(new Action(() => {
                 pbBuffer.Image = bufferImage;
@@ -164,6 +165,7 @@ namespace VT100.Viewer
             buffer.ToBitmap().Save("screen.png");
             bufferImage = buffer.ToScreenBitmap();
             pbBuffer.Image = bufferImage;
+            buffer.Dispose();
         }
 
         private async void HandleRawInputTextBoxKeyDown(object sender, KeyEventArgs e)

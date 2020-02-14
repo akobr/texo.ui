@@ -6,7 +6,8 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
     public partial class SequenceChangesManager : IConsoleBufferChangesManager
     {
         private readonly LinkedList<BufferSequence> changes;
-        private int screenStart, screenLenght, lineWidth, cursor;
+        private SizedBufferSequence startScreen;
+        private int startCursor;
         private int sequenceInProgressStart, sequenceInProgressEnd;
 
         public BufferSequence AllChangeSequence
@@ -86,17 +87,15 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
             }
         }
 
-        public void Start(int screenStart, int screenLenght, int lineWidth, int cursor)
+        public void Start(SizedBufferSequence screen, int cursor)
         {
             Reset();
 
-            this.screenStart = screenStart;
-            this.screenLenght = screenLenght;
-            this.lineWidth = lineWidth;
-            this.cursor = cursor;
+            startScreen = screen;
+            startCursor = cursor;
         }
 
-        public ConsoleBufferChangeBatch Finish(ConsoleBufferType batchType, int screenStart, int screenLenght, int lineWidth, int cursor)
+        public ConsoleBufferChangeBatch Finish(SizedBufferSequence screen, int cursor, int snapshotStartIndex, int snapshotLength)
         {
             throw new NotImplementedException();
         }
