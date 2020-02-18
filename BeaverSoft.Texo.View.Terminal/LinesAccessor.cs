@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     public class LinesAccessor : IList<string>
     {

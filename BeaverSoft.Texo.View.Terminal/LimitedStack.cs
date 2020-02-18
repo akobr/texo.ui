@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     /// <summary>
     /// Limited stack

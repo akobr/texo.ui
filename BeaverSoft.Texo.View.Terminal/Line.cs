@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 using System.Text;
 using System.Drawing;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     /// <summary>
     /// Line of text

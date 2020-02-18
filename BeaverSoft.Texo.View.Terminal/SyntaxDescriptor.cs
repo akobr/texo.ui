@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     public class SyntaxDescriptor: IDisposable
     {

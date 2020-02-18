@@ -5,7 +5,7 @@ using System.Collections;
 using System.Drawing;
 using System.IO;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     /// <summary>
     /// This class contains the source text (chars and styles).
@@ -13,43 +13,52 @@ namespace FastColoredTextBoxNS
     /// </summary>
     public class TextSource: IList<Line>, IDisposable
     {
-        readonly protected List<Line> lines = new List<Line>();
+        protected readonly List<Line> lines = new List<Line>();
         protected LinesAccessor linesAccessor;
-        int lastLineUniqueId;
-        public CommandManager Manager { get; set; }
-        FastColoredTextBox currentTB;
+
+        private int lastLineUniqueId;
+        private FastColoredTextBox currentTB;
+
         /// <summary>
         /// Styles
         /// </summary>
         public readonly Style[] Styles;
+
         /// <summary>
         /// Occurs when line was inserted/added
         /// </summary>
         public event EventHandler<LineInsertedEventArgs> LineInserted;
+
         /// <summary>
         /// Occurs when line was removed
         /// </summary>
         public event EventHandler<LineRemovedEventArgs> LineRemoved;
+
         /// <summary>
         /// Occurs when text was changed
         /// </summary>
         public event EventHandler<TextChangedEventArgs> TextChanged;
+
         /// <summary>
         /// Occurs when recalc is needed
         /// </summary>
         public event EventHandler<TextChangedEventArgs> RecalcNeeded;
+
         /// <summary>
         /// Occurs when recalc wordwrap is needed
         /// </summary>
         public event EventHandler<TextChangedEventArgs> RecalcWordWrap;
+
         /// <summary>
         /// Occurs before text changing
         /// </summary>
         public event EventHandler<TextChangingEventArgs> TextChanging;
+
         /// <summary>
         /// Occurs after CurrentTB was changed
         /// </summary>
         public event EventHandler CurrentTBChanged;
+
         /// <summary>
         /// Current focused FastColoredTextBox
         /// </summary>
@@ -62,6 +71,9 @@ namespace FastColoredTextBoxNS
                 OnCurrentTBChanged();
             }
         }
+
+        public CommandManager Manager { get; }
+        public TextStylesManager TextStyles { get; }
 
         public virtual void ClearIsChanged()
         {
@@ -91,14 +103,8 @@ namespace FastColoredTextBoxNS
             CurrentTB = currentTB;
             linesAccessor = new LinesAccessor(this);
             Manager = new CommandManager(this);
-            Styles = new Style[Style.COUNT];
-
-            InitDefaultStyle();
-        }
-
-        public virtual void InitDefaultStyle()
-        {
-            DefaultStyle = new TextStyle(null, null, FontStyle.Regular);
+            TextStyles = new TextStylesManager();
+            Styles = new Style[Style.MAX_COUNT];
         }
 
         public virtual Line this[int i]
@@ -129,7 +135,7 @@ namespace FastColoredTextBoxNS
             return lines.GetEnumerator();
         }
 
-        IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return (lines  as IEnumerator);
         }

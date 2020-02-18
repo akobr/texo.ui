@@ -1,4 +1,4 @@
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     /// <summary>
     /// Char and style
@@ -11,7 +11,7 @@ namespace FastColoredTextBoxNS
         public char c;
 
         /// <summary>
-        /// Main style of the character
+        /// Main style ID of the character
         /// </summary>
         public byte mainStyleId;
 
@@ -24,7 +24,7 @@ namespace FastColoredTextBoxNS
         public Char(char c)
         {
             this.c = c;
-            mainStyleId = 0;
+            mainStyleId = TextStylesManager.DEFAULT_STYLE_ID;
             style = StyleIndex.None;
         }
     }

@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     public partial class ReplaceForm : Form
     {

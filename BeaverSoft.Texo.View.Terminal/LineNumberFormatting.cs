@@ -1,4 +1,4 @@
-﻿namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     /// <summary>
     /// Customize how we display the line numbers

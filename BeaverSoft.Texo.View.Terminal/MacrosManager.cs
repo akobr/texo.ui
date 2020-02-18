@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     /// <summary>
     /// This class records, stores and executes the macros.
@@ -63,7 +63,6 @@ namespace FastColoredTextBoxNS
                     var p = (KeyValuePair<char, Keys>)item;
                     UnderlayingControl.ProcessKey(p.Key, p.Value);
                 }
-                
             }
             UnderlayingControl.EndAutoUndo();
             UnderlayingControl.Selection.EndUpdate();
@@ -144,7 +143,7 @@ namespace FastColoredTextBoxNS
                 return sb.ToString();
             }
 
-            set 
+            set
             {
                 isRecording = false;
                 ClearMacros();

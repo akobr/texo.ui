@@ -22,7 +22,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Drawing2D;
@@ -37,7 +36,7 @@ using System.Windows.Forms.Design;
 using Microsoft.Win32;
 using Timer = System.Windows.Forms.Timer;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     /// <summary>
     /// Fast colored textbox
@@ -468,7 +467,6 @@ namespace FastColoredTextBoxNS
             set
             {
                 base.ForeColor = value;
-                lines.InitDefaultStyle();
                 Invalidate();
             }
         }
@@ -1553,7 +1551,7 @@ namespace FastColoredTextBoxNS
                     if (!base.AutoScroll)
                         base.AutoScroll = true;
                     Size newSize = value;
-                    if (WordWrap && WordWrapMode != FastColoredTextBoxNS.WordWrapMode.Custom)
+                    if (WordWrap && WordWrapMode != WordWrapMode.Custom)
                     {
                         int maxWidth = GetMaxLineWordWrapedWidth();
                         newSize = new Size(Math.Min(newSize.Width, maxWidth), newSize.Height);
@@ -2022,7 +2020,7 @@ namespace FastColoredTextBoxNS
             if (place.iLine < LinesCount && place.iChar < this[place.iLine].Count)
             {
                 var s = (uint) this[place].style;
-                for (int i = 0; i < Style.COUNT; i++)
+                for (int i = 0; i < Style.MAX_COUNT; i++)
                     if ((s & ((uint) 1) << i) != 0)
                         result.Add(Styles[i]);
             }

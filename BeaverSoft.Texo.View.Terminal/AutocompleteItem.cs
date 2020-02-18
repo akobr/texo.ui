@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Printing;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     /// <summary>
     /// Item of autocomplete menu

@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
+    // TODO: [terminal] probably can be removed (not sure if we need this functionality)
+
     /// <summary>
     /// Exports colored text as RTF
     /// </summary>
@@ -95,7 +97,7 @@ namespace FastColoredTextBoxNS
                 }
             }
             Flush(sb, tempSB, currentStyleId);
-           
+
             //build color table
             var list = new SortedList<int, Color>();
             foreach (var pair in colorTable)

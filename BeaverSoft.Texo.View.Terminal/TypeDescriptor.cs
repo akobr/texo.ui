@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     ///
     /// These classes are required for correct data binding to Text property of FastColoredTextbox
-    /// 
+    ///
     class FCTBDescriptionProvider : TypeDescriptionProvider
     {
         public FCTBDescriptionProvider(Type type)

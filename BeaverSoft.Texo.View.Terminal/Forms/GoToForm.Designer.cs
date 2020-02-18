@@ -1,4 +1,4 @@
-﻿namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     partial class GoToForm
     {
@@ -61,7 +61,7 @@
             this.btnOk.TabIndex = 2;
             this.btnOk.Text = "OK";
             this.btnOk.UseVisualStyleBackColor = true;
-            this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
+            this.btnOk.Click += new System.EventHandler(this.HandleButtonOkClick);
             // 
             // btnCancel
             // 
@@ -72,7 +72,7 @@
             this.btnCancel.TabIndex = 3;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.HandleButtonCancelClick);
             // 
             // GoToForm
             // 

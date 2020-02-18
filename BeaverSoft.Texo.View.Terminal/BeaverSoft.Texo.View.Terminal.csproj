@@ -33,63 +33,69 @@
     <EmbeddedResource Include="FastColoredTextBox.resx">
       <DependentUpon>FastColoredTextBox.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FindForm.resx">
+    <EmbeddedResource Include="Forms\FindForm.resx">
       <DependentUpon>FindForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GoToForm.resx">
+    <EmbeddedResource Include="Forms\GoToForm.resx">
       <DependentUpon>GoToForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="HotkeysEditorForm.resx">
+    <EmbeddedResource Include="Forms\HotkeysEditorForm.resx">
       <DependentUpon>HotkeysEditorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ReplaceForm.resx">
+    <EmbeddedResource Include="Forms\ReplaceForm.resx">
       <DependentUpon>ReplaceForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutocompleteItem.cs" />
-    <Compile Include="AutocompleteMenu.cs">
+    <Compile Include="Controls\AutocompleteMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Bookmarks.cs" />
     <Compile Include="Char.cs" />
-    <Compile Include="DocumentMap.cs">
+    <Compile Include="Controls\DocumentMap.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="EncodingDetector.cs" />
-    <Compile Include="ExportToHTML.cs" />
-    <Compile Include="ExportToRTF.cs" />
-    <Compile Include="GoToForm.cs">
+    <Compile Include="Exporters\ExportToHTML.cs" />
+    <Compile Include="Exporters\ExportToRTF.cs" />
+    <Compile Include="Styles\FoldedBlockStyle.cs" />
+    <Compile Include="Forms\GoToForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GoToForm.Designer.cs">
+    <Compile Include="Forms\GoToForm.Designer.cs">
       <DependentUpon>GoToForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Hints.cs" />
-    <Compile Include="HotkeysEditorForm.cs">
+    <Compile Include="Forms\HotkeysEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="HotkeysEditorForm.Designer.cs">
+    <Compile Include="Forms\HotkeysEditorForm.Designer.cs">
       <DependentUpon>HotkeysEditorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="LineNumberFormatting.cs" />
     <Compile Include="LinesAccessor.cs" />
     <Compile Include="MacrosManager.cs" />
+    <Compile Include="Styles\MarkerStyle.cs" />
     <Compile Include="PlatformType.cs" />
     <Compile Include="Hotkeys.cs" />
-    <Compile Include="Ruler.cs">
+    <Compile Include="Styles\ReadOnlyStyle.cs" />
+    <Compile Include="Controls\Ruler.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Ruler.Designer.cs">
+    <Compile Include="Controls\Ruler.Designer.cs">
       <DependentUpon>Ruler.cs</DependentUpon>
     </Compile>
+    <Compile Include="Styles\SelectionStyle.cs" />
+    <Compile Include="Styles\ShortcutStyle.cs" />
+    <Compile Include="Styles\TextStylesManager.cs" />
     <Compile Include="SyntaxDescriptor.cs" />
     <Compile Include="SyntaxHighlighter.cs" />
-    <Compile Include="ReplaceForm.cs">
+    <Compile Include="Forms\ReplaceForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ReplaceForm.Designer.cs">
+    <Compile Include="Forms\ReplaceForm.Designer.cs">
       <DependentUpon>ReplaceForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FastColoredTextBox.cs">
@@ -97,10 +103,10 @@
     </Compile>
     <Compile Include="CommandManager.cs" />
     <Compile Include="Commands.cs" />
-    <Compile Include="FindForm.cs">
+    <Compile Include="Forms\FindForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FindForm.Designer.cs">
+    <Compile Include="Forms\FindForm.Designer.cs">
       <DependentUpon>FindForm.cs</DependentUpon>
     </Compile>
     <Compile Include="LimitedStack.cs" />
@@ -109,12 +115,14 @@
     <Compile Include="Range.cs" />
     <Compile Include="Style.cs" />
     <Compile Include="TextSource.cs" />
+    <Compile Include="Styles\TextStyle.cs" />
     <Compile Include="TypeDescriptor.cs" />
-    <Compile Include="FileTextSource.cs" />
-    <Compile Include="UnfocusablePanel.cs">
+    <Compile Include="Sources\FileTextSource.cs" />
+    <Compile Include="Controls\UnfocusablePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="VisualMarker.cs" />
+    <Compile Include="Styles\WavyLineStyle.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

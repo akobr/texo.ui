@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -69,15 +68,12 @@ namespace BeaverSoft.Texo.Core.Console.Rendering.Managers
 
         private byte GetNextStyleId()
         {
-            //byte test = 255;
-            //++test;
             return ++styleId == 0 ? ++styleId : styleId;
         }
 
         private static uint MakeRgb((byte R, byte G, byte B) color)
         {
             uint colorInt = (uint)(color.R << 16 | color.G << 8 | color.B << 0 | 255 << 24);
-            //string text = Convert.ToString(colorInt, 2);
             return colorInt;
         }
     }

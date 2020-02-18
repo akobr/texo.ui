@@ -1,4 +1,4 @@
-﻿namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     partial class HotkeysEditorForm
     {

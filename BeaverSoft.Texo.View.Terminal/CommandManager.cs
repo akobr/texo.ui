@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
     public class CommandManager
     {
@@ -153,8 +153,8 @@ namespace FastColoredTextBoxNS
             TextSource.CurrentTB.OnUndoRedoStateChanged();
         }
 
-        public bool UndoEnabled 
-        { 
+        public bool UndoEnabled
+        {
             get
             {
                 return history.Count > 0;

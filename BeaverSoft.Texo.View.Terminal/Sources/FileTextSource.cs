@@ -1,12 +1,14 @@
-﻿//#define debug
+//#define debug
 
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace FastColoredTextBoxNS
+namespace BeaverSoft.Texo.View.Terminal
 {
+    // TODO: [terminal] probably we want support of this in the future (open text files in this view)
+
     /// <summary>
     /// This class contains the source text (chars and styles).
     /// It stores a text lines, the manager of commands, undo/redo stack, styles.
@@ -162,7 +164,7 @@ namespace FastColoredTextBoxNS
             sourceFileLinePositions.AddRange(temp2);
             sourceFileLinePositions.TrimExcess();
             sourceFileLinePositions.RemoveRange(c, temp.Length);
-            
+
 
             fileEncoding = enc;
 
@@ -343,7 +345,7 @@ namespace FastColoredTextBoxNS
 
         public override Line this[int i]
         {
-            get 
+            get
             {
                 if (base.lines[i] != null)
                     return lines[i];
