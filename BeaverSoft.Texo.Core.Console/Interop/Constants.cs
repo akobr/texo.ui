@@ -9,5 +9,7 @@ namespace BeaverSoft.Texo.Core.Console.Interop
         public const uint DUPLICATE_SAME_ACCESS = 0x00000002;
 
         public const int DEFAULT_BUFFER_SIZE = 4096;
+
+        public const int STARTF_USESTDHANDLES = 0x00000100;
     }
 }

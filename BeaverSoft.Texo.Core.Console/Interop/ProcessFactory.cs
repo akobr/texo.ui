@@ -31,6 +31,12 @@ namespace BeaverSoft.Texo.Core.Console.Interop
             }
 
             var startupInfo = new StartInfoExtended();
+
+            // make sure we are not passing standard input/output to new process (might be redirected to the debugger)
+            startupInfo.StartupInfo.dwFlags = Constants.STARTF_USESTDHANDLES;
+            startupInfo.StartupInfo.hStdInput = IntPtr.Zero;
+            startupInfo.StartupInfo.hStdOutput = IntPtr.Zero;
+
             startupInfo.StartupInfo.cb = Marshal.SizeOf<StartInfoExtended>();
             startupInfo.lpAttributeList = Marshal.AllocHGlobal(lpSize);
 
