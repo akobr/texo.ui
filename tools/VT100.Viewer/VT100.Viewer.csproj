@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -11,4 +11,10 @@
     <ProjectReference Include="..\..\BeaverSoft.Texo.Core.Console\BeaverSoft.Texo.Core.Console.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Properties\**" />
+    <Content Remove="Properties\**" />
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+  </ItemGroup>
 </Project>

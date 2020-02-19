@@ -98,6 +98,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaverSoft.Texo.Core.Consol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaverSoft.Texo.View.Terminal", "BeaverSoft.Texo.View.Terminal\BeaverSoft.Texo.View.Terminal.csproj", "{D97035CE-679A-446C-8F2E-219073502658}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VT100.Viewer.Native", "tools\VT100.Viewer\VT100.Viewer.Native.csproj", "{9EB3E9DA-5C8C-4AD7-A3BC-5440AACB8B70}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -256,6 +258,10 @@ Global
 		{D97035CE-679A-446C-8F2E-219073502658}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D97035CE-679A-446C-8F2E-219073502658}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D97035CE-679A-446C-8F2E-219073502658}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EB3E9DA-5C8C-4AD7-A3BC-5440AACB8B70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EB3E9DA-5C8C-4AD7-A3BC-5440AACB8B70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EB3E9DA-5C8C-4AD7-A3BC-5440AACB8B70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EB3E9DA-5C8C-4AD7-A3BC-5440AACB8B70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -295,6 +301,7 @@ Global
 		{1084174C-3B2D-403A-A25A-939B8E58FD69} = {033465D5-8DBB-4F82-B013-3FD6137E8569}
 		{35B9CF2D-EB89-42C4-9D41-23173AC8CE90} = {033465D5-8DBB-4F82-B013-3FD6137E8569}
 		{D97035CE-679A-446C-8F2E-219073502658} = {534F00C1-22A4-4090-9566-6C6A8468ACC1}
+		{9EB3E9DA-5C8C-4AD7-A3BC-5440AACB8B70} = {033465D5-8DBB-4F82-B013-3FD6137E8569}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDFCCFD5-8669-4BBF-83FF-8DFCC3F39551}
