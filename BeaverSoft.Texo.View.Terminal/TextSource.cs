@@ -96,7 +96,7 @@ namespace BeaverSoft.Texo.View.Terminal
         /// Default text style
         /// This style is using when no one other TextStyle is not defined in Char.style
         /// </summary>
-        public TextStyle DefaultStyle { get; set; }
+        public TextStyle DefaultStyle => TextStyles.DefaultStyle;
 
         public TextSource(FastColoredTextBox currentTB)
         {

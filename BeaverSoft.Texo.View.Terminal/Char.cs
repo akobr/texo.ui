@@ -11,9 +11,9 @@ namespace BeaverSoft.Texo.View.Terminal
         public char c;
 
         /// <summary>
-        /// Main style ID of the character
+        /// Text style ID of the character
         /// </summary>
-        public byte mainStyleId;
+        public byte textStyleId;
 
         /// <summary>
         /// Secondary styles bit mask
@@ -24,7 +24,7 @@ namespace BeaverSoft.Texo.View.Terminal
         public Char(char c)
         {
             this.c = c;
-            mainStyleId = TextStylesManager.DEFAULT_STYLE_ID;
+            textStyleId = TextStylesManager.DEFAULT_STYLE_ID;
             style = StyleIndex.None;
         }
     }

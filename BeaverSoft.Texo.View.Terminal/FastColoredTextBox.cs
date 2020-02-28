@@ -829,7 +829,7 @@ namespace BeaverSoft.Texo.View.Terminal
         /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public HotkeysMapping HotkeysMapping{ get; set;}
+        public HotkeysMapping HotkeysMapping{ get; set; }
 
         /// <summary>
         /// Default text style
@@ -840,7 +840,6 @@ namespace BeaverSoft.Texo.View.Terminal
         public TextStyle DefaultStyle
         {
             get { return lines.DefaultStyle; }
-            set { lines.DefaultStyle = value; }
         }
 
         /// <summary>
@@ -5392,21 +5391,26 @@ namespace BeaverSoft.Texo.View.Terminal
             {
                 //render by custom styles
                 StyleIndex currentStyleIndex = StyleIndex.None;
+                byte currentTextStyle = TextStylesManager.DEFAULT_STYLE_ID;
                 int iLastFlushedChar = firstChar - 1;
 
                 for (int iChar = firstChar; iChar <= lastChar; iChar++)
                 {
                     StyleIndex style = line[from + iChar].style;
-                    if (currentStyleIndex != style)
+                    byte textStyle = line[from + iChar].textStyleId;
+
+                    if (currentStyleIndex != style || currentTextStyle != textStyle)
                     {
-                        FlushRendering(gr, currentStyleIndex,
-                                       new Point(startX + (iLastFlushedChar + 1)*CharWidth, y),
+                        FlushRendering(gr, currentStyleIndex, currentTextStyle,
+                                       new Point(startX + (iLastFlushedChar + 1) * CharWidth, y),
                                        new Range(this, from + iLastFlushedChar + 1, iLine, from + iChar, iLine));
                         iLastFlushedChar = iChar - 1;
                         currentStyleIndex = style;
+                        currentTextStyle = textStyle;
                     }
                 }
-                FlushRendering(gr, currentStyleIndex, new Point(startX + (iLastFlushedChar + 1)*CharWidth, y),
+                FlushRendering(gr, currentStyleIndex, currentTextStyle,
+                               new Point(startX + (iLastFlushedChar + 1) * CharWidth, y),
                                new Range(this, from + iLastFlushedChar + 1, iLine, from + lastChar + 1, iLine));
             }
 
@@ -5425,7 +5429,7 @@ namespace BeaverSoft.Texo.View.Terminal
             }
         }
 
-        private void FlushRendering(Graphics gr, StyleIndex styleIndex, Point pos, Range range)
+        private void FlushRendering(Graphics gr, StyleIndex styleIndex, byte textStyleIndex, Point pos, Range range)
         {
             if (range.End > range.Start)
             {
@@ -5446,7 +5450,7 @@ namespace BeaverSoft.Texo.View.Terminal
                 }
                 //draw by default renderer
                 if (!hasTextStyle)
-                    DefaultStyle.Draw(gr, pos, range);
+                    lines.TextStyles[textStyleIndex].Draw(gr, pos, range);
             }
         }
 
