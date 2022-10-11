@@ -9,7 +9,7 @@
     <PackageReference Include="Microsoft.Build" Version="14.3.0" />
     <PackageReference Include="NuGet.PackageManagement" Version="4.8.0" />
     <PackageReference Include="NuGet.ProjectManagement" Version="4.2.0" />
-    <PackageReference Include="NuGet.Protocol" Version="4.8.0" />
+    <PackageReference Include="NuGet.Protocol" Version="4.9.6+a32bce39889f724fbd11cfd12e946f802168b583" />
     <PackageReference Include="NuGet.Protocol.Core.v2" Version="3.5.0" />
   </ItemGroup>
 
